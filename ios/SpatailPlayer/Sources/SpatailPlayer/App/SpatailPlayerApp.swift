@@ -1,11 +1,11 @@
 // SpatailPlayerApp.swift
-// @main entry. Single window. URL handler routes .spatail opens into the
-// PlayerView.
+// Optional Scene shell so a consuming app can do `WindowGroup { PlayerView() }`
+// or just embed `PlayerView()` directly. Not `@main` — the consuming app target
+// owns the process entry point.
 
 #if os(iOS) || os(visionOS)
 import SwiftUI
 
-@main
 public struct SpatailPlayerApp: App {
     public init() {}
 

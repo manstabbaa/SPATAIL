@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.10
 // Package.swift — Swift Package manifest for SpatailPlayer.
 //
 // The iOS app target is created in Xcode; this Package wraps the Sources/
@@ -10,7 +10,7 @@ import PackageDescription
 let package = Package(
     name: "SpatailPlayer",
     platforms: [
-        .iOS(.v17),
+        .iOS("18.0"),     // SceneController uses Entity(contentsOf:) which is iOS 18+
         .macOS(.v14),     // for host-side codable/protocol tests
     ],
     products: [

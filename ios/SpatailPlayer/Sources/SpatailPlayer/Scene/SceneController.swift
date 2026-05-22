@@ -6,7 +6,7 @@
 //   - experience.delta(patch) → applies a diff to the in-memory contract
 //     and re-resolves placements (geometry untouched).
 
-#if canImport(RealityKit)
+#if os(iOS) || os(visionOS)
 import Foundation
 import RealityKit
 

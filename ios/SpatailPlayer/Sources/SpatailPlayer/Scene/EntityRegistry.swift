@@ -2,7 +2,7 @@
 // Maps between USD prim paths, RealityKit entities, and contract element IDs.
 // Single source of truth for tap → element resolution.
 
-#if canImport(RealityKit)
+#if os(iOS) || os(visionOS)
 import RealityKit
 
 public final class EntityRegistry {

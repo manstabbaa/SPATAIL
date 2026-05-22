@@ -133,8 +133,7 @@ public actor SessionClient {
     // MARK: - Wire receive
 
     private func receiveLoop() async {
-        while !Task.isCancelled, let task else { break }
-        guard let task else { return }
+        guard !Task.isCancelled, let task else { return }
         do {
             let msg = try await task.receive()
             await handle(msg)

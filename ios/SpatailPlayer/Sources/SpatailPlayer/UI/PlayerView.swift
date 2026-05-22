@@ -1,7 +1,7 @@
 // PlayerView.swift
 // Top-level ARView wrapper. Hosts the SceneController and routes user input.
 
-#if canImport(SwiftUI) && canImport(RealityKit) && canImport(ARKit)
+#if os(iOS) || os(visionOS)
 import SwiftUI
 import RealityKit
 import ARKit

@@ -2,7 +2,7 @@
 // @main entry. Single window. URL handler routes .spatail opens into the
 // PlayerView.
 
-#if canImport(SwiftUI)
+#if os(iOS) || os(visionOS)
 import SwiftUI
 
 @main

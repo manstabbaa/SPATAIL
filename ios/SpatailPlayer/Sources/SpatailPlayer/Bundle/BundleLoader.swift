@@ -6,6 +6,7 @@
 // Spec: docs/xr/IOS_BUNDLE_SPEC.md
 
 import Foundation
+import ZIPFoundation
 
 public struct LoadedBundle: Sendable {
     public let folder: URL
@@ -78,17 +79,11 @@ public enum BundleLoader {
         }
         try fm.createDirectory(at: dest, withIntermediateDirectories: true)
 
-        // Foundation has no first-party unzip pre-iOS 18. For v1 use
-        // `Process` only on macOS-host tests; on-device, use the system
-        // `NSFileCoordinator` quicklook adaptor or add ZIPFoundation later.
-        //
-        // To keep this file dependency-free, we ship a TODO and fail
-        // explicitly; the caller will substitute ZIPFoundation. Once you
-        // add the dependency, replace this body with:
-        //
-        //     try Zip.unzipFile(sourceURL, destination: dest,
-        //                       overwrite: true, password: nil)
-        throw BundleLoaderError.unzipFailed(
-            "ZIPFoundation not yet wired — see TODO in BundleLoader.swift")
+        do {
+            try fm.unzipItem(at: sourceURL, to: dest)
+        } catch {
+            throw BundleLoaderError.unzipFailed(error.localizedDescription)
+        }
+        return dest
     }
 }

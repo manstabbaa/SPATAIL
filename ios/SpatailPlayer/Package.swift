@@ -16,9 +16,15 @@ let package = Package(
     products: [
         .library(name: "SpatailPlayer", targets: ["SpatailPlayer"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/weichsel/ZIPFoundation", from: "0.9.19"),
+    ],
     targets: [
         .target(
             name: "SpatailPlayer",
+            dependencies: [
+                .product(name: "ZIPFoundation", package: "ZIPFoundation"),
+            ],
             path: "Sources/SpatailPlayer"),
         .testTarget(
             name: "SpatailPlayerTests",

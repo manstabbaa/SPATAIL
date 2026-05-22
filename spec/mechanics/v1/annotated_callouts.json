@@ -1,0 +1,16 @@
+{
+  "kind": "annotated_callouts",
+  "status": "shipped",
+  "version": 1,
+  "description": "Pinned labels with leader lines from a target's features. Pre-existing renderer (anchored_callout representationMode).",
+  "expectedSourceShape": {
+    "target": "elementId the callouts belong to",
+    "items":  "[{ id, label, finding, spotlightOnHero?: [x,y,z] }]"
+  },
+  "params": {
+    "labelMaxChars": { "type": "integer", "default": 64 },
+    "leaderStyle":   { "type": "enum", "values": ["solid","dashed"], "default": "dashed" }
+  },
+  "output": "One spatialElement per item with representationMode `anchored_callout` and an `attached_to` relationship to the target.",
+  "qualityBar": { "reference": "Mercedes F1 wheel — 7 regional callouts + 13 button-level callouts using spotlightOnHero." }
+}

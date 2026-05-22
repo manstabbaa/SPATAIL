@@ -1,0 +1,68 @@
+{
+  "id": "q3-manufacturing-review",
+  "title": "Q3 Manufacturing Cost Review",
+  "prompt": "Explain why Q3 manufacturing costs increased and what we should do next.",
+  "domain": "corporate_review",
+  "environment": {
+    "kind": "boardroom",
+    "anchorObject": "table"
+  },
+  "sources": [
+    {
+      "kind": "numeric_summary",
+      "title": "Q3 KPI summary",
+      "kpis": [
+        { "label": "Manufacturing cost / unit",   "value": "$184",   "delta": "+12.4% QoQ", "trend": "up" },
+        { "label": "Raw material cost",           "value": "$72/unit", "delta": "+8.1% QoQ",  "trend": "up" },
+        { "label": "Labor cost",                  "value": "$48/unit", "delta": "+4.2% QoQ",  "trend": "up" },
+        { "label": "Energy cost",                 "value": "$23/unit", "delta": "+34% QoQ",   "trend": "up" },
+        { "label": "Defect rate",                 "value": "2.1%",     "delta": "+0.6 pp",    "trend": "up" },
+        { "label": "On-time delivery",            "value": "91%",      "delta": "-3 pp",      "trend": "down" }
+      ]
+    },
+
+    {
+      "kind": "summary",
+      "title": "Cost breakdown — what drove the increase",
+      "body": "Three drivers account for ~90% of the QoQ cost increase: (1) aluminum spot price up 18% in August, (2) unplanned downtime on Line 3 in week 11 (heat exchanger failure), and (3) higher overtime hours to recover the Line 3 backlog. Energy cost rose with a summer peak-pricing tier; this is partially reversible in Q4."
+    },
+
+    {
+      "kind": "object3d",
+      "id": "factory_floor_model",
+      "name": "Factory floor process model",
+      "role": "process",
+      "assetGroupRef": "factory-floor",
+      "components": [
+        { "id": "line_1", "name": "Line 1 — Stamping" },
+        { "id": "line_2", "name": "Line 2 — Welding" },
+        { "id": "line_3", "name": "Line 3 — Assembly (failed in wk 11)" },
+        { "id": "line_4", "name": "Line 4 — Paint" },
+        { "id": "qc_bay", "name": "QC Bay" }
+      ]
+    },
+
+    {
+      "kind": "timeline",
+      "title": "Q3 events that moved the number",
+      "events": [
+        { "when": "Jul wk 2",  "label": "Aluminum spot +18%",        "detail": "Hedge contract expired" },
+        { "when": "Aug wk 5",  "label": "Summer peak energy tier",   "detail": "Utility tariff stepped up" },
+        { "when": "Sep wk 11", "label": "Line 3 heat exchanger failure", "detail": "4-day unplanned downtime" },
+        { "when": "Sep wk 12", "label": "Overtime authorized",        "detail": "Recover Line 3 backlog" },
+        { "when": "Sep wk 13", "label": "Defect spike on Line 4",     "detail": "Likely paint humidity correlated" }
+      ]
+    },
+
+    {
+      "kind": "decisions",
+      "title": "Recommended next actions",
+      "options": [
+        { "id": "rehedge",      "label": "Re-hedge aluminum for Q4–Q1", "detail": "Lock spot now to cap material cost." },
+        { "id": "line3_pm",     "label": "Preventive maintenance on Line 3 sister units", "detail": "Heat exchanger inspection across Lines 2 and 5." },
+        { "id": "energy_audit", "label": "Energy audit before next summer", "detail": "Shift peak-tier load to off-peak shifts." },
+        { "id": "paint_humidity", "label": "Add humidity control on Line 4 paint booth", "detail": "Address Sep defect spike root cause." }
+      ]
+    }
+  ]
+}

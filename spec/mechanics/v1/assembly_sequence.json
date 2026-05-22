@@ -1,0 +1,16 @@
+{
+  "kind": "assembly_sequence",
+  "status": "placeholder",
+  "placeholderFor": "exploded_view",
+  "version": 1,
+  "description": "Step-by-step `add part N` build. Reverse-mode of disassembly_sequence. Routes to exploded_view's reverse beat until the dedicated renderer lands.",
+  "expectedSourceShape": {
+    "target": "elementId of the destination assembly",
+    "steps":  "[{ id, partRef, instruction, durationSec? }]"
+  },
+  "params": {
+    "previewNextPartAsGhost": { "type": "boolean", "default": true },
+    "stagger":                 { "type": "number",  "default": 0.4, "units": "seconds" }
+  },
+  "qualityBar": { "reference": "Steering wheel reassembly — 7 beats, each fades the next part in as a ghost, then commits with a small click." }
+}

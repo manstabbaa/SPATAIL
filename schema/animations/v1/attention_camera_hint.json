@@ -1,0 +1,29 @@
+{
+  "primitive": "attention_camera_hint",
+  "version": 1,
+  "description": "Suggests where the viewer's camera (web orbit camera, AR ghost-camera, or visionOS attention reticle) should look during this beat. Not a transform on any element — a hint the renderer consumes.",
+  "appliesTo": ["any"],
+  "params": {
+    "lookAt": {
+      "type": "vec3-or-elementId",
+      "desc": "Either a literal [x,y,z] target, or the id of an element whose world position should be used."
+    },
+    "distance": {
+      "type": "number",
+      "default": 1.6,
+      "units": "metres",
+      "desc": "How far back from the lookAt to position the camera."
+    },
+    "elevation": {
+      "type": "number",
+      "default": 0.5,
+      "desc": "Y offset added to the lookAt for the camera position."
+    }
+  },
+  "duration": { "default": 0.8, "units": "seconds" },
+  "easing":   { "default": "ease-in-out-cubic" },
+  "notes": [
+    "On the web viewer this becomes a smooth OrbitControls target/position tween.",
+    "On visionOS it should be a reticle / glow on the target rather than a forced camera move."
+  ]
+}

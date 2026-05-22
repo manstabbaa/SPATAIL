@@ -1,0 +1,237 @@
+{
+  "id": "mercedes-f1-wheel",
+  "title": "Mercedes F1 Wheel — Walkthrough",
+  "prompt": "Walk me through this Mercedes-AMG F1 steering wheel.",
+  "domain": "motorsport_engineering",
+  "default": true,
+  "environment": {
+    "kind": "workbench",
+    "anchorObject": "steering_wheel"
+  },
+  "sources": [
+    {
+      "kind": "fact",
+      "group": "wheel_identity",
+      "bucketTitle": "Wheel Identity",
+      "placementHint": "left_of_user",
+      "key": "Team",
+      "value": "Mercedes-AMG Petronas F1"
+    },
+    { "kind": "fact", "group": "wheel_identity", "placementHint": "left_of_user",
+      "key": "Era", "value": "Hybrid V6 turbo, 2014-2025 generation" },
+    { "kind": "fact", "group": "wheel_identity", "placementHint": "left_of_user",
+      "key": "Material", "value": "Carbon-fibre chassis, suede grips, magnesium quick-release" },
+    { "kind": "fact", "group": "wheel_identity", "placementHint": "left_of_user",
+      "key": "Mass", "value": "~1.3 kg (FIA-regulated)" },
+
+    {
+      "kind": "summary",
+      "title": "Why this wheel is its own computer",
+      "placementHint": "left_of_user",
+      "body": "An F1 wheel is the driver's primary interface to a ~$15M race car. It carries the dash display, every in-race adjustment (brake bias, differential, fuel mix, ERS deployment, torque maps, DRS, pit limiter), the radio, and the clutch + shift mechanics. The driver makes 50-100 mid-lap inputs without taking their hands off the grips."
+    },
+
+    {
+      "kind": "list",
+      "title": "Race-day adjustments",
+      "placementHint": "right_of_user",
+      "items": [
+        "Brake bias — rotary, shifts F/R brake pressure split",
+        "Differential — rotary, locks/opens the diff for corner entry / mid / exit",
+        "Fuel mix — multifunction switch, lean ↔ rich",
+        "Torque map — multifunction, engine character per stint",
+        "Strat mode — multifunction, race-vs-quali-vs-safety-car mapping",
+        "ERS deployment — paddle / button, harvests + deploys battery",
+        "DRS — button or paddle, opens rear wing on straights",
+        "Pit limiter — button, caps speed in pit lane",
+        "Drink — button, releases water from helmet bladder",
+        "Radio — button, talks to the pit wall"
+      ]
+    },
+
+    {
+      "kind": "list",
+      "title": "What this CAD does NOT model",
+      "placementHint": "right_of_user",
+      "items": [
+        "Individual button surfaces (the real wheel has ~25 buttons; here they are decals on a flat plastic face)",
+        "LED rev strip across the top",
+        "LCD dash display backlight",
+        "Suede / Alcantara grip texture",
+        "Quick-release internal mechanism",
+        "Paddle-shift internal linkages",
+        "Carbon-fibre weave detail (treated as plain matte black plastic for v0.1 visualisation)"
+      ]
+    },
+
+    {
+      "kind": "object3d",
+      "id": "steering_wheel",
+      "name": "Mercedes F1 Steering Wheel",
+      "role": "target",
+      "assetGroupRef": "car-engine",
+      "placementHint": "table",
+      "finding": "The centrepiece. Sits on the workbench so the driver-controls layout is readable from the user's seat. Bright translucent shader is the spatial-language signal that this is the subject of every other element in the scene."
+    },
+
+    {
+      "kind": "object3d",
+      "id": "mark_left_grip",
+      "name": "Left Grip Handle",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "finding": "Suede-wrapped handle the driver's left hand never leaves. Behind it: the left paddle (downshift) and the left clutch paddle (bite-point control on race starts)."
+    },
+    {
+      "kind": "object3d",
+      "id": "mark_right_grip",
+      "name": "Right Grip Handle",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "finding": "Right-hand grip. Behind it: the right paddle (upshift) and the right clutch paddle. On many seasons the DRS button also lives on the back of this grip."
+    },
+    {
+      "kind": "object3d",
+      "id": "mark_center_console",
+      "name": "Center Console / Display Bay",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "finding": "Houses the LCD dash readout (gear, speed, lap delta, tyre temps, fuel, ERS state). Surrounded by the most frequently-used buttons: radio, OK / confirm, drink, BB+ / BB-."
+    },
+    {
+      "kind": "object3d",
+      "id": "mark_top_left_bay",
+      "name": "Top-Left Control Bay",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "finding": "On most Mercedes wheels this carries the brake-bias rotary and the clutch-bite rotary. Brake bias is adjusted into and out of slow corners; bite-point is set on the formation lap."
+    },
+    {
+      "kind": "object3d",
+      "id": "mark_top_right_bay",
+      "name": "Top-Right Control Bay",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "finding": "Differential rotary + strategy multifunction. Diff entry / mid / exit settings get touched on every lap. Strategy mode swaps the whole map set: race / qualifying / safety car / cool-down."
+    },
+    {
+      "kind": "object3d",
+      "id": "mark_quick_release",
+      "name": "Mercedes Star — Quick-Release Nut",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "finding": "The team logo is the visible face of the quick-release collar. Pull, the wheel comes off in ~1 second — required by FIA regulation so a driver can egress in <5 seconds."
+    },
+    {
+      "kind": "object3d",
+      "id": "mark_lower_rim",
+      "name": "Lower Rim Bar",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "finding": "The structural cross-piece that joins the left and right grip handles into one composite chassis. Typically holds the pit-limiter button + the burnout / start-mode trigger in a centre position."
+    },
+
+    {
+      "kind": "object3d",
+      "id": "btn_drs",
+      "name": "DRS Button",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "mechanismKind": "button",
+      "spotlightOnHero": [0.052, 0.005, 0.018],
+      "finding": "Drag Reduction System. A single press opens the rear-wing upper flap, stalling the wing and shedding ~15% of drag for ~9 m/s top-end on a long straight. Hold-to-arm on some wheels; close happens automatically on brake or lift."
+    },
+    {
+      "kind": "object3d",
+      "id": "btn_pc",
+      "name": "PC Button (Pit Confirm)",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "mechanismKind": "button",
+      "spotlightOnHero": [0.018, 0.038, 0.020],
+      "finding": "Pit confirm. Latches the pit-lane strategy preset the engineer just radio'd in (tyre compound, fuel plan, front-wing setting), so the driver enters the pit window with the right map already loaded."
+    },
+    {
+      "kind": "object3d",
+      "id": "btn_pl",
+      "name": "PL Button (Pit Limiter)",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "mechanismKind": "button",
+      "spotlightOnHero": [-0.012, 0.038, 0.020],
+      "finding": "Pit limiter. Caps the car's throttle so it can't exceed the regulated pit-lane speed (80 km/h race / 60 km/h practice). Latches on at the entry line; the driver flicks it off at the exit."
+    },
+    {
+      "kind": "object3d",
+      "id": "btn_plus_one",
+      "name": "+1 Button",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "mechanismKind": "button",
+      "spotlightOnHero": [0.030, 0.038, 0.020],
+      "finding": "Generic +1 increment. Bumps whichever rotary is currently selected on the dash by one position without rotating the dial — used when the driver can't take a hand off the grip to twist."
+    },
+    {
+      "kind": "object3d",
+      "id": "rot_bbw",
+      "name": "BB+ / BB- (Brake Bias) Rotary",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "mechanismKind": "rotary",
+      "spotlightOnHero": [-0.038, -0.005, 0.018],
+      "finding": "Brake bias adjustment. Each click shifts the front/rear hydraulic pressure split by ~0.5%. Drivers wind bias rearward into slow corners (rotation), forward into fast corners (stability)."
+    },
+    {
+      "kind": "object3d",
+      "id": "rot_diff",
+      "name": "Differential Rotary (DIFF)",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "mechanismKind": "rotary",
+      "spotlightOnHero": [0.040, -0.005, 0.018],
+      "finding": "Differential lock setting. Three sub-rotaries (ENTRY, MID, EXIT) control how locked the diff is at each corner phase. Looser entry = more rotation. Tighter exit = traction off the corner."
+    },
+    {
+      "kind": "object3d",
+      "id": "rot_strat",
+      "name": "Strategy Rotary (STRAT)",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "mechanismKind": "rotary",
+      "spotlightOnHero": [0.062, -0.028, 0.018],
+      "finding": "Whole-car mode swap. Each position is a pre-baked map for race / quali / safety-car / VSC / formation-lap / cool-down. Changes torque map, ERS deploy, fuel mix, brake-by-wire, all in one click."
+    },
+    {
+      "kind": "object3d",
+      "id": "btn_rs",
+      "name": "RS Button (Radio / Talk)",
+      "role": "callout",
+      "targetRef": "steering_wheel",
+      "mechanismKind": "button",
+      "spotlightOnHero": [-0.060, -0.030, 0.018],
+      "finding": "Press-to-talk radio. Opens the link to the pit wall; release closes it. Engineers radio anytime, but the driver only transmits while pressing this."
+    },
+
+    {
+      "kind": "diagnostic",
+      "title": "Rotaries change car behaviour mid-corner",
+      "targetRef": "steering_wheel",
+      "finding": "Every rotary affects the chassis dynamic. A mis-clicked differential setting on corner entry can rotate the car off line. Drivers train these positions by feel — that is why the labels are recessed into the chassis, not raised: the finger reads the click, not the eyes."
+    },
+
+    {
+      "kind": "decisions",
+      "title": "Explore by region",
+      "options": [
+        { "id": "focus_grips",       "label": "Focus on grips + paddles",
+          "detail": "Walk the user through the left/right handles and the paddles immediately behind them." },
+        { "id": "focus_top_bays",    "label": "Focus on top control bays",
+          "detail": "Brake bias, differential, strategy, clutch bite — the rotary cluster region." },
+        { "id": "focus_display",     "label": "Focus on the dash",
+          "detail": "What the LCD shows during a lap; the buttons around it that the driver hits without looking." },
+        { "id": "focus_quick_release","label": "Focus on the quick-release",
+          "detail": "Explain the 1-second wheel removal and FIA egress timing rule." }
+      ]
+    }
+  ]
+}

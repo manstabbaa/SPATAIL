@@ -1,0 +1,16 @@
+{
+  "kind": "highlighted_region",
+  "status": "shipped",
+  "version": 1,
+  "description": "Local emissive + outline on a specified zone of a target. Pre-existing renderer (highlighted_target representationMode).",
+  "expectedSourceShape": {
+    "target": "elementId being highlighted",
+    "zone":   "optional sub-region within the target (used by spotlightOnHero)"
+  },
+  "params": {
+    "color":     { "type": "string", "default": "#6ea8ff" },
+    "intensity": { "type": "number", "default": 1.0 }
+  },
+  "output": "Augments the target element with a `highlight_pulse` animation + a halo material override.",
+  "qualityBar": { "reference": "Mustang air filter housing — translucent blue + outer halo + pulse on focus." }
+}

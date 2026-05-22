@@ -1,0 +1,1654 @@
+{
+  "schemaVersion": "0.5.0-spatail",
+  "createdAt": "2026-05-20T18:48:33.966Z",
+  "experienceId": "wheel-reassembly",
+  "title": "Reassembling the Mercedes F1 Wheel",
+  "sourcePrompt": "Walk me through reassembling this steering wheel.",
+  "sourceInputs": [
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Mercedes F1 Steering Wheel"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Hub"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Lower rim bar"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Left grip"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Right grip"
+    }
+  ],
+  "sourceFiles": [],
+  "detectedDomain": {
+    "name": "assembly_guide",
+    "confidence": "high",
+    "source": "card.domain"
+  },
+  "environmentAssumptions": {
+    "kind": "workbench",
+    "source": "card.environment"
+  },
+  "spatialElements": [
+    {
+      "id": "elem_steering_wheel_0",
+      "title": "Mercedes F1 Steering Wheel",
+      "contentType": "physical_target",
+      "representationMode": "highlighted_target",
+      "placement": {
+        "kind": "table",
+        "anchor": "table_center",
+        "position": [
+          0,
+          0.8,
+          0
+        ],
+        "sizeMeters": [
+          0.6,
+          0.3,
+          0.6
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 90,
+      "sourceContent": {
+        "name": "Mercedes F1 Steering Wheel",
+        "role": "target",
+        "assetGroupRef": "car-engine",
+        "components": [],
+        "targetRef": null,
+        "finding": "Hero. Sits on the workbench so the assembly sequence reads cleanly from above.",
+        "placementHint": "table",
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [
+        {
+          "id": "car-engine",
+          "preferredSource": "cad_folder",
+          "hint": "car-engine",
+          "fallback": "placeholder_box",
+          "resolvedAssetGroup": {
+            "groupKey": "car-engine",
+            "items": [
+              {
+                "fileName": "Steering Wheel.obj",
+                "relativePath": "car-engine\\Steering Wheel.obj",
+                "extension": ".obj",
+                "role": "primary_object"
+              }
+            ]
+          },
+          "processedAssetPath": "/assets_processed/animations/wheel/wheel.glb",
+          "importer": "spatail_animation_export",
+          "_replacedByAuthoredBundle": "wheel"
+        }
+      ],
+      "fallbackGeometry": "box",
+      "interactions": [
+        {
+          "id": "highlight_current_part",
+          "type": "highlight",
+          "behavior": "tint the target with the bright blue shader"
+        },
+        {
+          "id": "isolate_target_part",
+          "type": "isolate",
+          "behavior": "hide every other element so only the target remains"
+        },
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show a fuller label panel for this target"
+        }
+      ],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": "anim.pulse.elem_steering_wheel_0",
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "The user is acting on a real / simulated object — emphasize it in place with a bright shader so the serviced part is unmistakable, rather than describing it in text.",
+      "whyThisPlacement": "Hero object sits on a clean workbench — no host vehicle to anchor to, so the user can walk around the whole part for inspection. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_co_hub_1",
+      "title": "Hub",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_0",
+        "position": [
+          0.35,
+          0.98,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Hub",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Splines onto the column. The wheel's reference frame starts here.",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_co_hub_1",
+      "respondsTo": [
+        "tap.elem_co_hub_1"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_co_lower_rim_2",
+      "title": "Lower rim bar",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_0",
+        "position": [
+          0.35,
+          1.16,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Lower rim bar",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Cross-piece tying the two grips into one composite chassis.",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_co_lower_rim_2",
+      "respondsTo": [
+        "tap.elem_co_lower_rim_2"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_co_left_grip_3",
+      "title": "Left grip",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_0",
+        "position": [
+          0.35,
+          1.3399999999999999,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Left grip",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Suede-wrapped handle the driver's left hand never leaves.",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_co_left_grip_3",
+      "respondsTo": [
+        "tap.elem_co_left_grip_3"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_co_right_grip_4",
+      "title": "Right grip",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_0",
+        "position": [
+          0.35,
+          1.52,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Right grip",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Right-hand grip; DRS button often lives on the back of this one.",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_co_right_grip_4",
+      "respondsTo": [
+        "tap.elem_co_right_grip_4"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    }
+  ],
+  "relationships": [
+    {
+      "from": "elem_co_hub_1",
+      "to": "elem_steering_wheel_0",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_co_lower_rim_2",
+      "to": "elem_steering_wheel_0",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_co_left_grip_3",
+      "to": "elem_steering_wheel_0",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_co_right_grip_4",
+      "to": "elem_steering_wheel_0",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    }
+  ],
+  "interactionPlan": {
+    "interactions": [
+      {
+        "id": "elem_steering_wheel_0::highlight_current_part",
+        "elementId": "elem_steering_wheel_0",
+        "type": "highlight",
+        "behavior": "tint the target with the bright blue shader",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_steering_wheel_0::isolate_target_part",
+        "elementId": "elem_steering_wheel_0",
+        "type": "isolate",
+        "behavior": "hide every other element so only the target remains",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_steering_wheel_0::tap_part_to_show_label",
+        "elementId": "elem_steering_wheel_0",
+        "type": "expand",
+        "behavior": "show a fuller label panel for this target",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_co_hub_1::tap_part_to_show_label",
+        "elementId": "elem_co_hub_1",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_co_lower_rim_2::tap_part_to_show_label",
+        "elementId": "elem_co_lower_rim_2",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_co_left_grip_3::tap_part_to_show_label",
+        "elementId": "elem_co_left_grip_3",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_co_right_grip_4::tap_part_to_show_label",
+        "elementId": "elem_co_right_grip_4",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::reset_view",
+        "elementId": null,
+        "type": "reset_view",
+        "behavior": "restore camera and every element's original state",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::next_step",
+        "elementId": null,
+        "type": "next_step",
+        "behavior": "advance the attention plan by one step",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::previous_step",
+        "elementId": null,
+        "type": "previous_step",
+        "behavior": "step the attention plan back by one",
+        "trigger": "ui"
+      }
+    ]
+  },
+  "attentionPlan": [
+    {
+      "step": 1,
+      "focusElementId": "elem_steering_wheel_0",
+      "narration": "Focus on Mercedes F1 Steering Wheel."
+    },
+    {
+      "step": 2,
+      "focusElementId": "elem_co_hub_1",
+      "narration": "Marker: Hub."
+    },
+    {
+      "step": 3,
+      "focusElementId": "elem_co_lower_rim_2",
+      "narration": "Marker: Lower rim bar."
+    },
+    {
+      "step": 4,
+      "focusElementId": "elem_co_left_grip_3",
+      "narration": "Marker: Left grip."
+    },
+    {
+      "step": 5,
+      "focusElementId": "elem_co_right_grip_4",
+      "narration": "Marker: Right grip."
+    }
+  ],
+  "assetRequirements": [
+    {
+      "id": "car-engine",
+      "preferredSource": "cad_folder",
+      "hint": "car-engine",
+      "fallback": "placeholder_box",
+      "resolvedAssetGroup": {
+        "groupKey": "car-engine",
+        "items": [
+          {
+            "fileName": "Steering Wheel.obj",
+            "relativePath": "car-engine\\Steering Wheel.obj",
+            "extension": ".obj",
+            "role": "primary_object"
+          }
+        ]
+      },
+      "processedAssetPath": "/assets_processed/spatail__car_engine__Steering_Wheel_obj.glb",
+      "importer": "presegmented"
+    },
+    {
+      "id": "f1-car",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "futuristic-egg-shaped-gaming-pod-chair-concept-interior-design-cad-model-1.snapshot.2",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "lego-minifig-3.snapshot.9",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "r-c-8-automodell-1.snapshot.3",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "yamaha-tdm-850-1.snapshot.3",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    }
+  ],
+  "animations": [
+    {
+      "id": "anim.pulse.elem_steering_wheel_0",
+      "primitive": "highlight_pulse",
+      "target": "elem_steering_wheel_0",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.4,
+        "pulses": 1
+      }
+    },
+    {
+      "id": "anim.explode.elem_steering_wheel_0",
+      "primitive": "explode",
+      "target": "elem_steering_wheel_0",
+      "duration": 1.6,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.18,
+        "axis": "y",
+        "stagger": 0.06
+      }
+    },
+    {
+      "id": "anim.assemble.elem_steering_wheel_0",
+      "primitive": "assemble",
+      "target": "elem_steering_wheel_0",
+      "duration": 1.4,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.04
+      }
+    },
+    {
+      "id": "anim.pulse.elem_co_hub_1",
+      "primitive": "highlight_pulse",
+      "target": "elem_co_hub_1",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_co_hub_1",
+      "primitive": "explode",
+      "target": "elem_co_hub_1",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_co_hub_1",
+      "primitive": "assemble",
+      "target": "elem_co_hub_1",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_co_lower_rim_2",
+      "primitive": "highlight_pulse",
+      "target": "elem_co_lower_rim_2",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_co_lower_rim_2",
+      "primitive": "explode",
+      "target": "elem_co_lower_rim_2",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_co_lower_rim_2",
+      "primitive": "assemble",
+      "target": "elem_co_lower_rim_2",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_co_left_grip_3",
+      "primitive": "highlight_pulse",
+      "target": "elem_co_left_grip_3",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_co_left_grip_3",
+      "primitive": "explode",
+      "target": "elem_co_left_grip_3",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_co_left_grip_3",
+      "primitive": "assemble",
+      "target": "elem_co_left_grip_3",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_co_right_grip_4",
+      "primitive": "highlight_pulse",
+      "target": "elem_co_right_grip_4",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_co_right_grip_4",
+      "primitive": "explode",
+      "target": "elem_co_right_grip_4",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_co_right_grip_4",
+      "primitive": "assemble",
+      "target": "elem_co_right_grip_4",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_02_explode_radial",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 2.5,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.02.explode_radial",
+        "actionName": "act_seq.steering_walkthrough.02.explode_radial_rig_slot.06",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.02.explode_radial",
+        "frameStart": 86,
+        "frameEnd": 146
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 2.5,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.03.assemble_finale",
+        "actionName": "act_seq.steering_walkthrough.03.assemble_finale_rig_slot.06",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.03.assemble_finale",
+        "frameStart": 151,
+        "frameEnd": 211
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_00_intro_fade_in",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 1.25,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.00.intro_fade_in",
+        "actionName": "act_intro",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.00.intro_fade_in",
+        "frameStart": 1,
+        "frameEnd": 31
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_01_look_at_whole_wheel",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 1.875,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.01.look_at_whole_wheel",
+        "actionName": "act_look",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.01.look_at_whole_wheel",
+        "frameStart": 36,
+        "frameEnd": 81
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_02_explode_radial__master",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 2.5,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.02.explode_radial__master",
+        "actionName": "act_explode_master",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.02.explode_radial__master",
+        "frameStart": 86,
+        "frameEnd": 146
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_03_assemble_finale__master",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 2.5,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.03.assemble_finale__master",
+        "actionName": "act_assemble_master",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.03.assemble_finale__master",
+        "frameStart": 151,
+        "frameEnd": 211
+      }
+    },
+    {
+      "id": "anim.loop.default_idle_rotation",
+      "primitive": "loop",
+      "target": "elem_steering_wheel_4",
+      "duration": 14.9583,
+      "easing": "linear",
+      "params": {
+        "wraps": "gltf_track",
+        "trackName": "act_idle_rotation",
+        "fps": 24
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "id": "tap.next",
+      "trigger": {
+        "type": "scene_event",
+        "target": "transport_next"
+      },
+      "actions": [
+        {
+          "type": "advance_step"
+        }
+      ],
+      "note": "Fired by the transport bar Next button (and tap on the scene background)."
+    },
+    {
+      "id": "tap.previous",
+      "trigger": {
+        "type": "scene_event",
+        "target": "transport_previous"
+      },
+      "actions": [
+        {
+          "type": "previous_step"
+        }
+      ],
+      "note": "Fired by the transport bar Previous button."
+    },
+    {
+      "id": "tap.elem_co_hub_1",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_co_hub_1"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_co_hub_1"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_co_hub_1"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_co_lower_rim_2",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_co_lower_rim_2"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_co_lower_rim_2"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_co_lower_rim_2"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_co_left_grip_3",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_co_left_grip_3"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_co_left_grip_3"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_co_left_grip_3"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_co_right_grip_4",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_co_right_grip_4"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_co_right_grip_4"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_co_right_grip_4"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.rim",
+      "trigger": {
+        "type": "tap",
+        "target": null
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.interaction.interaction_tap_rim"
+        }
+      ],
+      "_authoring": {
+        "object": "wheel_assembly",
+        "strip": "interaction.tap.rim",
+        "frameStart": 1,
+        "frameEnd": 16
+      },
+      "_authoredFrom": "wheel"
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq.wheel-reassembly.walkthrough",
+      "title": "Default walkthrough",
+      "generatedFromAttentionPlan": true,
+      "steps": [
+        {
+          "atSecond": 0,
+          "label": "Settle into the room.",
+          "wait": 0.5
+        },
+        {
+          "afterPrevious": true,
+          "label": "Look at the hero.",
+          "play": "anim.pulse.elem_steering_wheel_0"
+        },
+        {
+          "afterPrevious": true,
+          "label": "Take the assembly apart.",
+          "play": "anim.explode.elem_steering_wheel_0"
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Hub.",
+          "play": [
+            "anim.pulse.elem_co_hub_1",
+            "anim.explode.elem_co_hub_1"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Lower rim bar.",
+          "play": [
+            "anim.pulse.elem_co_lower_rim_2",
+            "anim.explode.elem_co_lower_rim_2"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Left grip.",
+          "play": [
+            "anim.pulse.elem_co_left_grip_3",
+            "anim.explode.elem_co_left_grip_3"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Right grip.",
+          "play": [
+            "anim.pulse.elem_co_right_grip_4",
+            "anim.explode.elem_co_right_grip_4"
+          ]
+        },
+        {
+          "afterPrevious": true,
+          "label": "Put it back together.",
+          "play": "anim.assemble.elem_steering_wheel_0"
+        },
+        {
+          "afterPrevious": true,
+          "label": "Done — restart to walk through again.",
+          "wait": 0.6
+        }
+      ]
+    },
+    {
+      "id": "seq.steering_walkthrough",
+      "title": "steering walkthrough",
+      "fromBlend": true,
+      "steps": [
+        {
+          "order": 0,
+          "label": "intro fade in",
+          "duration": 1.25,
+          "frameStart": 1,
+          "frameEnd": 31,
+          "play": [
+            "anim.transform.seq_steering_walkthrough_00_intro_fade_in"
+          ],
+          "afterPrevious": true
+        },
+        {
+          "order": 1,
+          "label": "look at whole wheel",
+          "duration": 1.875,
+          "frameStart": 36,
+          "frameEnd": 81,
+          "play": [
+            "anim.transform.seq_steering_walkthrough_01_look_at_whole_wheel"
+          ],
+          "afterPrevious": true
+        },
+        {
+          "order": 2,
+          "label": "explode radial",
+          "duration": 2.5,
+          "frameStart": 86,
+          "frameEnd": 146,
+          "play": [
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial"
+          ],
+          "afterPrevious": true
+        },
+        {
+          "order": 3,
+          "label": "assemble finale",
+          "duration": 2.5,
+          "frameStart": 151,
+          "frameEnd": 211,
+          "play": [
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale"
+          ],
+          "afterPrevious": true
+        }
+      ]
+    }
+  ],
+  "defaultSequenceId": "seq.steering_walkthrough",
+  "roomContract": {
+    "schemaVersion": "0.4.0-room",
+    "roomId": "mock-default-room",
+    "capturedAt": "2026-05-18T00:00:00Z",
+    "source": "mock",
+    "label": "Mock workshop — desktop simulator",
+    "boundingBox": {
+      "min": [
+        -3,
+        0,
+        -2
+      ],
+      "max": [
+        3,
+        2.7,
+        2
+      ]
+    },
+    "userPose": {
+      "position": [
+        0,
+        1.6,
+        1.4
+      ],
+      "forward": [
+        0,
+        0,
+        -1
+      ]
+    },
+    "surfaces": [
+      {
+        "id": "floor.main",
+        "kind": "floor",
+        "polygon": [
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            -3,
+            0,
+            2
+          ]
+        ],
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "areaMeters2": 24,
+        "confidence": 0.95,
+        "facingUser": false
+      },
+      {
+        "id": "wall.north",
+        "kind": "wall",
+        "polygon": [
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            -2
+          ]
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "areaMeters2": 16.2,
+        "confidence": 0.92,
+        "facingUser": true,
+        "note": "Largest user-facing wall — preferred mount for wall_dashboard elements."
+      },
+      {
+        "id": "wall.west",
+        "kind": "wall",
+        "polygon": [
+          [
+            -3,
+            0,
+            2
+          ],
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            2
+          ]
+        ],
+        "normal": [
+          1,
+          0,
+          0
+        ],
+        "areaMeters2": 10.8,
+        "confidence": 0.88,
+        "facingUser": false
+      },
+      {
+        "id": "wall.east",
+        "kind": "wall",
+        "polygon": [
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            3,
+            2.7,
+            2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ]
+        ],
+        "normal": [
+          -1,
+          0,
+          0
+        ],
+        "areaMeters2": 10.8,
+        "confidence": 0.88,
+        "facingUser": false
+      },
+      {
+        "id": "ceiling.main",
+        "kind": "ceiling",
+        "polygon": [
+          [
+            -3,
+            2.7,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            2
+          ],
+          [
+            -3,
+            2.7,
+            2
+          ]
+        ],
+        "normal": [
+          0,
+          -1,
+          0
+        ],
+        "areaMeters2": 24,
+        "confidence": 0.9,
+        "facingUser": false
+      },
+      {
+        "id": "table.workbench",
+        "kind": "table",
+        "polygon": [
+          [
+            -0.8,
+            0.75,
+            -0.5
+          ],
+          [
+            0.8,
+            0.75,
+            -0.5
+          ],
+          [
+            0.8,
+            0.75,
+            0.5
+          ],
+          [
+            -0.8,
+            0.75,
+            0.5
+          ]
+        ],
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "areaMeters2": 1.6,
+        "heightMeters": 0.75,
+        "confidence": 0.96,
+        "note": "Hero workbench — primary surface for tabletop_model + highlighted_target."
+      }
+    ],
+    "anchorPoints": [
+      {
+        "id": "anchor.user_front",
+        "position": [
+          0,
+          1.4,
+          0.3
+        ],
+        "kind": "user_relative"
+      },
+      {
+        "id": "anchor.user_left",
+        "position": [
+          -0.8,
+          1.4,
+          0.6
+        ],
+        "kind": "user_relative"
+      },
+      {
+        "id": "anchor.user_right",
+        "position": [
+          0.8,
+          1.4,
+          0.6
+        ],
+        "kind": "user_relative"
+      }
+    ]
+  },
+  "explanation": {
+    "intentSummary": "Guide the user through an assembly procedure.",
+    "written": "The prompt 'Walk me through reassembling this steering wheel' is asking for a guided assembly. A good answer is a step-by-step sequence: ghost the next part to show where it's going to land, commit it on advance, name the part + its function, and end with a side-by-side before/after so the user can confirm the procedure landed."
+  },
+  "mechanics": [
+    {
+      "id": "mech.1.assembly_sequence",
+      "kind": "exploded_view",
+      "requestedKind": "assembly_sequence",
+      "target": "elem_steering_wheel_0",
+      "anchorsOn": null,
+      "params": {
+        "previewNextPartAsGhost": true,
+        "stagger": 0.4,
+        "steps": [
+          {
+            "id": "step.hub",
+            "partRef": "rim_bar",
+            "instruction": "Drop the hub into the central spline; align the index mark."
+          },
+          {
+            "id": "step.lower_rim",
+            "partRef": "rim_bar",
+            "instruction": "Bolt the lower rim bar across the bottom of the hub."
+          },
+          {
+            "id": "step.left_grip",
+            "partRef": "left_grip",
+            "instruction": "Slide the left grip onto the lower rim and torque to spec."
+          },
+          {
+            "id": "step.right_grip",
+            "partRef": "right_grip",
+            "instruction": "Slide the right grip on; check the paddle ribbon is seated."
+          },
+          {
+            "id": "step.bays",
+            "partRef": "top_left_bay",
+            "instruction": "Click each top control bay into place; cable routing on top, not pinched."
+          },
+          {
+            "id": "step.console",
+            "partRef": "center_console",
+            "instruction": "Drop the centre display into its frame; the LCD ribbon plugs into the hub."
+          },
+          {
+            "id": "step.star",
+            "partRef": "mercedes_star",
+            "instruction": "Thread the quick-release nut; the Mercedes star is the visible face."
+          }
+        ]
+      },
+      "why": "Build the wheel step-by-step so the user can follow along.",
+      "placeholderRouted": true,
+      "placeholderReason": "assembly_sequence -> exploded_view",
+      "_sourceTarget": "steering_wheel"
+    },
+    {
+      "id": "mech.2.annotated_callouts",
+      "kind": "annotated_callouts",
+      "requestedKind": "annotated_callouts",
+      "target": "elem_steering_wheel_0",
+      "anchorsOn": null,
+      "params": {
+        "items": [
+          {
+            "id": "co.hub",
+            "label": "Hub",
+            "finding": "Splines onto the column. The wheel's reference frame starts here."
+          },
+          {
+            "id": "co.lower_rim",
+            "label": "Lower rim bar",
+            "finding": "Cross-piece tying the two grips into one composite chassis."
+          },
+          {
+            "id": "co.left_grip",
+            "label": "Left grip",
+            "finding": "Suede-wrapped handle the driver's left hand never leaves."
+          },
+          {
+            "id": "co.right_grip",
+            "label": "Right grip",
+            "finding": "Right-hand grip; DRS button often lives on the back of this one."
+          }
+        ]
+      },
+      "why": "Label each part with its name + function as it's committed.",
+      "placeholderRouted": false,
+      "placeholderReason": null,
+      "_sourceTarget": "steering_wheel"
+    },
+    {
+      "id": "mech.3.before_after",
+      "kind": "comparison_grid",
+      "requestedKind": "before_after",
+      "target": "elem_steering_wheel_0",
+      "anchorsOn": null,
+      "params": {
+        "before": "exploded",
+        "after": "assembled",
+        "morphSeconds": 1
+      },
+      "why": "Confirm the procedure landed by comparing the parts-apart and reassembled states.",
+      "placeholderRouted": true,
+      "placeholderReason": "before_after -> comparison_grid",
+      "_sourceTarget": "steering_wheel"
+    }
+  ],
+  "presentation": {
+    "layout": "stage_in_front",
+    "ordering": [
+      "mech.1.assembly_sequence",
+      "mech.2.annotated_callouts",
+      "mech.3.before_after"
+    ],
+    "note": "Default flat stage 1.5m ahead of the user. Room-aware composition is a wrapper for later."
+  },
+  "reasoningSummary": "Prompt \"Walk me through reassembling this steering wheel.\" was understood as domain \"assembly_guide\" with 5 content items. Spatial mix: 1× highlighted_target, 4× anchored_callout.",
+  "vocabularies": {
+    "contentTypes": [
+      "summary_panel",
+      "numeric_summary",
+      "list",
+      "step_sequence",
+      "timeline",
+      "decision_set",
+      "physical_target",
+      "assembly_explode",
+      "diagnostic_finding",
+      "anchored_marker",
+      "alignment_guide",
+      "airflow_streamlines",
+      "process_model",
+      "environment"
+    ],
+    "representationModes": [
+      "two_d_panel",
+      "wall_dashboard",
+      "three_d_model",
+      "tabletop_model",
+      "floor_timeline",
+      "floating_decision_card",
+      "highlighted_target",
+      "exploded_view",
+      "anchored_callout",
+      "guide_line",
+      "diagnostic_overlay",
+      "airflow_field"
+    ],
+    "placements": [
+      "wall",
+      "table",
+      "floor",
+      "object_anchored",
+      "above_target",
+      "near_user",
+      "near_presenter",
+      "left_of_user",
+      "right_of_user",
+      "in_front_of_user",
+      "room_center"
+    ],
+    "anchorStrategies": [
+      "world_anchor",
+      "plane_anchor",
+      "object_anchor",
+      "relative_to_target",
+      "user_relative",
+      "simulated_anchor"
+    ],
+    "scaleModes": [
+      "real_scale",
+      "tabletop_scale",
+      "enlarged_detail",
+      "compact_panel",
+      "room_scale"
+    ],
+    "attentionBehaviors": [
+      "ambient",
+      "persistent_context",
+      "active_focus",
+      "peripheral",
+      "on_demand",
+      "guiding"
+    ],
+    "animationPrimitives": [
+      "transform_keyframes",
+      "explode",
+      "assemble",
+      "highlight_pulse",
+      "fade",
+      "set_visible",
+      "attention_camera_hint"
+    ],
+    "interactionTriggers": [
+      "tap",
+      "hover",
+      "dwell",
+      "scene_event"
+    ],
+    "interactionActions": [
+      "play_animation",
+      "stop_animation",
+      "advance_step",
+      "previous_step",
+      "restart_sequence",
+      "set_visible"
+    ],
+    "fidelities": [
+      "ghost",
+      "draft",
+      "committed",
+      "authored"
+    ],
+    "mechanicKinds": [
+      "exploded_view",
+      "annotated_callouts",
+      "highlighted_region",
+      "timeline",
+      "cross_section",
+      "assembly_sequence",
+      "ghosted_internal",
+      "flow_diagram",
+      "process_animation",
+      "cutaway",
+      "disassembly_sequence",
+      "before_after",
+      "comparison_grid",
+      "metric_dashboard",
+      "cross_reference",
+      "scale_reference",
+      "color_coded_map",
+      "force_arrows",
+      "particle_flow",
+      "cutaway_orbit",
+      "xray_layer_stack",
+      "interactive_dissection",
+      "placeholder_mechanic"
+    ],
+    "presentationLayouts": [
+      "stage_in_front",
+      "flat_grid",
+      "scene_floor",
+      "wall_room"
+    ]
+  }
+}

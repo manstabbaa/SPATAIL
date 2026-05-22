@@ -1,0 +1,25 @@
+{
+  "kind": "flow_diagram",
+  "status": "shipped",
+  "version": 1,
+  "description": "Directed graph of process steps with animated tokens flowing along edges. Drawn as a single 2D panel so it composes cleanly next to a 3D hero.",
+  "expectedSourceShape": {
+    "nodes": "[{ id, label, kind?: 'process'|'gate'|'output', subtitle? }]",
+    "edges": "[{ from, to, label?, weight? }]",
+    "title": "optional panel title"
+  },
+  "params": {
+    "orientation": { "type": "enum",   "values": ["lr","tb"], "default": "lr" },
+    "tokenSpeed":  { "type": "number", "default": 0.8, "units": "edges/sec",
+                     "desc": "how often a flowing token completes an edge" },
+    "tokenColor":  { "type": "string", "default": "#6ea8ff" },
+    "highlightNodeId": { "type": "string", "default": null,
+                         "desc": "node to mark as the current focus (e.g. the bottleneck step)" }
+  },
+  "output": "A single spatialElement with representationMode `two_d_panel`. The element's sourceContent carries `flow: { nodes, edges, params }` so the panel renderer's flow_diagram handler can draw + animate it.",
+  "qualityBar": {
+    "reference": "Q3 manufacturing: Stamping → Welding → Assembly → Paint → QC with the bottleneck (Assembly Line 3) highlighted; tokens flow at 0.8 e/s and stack up at the bottleneck node to communicate backlog.",
+    "renderer": "viewer/mechanics/handlers/flow_diagram.js",
+    "notes": "Use canvas drawn at 480 px/m and rebuild on token tick. Nodes are rounded rects with subtitle; edges are bezier or quadratic curves; tokens are filled dots that travel t=0..1 along each edge."
+  }
+}

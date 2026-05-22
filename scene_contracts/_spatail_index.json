@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "0.5.0-spatail",
+  "generatedAt": "2026-05-20T18:48:33.966Z",
+  "experiences": [
+    {
+      "experienceId": "f1-aero",
+      "title": "F1 Car — Aerodynamics & DRS",
+      "detectedDomain": "motorsport_engineering",
+      "contractPath": "scene_contracts/f1-aero-spatial-contract.json",
+      "sourcePrompt": "Walk me through how this F1 car's aerodynamics work — especially the DRS.",
+      "elementCount": 12,
+      "modeCounts": {
+        "two_d_panel": 2,
+        "highlighted_target": 1,
+        "anchored_callout": 5,
+        "airflow_field": 2,
+        "diagnostic_overlay": 1,
+        "floating_decision_card": 1
+      },
+      "isDefault": false
+    },
+    {
+      "experienceId": "four-stroke-engine",
+      "title": "How a Four-Stroke Engine Works",
+      "detectedDomain": "mechanical_explanation",
+      "contractPath": "scene_contracts/four-stroke-engine-spatial-contract.json",
+      "sourcePrompt": "How does a four-stroke engine work?",
+      "elementCount": 8,
+      "modeCounts": {
+        "highlighted_target": 1,
+        "anchored_callout": 6,
+        "two_d_panel": 1
+      },
+      "isDefault": false
+    },
+    {
+      "experienceId": "q3-cost-spike",
+      "title": "Why Q3 Manufacturing Costs Spiked",
+      "detectedDomain": "corporate_review",
+      "contractPath": "scene_contracts/q3-cost-spike-spatial-contract.json",
+      "sourcePrompt": "Why did Q3 manufacturing costs spike?",
+      "elementCount": 1,
+      "modeCounts": {
+        "two_d_panel": 1
+      },
+      "isDefault": false
+    },
+    {
+      "experienceId": "q3-manufacturing-review",
+      "title": "Q3 Manufacturing Cost Review",
+      "detectedDomain": "corporate_review",
+      "contractPath": "scene_contracts/q3-manufacturing-review-spatial-contract.json",
+      "sourcePrompt": "Explain why Q3 manufacturing costs increased and what we should do next.",
+      "elementCount": 5,
+      "modeCounts": {
+        "wall_dashboard": 1,
+        "two_d_panel": 1,
+        "tabletop_model": 1,
+        "floor_timeline": 1,
+        "floating_decision_card": 1
+      },
+      "isDefault": false
+    },
+    {
+      "experienceId": "mercedes-f1-wheel",
+      "title": "Mercedes F1 Wheel — Walkthrough",
+      "detectedDomain": "motorsport_engineering",
+      "contractPath": "scene_contracts/steering-wheel-teardown-spatial-contract.json",
+      "sourcePrompt": "Walk me through this Mercedes-AMG F1 steering wheel.",
+      "elementCount": 22,
+      "modeCounts": {
+        "two_d_panel": 4,
+        "highlighted_target": 1,
+        "anchored_callout": 15,
+        "diagnostic_overlay": 1,
+        "floating_decision_card": 1
+      },
+      "isDefault": true
+    },
+    {
+      "experienceId": "wheel-reassembly",
+      "title": "Reassembling the Mercedes F1 Wheel",
+      "detectedDomain": "assembly_guide",
+      "contractPath": "scene_contracts/wheel-reassembly-spatial-contract.json",
+      "sourcePrompt": "Walk me through reassembling this steering wheel.",
+      "elementCount": 5,
+      "modeCounts": {
+        "highlighted_target": 1,
+        "anchored_callout": 4
+      },
+      "isDefault": false
+    }
+  ]
+}

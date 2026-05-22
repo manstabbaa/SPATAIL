@@ -1,0 +1,13 @@
+{
+  "kind": "ghosted_internal",
+  "status": "placeholder",
+  "placeholderFor": "highlighted_region",
+  "version": 1,
+  "description": "Outer shell goes semi-transparent, internals stay solid. Top-5 priority — placeholder routes to highlighted_region until the dedicated material-pass lands.",
+  "expectedSourceShape": { "target": "elementId of the outer shell mesh" },
+  "params": {
+    "shellOpacity":     { "type": "number", "default": 0.18 },
+    "internalSelector": { "type": "string", "default": null, "desc": "node-name regex selecting child meshes to keep solid" }
+  },
+  "qualityBar": { "reference": "Four-stroke engine block — head + sleeves go ghost; piston/conrod/crank stay solid." }
+}

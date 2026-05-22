@@ -1,0 +1,29 @@
+{
+  "name": "spatial",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Spatial — AI-powered XR creation system. First local loop: ingest 3D/CAD assets, build a Spatial Scene Contract, preview in a web viewer.",
+  "type": "module",
+  "scripts": {
+    "generate": "node pipeline/generate.js",
+    "viewer": "node viewer/server.js",
+    "dev": "node pipeline/generate.js && node viewer/server.js",
+    "spatail": "node pipeline/spatail_generate.js",
+    "spatail:viewer": "node viewer/open_spatail.js",
+    "spatail:dev": "node pipeline/spatail_generate.js && node viewer/open_spatail.js",
+    "spatail:ios": "node pipeline/spatail_generate.js && node pipeline/copy_contracts_to_ios.js",
+    "spatail:ios:bundle": "node pipeline/spatail_generate.js && node pipeline/copy_contracts_to_ios.js && node pipeline/bundle_ios.js",
+    "spatail:animations": "node pipeline/blender/run_export_animations.js",
+    "spatail:authoring:build-libraries": "node pipeline/blender/run_build_libraries.js",
+    "spatail:authoring:bootstrap": "node pipeline/blender/run_bootstrap_wheel.js",
+    "spatail:segment": "node pipeline/blender/run_segment_and_analyze.js",
+    "sync:swift-vocab": "node tools/sync/gen_swift_vocab.mjs",
+    "sync:check": "node tools/sync/check_protocol_sync.mjs",
+    "sync": "npm run sync:swift-vocab && npm run sync:check",
+    "git:sync": "bash tools/sync/git-sync.sh",
+    "git:push": "bash tools/sync/git-push.sh"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

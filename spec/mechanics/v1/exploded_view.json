@@ -1,0 +1,16 @@
+{
+  "kind": "exploded_view",
+  "status": "shipped",
+  "version": 1,
+  "description": "Spread the target's animatable child parts outward from the parent centroid along local +Y. Pre-existing renderer in the viewer's animation system.",
+  "expectedSourceShape": { "target": "elementId of a multi-part 3D model" },
+  "params": {
+    "spread":  { "type": "number", "default": 0.18, "units": "metres" },
+    "axis":    { "type": "enum",   "values": ["y","x","z","radial"], "default": "y" },
+    "stagger": { "type": "number", "default": 0.06, "units": "seconds" }
+  },
+  "output": "Augments the target element with `explode` + `assemble` animations + a `tap.target` interaction.",
+  "qualityBar": {
+    "reference": "Mercedes F1 wheel — 7 named regions lift along +Y on a 1.6s eased curve, reassemble on the reverse beat."
+  }
+}

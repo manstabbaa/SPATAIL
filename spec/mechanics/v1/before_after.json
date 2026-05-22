@@ -1,0 +1,9 @@
+{
+  "kind": "before_after",
+  "status": "placeholder",
+  "placeholderFor": "comparison_grid",
+  "version": 1,
+  "description": "Two states side-by-side or morphed between. Useful for repair / damage / option-comparison.",
+  "expectedSourceShape": { "before": "elementId or panel", "after": "elementId or panel", "label": "string" },
+  "params": { "morphSeconds": { "type": "number", "default": 0.8 } }
+}

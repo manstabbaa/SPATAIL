@@ -1,0 +1,13 @@
+{
+  "kind": "process_animation",
+  "status": "placeholder",
+  "placeholderFor": "exploded_view",
+  "version": 1,
+  "description": "Looping demonstration of how a mechanism moves (rotate, slide, articulate). Top-5 priority — placeholder until the curve-baked animation pass lands.",
+  "expectedSourceShape": {
+    "target": "elementId of the mechanism",
+    "motion": "[{ partRef, channel: 'rotation'|'translation', amplitude, axis, period }]"
+  },
+  "params": { "loop": { "type": "boolean", "default": true } },
+  "qualityBar": { "reference": "Four-stroke engine — piston down + valves staggered + crank rotation, 1.2s loop." }
+}

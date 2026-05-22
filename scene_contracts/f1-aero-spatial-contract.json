@@ -1,0 +1,2303 @@
+{
+  "schemaVersion": "0.5.0-spatail",
+  "createdAt": "2026-05-20T18:48:33.959Z",
+  "experienceId": "f1-aero",
+  "title": "F1 Car — Aerodynamics & DRS",
+  "sourcePrompt": "Walk me through how this F1 car's aerodynamics work — especially the DRS.",
+  "sourceInputs": [
+    {
+      "kind": "fact",
+      "key": "Era",
+      "title": null
+    },
+    {
+      "kind": "fact",
+      "key": "Bodywork",
+      "title": null
+    },
+    {
+      "kind": "fact",
+      "key": "Downforce",
+      "title": null
+    },
+    {
+      "kind": "fact",
+      "key": "DRS top-end gain",
+      "title": null
+    },
+    {
+      "kind": "summary",
+      "key": null,
+      "title": "How airflow makes the car stick"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "F1 Car"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Front Wing"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Floor / Venturi Tunnels"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Sidepod Inlets"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Rear Wing — DRS Flap"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Beam Wing"
+    },
+    {
+      "kind": "airflow",
+      "key": null,
+      "title": "Airflow — DRS closed"
+    },
+    {
+      "kind": "airflow",
+      "key": null,
+      "title": "Airflow — DRS open"
+    },
+    {
+      "kind": "diagnostic",
+      "key": null,
+      "title": "DRS — when it's available"
+    },
+    {
+      "kind": "decisions",
+      "key": null,
+      "title": "Explore"
+    }
+  ],
+  "sourceFiles": [],
+  "detectedDomain": {
+    "name": "motorsport_engineering",
+    "confidence": "high",
+    "source": "card.domain"
+  },
+  "environmentAssumptions": {
+    "kind": "workbench",
+    "anchorObject": "f1_car",
+    "source": "card.environment"
+  },
+  "spatialElements": [
+    {
+      "id": "elem_car_identity_0",
+      "title": "Car Identity",
+      "contentType": "summary_panel",
+      "representationMode": "two_d_panel",
+      "placement": {
+        "kind": "left_of_user",
+        "anchor": "left_of_user",
+        "position": [
+          -2.4,
+          1.5,
+          1.2999999999999998
+        ],
+        "rotationDeg": [
+          0,
+          55,
+          0
+        ],
+        "sizeMeters": [
+          1,
+          0.8
+        ]
+      },
+      "anchorStrategy": "user_relative",
+      "scaleMode": "compact_panel",
+      "priority": 40,
+      "sourceContent": {
+        "facts": [
+          {
+            "key": "Era",
+            "value": "Ground-effect regulations (2022-present)"
+          },
+          {
+            "key": "Bodywork",
+            "value": "Carbon-fibre monocoque, fully ducted floor"
+          },
+          {
+            "key": "Downforce",
+            "value": "~2.5× the car's weight at 250 km/h"
+          },
+          {
+            "key": "DRS top-end gain",
+            "value": "~9 m/s on a long straight"
+          }
+        ],
+        "placementHint": "left_of_user"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "expand this panel to a fuller view"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "wall.north",
+        "kind": "wall",
+        "areaMeters2": 16.2,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "centroid": [
+          0,
+          1.35,
+          -2
+        ],
+        "heightMeters": null,
+        "facingUser": true,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "Short readable text — a 2D panel keeps it scannable without occupying physical workspace.",
+      "whyThisPlacement": "Persistent reference content (status, insurance, history) belongs to the user's left so it stays glanceable without competing with the repair target straight ahead. — Resolved to wall.north (wall, 6.0m × 2.7m, area 16.2m²)."
+    },
+    {
+      "id": "elem_how_airflow_makes_the_car_stick_1",
+      "title": "How airflow makes the car stick",
+      "contentType": "summary_panel",
+      "representationMode": "two_d_panel",
+      "placement": {
+        "kind": "left_of_user",
+        "anchor": "left_of_user",
+        "position": [
+          -2.4,
+          1.5,
+          1.2499999999999998
+        ],
+        "rotationDeg": [
+          0,
+          55,
+          0
+        ],
+        "sizeMeters": [
+          1,
+          0.8
+        ]
+      },
+      "anchorStrategy": "user_relative",
+      "scaleMode": "compact_panel",
+      "priority": 40,
+      "sourceContent": {
+        "title": "How airflow makes the car stick",
+        "placementHint": "left_of_user",
+        "body": "Front wing turns flow inboard and downward. Sidepods + floor channel high-velocity air through Venturi tunnels under the car (ground-effect), creating low pressure beneath the floor. Rear wing + beam wing generate the remaining ~40% of downforce. DRS opens a flap in the upper rear wing on straights, dumping that downforce in exchange for top-end speed."
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "expand this panel to a fuller view"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "wall.north",
+        "kind": "wall",
+        "areaMeters2": 16.2,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "centroid": [
+          0,
+          1.35,
+          -2
+        ],
+        "heightMeters": null,
+        "facingUser": true,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "Short readable text — a 2D panel keeps it scannable without occupying physical workspace.",
+      "whyThisPlacement": "Persistent reference content (status, insurance, history) belongs to the user's left so it stays glanceable without competing with the repair target straight ahead. — Resolved to wall.north (wall, 6.0m × 2.7m, area 16.2m²)."
+    },
+    {
+      "id": "elem_f1_car_2",
+      "title": "F1 Car",
+      "contentType": "physical_target",
+      "representationMode": "highlighted_target",
+      "placement": {
+        "kind": "table",
+        "anchor": "table_center",
+        "position": [
+          0,
+          0.8,
+          0
+        ],
+        "sizeMeters": [
+          0.6,
+          0.3,
+          0.6
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 90,
+      "sourceContent": {
+        "name": "F1 Car",
+        "role": "target",
+        "assetGroupRef": "f1-car",
+        "components": [],
+        "targetRef": null,
+        "finding": "Hero geometry. Stays on the table as the reference object the airflow + every callout anchors to.",
+        "placementHint": "table",
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [
+        {
+          "id": "f1-car",
+          "preferredSource": "cad_folder",
+          "hint": "f1-car",
+          "fallback": "placeholder_box",
+          "resolvedAssetGroup": {
+            "groupKey": "f1-car",
+            "items": [
+              {
+                "fileName": "TOBi_Racing.obj",
+                "relativePath": "f1-car\\TOBi_Racing.obj",
+                "extension": ".obj",
+                "role": "primary_object"
+              }
+            ]
+          },
+          "processedAssetPath": "/assets_processed/spatail__f1_car__TOBi_Racing_obj.glb",
+          "importer": "presegmented"
+        }
+      ],
+      "fallbackGeometry": "box",
+      "interactions": [
+        {
+          "id": "highlight_current_part",
+          "type": "highlight",
+          "behavior": "tint the target with the bright blue shader"
+        },
+        {
+          "id": "isolate_target_part",
+          "type": "isolate",
+          "behavior": "hide every other element so only the target remains"
+        },
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show a fuller label panel for this target"
+        }
+      ],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": "anim.pulse.elem_f1_car_2",
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "The user is acting on a real / simulated object — emphasize it in place with a bright shader so the serviced part is unmistakable, rather than describing it in text.",
+      "whyThisPlacement": "Hero object sits on a clean workbench — no host vehicle to anchor to, so the user can walk around the whole part for inspection. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_front_wing_3",
+      "title": "Front Wing",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_f1_car_2",
+        "position": [
+          0.35,
+          0.98,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Front Wing",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "f1_car",
+        "finding": "Multi-element wing + endplates. Turns oncoming air downward and outboard around the front tyres. Sets the entire aerodynamic balance of the car — every other surface downstream depends on it.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          0,
+          3.6,
+          0.05
+        ],
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_front_wing_3",
+      "respondsTo": [
+        "tap.elem_mark_front_wing_3"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_floor_tunnel_4",
+      "title": "Floor / Venturi Tunnels",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_f1_car_2",
+        "position": [
+          0.35,
+          1.16,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Floor / Venturi Tunnels",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "f1_car",
+        "finding": "Two underbody Venturi tunnels accelerate air, creating low pressure that sucks the car to the track. Source of ~60% of total downforce in the current regulations.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          0,
+          0,
+          -0.35
+        ],
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_floor_tunnel_4",
+      "respondsTo": [
+        "tap.elem_mark_floor_tunnel_4"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_sidepod_inlets_5",
+      "title": "Sidepod Inlets",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_f1_car_2",
+        "position": [
+          0.35,
+          1.3399999999999999,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Sidepod Inlets",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "f1_car",
+        "finding": "Feed the engine + ERS coolers. Surface geometry above the inlets steers air over the bodywork toward the rear wing and prevents stagnation behind the front tyres.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          0.7,
+          1.2,
+          0.2
+        ],
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_sidepod_inlets_5",
+      "respondsTo": [
+        "tap.elem_mark_sidepod_inlets_5"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_rear_wing_drs_6",
+      "title": "Rear Wing — DRS Flap",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_f1_car_2",
+        "position": [
+          0.35,
+          1.52,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Rear Wing — DRS Flap",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "f1_car",
+        "finding": "Two-element rear wing. Upper element is the DRS flap — hydraulically opens on activation, stalling the wing and shedding ~15% of total drag for a ~9 m/s top-end gain. Closes the moment the driver brakes or lifts.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          0,
+          -3.4,
+          0.55
+        ],
+        "mechanismKind": "drs_flap"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_rear_wing_drs_6",
+      "respondsTo": [
+        "tap.elem_mark_rear_wing_drs_6"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_beam_wing_7",
+      "title": "Beam Wing",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_f1_car_2",
+        "position": [
+          0.35,
+          1.7,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Beam Wing",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "f1_car",
+        "finding": "Lower aerodynamic element between the diffuser and the rear wing. Recovers air from under the floor and helps load the diffuser at high speed.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          0,
+          -3.55,
+          0.2
+        ],
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_beam_wing_7",
+      "respondsTo": [
+        "tap.elem_mark_beam_wing_7"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_airflow_drs_closed_8",
+      "title": "Airflow — DRS closed",
+      "contentType": "airflow_streamlines",
+      "representationMode": "airflow_field",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "airflow_around:elem_f1_car_2",
+        "position": [
+          0,
+          0.8,
+          0
+        ],
+        "sizeMeters": [
+          1,
+          1,
+          2
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "real_scale",
+      "priority": 40,
+      "sourceContent": {
+        "regime": "drs_closed",
+        "description": "Stream lines wrap the body, stagnate on the rear wing's upper element, generate the full downforce package.",
+        "targetRef": "f1_car",
+        "streams": [
+          {
+            "from": [
+              0,
+              4.5,
+              0.1
+            ],
+            "to": [
+              0,
+              3,
+              0.4
+            ],
+            "via": [
+              [
+                0,
+                3.8,
+                0.2
+              ]
+            ]
+          },
+          {
+            "from": [
+              0.6,
+              4.5,
+              0.1
+            ],
+            "to": [
+              0.7,
+              1.2,
+              0.25
+            ],
+            "via": [
+              [
+                0.6,
+                3.5,
+                0.15
+              ],
+              [
+                0.7,
+                2.4,
+                0.2
+              ]
+            ]
+          },
+          {
+            "from": [
+              0,
+              4.5,
+              0.05
+            ],
+            "to": [
+              0,
+              -3.4,
+              0.55
+            ],
+            "via": [
+              [
+                0,
+                3,
+                0.3
+              ],
+              [
+                0,
+                1.5,
+                0.5
+              ],
+              [
+                0,
+                -1.5,
+                0.62
+              ]
+            ]
+          },
+          {
+            "from": [
+              0,
+              4.5,
+              0
+            ],
+            "to": [
+              0,
+              -3.6,
+              0.1
+            ],
+            "via": [
+              [
+                0,
+                3,
+                -0.1
+              ],
+              [
+                0,
+                0,
+                -0.3
+              ],
+              [
+                0,
+                -3,
+                -0.2
+              ]
+            ]
+          }
+        ]
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "toggle_regime",
+          "type": "select",
+          "behavior": "switch DRS-closed vs DRS-open airflow regime"
+        }
+      ],
+      "attentionBehavior": "guiding",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "Airflow is invisible until you draw it — animated streamlines tracing the body are the only way to show what the air actually does in 3D, especially when comparing regimes (DRS closed vs open).",
+      "whyThisPlacement": "Airflow only makes sense relative to the body it flows around — anchored to the hero geometry so streamlines stay registered to the car. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_airflow_drs_open_9",
+      "title": "Airflow — DRS open",
+      "contentType": "airflow_streamlines",
+      "representationMode": "airflow_field",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "airflow_around:elem_f1_car_2",
+        "position": [
+          0,
+          0.8,
+          0
+        ],
+        "sizeMeters": [
+          1,
+          1,
+          2
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "real_scale",
+      "priority": 40,
+      "sourceContent": {
+        "regime": "drs_open",
+        "description": "Upper rear-wing element rotates up; the stagnation point disappears; the wing stalls and the air shoots straight through, shedding downforce for top-end speed.",
+        "targetRef": "f1_car",
+        "streams": [
+          {
+            "from": [
+              0,
+              4.5,
+              0.1
+            ],
+            "to": [
+              0,
+              -4.5,
+              0.6
+            ],
+            "via": [
+              [
+                0,
+                3,
+                0.3
+              ],
+              [
+                0,
+                0,
+                0.55
+              ],
+              [
+                0,
+                -3.4,
+                0.62
+              ]
+            ]
+          },
+          {
+            "from": [
+              0.6,
+              4.5,
+              0.1
+            ],
+            "to": [
+              0.6,
+              -4.5,
+              0.3
+            ],
+            "via": [
+              [
+                0.6,
+                0,
+                0.2
+              ]
+            ]
+          },
+          {
+            "from": [
+              0,
+              4.5,
+              0
+            ],
+            "to": [
+              0,
+              -4.5,
+              0.1
+            ],
+            "via": [
+              [
+                0,
+                0,
+                -0.1
+              ]
+            ]
+          }
+        ]
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "toggle_regime",
+          "type": "select",
+          "behavior": "switch DRS-closed vs DRS-open airflow regime"
+        }
+      ],
+      "attentionBehavior": "guiding",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "Airflow is invisible until you draw it — animated streamlines tracing the body are the only way to show what the air actually does in 3D, especially when comparing regimes (DRS closed vs open).",
+      "whyThisPlacement": "Airflow only makes sense relative to the body it flows around — anchored to the hero geometry so streamlines stay registered to the car. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_drs_when_it_s_available_10",
+      "title": "DRS — when it's available",
+      "contentType": "diagnostic_finding",
+      "representationMode": "diagnostic_overlay",
+      "placement": {
+        "kind": "above_target",
+        "anchor": "diag_above_target:elem_f1_car_2",
+        "position": [
+          -0.5,
+          1.4500000000000002,
+          -0.05
+        ],
+        "sizeMeters": [
+          0.7,
+          0.22
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 78,
+      "sourceContent": {
+        "title": "DRS — when it's available",
+        "targetRef": "f1_car",
+        "finding": "DRS is only allowed in designated zones, and only when the driver is within 1.0 s of the car ahead at the detection point. Closes the moment the brake pedal is touched or the throttle is lifted."
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "expand the diagnostic finding into a fuller panel"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_drs_when_it_s_available_10",
+      "respondsTo": [
+        "tap.elem_drs_when_it_s_available_10"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A diagnosis explains *why* the user is here — float it above the target so it reads as commentary on the physical part, not as another anchored sticker.",
+      "whyThisPlacement": "A diagnosis explains *why* the user is here — floated above the target so it reads as commentary on the physical part rather than as another sticker on it. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_explore_11",
+      "title": "Explore",
+      "contentType": "decision_set",
+      "representationMode": "floating_decision_card",
+      "placement": {
+        "kind": "near_user",
+        "anchor": "hand_reach",
+        "position": [
+          -0.6,
+          1.3,
+          1.2
+        ],
+        "sizeMeters": [
+          0.45,
+          0.3
+        ]
+      },
+      "anchorStrategy": "user_relative",
+      "scaleMode": "compact_panel",
+      "priority": 55,
+      "sourceContent": {
+        "title": "Explore",
+        "options": [
+          {
+            "id": "focus_drs",
+            "label": "Show DRS in detail",
+            "detail": "Strip the scene to the rear wing + DRS flap with leader line + airflow comparison."
+          },
+          {
+            "id": "focus_floor",
+            "label": "Floor / ground effect",
+            "detail": "Highlight the underbody Venturi tunnels and the air path beneath the car."
+          },
+          {
+            "id": "focus_front_wing",
+            "label": "Front wing",
+            "detail": "Walk through how the front wing sets the rest of the car's aero balance."
+          }
+        ]
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "select_decision",
+          "type": "select",
+          "behavior": "pick this option and advance the experience"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "A small set of next-actions belongs in the user's hand-reach zone, not on a wall — floating selectable cards.",
+      "whyThisPlacement": "Decisions need to be touched / selected, so they live in the user's hand-reach zone, not on a distant wall."
+    }
+  ],
+  "relationships": [
+    {
+      "from": "elem_mark_front_wing_3",
+      "to": "elem_f1_car_2",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_mark_floor_tunnel_4",
+      "to": "elem_f1_car_2",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_mark_sidepod_inlets_5",
+      "to": "elem_f1_car_2",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_mark_rear_wing_drs_6",
+      "to": "elem_f1_car_2",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_mark_beam_wing_7",
+      "to": "elem_f1_car_2",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_airflow_drs_closed_8",
+      "to": "elem_f1_car_2",
+      "type": "relates_to",
+      "note": "Related element."
+    },
+    {
+      "from": "elem_airflow_drs_open_9",
+      "to": "elem_f1_car_2",
+      "type": "relates_to",
+      "note": "Related element."
+    },
+    {
+      "from": "elem_drs_when_it_s_available_10",
+      "to": "elem_f1_car_2",
+      "type": "diagnoses",
+      "note": "Finding is floated above the diagnosed part as commentary."
+    }
+  ],
+  "interactionPlan": {
+    "interactions": [
+      {
+        "id": "elem_car_identity_0::tap_part_to_show_label",
+        "elementId": "elem_car_identity_0",
+        "type": "expand",
+        "behavior": "expand this panel to a fuller view",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_how_airflow_makes_the_car_stick_1::tap_part_to_show_label",
+        "elementId": "elem_how_airflow_makes_the_car_stick_1",
+        "type": "expand",
+        "behavior": "expand this panel to a fuller view",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_f1_car_2::highlight_current_part",
+        "elementId": "elem_f1_car_2",
+        "type": "highlight",
+        "behavior": "tint the target with the bright blue shader",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_f1_car_2::isolate_target_part",
+        "elementId": "elem_f1_car_2",
+        "type": "isolate",
+        "behavior": "hide every other element so only the target remains",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_f1_car_2::tap_part_to_show_label",
+        "elementId": "elem_f1_car_2",
+        "type": "expand",
+        "behavior": "show a fuller label panel for this target",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_front_wing_3::tap_part_to_show_label",
+        "elementId": "elem_mark_front_wing_3",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_floor_tunnel_4::tap_part_to_show_label",
+        "elementId": "elem_mark_floor_tunnel_4",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_sidepod_inlets_5::tap_part_to_show_label",
+        "elementId": "elem_mark_sidepod_inlets_5",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_rear_wing_drs_6::tap_part_to_show_label",
+        "elementId": "elem_mark_rear_wing_drs_6",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_beam_wing_7::tap_part_to_show_label",
+        "elementId": "elem_mark_beam_wing_7",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_airflow_drs_closed_8::toggle_regime",
+        "elementId": "elem_airflow_drs_closed_8",
+        "type": "select",
+        "behavior": "switch DRS-closed vs DRS-open airflow regime",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_airflow_drs_open_9::toggle_regime",
+        "elementId": "elem_airflow_drs_open_9",
+        "type": "select",
+        "behavior": "switch DRS-closed vs DRS-open airflow regime",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_drs_when_it_s_available_10::tap_part_to_show_label",
+        "elementId": "elem_drs_when_it_s_available_10",
+        "type": "expand",
+        "behavior": "expand the diagnostic finding into a fuller panel",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_explore_11::select_decision",
+        "elementId": "elem_explore_11",
+        "type": "select",
+        "behavior": "pick this option and advance the experience",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::reset_view",
+        "elementId": null,
+        "type": "reset_view",
+        "behavior": "restore camera and every element's original state",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::next_step",
+        "elementId": null,
+        "type": "next_step",
+        "behavior": "advance the attention plan by one step",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::previous_step",
+        "elementId": null,
+        "type": "previous_step",
+        "behavior": "step the attention plan back by one",
+        "trigger": "ui"
+      }
+    ]
+  },
+  "attentionPlan": [
+    {
+      "step": 1,
+      "focusElementId": "elem_f1_car_2",
+      "narration": "Focus on F1 Car."
+    },
+    {
+      "step": 2,
+      "focusElementId": "elem_drs_when_it_s_available_10",
+      "narration": "Finding: DRS — when it's available."
+    },
+    {
+      "step": 3,
+      "focusElementId": "elem_mark_front_wing_3",
+      "narration": "Marker: Front Wing."
+    },
+    {
+      "step": 4,
+      "focusElementId": "elem_mark_floor_tunnel_4",
+      "narration": "Marker: Floor / Venturi Tunnels."
+    },
+    {
+      "step": 5,
+      "focusElementId": "elem_mark_sidepod_inlets_5",
+      "narration": "Marker: Sidepod Inlets."
+    },
+    {
+      "step": 6,
+      "focusElementId": "elem_mark_rear_wing_drs_6",
+      "narration": "Marker: Rear Wing — DRS Flap."
+    },
+    {
+      "step": 7,
+      "focusElementId": "elem_mark_beam_wing_7",
+      "narration": "Marker: Beam Wing."
+    },
+    {
+      "step": 8,
+      "focusElementId": "elem_explore_11",
+      "narration": "Choose what to do next — Explore."
+    },
+    {
+      "step": 9,
+      "focusElementId": "elem_car_identity_0",
+      "narration": "Reference: Car Identity."
+    },
+    {
+      "step": 10,
+      "focusElementId": "elem_how_airflow_makes_the_car_stick_1",
+      "narration": "Reference: How airflow makes the car stick."
+    },
+    {
+      "step": 11,
+      "focusElementId": "elem_airflow_drs_closed_8",
+      "narration": "Look at Airflow — DRS closed."
+    },
+    {
+      "step": 12,
+      "focusElementId": "elem_airflow_drs_open_9",
+      "narration": "Look at Airflow — DRS open."
+    }
+  ],
+  "assetRequirements": [
+    {
+      "id": "f1-car",
+      "preferredSource": "cad_folder",
+      "hint": "f1-car",
+      "fallback": "placeholder_box",
+      "resolvedAssetGroup": {
+        "groupKey": "f1-car",
+        "items": [
+          {
+            "fileName": "TOBi_Racing.obj",
+            "relativePath": "f1-car\\TOBi_Racing.obj",
+            "extension": ".obj",
+            "role": "primary_object"
+          }
+        ]
+      },
+      "processedAssetPath": "/assets_processed/spatail__f1_car__TOBi_Racing_obj.glb",
+      "importer": "presegmented"
+    },
+    {
+      "id": "car-engine",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "futuristic-egg-shaped-gaming-pod-chair-concept-interior-design-cad-model-1.snapshot.2",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "lego-minifig-3.snapshot.9",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "r-c-8-automodell-1.snapshot.3",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "yamaha-tdm-850-1.snapshot.3",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    }
+  ],
+  "animations": [
+    {
+      "id": "anim.pulse.elem_f1_car_2",
+      "primitive": "highlight_pulse",
+      "target": "elem_f1_car_2",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.4,
+        "pulses": 1
+      }
+    },
+    {
+      "id": "anim.explode.elem_f1_car_2",
+      "primitive": "explode",
+      "target": "elem_f1_car_2",
+      "duration": 1.6,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.18,
+        "axis": "y",
+        "stagger": 0.06
+      }
+    },
+    {
+      "id": "anim.assemble.elem_f1_car_2",
+      "primitive": "assemble",
+      "target": "elem_f1_car_2",
+      "duration": 1.4,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.04
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_front_wing_3",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_front_wing_3",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_front_wing_3",
+      "primitive": "explode",
+      "target": "elem_mark_front_wing_3",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_front_wing_3",
+      "primitive": "assemble",
+      "target": "elem_mark_front_wing_3",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_floor_tunnel_4",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_floor_tunnel_4",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_floor_tunnel_4",
+      "primitive": "explode",
+      "target": "elem_mark_floor_tunnel_4",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_floor_tunnel_4",
+      "primitive": "assemble",
+      "target": "elem_mark_floor_tunnel_4",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_sidepod_inlets_5",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_sidepod_inlets_5",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_sidepod_inlets_5",
+      "primitive": "explode",
+      "target": "elem_mark_sidepod_inlets_5",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_sidepod_inlets_5",
+      "primitive": "assemble",
+      "target": "elem_mark_sidepod_inlets_5",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_rear_wing_drs_6",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_rear_wing_drs_6",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_rear_wing_drs_6",
+      "primitive": "explode",
+      "target": "elem_mark_rear_wing_drs_6",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_rear_wing_drs_6",
+      "primitive": "assemble",
+      "target": "elem_mark_rear_wing_drs_6",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_beam_wing_7",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_beam_wing_7",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_beam_wing_7",
+      "primitive": "explode",
+      "target": "elem_mark_beam_wing_7",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_beam_wing_7",
+      "primitive": "assemble",
+      "target": "elem_mark_beam_wing_7",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_drs_when_it_s_available_10",
+      "primitive": "highlight_pulse",
+      "target": "elem_drs_when_it_s_available_10",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_drs_when_it_s_available_10",
+      "primitive": "explode",
+      "target": "elem_drs_when_it_s_available_10",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_drs_when_it_s_available_10",
+      "primitive": "assemble",
+      "target": "elem_drs_when_it_s_available_10",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "id": "tap.next",
+      "trigger": {
+        "type": "scene_event",
+        "target": "transport_next"
+      },
+      "actions": [
+        {
+          "type": "advance_step"
+        }
+      ],
+      "note": "Fired by the transport bar Next button (and tap on the scene background)."
+    },
+    {
+      "id": "tap.previous",
+      "trigger": {
+        "type": "scene_event",
+        "target": "transport_previous"
+      },
+      "actions": [
+        {
+          "type": "previous_step"
+        }
+      ],
+      "note": "Fired by the transport bar Previous button."
+    },
+    {
+      "id": "tap.elem_mark_front_wing_3",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_front_wing_3"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_front_wing_3"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_front_wing_3"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_mark_floor_tunnel_4",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_floor_tunnel_4"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_floor_tunnel_4"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_floor_tunnel_4"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_mark_sidepod_inlets_5",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_sidepod_inlets_5"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_sidepod_inlets_5"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_sidepod_inlets_5"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_mark_rear_wing_drs_6",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_rear_wing_drs_6"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_rear_wing_drs_6"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_rear_wing_drs_6"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_mark_beam_wing_7",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_beam_wing_7"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_beam_wing_7"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_beam_wing_7"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_drs_when_it_s_available_10",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_drs_when_it_s_available_10"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_drs_when_it_s_available_10"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_drs_when_it_s_available_10"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq.f1-aero.walkthrough",
+      "title": "Default walkthrough",
+      "generatedFromAttentionPlan": true,
+      "steps": [
+        {
+          "atSecond": 0,
+          "label": "Settle into the room.",
+          "wait": 0.5
+        },
+        {
+          "afterPrevious": true,
+          "label": "Look at the hero.",
+          "play": "anim.pulse.elem_f1_car_2"
+        },
+        {
+          "afterPrevious": true,
+          "label": "Take the assembly apart.",
+          "play": "anim.explode.elem_f1_car_2"
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Front Wing.",
+          "play": [
+            "anim.pulse.elem_mark_front_wing_3",
+            "anim.explode.elem_mark_front_wing_3"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Floor / Venturi Tunnels.",
+          "play": [
+            "anim.pulse.elem_mark_floor_tunnel_4",
+            "anim.explode.elem_mark_floor_tunnel_4"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Sidepod Inlets.",
+          "play": [
+            "anim.pulse.elem_mark_sidepod_inlets_5",
+            "anim.explode.elem_mark_sidepod_inlets_5"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Rear Wing — DRS Flap.",
+          "play": [
+            "anim.pulse.elem_mark_rear_wing_drs_6",
+            "anim.explode.elem_mark_rear_wing_drs_6"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Beam Wing.",
+          "play": [
+            "anim.pulse.elem_mark_beam_wing_7",
+            "anim.explode.elem_mark_beam_wing_7"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on DRS — when it's available.",
+          "play": [
+            "anim.pulse.elem_drs_when_it_s_available_10",
+            "anim.explode.elem_drs_when_it_s_available_10"
+          ]
+        },
+        {
+          "afterPrevious": true,
+          "label": "Put it back together.",
+          "play": "anim.assemble.elem_f1_car_2"
+        },
+        {
+          "afterPrevious": true,
+          "label": "Done — restart to walk through again.",
+          "wait": 0.6
+        }
+      ]
+    }
+  ],
+  "defaultSequenceId": "seq.f1-aero.walkthrough",
+  "roomContract": {
+    "schemaVersion": "0.4.0-room",
+    "roomId": "mock-default-room",
+    "capturedAt": "2026-05-18T00:00:00Z",
+    "source": "mock",
+    "label": "Mock workshop — desktop simulator",
+    "boundingBox": {
+      "min": [
+        -3,
+        0,
+        -2
+      ],
+      "max": [
+        3,
+        2.7,
+        2
+      ]
+    },
+    "userPose": {
+      "position": [
+        0,
+        1.6,
+        1.4
+      ],
+      "forward": [
+        0,
+        0,
+        -1
+      ]
+    },
+    "surfaces": [
+      {
+        "id": "floor.main",
+        "kind": "floor",
+        "polygon": [
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            -3,
+            0,
+            2
+          ]
+        ],
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "areaMeters2": 24,
+        "confidence": 0.95,
+        "facingUser": false
+      },
+      {
+        "id": "wall.north",
+        "kind": "wall",
+        "polygon": [
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            -2
+          ]
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "areaMeters2": 16.2,
+        "confidence": 0.92,
+        "facingUser": true,
+        "note": "Largest user-facing wall — preferred mount for wall_dashboard elements."
+      },
+      {
+        "id": "wall.west",
+        "kind": "wall",
+        "polygon": [
+          [
+            -3,
+            0,
+            2
+          ],
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            2
+          ]
+        ],
+        "normal": [
+          1,
+          0,
+          0
+        ],
+        "areaMeters2": 10.8,
+        "confidence": 0.88,
+        "facingUser": false
+      },
+      {
+        "id": "wall.east",
+        "kind": "wall",
+        "polygon": [
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            3,
+            2.7,
+            2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ]
+        ],
+        "normal": [
+          -1,
+          0,
+          0
+        ],
+        "areaMeters2": 10.8,
+        "confidence": 0.88,
+        "facingUser": false
+      },
+      {
+        "id": "ceiling.main",
+        "kind": "ceiling",
+        "polygon": [
+          [
+            -3,
+            2.7,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            2
+          ],
+          [
+            -3,
+            2.7,
+            2
+          ]
+        ],
+        "normal": [
+          0,
+          -1,
+          0
+        ],
+        "areaMeters2": 24,
+        "confidence": 0.9,
+        "facingUser": false
+      },
+      {
+        "id": "table.workbench",
+        "kind": "table",
+        "polygon": [
+          [
+            -0.8,
+            0.75,
+            -0.5
+          ],
+          [
+            0.8,
+            0.75,
+            -0.5
+          ],
+          [
+            0.8,
+            0.75,
+            0.5
+          ],
+          [
+            -0.8,
+            0.75,
+            0.5
+          ]
+        ],
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "areaMeters2": 1.6,
+        "heightMeters": 0.75,
+        "confidence": 0.96,
+        "note": "Hero workbench — primary surface for tabletop_model + highlighted_target."
+      }
+    ],
+    "anchorPoints": [
+      {
+        "id": "anchor.user_front",
+        "position": [
+          0,
+          1.4,
+          0.3
+        ],
+        "kind": "user_relative"
+      },
+      {
+        "id": "anchor.user_left",
+        "position": [
+          -0.8,
+          1.4,
+          0.6
+        ],
+        "kind": "user_relative"
+      },
+      {
+        "id": "anchor.user_right",
+        "position": [
+          0.8,
+          1.4,
+          0.6
+        ],
+        "kind": "user_relative"
+      }
+    ]
+  },
+  "explanation": {
+    "intentSummary": "Make the prompt's subject visible and inspectable.",
+    "written": "The prompt \"Walk me through how this F1 car's aerodynamics work — especially the DRS.\" doesn't fit a recognised explanation pattern, so we fall back to the highest-leverage default: render the subject as a 3D object the user can inspect, with labelled callouts on its salient features and a short written explanation alongside."
+  },
+  "mechanics": [
+    {
+      "id": "mech.1.highlighted_region",
+      "kind": "highlighted_region",
+      "requestedKind": "highlighted_region",
+      "target": "elem_f1_car_2",
+      "anchorsOn": null,
+      "params": {},
+      "why": "Make the subject salient.",
+      "placeholderRouted": false,
+      "placeholderReason": null,
+      "_sourceTarget": "f1_car"
+    },
+    {
+      "id": "mech.2.annotated_callouts",
+      "kind": "annotated_callouts",
+      "requestedKind": "annotated_callouts",
+      "target": "elem_f1_car_2",
+      "anchorsOn": null,
+      "params": {},
+      "why": "Label its features.",
+      "placeholderRouted": false,
+      "placeholderReason": null,
+      "_sourceTarget": "f1_car"
+    }
+  ],
+  "presentation": {
+    "layout": "stage_in_front",
+    "ordering": [
+      "mech.1.highlighted_region",
+      "mech.2.annotated_callouts"
+    ],
+    "note": "Default flat stage 1.5m ahead of the user. Room-aware composition is a wrapper for later."
+  },
+  "reasoningSummary": "Prompt \"Walk me through how this F1 car's aerodynamics work — especially the DRS.\" was understood as domain \"motorsport_engineering\" with 12 content items. Spatial mix: 2× two_d_panel, 1× highlighted_target, 5× anchored_callout, 2× airflow_field, 1× diagnostic_overlay, 1× floating_decision_card. Textual and numeric content stayed as readable panels rather than being forced into 3D widgets. Diagnoses were floated above the diagnosed part as commentary, not stickers on it. Decisions were placed in the user's hand-reach zone for direct selection.",
+  "vocabularies": {
+    "contentTypes": [
+      "summary_panel",
+      "numeric_summary",
+      "list",
+      "step_sequence",
+      "timeline",
+      "decision_set",
+      "physical_target",
+      "assembly_explode",
+      "diagnostic_finding",
+      "anchored_marker",
+      "alignment_guide",
+      "airflow_streamlines",
+      "process_model",
+      "environment"
+    ],
+    "representationModes": [
+      "two_d_panel",
+      "wall_dashboard",
+      "three_d_model",
+      "tabletop_model",
+      "floor_timeline",
+      "floating_decision_card",
+      "highlighted_target",
+      "exploded_view",
+      "anchored_callout",
+      "guide_line",
+      "diagnostic_overlay",
+      "airflow_field"
+    ],
+    "placements": [
+      "wall",
+      "table",
+      "floor",
+      "object_anchored",
+      "above_target",
+      "near_user",
+      "near_presenter",
+      "left_of_user",
+      "right_of_user",
+      "in_front_of_user",
+      "room_center"
+    ],
+    "anchorStrategies": [
+      "world_anchor",
+      "plane_anchor",
+      "object_anchor",
+      "relative_to_target",
+      "user_relative",
+      "simulated_anchor"
+    ],
+    "scaleModes": [
+      "real_scale",
+      "tabletop_scale",
+      "enlarged_detail",
+      "compact_panel",
+      "room_scale"
+    ],
+    "attentionBehaviors": [
+      "ambient",
+      "persistent_context",
+      "active_focus",
+      "peripheral",
+      "on_demand",
+      "guiding"
+    ],
+    "animationPrimitives": [
+      "transform_keyframes",
+      "explode",
+      "assemble",
+      "highlight_pulse",
+      "fade",
+      "set_visible",
+      "attention_camera_hint"
+    ],
+    "interactionTriggers": [
+      "tap",
+      "hover",
+      "dwell",
+      "scene_event"
+    ],
+    "interactionActions": [
+      "play_animation",
+      "stop_animation",
+      "advance_step",
+      "previous_step",
+      "restart_sequence",
+      "set_visible"
+    ],
+    "fidelities": [
+      "ghost",
+      "draft",
+      "committed",
+      "authored"
+    ],
+    "mechanicKinds": [
+      "exploded_view",
+      "annotated_callouts",
+      "highlighted_region",
+      "timeline",
+      "cross_section",
+      "assembly_sequence",
+      "ghosted_internal",
+      "flow_diagram",
+      "process_animation",
+      "cutaway",
+      "disassembly_sequence",
+      "before_after",
+      "comparison_grid",
+      "metric_dashboard",
+      "cross_reference",
+      "scale_reference",
+      "color_coded_map",
+      "force_arrows",
+      "particle_flow",
+      "cutaway_orbit",
+      "xray_layer_stack",
+      "interactive_dissection",
+      "placeholder_mechanic"
+    ],
+    "presentationLayouts": [
+      "stage_in_front",
+      "flat_grid",
+      "scene_floor",
+      "wall_room"
+    ]
+  }
+}

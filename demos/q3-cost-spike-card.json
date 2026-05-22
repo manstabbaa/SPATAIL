@@ -1,0 +1,79 @@
+{
+  "id": "q3-cost-spike",
+  "title": "Why Q3 Manufacturing Costs Spiked",
+  "prompt": "Why did Q3 manufacturing costs spike?",
+  "domain": "corporate_review",
+  "default": false,
+  "environment": { "kind": "boardroom" },
+
+  "explanation": {
+    "intentSummary": "Explain a causal change in a system or metric.",
+    "written": "The prompt 'Why did Q3 manufacturing costs spike?' is asking for a causal explanation of a measured change. A good answer leads with the metric (the spike is the subject — make the magnitude unambiguous), traces it through the manufacturing flow (so the user can see WHERE in the line the cost moved), shows the events that caused it on a timeline (so the user can see WHEN), and lays out the choice the team actually has to make next."
+  },
+
+  "mechanics": [
+    { "kind": "metric_dashboard", "target": null,
+      "params": { "title": "Q3 KPI summary",
+                  "kpis": [
+                    { "label": "Manufacturing cost / unit", "value": "$184",   "delta": "+12.4% QoQ", "trend": "up"   },
+                    { "label": "Raw material cost",         "value": "$72/u",  "delta": "+8.1% QoQ",  "trend": "up"   },
+                    { "label": "Labor cost",                "value": "$48/u",  "delta": "+4.2% QoQ",  "trend": "up"   },
+                    { "label": "Energy cost",               "value": "$23/u",  "delta": "+34% QoQ",   "trend": "up"   },
+                    { "label": "Defect rate",               "value": "2.1%",   "delta": "+0.6 pp",    "trend": "up"   },
+                    { "label": "On-time delivery",          "value": "91%",    "delta": "-3 pp",      "trend": "down" }
+                  ] },
+      "why": "Lead with the metric so the magnitude is unambiguous." },
+
+    { "kind": "flow_diagram", "target": null,
+      "params": { "title": "Manufacturing flow — where the cost moved",
+                  "highlightNodeId": "assembly",
+                  "tokenSpeed": 0.8,
+                  "orientation": "lr",
+                  "nodes": [
+                    { "id": "stamping", "label": "Stamping" },
+                    { "id": "welding",  "label": "Welding" },
+                    { "id": "assembly", "label": "Assembly (Line 3)", "subtitle": "Bottleneck — wk 11 heat-exchanger failure" },
+                    { "id": "paint",    "label": "Paint",             "subtitle": "Defect spike on Line 4" },
+                    { "id": "qc",       "label": "QC", "kind": "gate" }
+                  ],
+                  "edges": [
+                    { "from": "stamping", "to": "welding" },
+                    { "from": "welding",  "to": "assembly" },
+                    { "from": "assembly", "to": "paint" },
+                    { "from": "paint",    "to": "qc" }
+                  ] },
+      "why": "Trace the spike through the process so the user can see WHERE in the line cost accumulated." },
+
+    { "kind": "timeline", "target": null,
+      "params": { "title": "Q3 events",
+                  "events": [
+                    { "when": "Jul wk 2",  "label": "Aluminium spot +18%",       "detail": "Hedge contract expired" },
+                    { "when": "Aug wk 5",  "label": "Peak energy tier",          "detail": "Utility tariff stepped up" },
+                    { "when": "Sep wk 11", "label": "Line 3 heat-exchanger failure", "detail": "4-day unplanned downtime" },
+                    { "when": "Sep wk 12", "label": "Overtime authorised",       "detail": "Recover Line 3 backlog" },
+                    { "when": "Sep wk 13", "label": "Defect spike on Line 4",    "detail": "Likely humidity-correlated paint defects" }
+                  ] },
+      "why": "Place the events on time so the user can see WHEN the spike happened." },
+
+    { "kind": "comparison_grid", "target": null,
+      "params": { "title": "What we could do next",
+                  "columns": [
+                    { "id": "rehedge",        "label": "Re-hedge aluminium" },
+                    { "id": "line3_pm",       "label": "PM on Line 3 sisters" },
+                    { "id": "energy_audit",   "label": "Energy audit" },
+                    { "id": "paint_humidity", "label": "Paint humidity ctrl" }
+                  ],
+                  "rows": [
+                    { "key": "Effort",         "values": ["S",  "M",  "M",  "L"] },
+                    { "key": "Cost impact",    "values": ["High","Med","Med","Low"] },
+                    { "key": "Time to effect", "values": ["1 wk","2 wk","6 wk","12 wk"] }
+                  ] },
+      "why": "End with the choice the user actually has to make." }
+  ],
+
+  "sources": [
+    { "kind": "summary", "title": "Cost spike — one-line",
+      "placementHint": "wall",
+      "body": "Q3 manufacturing cost / unit rose 12.4% QoQ. Three drivers account for ~90% of the increase: aluminium +18% (hedge expired), unplanned Line 3 downtime in wk 11, and peak-tier summer energy." }
+  ]
+}

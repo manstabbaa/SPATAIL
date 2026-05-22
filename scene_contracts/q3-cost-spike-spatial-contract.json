@@ -1,0 +1,834 @@
+{
+  "schemaVersion": "0.5.0-spatail",
+  "createdAt": "2026-05-20T18:48:33.963Z",
+  "experienceId": "q3-cost-spike",
+  "title": "Why Q3 Manufacturing Costs Spiked",
+  "sourcePrompt": "Why did Q3 manufacturing costs spike?",
+  "sourceInputs": [
+    {
+      "kind": "summary",
+      "key": null,
+      "title": "Cost spike — one-line"
+    }
+  ],
+  "sourceFiles": [],
+  "detectedDomain": {
+    "name": "corporate_review",
+    "confidence": "high",
+    "source": "card.domain"
+  },
+  "environmentAssumptions": {
+    "kind": "boardroom",
+    "source": "card.environment"
+  },
+  "spatialElements": [
+    {
+      "id": "elem_cost_spike_one_line_0",
+      "title": "Cost spike — one-line",
+      "contentType": "summary_panel",
+      "representationMode": "two_d_panel",
+      "placement": {
+        "kind": "wall",
+        "anchor": "wall_back",
+        "position": [
+          -1.2,
+          2,
+          -1.98
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMeters": [
+          1.3,
+          0.95
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "enlarged_detail",
+      "priority": 40,
+      "sourceContent": {
+        "title": "Cost spike — one-line",
+        "placementHint": "wall",
+        "body": "Q3 manufacturing cost / unit rose 12.4% QoQ. Three drivers account for ~90% of the increase: aluminium +18% (hedge expired), unplanned Line 3 downtime in wk 11, and peak-tier summer energy."
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "expand this panel to a fuller view"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "wall.north",
+        "kind": "wall",
+        "areaMeters2": 16.2,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "centroid": [
+          0,
+          1.35,
+          -2
+        ],
+        "heightMeters": null,
+        "facingUser": true,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "Short readable text — a 2D panel keeps it scannable without occupying physical workspace.",
+      "whyThisPlacement": "Dashboards are shared overview information — the back wall is the obvious 'everyone looks here' surface for glanceable KPIs. — Resolved to wall.north (wall, 6.0m × 2.7m, area 16.2m²)."
+    }
+  ],
+  "relationships": [],
+  "interactionPlan": {
+    "interactions": [
+      {
+        "id": "elem_cost_spike_one_line_0::tap_part_to_show_label",
+        "elementId": "elem_cost_spike_one_line_0",
+        "type": "expand",
+        "behavior": "expand this panel to a fuller view",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::reset_view",
+        "elementId": null,
+        "type": "reset_view",
+        "behavior": "restore camera and every element's original state",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::next_step",
+        "elementId": null,
+        "type": "next_step",
+        "behavior": "advance the attention plan by one step",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::previous_step",
+        "elementId": null,
+        "type": "previous_step",
+        "behavior": "step the attention plan back by one",
+        "trigger": "ui"
+      }
+    ]
+  },
+  "attentionPlan": [
+    {
+      "step": 1,
+      "focusElementId": "elem_cost_spike_one_line_0",
+      "narration": "Reference: Cost spike — one-line."
+    }
+  ],
+  "assetRequirements": [
+    {
+      "id": "car-engine",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "f1-car",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "futuristic-egg-shaped-gaming-pod-chair-concept-interior-design-cad-model-1.snapshot.2",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "lego-minifig-3.snapshot.9",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "r-c-8-automodell-1.snapshot.3",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "yamaha-tdm-850-1.snapshot.3",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    }
+  ],
+  "animations": [],
+  "interactions": [
+    {
+      "id": "tap.next",
+      "trigger": {
+        "type": "scene_event",
+        "target": "transport_next"
+      },
+      "actions": [
+        {
+          "type": "advance_step"
+        }
+      ],
+      "note": "Fired by the transport bar Next button (and tap on the scene background)."
+    },
+    {
+      "id": "tap.previous",
+      "trigger": {
+        "type": "scene_event",
+        "target": "transport_previous"
+      },
+      "actions": [
+        {
+          "type": "previous_step"
+        }
+      ],
+      "note": "Fired by the transport bar Previous button."
+    }
+  ],
+  "sequences": [],
+  "defaultSequenceId": null,
+  "roomContract": {
+    "schemaVersion": "0.4.0-room",
+    "roomId": "mock-default-room",
+    "capturedAt": "2026-05-18T00:00:00Z",
+    "source": "mock",
+    "label": "Mock workshop — desktop simulator",
+    "boundingBox": {
+      "min": [
+        -3,
+        0,
+        -2
+      ],
+      "max": [
+        3,
+        2.7,
+        2
+      ]
+    },
+    "userPose": {
+      "position": [
+        0,
+        1.6,
+        1.4
+      ],
+      "forward": [
+        0,
+        0,
+        -1
+      ]
+    },
+    "surfaces": [
+      {
+        "id": "floor.main",
+        "kind": "floor",
+        "polygon": [
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            -3,
+            0,
+            2
+          ]
+        ],
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "areaMeters2": 24,
+        "confidence": 0.95,
+        "facingUser": false
+      },
+      {
+        "id": "wall.north",
+        "kind": "wall",
+        "polygon": [
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            -2
+          ]
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "areaMeters2": 16.2,
+        "confidence": 0.92,
+        "facingUser": true,
+        "note": "Largest user-facing wall — preferred mount for wall_dashboard elements."
+      },
+      {
+        "id": "wall.west",
+        "kind": "wall",
+        "polygon": [
+          [
+            -3,
+            0,
+            2
+          ],
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            2
+          ]
+        ],
+        "normal": [
+          1,
+          0,
+          0
+        ],
+        "areaMeters2": 10.8,
+        "confidence": 0.88,
+        "facingUser": false
+      },
+      {
+        "id": "wall.east",
+        "kind": "wall",
+        "polygon": [
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            3,
+            2.7,
+            2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ]
+        ],
+        "normal": [
+          -1,
+          0,
+          0
+        ],
+        "areaMeters2": 10.8,
+        "confidence": 0.88,
+        "facingUser": false
+      },
+      {
+        "id": "ceiling.main",
+        "kind": "ceiling",
+        "polygon": [
+          [
+            -3,
+            2.7,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            2
+          ],
+          [
+            -3,
+            2.7,
+            2
+          ]
+        ],
+        "normal": [
+          0,
+          -1,
+          0
+        ],
+        "areaMeters2": 24,
+        "confidence": 0.9,
+        "facingUser": false
+      },
+      {
+        "id": "table.workbench",
+        "kind": "table",
+        "polygon": [
+          [
+            -0.8,
+            0.75,
+            -0.5
+          ],
+          [
+            0.8,
+            0.75,
+            -0.5
+          ],
+          [
+            0.8,
+            0.75,
+            0.5
+          ],
+          [
+            -0.8,
+            0.75,
+            0.5
+          ]
+        ],
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "areaMeters2": 1.6,
+        "heightMeters": 0.75,
+        "confidence": 0.96,
+        "note": "Hero workbench — primary surface for tabletop_model + highlighted_target."
+      }
+    ],
+    "anchorPoints": [
+      {
+        "id": "anchor.user_front",
+        "position": [
+          0,
+          1.4,
+          0.3
+        ],
+        "kind": "user_relative"
+      },
+      {
+        "id": "anchor.user_left",
+        "position": [
+          -0.8,
+          1.4,
+          0.6
+        ],
+        "kind": "user_relative"
+      },
+      {
+        "id": "anchor.user_right",
+        "position": [
+          0.8,
+          1.4,
+          0.6
+        ],
+        "kind": "user_relative"
+      }
+    ]
+  },
+  "explanation": {
+    "intentSummary": "Explain a causal change in a system or metric.",
+    "written": "The prompt 'Why did Q3 manufacturing costs spike?' is asking for a causal explanation of a measured change. A good answer leads with the metric (the spike is the subject — make the magnitude unambiguous), traces it through the manufacturing flow (so the user can see WHERE in the line the cost moved), shows the events that caused it on a timeline (so the user can see WHEN), and lays out the choice the team actually has to make next."
+  },
+  "mechanics": [
+    {
+      "id": "mech.1.metric_dashboard",
+      "kind": "metric_dashboard",
+      "requestedKind": "metric_dashboard",
+      "target": null,
+      "anchorsOn": null,
+      "params": {
+        "title": "Q3 KPI summary",
+        "kpis": [
+          {
+            "label": "Manufacturing cost / unit",
+            "value": "$184",
+            "delta": "+12.4% QoQ",
+            "trend": "up"
+          },
+          {
+            "label": "Raw material cost",
+            "value": "$72/u",
+            "delta": "+8.1% QoQ",
+            "trend": "up"
+          },
+          {
+            "label": "Labor cost",
+            "value": "$48/u",
+            "delta": "+4.2% QoQ",
+            "trend": "up"
+          },
+          {
+            "label": "Energy cost",
+            "value": "$23/u",
+            "delta": "+34% QoQ",
+            "trend": "up"
+          },
+          {
+            "label": "Defect rate",
+            "value": "2.1%",
+            "delta": "+0.6 pp",
+            "trend": "up"
+          },
+          {
+            "label": "On-time delivery",
+            "value": "91%",
+            "delta": "-3 pp",
+            "trend": "down"
+          }
+        ]
+      },
+      "why": "Lead with the metric so the magnitude is unambiguous.",
+      "placeholderRouted": false,
+      "placeholderReason": null
+    },
+    {
+      "id": "mech.2.flow_diagram",
+      "kind": "flow_diagram",
+      "requestedKind": "flow_diagram",
+      "target": null,
+      "anchorsOn": null,
+      "params": {
+        "title": "Manufacturing flow — where the cost moved",
+        "highlightNodeId": "assembly",
+        "tokenSpeed": 0.8,
+        "orientation": "lr",
+        "nodes": [
+          {
+            "id": "stamping",
+            "label": "Stamping"
+          },
+          {
+            "id": "welding",
+            "label": "Welding"
+          },
+          {
+            "id": "assembly",
+            "label": "Assembly (Line 3)",
+            "subtitle": "Bottleneck — wk 11 heat-exchanger failure"
+          },
+          {
+            "id": "paint",
+            "label": "Paint",
+            "subtitle": "Defect spike on Line 4"
+          },
+          {
+            "id": "qc",
+            "label": "QC",
+            "kind": "gate"
+          }
+        ],
+        "edges": [
+          {
+            "from": "stamping",
+            "to": "welding"
+          },
+          {
+            "from": "welding",
+            "to": "assembly"
+          },
+          {
+            "from": "assembly",
+            "to": "paint"
+          },
+          {
+            "from": "paint",
+            "to": "qc"
+          }
+        ]
+      },
+      "why": "Trace the spike through the process so the user can see WHERE in the line cost accumulated.",
+      "placeholderRouted": false,
+      "placeholderReason": null
+    },
+    {
+      "id": "mech.3.timeline",
+      "kind": "timeline",
+      "requestedKind": "timeline",
+      "target": null,
+      "anchorsOn": null,
+      "params": {
+        "title": "Q3 events",
+        "events": [
+          {
+            "when": "Jul wk 2",
+            "label": "Aluminium spot +18%",
+            "detail": "Hedge contract expired"
+          },
+          {
+            "when": "Aug wk 5",
+            "label": "Peak energy tier",
+            "detail": "Utility tariff stepped up"
+          },
+          {
+            "when": "Sep wk 11",
+            "label": "Line 3 heat-exchanger failure",
+            "detail": "4-day unplanned downtime"
+          },
+          {
+            "when": "Sep wk 12",
+            "label": "Overtime authorised",
+            "detail": "Recover Line 3 backlog"
+          },
+          {
+            "when": "Sep wk 13",
+            "label": "Defect spike on Line 4",
+            "detail": "Likely humidity-correlated paint defects"
+          }
+        ]
+      },
+      "why": "Place the events on time so the user can see WHEN the spike happened.",
+      "placeholderRouted": false,
+      "placeholderReason": null
+    },
+    {
+      "id": "mech.4.comparison_grid",
+      "kind": "metric_dashboard",
+      "requestedKind": "comparison_grid",
+      "target": null,
+      "anchorsOn": null,
+      "params": {
+        "title": "What we could do next",
+        "columns": [
+          {
+            "id": "rehedge",
+            "label": "Re-hedge aluminium"
+          },
+          {
+            "id": "line3_pm",
+            "label": "PM on Line 3 sisters"
+          },
+          {
+            "id": "energy_audit",
+            "label": "Energy audit"
+          },
+          {
+            "id": "paint_humidity",
+            "label": "Paint humidity ctrl"
+          }
+        ],
+        "rows": [
+          {
+            "key": "Effort",
+            "values": [
+              "S",
+              "M",
+              "M",
+              "L"
+            ]
+          },
+          {
+            "key": "Cost impact",
+            "values": [
+              "High",
+              "Med",
+              "Med",
+              "Low"
+            ]
+          },
+          {
+            "key": "Time to effect",
+            "values": [
+              "1 wk",
+              "2 wk",
+              "6 wk",
+              "12 wk"
+            ]
+          }
+        ]
+      },
+      "why": "End with the choice the user actually has to make.",
+      "placeholderRouted": true,
+      "placeholderReason": "comparison_grid -> metric_dashboard"
+    }
+  ],
+  "presentation": {
+    "layout": "stage_in_front",
+    "ordering": [
+      "mech.1.metric_dashboard",
+      "mech.2.flow_diagram",
+      "mech.3.timeline",
+      "mech.4.comparison_grid"
+    ],
+    "note": "Default flat stage 1.5m ahead of the user. Room-aware composition is a wrapper for later."
+  },
+  "reasoningSummary": "Prompt \"Why did Q3 manufacturing costs spike?\" was understood as domain \"corporate_review\" with 1 content items. Spatial mix: 1× two_d_panel. Textual and numeric content stayed as readable panels rather than being forced into 3D widgets.",
+  "vocabularies": {
+    "contentTypes": [
+      "summary_panel",
+      "numeric_summary",
+      "list",
+      "step_sequence",
+      "timeline",
+      "decision_set",
+      "physical_target",
+      "assembly_explode",
+      "diagnostic_finding",
+      "anchored_marker",
+      "alignment_guide",
+      "airflow_streamlines",
+      "process_model",
+      "environment"
+    ],
+    "representationModes": [
+      "two_d_panel",
+      "wall_dashboard",
+      "three_d_model",
+      "tabletop_model",
+      "floor_timeline",
+      "floating_decision_card",
+      "highlighted_target",
+      "exploded_view",
+      "anchored_callout",
+      "guide_line",
+      "diagnostic_overlay",
+      "airflow_field"
+    ],
+    "placements": [
+      "wall",
+      "table",
+      "floor",
+      "object_anchored",
+      "above_target",
+      "near_user",
+      "near_presenter",
+      "left_of_user",
+      "right_of_user",
+      "in_front_of_user",
+      "room_center"
+    ],
+    "anchorStrategies": [
+      "world_anchor",
+      "plane_anchor",
+      "object_anchor",
+      "relative_to_target",
+      "user_relative",
+      "simulated_anchor"
+    ],
+    "scaleModes": [
+      "real_scale",
+      "tabletop_scale",
+      "enlarged_detail",
+      "compact_panel",
+      "room_scale"
+    ],
+    "attentionBehaviors": [
+      "ambient",
+      "persistent_context",
+      "active_focus",
+      "peripheral",
+      "on_demand",
+      "guiding"
+    ],
+    "animationPrimitives": [
+      "transform_keyframes",
+      "explode",
+      "assemble",
+      "highlight_pulse",
+      "fade",
+      "set_visible",
+      "attention_camera_hint"
+    ],
+    "interactionTriggers": [
+      "tap",
+      "hover",
+      "dwell",
+      "scene_event"
+    ],
+    "interactionActions": [
+      "play_animation",
+      "stop_animation",
+      "advance_step",
+      "previous_step",
+      "restart_sequence",
+      "set_visible"
+    ],
+    "fidelities": [
+      "ghost",
+      "draft",
+      "committed",
+      "authored"
+    ],
+    "mechanicKinds": [
+      "exploded_view",
+      "annotated_callouts",
+      "highlighted_region",
+      "timeline",
+      "cross_section",
+      "assembly_sequence",
+      "ghosted_internal",
+      "flow_diagram",
+      "process_animation",
+      "cutaway",
+      "disassembly_sequence",
+      "before_after",
+      "comparison_grid",
+      "metric_dashboard",
+      "cross_reference",
+      "scale_reference",
+      "color_coded_map",
+      "force_arrows",
+      "particle_flow",
+      "cutaway_orbit",
+      "xray_layer_stack",
+      "interactive_dissection",
+      "placeholder_mechanic"
+    ],
+    "presentationLayouts": [
+      "stage_in_front",
+      "flat_grid",
+      "scene_floor",
+      "wall_room"
+    ]
+  }
+}

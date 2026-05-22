@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "spatial-viewer",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["viewer/server.js"],
+      "port": 5173
+    }
+  ]
+}

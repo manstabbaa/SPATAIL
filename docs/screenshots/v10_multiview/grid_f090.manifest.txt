@@ -1,0 +1,4 @@
+persp: C:/SPATAIL_MAX/docs/screenshots/v10_multiview/_tiles/f0090_persp.png
+front: C:/SPATAIL_MAX/docs/screenshots/v10_multiview/_tiles/f0090_front.png
+right: C:/SPATAIL_MAX/docs/screenshots/v10_multiview/_tiles/f0090_right.png
+top: C:/SPATAIL_MAX/docs/screenshots/v10_multiview/_tiles/f0090_top.png

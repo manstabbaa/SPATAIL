@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SPATAIL</title>
+    <link rel="stylesheet" href="/viewer/spatail.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body class="void">
+    <!--
+      Spatial IS the visual layer. The web client is a void with a single
+      prompt bar — every spatial decision is shown IN the scene, not in
+      sidebars. The art-direction canvas. The iOS client adds the camera
+      feed underneath; the web preview keeps a neutral background.
+
+      The debug-only DOM nodes (sidebars, transport, picker) are kept so
+      spatail.js can still write into them, but they live inside <details>
+      so the void stays clean. Press the small ▾ chip bottom-right to open.
+    -->
+    <div id="app">
+      <main>
+        <section id="stage">
+          <div id="canvas-wrap"></div>
+        </section>
+      </main>
+
+      <!-- The single visible UI affordance on the web client. -->
+      <form id="prompt-form" autocomplete="off">
+        <input id="prompt-input"
+               type="text"
+               placeholder="Ask SPATAIL anything about the steering wheel…"
+               aria-label="Prompt SPATAIL"
+               spellcheck="false" />
+        <button type="submit" aria-label="Send" title="Send">↵</button>
+      </form>
+
+      <!-- Tiny status pill — what the system is doing right now. -->
+      <div id="status-pill"><span id="status">ready</span></div>
+
+      <!--
+        Tab switcher — content packs. Each tab loads a different experience
+        contract (steering wheel, F1 aero, eventually anything else). The
+        runtime treats each pack as a self-contained scene. Adding a new
+        tab = a new card + a new entry in this list. Renderer code never
+        changes.
+      -->
+      <div id="content-tabs" role="tablist">
+        <button class="content-tab" data-experience="mercedes-f1-wheel" type="button">Steering Wheel</button>
+        <button class="content-tab" data-experience="f1-aero" type="button">F1 Aero · DRS</button>
+      </div>
+
+      <!--
+        Dev / debug drawer. Hidden by default; click the chip to open.
+        Everything inside is the older Contract Studio inspector — kept
+        live so spatail.js can populate it for diagnostics, but never
+        in the user's face. Will move to a separate /studio route later.
+      -->
+      <details id="debug-drawer">
+        <summary aria-label="Toggle debug drawer">debug ▾</summary>
+        <aside id="sidebar">
+          <section class="panel">
+            <h2>Experience</h2>
+            <select id="experience-picker"></select>
+            <div class="picker-row">
+              <a id="contract-link" href="#" target="_blank">raw contract →</a>
+              <span id="schema-version"></span>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>Source</h2>
+            <dl id="source-meta"></dl>
+          </section>
+
+          <section class="panel">
+            <h2>
+              By placement
+              <button id="rel-lines-toggle" class="toggle-btn"
+                      title="Show / hide dashed relationship lines in the 3D stage"
+                      aria-pressed="true">relationships: on</button>
+            </h2>
+            <div id="placement-groups"></div>
+          </section>
+
+          <section class="panel">
+            <h2>Spatial elements <span id="element-count" class="count">0</span></h2>
+            <ul id="element-list"></ul>
+          </section>
+
+          <section class="panel" id="reasoning-panel">
+            <h2>Why this spatial choice?</h2>
+            <div id="reasoning-empty" class="hint">
+              Pick an element to see why SPATAIL chose this representation,
+              where it's placed, what it's anchored to, and what interactions
+              it supports.
+            </div>
+            <div id="reasoning-body" hidden>
+              <div id="reasoning-title" class="reasoning-title"></div>
+              <div class="rep-grid">
+                <div><div class="rep-label">representation</div>
+                     <div id="rep-mode" class="rep-value"></div></div>
+                <div><div class="rep-label">placement</div>
+                     <div id="rep-placement" class="rep-value"></div></div>
+                <div><div class="rep-label">anchor</div>
+                     <div id="rep-anchor" class="rep-value"></div></div>
+                <div><div class="rep-label">scale</div>
+                     <div id="rep-scale" class="rep-value"></div></div>
+                <div><div class="rep-label">attention</div>
+                     <div id="rep-attention" class="rep-value"></div></div>
+                <div><div class="rep-label">fidelity</div>
+                     <div id="rep-fidelity" class="rep-value"></div></div>
+              </div>
+              <div class="why-block">
+                <div class="why-label">why this representation</div>
+                <div id="why-rep" class="why-text"></div>
+              </div>
+              <div class="why-block">
+                <div class="why-label">why this placement</div>
+                <div id="why-place" class="why-text"></div>
+              </div>
+              <div class="why-block" id="interactions-block">
+                <div class="why-label">interactions</div>
+                <ul id="interactions-list" class="interactions-list"></ul>
+              </div>
+              <div class="why-block" id="related-block" hidden>
+                <div class="why-label">related</div>
+                <ul id="related-list"></ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>Reasoning summary</h2>
+            <p id="summary-text" class="summary"></p>
+          </section>
+
+          <section class="panel">
+            <h2>Attention plan</h2>
+            <ol id="attention-list"></ol>
+          </section>
+
+          <section class="panel">
+            <h2>Interaction plan</h2>
+            <ul id="interaction-plan-list" class="interaction-plan-list"></ul>
+          </section>
+        </aside>
+      </details>
+
+      <!--
+        Diagnostic-only nodes that spatail.js writes into but the user
+        doesn't need to see in the void. Off-screen, still in the DOM.
+      -->
+      <div class="offscreen" aria-hidden="true">
+        <div id="prompt-overlay"><div id="prompt-text">—</div></div>
+        <div id="hud"><div id="hud-line"></div></div>
+        <div id="legend"></div>
+        <div id="transport" hidden>
+          <button class="t-btn" id="t-restart"></button>
+          <button class="t-btn" id="t-prev"></button>
+          <button class="t-btn t-play" id="t-play"></button>
+          <button class="t-btn" id="t-next"></button>
+          <div class="t-readout">
+            <div class="t-progress"><div class="t-progress-fill" id="t-progress-fill"></div></div>
+            <div class="t-label" id="t-label"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/viewer/spatail.js"></script>
+  </body>
+</html>

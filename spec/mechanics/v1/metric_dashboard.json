@@ -1,0 +1,9 @@
+{
+  "kind": "metric_dashboard",
+  "status": "shipped",
+  "version": 1,
+  "description": "KPI tiles, charts, status pills. When text is the right answer, don't force 3D. Pre-existing renderer (wall_dashboard).",
+  "expectedSourceShape": { "kpis": "[{ label, value, delta?, trend? }]", "title": "optional" },
+  "params": { "columns": { "type": "integer", "default": 2 } },
+  "qualityBar": { "reference": "Q3 KPI summary — 6 KPIs in 2 cols with delta + trend chip." }
+}

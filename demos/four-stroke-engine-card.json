@@ -1,0 +1,77 @@
+{
+  "id": "four-stroke-engine",
+  "title": "How a Four-Stroke Engine Works",
+  "prompt": "How does a four-stroke engine work?",
+  "domain": "mechanical_explanation",
+  "default": false,
+  "environment": { "kind": "workbench" },
+
+  "explanation": {
+    "intentSummary": "Explain a mechanism's working principle.",
+    "written": "The prompt 'How does a four-stroke engine work?' is asking for an explanation of a mechanism's working principle. A good answer reveals what's inside the engine block (you can't explain a four-stroke without showing the piston, valves and crank), shows the four strokes in motion (Intake → Compression → Power → Exhaust — the timing is the point), and labels the parts in place so the user can tie what they see to the names they'll hear elsewhere."
+  },
+
+  "mechanics": [
+    { "kind": "ghosted_internal",   "target": "engine_block",
+      "params": { "shellOpacity": 0.18, "internalSelector": "piston|conrod|crank|valve" },
+      "why": "Reveal the interior so the moving parts are visible — a four-stroke is unintelligible from the outside." },
+    { "kind": "cross_section",      "target": "engine_block",
+      "params": { "axis": "z", "offset": 0.0, "silhouette": true },
+      "why": "Cut the block along the cylinder axis so the user can see the cylinder, piston, valves, and head at once." },
+    { "kind": "process_animation",  "target": "engine_block",
+      "params": { "loop": true,
+                  "motion": [
+                    { "partRef": "piston",       "channel": "translation", "axis": "y", "amplitude": 0.04, "period": 1.2 },
+                    { "partRef": "intake_valve", "channel": "translation", "axis": "y", "amplitude": 0.012, "period": 1.2, "phase": 0.0  },
+                    { "partRef": "exhaust_valve","channel": "translation", "axis": "y", "amplitude": 0.012, "period": 1.2, "phase": 0.75 },
+                    { "partRef": "crank",        "channel": "rotation",    "axis": "z", "amplitude": 6.283, "period": 1.2 }
+                  ] },
+      "why": "Loop the four strokes so the user can see the timing relationships between piston, valves, and crank." },
+    { "kind": "annotated_callouts", "target": "engine_block",
+      "params": { "items": [
+        { "id": "co.cylinder",       "label": "Cylinder",      "finding": "The piston rides up and down inside this bore." },
+        { "id": "co.piston",         "label": "Piston",        "finding": "Converts gas pressure into linear motion." },
+        { "id": "co.intake_valve",   "label": "Intake valve",  "finding": "Opens during the Intake stroke to let the air/fuel mix in." },
+        { "id": "co.exhaust_valve",  "label": "Exhaust valve", "finding": "Opens during the Exhaust stroke to let burnt gas out." },
+        { "id": "co.spark_plug",     "label": "Spark plug",    "finding": "Fires at top-dead-centre on the Power stroke." },
+        { "id": "co.crankshaft",     "label": "Crankshaft",    "finding": "Translates piston motion into rotation — this is where torque leaves the engine." }
+      ] },
+      "why": "Pin the part names so the user can tie what they see to the vocabulary." }
+  ],
+
+  "sources": [
+    { "kind": "object3d", "id": "engine_block", "name": "Engine Block (placeholder)",
+      "role": "target", "assetGroupRef": "engine_placeholder",
+      "placementHint": "table",
+      "finding": "Placeholder mesh — the existing car-engine GLB stands in until a dedicated four-stroke asset lands." },
+
+    { "kind": "object3d", "id": "co.cylinder",      "name": "Cylinder",      "role": "callout",
+      "targetRef": "engine_block", "spotlightOnHero": [0.00,  0.02,  0.00],
+      "finding": "The piston rides up and down inside this bore." },
+    { "kind": "object3d", "id": "co.piston",        "name": "Piston",        "role": "callout",
+      "targetRef": "engine_block", "spotlightOnHero": [0.00,  0.00,  0.00],
+      "finding": "Converts gas pressure into linear motion." },
+    { "kind": "object3d", "id": "co.intake_valve",  "name": "Intake valve",  "role": "callout",
+      "targetRef": "engine_block", "spotlightOnHero": [-0.02, 0.025, 0.00],
+      "finding": "Opens during the Intake stroke to let the air/fuel mix in." },
+    { "kind": "object3d", "id": "co.exhaust_valve", "name": "Exhaust valve", "role": "callout",
+      "targetRef": "engine_block", "spotlightOnHero": [0.02,  0.025, 0.00],
+      "finding": "Opens during the Exhaust stroke to let burnt gas out." },
+    { "kind": "object3d", "id": "co.spark_plug",    "name": "Spark plug",    "role": "callout",
+      "targetRef": "engine_block", "spotlightOnHero": [0.00,  0.03,  0.00],
+      "finding": "Fires at top-dead-centre on the Power stroke." },
+    { "kind": "object3d", "id": "co.crankshaft",    "name": "Crankshaft",    "role": "callout",
+      "targetRef": "engine_block", "spotlightOnHero": [0.00, -0.03,  0.00],
+      "finding": "Translates piston motion into rotation — this is where torque leaves the engine." },
+
+    { "kind": "list", "title": "Four strokes, in order",
+      "placementHint": "left_of_user",
+      "items": [
+        "Intake — piston down, intake valve open, exhaust valve shut. Air-fuel mix fills the cylinder.",
+        "Compression — both valves shut. Piston rises, squeezing the charge.",
+        "Power — spark plug fires at top of stroke. Combustion drives the piston down — this is where torque is produced.",
+        "Exhaust — exhaust valve opens, piston rises and pushes burnt gas out."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "kind": "placeholder_mechanic",
+  "status": "fallback",
+  "version": 1,
+  "description": "When the orchestrator picks a mechanic that the viewer can't yet render, the contract emits this as a labelled stub panel so the gap is visible (not silently swallowed).",
+  "expectedSourceShape": { "label": "what the orchestrator wanted to do here" },
+  "params": {}
+}

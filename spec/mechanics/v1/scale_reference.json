@@ -1,0 +1,8 @@
+{
+  "kind": "scale_reference",
+  "status": "placeholder",
+  "placeholderFor": "annotated_callouts",
+  "version": 1,
+  "description": "Known-size object placed next to subject (human silhouette, coin, hand).",
+  "expectedSourceShape": { "object": "enum: human | coin | hand | a4 | iphone", "position": "[x,y,z]" }
+}

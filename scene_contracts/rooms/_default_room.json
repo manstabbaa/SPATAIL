@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "0.4.0-room",
+  "roomId": "mock-default-room",
+  "capturedAt": "2026-05-18T00:00:00Z",
+  "source": "mock",
+  "label": "Mock workshop — desktop simulator",
+  "boundingBox": {
+    "min": [-3.0, 0.0, -2.0],
+    "max": [ 3.0, 2.7,  2.0]
+  },
+  "userPose": {
+    "position": [0.0, 1.6, 1.4],
+    "forward":  [0.0, 0.0, -1.0]
+  },
+  "surfaces": [
+    {
+      "id": "floor.main",
+      "kind": "floor",
+      "polygon": [
+        [-3.0, 0.0, -2.0],
+        [ 3.0, 0.0, -2.0],
+        [ 3.0, 0.0,  2.0],
+        [-3.0, 0.0,  2.0]
+      ],
+      "normal":   [0, 1, 0],
+      "areaMeters2": 24.0,
+      "confidence": 0.95,
+      "facingUser": false
+    },
+    {
+      "id": "wall.north",
+      "kind": "wall",
+      "polygon": [
+        [-3.0, 0.0, -2.0],
+        [ 3.0, 0.0, -2.0],
+        [ 3.0, 2.7, -2.0],
+        [-3.0, 2.7, -2.0]
+      ],
+      "normal":   [0, 0, 1],
+      "areaMeters2": 16.2,
+      "confidence": 0.92,
+      "facingUser": true,
+      "note": "Largest user-facing wall — preferred mount for wall_dashboard elements."
+    },
+    {
+      "id": "wall.west",
+      "kind": "wall",
+      "polygon": [
+        [-3.0, 0.0,  2.0],
+        [-3.0, 0.0, -2.0],
+        [-3.0, 2.7, -2.0],
+        [-3.0, 2.7,  2.0]
+      ],
+      "normal":   [1, 0, 0],
+      "areaMeters2": 10.8,
+      "confidence": 0.88,
+      "facingUser": false
+    },
+    {
+      "id": "wall.east",
+      "kind": "wall",
+      "polygon": [
+        [ 3.0, 0.0, -2.0],
+        [ 3.0, 0.0,  2.0],
+        [ 3.0, 2.7,  2.0],
+        [ 3.0, 2.7, -2.0]
+      ],
+      "normal":   [-1, 0, 0],
+      "areaMeters2": 10.8,
+      "confidence": 0.88,
+      "facingUser": false
+    },
+    {
+      "id": "ceiling.main",
+      "kind": "ceiling",
+      "polygon": [
+        [-3.0, 2.7, -2.0],
+        [ 3.0, 2.7, -2.0],
+        [ 3.0, 2.7,  2.0],
+        [-3.0, 2.7,  2.0]
+      ],
+      "normal":   [0, -1, 0],
+      "areaMeters2": 24.0,
+      "confidence": 0.90,
+      "facingUser": false
+    },
+    {
+      "id": "table.workbench",
+      "kind": "table",
+      "polygon": [
+        [-0.8, 0.75, -0.5],
+        [ 0.8, 0.75, -0.5],
+        [ 0.8, 0.75,  0.5],
+        [-0.8, 0.75,  0.5]
+      ],
+      "normal":   [0, 1, 0],
+      "centroid": [0.0, 0.75, 0.0],
+      "areaMeters2": 1.6,
+      "heightMeters": 0.75,
+      "confidence": 0.96,
+      "note": "Hero workbench — primary surface for tabletop_model + highlighted_target."
+    }
+  ],
+  "anchorPoints": [
+    { "id": "anchor.user_front", "position": [0.0, 1.4, 0.3], "kind": "user_relative" },
+    { "id": "anchor.user_left",  "position": [-0.8, 1.4, 0.6], "kind": "user_relative" },
+    { "id": "anchor.user_right", "position": [ 0.8, 1.4, 0.6], "kind": "user_relative" }
+  ]
+}

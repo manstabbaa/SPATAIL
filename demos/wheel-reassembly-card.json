@@ -1,0 +1,54 @@
+{
+  "id": "wheel-reassembly",
+  "title": "Reassembling the Mercedes F1 Wheel",
+  "prompt": "Walk me through reassembling this steering wheel.",
+  "domain": "assembly_guide",
+  "default": false,
+  "environment": { "kind": "workbench" },
+
+  "explanation": {
+    "intentSummary": "Guide the user through an assembly procedure.",
+    "written": "The prompt 'Walk me through reassembling this steering wheel' is asking for a guided assembly. A good answer is a step-by-step sequence: ghost the next part to show where it's going to land, commit it on advance, name the part + its function, and end with a side-by-side before/after so the user can confirm the procedure landed."
+  },
+
+  "mechanics": [
+    { "kind": "assembly_sequence",  "target": "steering_wheel",
+      "params": { "previewNextPartAsGhost": true, "stagger": 0.4,
+                  "steps": [
+                    { "id": "step.hub",         "partRef": "rim_bar",          "instruction": "Drop the hub into the central spline; align the index mark." },
+                    { "id": "step.lower_rim",   "partRef": "rim_bar",          "instruction": "Bolt the lower rim bar across the bottom of the hub." },
+                    { "id": "step.left_grip",   "partRef": "left_grip",        "instruction": "Slide the left grip onto the lower rim and torque to spec." },
+                    { "id": "step.right_grip",  "partRef": "right_grip",       "instruction": "Slide the right grip on; check the paddle ribbon is seated." },
+                    { "id": "step.bays",        "partRef": "top_left_bay",     "instruction": "Click each top control bay into place; cable routing on top, not pinched." },
+                    { "id": "step.console",     "partRef": "center_console",   "instruction": "Drop the centre display into its frame; the LCD ribbon plugs into the hub." },
+                    { "id": "step.star",        "partRef": "mercedes_star",    "instruction": "Thread the quick-release nut; the Mercedes star is the visible face." }
+                  ] },
+      "why": "Build the wheel step-by-step so the user can follow along." },
+    { "kind": "annotated_callouts", "target": "steering_wheel",
+      "params": { "items": [
+        { "id": "co.hub",       "label": "Hub",            "finding": "Splines onto the column. The wheel's reference frame starts here." },
+        { "id": "co.lower_rim", "label": "Lower rim bar",  "finding": "Cross-piece tying the two grips into one composite chassis." },
+        { "id": "co.left_grip", "label": "Left grip",      "finding": "Suede-wrapped handle the driver's left hand never leaves." },
+        { "id": "co.right_grip","label": "Right grip",     "finding": "Right-hand grip; DRS button often lives on the back of this one." }
+      ] },
+      "why": "Label each part with its name + function as it's committed." },
+    { "kind": "before_after", "target": "steering_wheel",
+      "params": { "before": "exploded", "after": "assembled", "morphSeconds": 1.0 },
+      "why": "Confirm the procedure landed by comparing the parts-apart and reassembled states." }
+  ],
+
+  "sources": [
+    { "kind": "object3d", "id": "steering_wheel", "name": "Mercedes F1 Steering Wheel",
+      "role": "target", "assetGroupRef": "car-engine", "placementHint": "table",
+      "finding": "Hero. Sits on the workbench so the assembly sequence reads cleanly from above." },
+
+    { "kind": "object3d", "id": "co.hub",       "name": "Hub",            "role": "callout", "targetRef": "steering_wheel",
+      "finding": "Splines onto the column. The wheel's reference frame starts here." },
+    { "kind": "object3d", "id": "co.lower_rim", "name": "Lower rim bar",  "role": "callout", "targetRef": "steering_wheel",
+      "finding": "Cross-piece tying the two grips into one composite chassis." },
+    { "kind": "object3d", "id": "co.left_grip", "name": "Left grip",      "role": "callout", "targetRef": "steering_wheel",
+      "finding": "Suede-wrapped handle the driver's left hand never leaves." },
+    { "kind": "object3d", "id": "co.right_grip","name": "Right grip",     "role": "callout", "targetRef": "steering_wheel",
+      "finding": "Right-hand grip; DRS button often lives on the back of this one." }
+  ]
+}

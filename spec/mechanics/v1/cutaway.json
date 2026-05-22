@@ -1,0 +1,9 @@
+{
+  "kind": "cutaway",
+  "status": "placeholder",
+  "placeholderFor": "cross_section",
+  "version": 1,
+  "description": "Section removed to expose a region. Differs from cross_section in that the removed material is hidden, not silhouetted.",
+  "expectedSourceShape": { "target": "elementId", "region": "AABB or boolean mesh" },
+  "params": { "fade": { "type": "number", "default": 0.0, "desc": "0 = hard cut, 1 = gradient fade" } }
+}

@@ -1,0 +1,10 @@
+{
+  "primitive": "set_visible",
+  "version": 1,
+  "description": "Discrete on / off toggle of the target's `visible` flag at a single beat. No interpolation. Use `fade` if you want a smooth transition.",
+  "appliesTo": ["any"],
+  "params": {
+    "visible": { "type": "boolean", "default": true }
+  },
+  "duration": { "default": 0, "units": "seconds" }
+}

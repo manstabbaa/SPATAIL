@@ -1,0 +1,9 @@
+{
+  "kind": "cutaway_orbit",
+  "status": "placeholder",
+  "placeholderFor": "cross_section",
+  "version": 1,
+  "description": "Slowly orbiting view that reveals interior as it rotates. Doesn't move the user's camera — the OBJECT rotates, exposing the cut.",
+  "expectedSourceShape": { "target": "elementId" },
+  "params": { "rpm": { "type": "number", "default": 3 } }
+}

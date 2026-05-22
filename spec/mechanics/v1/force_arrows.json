@@ -1,0 +1,8 @@
+{
+  "kind": "force_arrows",
+  "status": "placeholder",
+  "placeholderFor": "annotated_callouts",
+  "version": 1,
+  "description": "Vector overlays for physics / mechanics explanations.",
+  "expectedSourceShape": { "arrows": "[{ origin, direction, magnitude, label? }]" }
+}

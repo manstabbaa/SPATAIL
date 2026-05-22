@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spatail.dev/schemas/spatialExperienceContract.schema.json",
+  "title": "SpatialExperienceContract",
+  "description": "SPATAIL v0.2 contract: a planner-produced description of every spatial element in an experience, with reasoning for every choice. Read by the web viewer today and the visionOS player tomorrow.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "experienceId",
+    "title",
+    "sourcePrompt",
+    "detectedDomain",
+    "spatialElements",
+    "interactionPlan",
+    "attentionPlan"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "0.2.0-spatail" },
+    "createdAt":     { "type": "string", "format": "date-time" },
+    "experienceId":  { "type": "string" },
+    "title":         { "type": "string" },
+    "sourcePrompt":  { "type": "string" },
+    "sourceInputs":  { "type": "array", "items": { "type": "object" } },
+    "sourceFiles":   { "type": "array" },
+    "detectedDomain": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name":       { "type": "string" },
+        "confidence": { "type": "string", "enum": ["low", "medium", "high"] },
+        "source":     { "type": "string" }
+      }
+    },
+    "environmentAssumptions": { "type": "object" },
+    "spatialElements": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/spatialElement" },
+      "minItems": 1
+    },
+    "relationships": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relationship" }
+    },
+    "attentionPlan": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/attentionStep" }
+    },
+    "interactionPlan": {
+      "type": "object",
+      "required": ["interactions"],
+      "properties": {
+        "interactions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/interaction" }
+        }
+      }
+    },
+    "assetRequirements": { "type": "array" },
+    "reasoningSummary":  { "type": "string" },
+    "vocabularies":      { "type": "object" }
+  },
+  "$defs": {
+    "spatialElement": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "contentType",
+        "representationMode",
+        "placement",
+        "anchorStrategy",
+        "scaleMode",
+        "priority",
+        "interactions",
+        "attentionBehavior",
+        "whyThisRepresentation",
+        "whyThisPlacement",
+        "requiredAssets",
+        "fallbackGeometry"
+      ],
+      "properties": {
+        "id":          { "type": "string" },
+        "title":       { "type": "string" },
+        "contentType": { "type": "string" },
+        "representationMode": { "$ref": "#/$defs/representationMode" },
+        "placement":   { "$ref": "#/$defs/placement" },
+        "anchorStrategy": { "$ref": "#/$defs/anchorStrategy" },
+        "scaleMode":   { "$ref": "#/$defs/scaleMode" },
+        "priority":    { "type": "number" },
+        "sourceContent": {},
+        "requiredAssets":     { "type": "array" },
+        "fallbackGeometry":   { "type": "string" },
+        "interactions":       { "type": "array", "items": { "$ref": "#/$defs/elementInteraction" } },
+        "attentionBehavior":  { "$ref": "#/$defs/attentionBehavior" },
+        "whyThisRepresentation": { "type": "string", "minLength": 1 },
+        "whyThisPlacement":      { "type": "string", "minLength": 1 }
+      }
+    },
+    "representationMode": {
+      "type": "string",
+      "enum": [
+        "two_d_panel",
+        "wall_dashboard",
+        "three_d_model",
+        "tabletop_model",
+        "floor_timeline",
+        "floating_decision_card",
+        "highlighted_target",
+        "exploded_view",
+        "anchored_callout",
+        "guide_line",
+        "diagnostic_overlay"
+      ]
+    },
+    "placement": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "wall", "table", "floor", "object_anchored",
+            "above_target", "near_user", "near_presenter",
+            "left_of_user", "right_of_user",
+            "in_front_of_user", "room_center"
+          ]
+        },
+        "anchor":   { "type": "string" },
+        "position": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+        "rotationDeg": { "type": "array", "items": { "type": "number" } },
+        "sizeMeters":  { "type": "array", "items": { "type": "number" } },
+        "from": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+        "to":   { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+        "layout": { "type": "string" },
+        "orientation": { "type": "string" }
+      }
+    },
+    "anchorStrategy": {
+      "type": "string",
+      "enum": [
+        "world_anchor", "plane_anchor", "object_anchor",
+        "relative_to_target", "user_relative", "simulated_anchor"
+      ]
+    },
+    "scaleMode": {
+      "type": "string",
+      "enum": [
+        "real_scale", "tabletop_scale", "enlarged_detail",
+        "compact_panel", "room_scale"
+      ]
+    },
+    "attentionBehavior": {
+      "type": "string",
+      "enum": [
+        "ambient", "persistent_context", "active_focus",
+        "peripheral", "on_demand", "guiding"
+      ]
+    },
+    "elementInteraction": {
+      "type": "object",
+      "required": ["id", "type", "behavior"],
+      "properties": {
+        "id":       { "type": "string" },
+        "type":     { "type": "string" },
+        "behavior": { "type": "string" }
+      }
+    },
+    "interaction": {
+      "type": "object",
+      "required": ["id", "type", "behavior", "trigger"],
+      "properties": {
+        "id":         { "type": "string" },
+        "elementId":  { "type": ["string", "null"] },
+        "type":       { "type": "string" },
+        "behavior":   { "type": "string" },
+        "trigger":    { "type": "string" }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "required": ["from", "to", "type"],
+      "properties": {
+        "from": { "type": "string" },
+        "to":   { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "aligned_above", "diagnoses", "attached_to",
+            "controls_attention_for", "connects", "relates_to"
+          ]
+        },
+        "note": { "type": "string" }
+      }
+    },
+    "attentionStep": {
+      "type": "object",
+      "required": ["step", "focusElementId", "narration"],
+      "properties": {
+        "step":            { "type": "integer", "minimum": 1 },
+        "focusElementId":  { "type": "string" },
+        "narration":       { "type": "string" }
+      }
+    }
+  }
+}

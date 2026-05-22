@@ -1,0 +1,55 @@
+# Normalize line endings to LF in the repo. Windows + Mac coexist cleanly:
+#   - Windows working tree gets CRLF on checkout (autocrlf=true) OR LF (autocrlf=input).
+#   - Mac working tree gets LF.
+#   - Repo always stores LF. No more "the file changed because of line endings."
+* text=auto eol=lf
+
+# Source explicitly LF (defensive — covers cases where autocrlf is off)
+*.swift   text eol=lf
+*.py      text eol=lf
+*.js      text eol=lf
+*.mjs     text eol=lf
+*.ts      text eol=lf
+*.md      text eol=lf
+*.json    text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.toml    text eol=lf
+*.css     text eol=lf
+*.html    text eol=lf
+*.svg     text eol=lf
+*.plist   text eol=lf
+
+# Shell scripts MUST be LF (CRLF breaks bash on Mac/Linux)
+*.sh      text eol=lf
+
+# Windows batch files keep CRLF (cmd.exe doesn't like LF)
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+
+# Binary — never normalize, never diff
+*.blend   binary
+*.blend1  binary
+*.usdz    binary
+*.usdc    binary
+*.usda    binary
+*.obj     binary
+*.fbx     binary
+*.gltf    binary
+*.glb     binary
+*.spatail binary
+*.zip     binary
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.webp    binary
+*.mp4     binary
+*.mov     binary
+*.m4a     binary
+*.wav     binary
+*.pdf     binary
+*.ico     binary
+*.icns    binary
+
+# Generated files — mark so reviewers know not to hand-edit
+ios/SpatailPlayer/Sources/SpatailPlayer/Contract/Vocab.swift linguist-generated=true

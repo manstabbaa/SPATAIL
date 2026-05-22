@@ -1,0 +1,140 @@
+{
+  "id": "f1-aero",
+  "title": "F1 Car — Aerodynamics & DRS",
+  "prompt": "Walk me through how this F1 car's aerodynamics work — especially the DRS.",
+  "domain": "motorsport_engineering",
+  "default": false,
+  "environment": { "kind": "workbench", "anchorObject": "f1_car" },
+  "sources": [
+    {
+      "kind": "fact",
+      "group": "car_identity",
+      "bucketTitle": "Car Identity",
+      "placementHint": "left_of_user",
+      "key": "Era",
+      "value": "Ground-effect regulations (2022-present)"
+    },
+    { "kind": "fact", "group": "car_identity", "placementHint": "left_of_user",
+      "key": "Bodywork", "value": "Carbon-fibre monocoque, fully ducted floor" },
+    { "kind": "fact", "group": "car_identity", "placementHint": "left_of_user",
+      "key": "Downforce", "value": "~2.5× the car's weight at 250 km/h" },
+    { "kind": "fact", "group": "car_identity", "placementHint": "left_of_user",
+      "key": "DRS top-end gain", "value": "~9 m/s on a long straight" },
+
+    {
+      "kind": "summary",
+      "title": "How airflow makes the car stick",
+      "placementHint": "left_of_user",
+      "body": "Front wing turns flow inboard and downward. Sidepods + floor channel high-velocity air through Venturi tunnels under the car (ground-effect), creating low pressure beneath the floor. Rear wing + beam wing generate the remaining ~40% of downforce. DRS opens a flap in the upper rear wing on straights, dumping that downforce in exchange for top-end speed."
+    },
+
+    {
+      "kind": "object3d",
+      "id": "f1_car",
+      "name": "F1 Car",
+      "role": "target",
+      "assetGroupRef": "f1-car",
+      "placementHint": "table",
+      "finding": "Hero geometry. Stays on the table as the reference object the airflow + every callout anchors to."
+    },
+
+    {
+      "kind": "object3d",
+      "id": "mark_front_wing",
+      "name": "Front Wing",
+      "role": "callout",
+      "targetRef": "f1_car",
+      "mechanismKind": null,
+      "spotlightOnHero": [0.0, 3.6, 0.05],
+      "finding": "Multi-element wing + endplates. Turns oncoming air downward and outboard around the front tyres. Sets the entire aerodynamic balance of the car — every other surface downstream depends on it."
+    },
+    {
+      "kind": "object3d",
+      "id": "mark_floor_tunnel",
+      "name": "Floor / Venturi Tunnels",
+      "role": "callout",
+      "targetRef": "f1_car",
+      "mechanismKind": null,
+      "spotlightOnHero": [0.0, 0.0, -0.35],
+      "finding": "Two underbody Venturi tunnels accelerate air, creating low pressure that sucks the car to the track. Source of ~60% of total downforce in the current regulations."
+    },
+    {
+      "kind": "object3d",
+      "id": "mark_sidepod_inlets",
+      "name": "Sidepod Inlets",
+      "role": "callout",
+      "targetRef": "f1_car",
+      "mechanismKind": null,
+      "spotlightOnHero": [0.7, 1.2, 0.2],
+      "finding": "Feed the engine + ERS coolers. Surface geometry above the inlets steers air over the bodywork toward the rear wing and prevents stagnation behind the front tyres."
+    },
+    {
+      "kind": "object3d",
+      "id": "mark_rear_wing_drs",
+      "name": "Rear Wing — DRS Flap",
+      "role": "callout",
+      "targetRef": "f1_car",
+      "mechanismKind": "drs_flap",
+      "spotlightOnHero": [0.0, -3.4, 0.55],
+      "finding": "Two-element rear wing. Upper element is the DRS flap — hydraulically opens on activation, stalling the wing and shedding ~15% of total drag for a ~9 m/s top-end gain. Closes the moment the driver brakes or lifts."
+    },
+    {
+      "kind": "object3d",
+      "id": "mark_beam_wing",
+      "name": "Beam Wing",
+      "role": "callout",
+      "targetRef": "f1_car",
+      "mechanismKind": null,
+      "spotlightOnHero": [0.0, -3.55, 0.2],
+      "finding": "Lower aerodynamic element between the diffuser and the rear wing. Recovers air from under the floor and helps load the diffuser at high speed."
+    },
+
+    {
+      "kind": "airflow",
+      "id": "airflow_drs_closed",
+      "title": "Airflow — DRS closed",
+      "targetRef": "f1_car",
+      "regime": "drs_closed",
+      "description": "Stream lines wrap the body, stagnate on the rear wing's upper element, generate the full downforce package.",
+      "streams": [
+        { "from": [0.0, 4.5, 0.10], "to": [0.0,  3.0, 0.40], "via": [[0.0, 3.8, 0.20]] },
+        { "from": [0.6, 4.5, 0.10], "to": [0.7,  1.2, 0.25], "via": [[0.6, 3.5, 0.15], [0.7, 2.4, 0.20]] },
+        { "from": [0.0, 4.5, 0.05], "to": [0.0, -3.4, 0.55], "via": [[0.0, 3.0, 0.30], [0.0, 1.5, 0.50], [0.0, -1.5, 0.62]] },
+        { "from": [0.0, 4.5, 0.00], "to": [0.0, -3.6, 0.10], "via": [[0.0, 3.0, -0.10], [0.0, 0.0, -0.30], [0.0, -3.0, -0.20]] }
+      ]
+    },
+    {
+      "kind": "airflow",
+      "id": "airflow_drs_open",
+      "title": "Airflow — DRS open",
+      "targetRef": "f1_car",
+      "regime": "drs_open",
+      "description": "Upper rear-wing element rotates up; the stagnation point disappears; the wing stalls and the air shoots straight through, shedding downforce for top-end speed.",
+      "streams": [
+        { "from": [0.0, 4.5, 0.10], "to": [0.0, -4.5, 0.60], "via": [[0.0, 3.0, 0.30], [0.0, 0.0, 0.55], [0.0, -3.4, 0.62]] },
+        { "from": [0.6, 4.5, 0.10], "to": [0.6, -4.5, 0.30], "via": [[0.6, 0.0, 0.20]] },
+        { "from": [0.0, 4.5, 0.00], "to": [0.0, -4.5, 0.10], "via": [[0.0, 0.0, -0.10]] }
+      ]
+    },
+
+    {
+      "kind": "diagnostic",
+      "title": "DRS — when it's available",
+      "targetRef": "f1_car",
+      "finding": "DRS is only allowed in designated zones, and only when the driver is within 1.0 s of the car ahead at the detection point. Closes the moment the brake pedal is touched or the throttle is lifted."
+    },
+
+    {
+      "kind": "decisions",
+      "title": "Explore",
+      "options": [
+        { "id": "focus_drs",       "label": "Show DRS in detail",
+          "detail": "Strip the scene to the rear wing + DRS flap with leader line + airflow comparison." },
+        { "id": "focus_floor",     "label": "Floor / ground effect",
+          "detail": "Highlight the underbody Venturi tunnels and the air path beneath the car." },
+        { "id": "focus_front_wing","label": "Front wing",
+          "detail": "Walk through how the front wing sets the rest of the car's aero balance." }
+      ]
+    }
+  ]
+}

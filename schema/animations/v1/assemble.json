@@ -1,0 +1,24 @@
+{
+  "primitive": "assemble",
+  "version": 1,
+  "description": "Reverse of `explode`. Drives the target's animatable children back to their snapshotted rest transforms with eased motion.",
+  "appliesTo": ["exploded_view", "three_d_model", "tabletop_model"],
+  "params": {
+    "stagger": {
+      "type": "number",
+      "default": 0.04,
+      "units": "seconds",
+      "desc": "Delay between successive parts settling back into place."
+    }
+  },
+  "duration": {
+    "default": 1.4,
+    "units": "seconds"
+  },
+  "easing": {
+    "default": "ease-in-out-cubic"
+  },
+  "notes": [
+    "If no rest snapshot exists (the target was never exploded), `assemble` is a no-op."
+  ]
+}

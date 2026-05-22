@@ -1,0 +1,8 @@
+{
+  "kind": "particle_flow",
+  "status": "placeholder",
+  "placeholderFor": "flow_diagram",
+  "version": 1,
+  "description": "Animated streams for fluid / electricity / data through 3D geometry.",
+  "expectedSourceShape": { "paths": "[{ from, to, density, color }]" }
+}

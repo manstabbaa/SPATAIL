@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spatial — Studio v0.1</title>
+    <link rel="stylesheet" href="/viewer/style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <header id="topbar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <span class="brand-name">Spatial</span>
+          <span class="brand-sub">Studio v0.1</span>
+        </div>
+        <div id="scene-meta">
+          <span id="scene-name">loading…</span>
+          <span id="scene-domain"></span>
+        </div>
+      </header>
+      <main>
+        <section id="stage">
+          <div id="canvas-wrap"></div>
+          <div id="hud">
+            <div id="hud-line"></div>
+          </div>
+        </section>
+        <aside id="sidebar">
+          <section class="panel">
+            <h2>Interactions</h2>
+            <div id="ui-buttons"></div>
+          </section>
+          <section class="panel">
+            <h2>Story</h2>
+            <ol id="story-list"></ol>
+          </section>
+          <section class="panel">
+            <h2>Asset inventory</h2>
+            <ul id="asset-list"></ul>
+          </section>
+          <section class="panel">
+            <h2>Spatial understanding</h2>
+            <dl id="understanding"></dl>
+          </section>
+        </aside>
+      </main>
+      <footer id="statusbar">
+        <span id="status">ready</span>
+        <span id="contract-link">
+          <a href="/scene_contracts/SpatialSceneContract.json" target="_blank">
+            view contract →
+          </a>
+        </span>
+      </footer>
+    </div>
+    <script type="module" src="/viewer/viewer.js"></script>
+  </body>
+</html>

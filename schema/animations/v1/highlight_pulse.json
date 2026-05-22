@@ -1,0 +1,31 @@
+{
+  "primitive": "highlight_pulse",
+  "version": 1,
+  "description": "Emissive throb on a material slot. Used to draw the user's eye to a specific spatial element during a sequence — e.g. each callout pulses as its narration plays.",
+  "appliesTo": ["any"],
+  "params": {
+    "colorHex": {
+      "type": "string",
+      "default": "#6ea8ff",
+      "desc": "Emissive tint applied during the pulse."
+    },
+    "intensity": {
+      "type": "number",
+      "default": 1.2,
+      "desc": "Peak emissiveIntensity at the apex of each pulse."
+    },
+    "pulses": {
+      "type": "integer",
+      "default": 2,
+      "desc": "Number of sinusoidal cycles within the duration."
+    }
+  },
+  "duration": {
+    "default": 1.2,
+    "units": "seconds"
+  },
+  "easing": { "default": "sine-in-out" },
+  "notes": [
+    "Walks every Mesh under the target. For materials that don't support emissive (e.g. UnlitMaterial / panels), the handler falls back to a brief scale-up pulse so the element still reads as 'attention'."
+  ]
+}

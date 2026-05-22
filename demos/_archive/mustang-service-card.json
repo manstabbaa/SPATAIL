@@ -1,0 +1,151 @@
+{
+  "id": "mustang-service",
+  "title": "Mustang Service Assistant",
+  "prompt": "Help me service my Mustang.",
+  "domain": "vehicle_maintenance",
+  "environment": {
+    "kind": "garage",
+    "anchorObject": "mustang"
+  },
+  "sources": [
+    {
+      "kind": "fact",
+      "group": "vehicle_status",
+      "bucketTitle": "Vehicle Status",
+      "placementHint": "left_of_user",
+      "key": "Vehicle",
+      "value": "2019 Mustang GT"
+    },
+    { "kind": "fact", "group": "vehicle_status", "placementHint": "left_of_user",
+      "key": "Mileage", "value": "45,672 mi" },
+    { "kind": "fact", "group": "vehicle_status", "placementHint": "left_of_user",
+      "key": "VIN", "value": "1FA6P8CF0K5152198" },
+    { "kind": "fact", "group": "vehicle_status", "placementHint": "left_of_user",
+      "key": "Service status", "value": "Air filter overdue (45,672 mi / due at 30,000)" },
+
+    {
+      "kind": "summary",
+      "title": "Maintenance Summary",
+      "placementHint": "left_of_user",
+      "body": "Air filter replacement is overdue. The current filter appears visibly dirty; light no longer passes through the pleats. No other warnings active."
+    },
+
+    {
+      "kind": "fact",
+      "group": "insurance",
+      "bucketTitle": "Insurance & Roadside",
+      "placementHint": "left_of_user",
+      "key": "Insurance",
+      "value": "GEICO — policy 4421-8839-22 (valid through 2026-08-14)"
+    },
+    { "kind": "fact", "group": "insurance", "placementHint": "left_of_user",
+      "key": "Roadside assistance", "value": "Available 24/7 — 1-800-424-3426" },
+    { "kind": "fact", "group": "insurance", "placementHint": "left_of_user",
+      "key": "Deductible", "value": "$500 collision · $250 comprehensive" },
+
+    {
+      "kind": "list",
+      "title": "Service History",
+      "placementHint": "left_of_user",
+      "items": [
+        "2025-11-12 — Oil change (5W-30 synthetic), tire rotation",
+        "2025-08-03 — Brake fluid flush",
+        "2025-04-19 — Cabin air filter replaced",
+        "2025-02-07 — Battery load test (pass, 12.6V)"
+      ]
+    },
+
+    {
+      "kind": "object3d",
+      "id": "engine_bay",
+      "name": "Engine Bay (Mustang)",
+      "role": "process",
+      "assetGroupRef": "car-engine",
+      "placementHint": "table"
+    },
+    {
+      "kind": "object3d",
+      "id": "air_filter_housing",
+      "name": "Air Filter Housing on Car",
+      "role": "target",
+      "assetGroupRef": "air-filter-assembly",
+      "placementHint": "engine_bay"
+    },
+
+    {
+      "kind": "diagnostic",
+      "title": "Dirty Filter Finding",
+      "targetRef": "air_filter_housing",
+      "finding": "Air filter appears dirty — light no longer passes through the pleats. Recommend replacement now."
+    },
+
+    {
+      "kind": "object3d",
+      "id": "air_filter_assembly",
+      "name": "Exploded Air Filter Assembly",
+      "role": "exploded_assembly",
+      "assetGroupRef": "air-filter-assembly",
+      "targetRef": "air_filter_housing",
+      "components": [
+        { "id": "airbox_lid",    "name": "Airbox lid" },
+        { "id": "dirty_filter",  "name": "Dirty filter (remove)" },
+        { "id": "new_filter",    "name": "New filter (install)" },
+        { "id": "lower_housing", "name": "Lower housing" }
+      ]
+    },
+
+    {
+      "kind": "guide",
+      "id": "exploded_to_housing_guide",
+      "title": "Alignment Guide",
+      "fromTargetRef": "air_filter_assembly",
+      "toTargetRef": "air_filter_housing",
+      "purpose": "Show that each exploded part lifts straight off the real housing — vertical only."
+    },
+
+    {
+      "kind": "object3d",
+      "id": "clips_callout",
+      "name": "Spring Clips (×4)",
+      "role": "callout",
+      "targetRef": "air_filter_housing",
+      "finding": "Two clips on each side — release before lifting the airbox lid."
+    },
+    {
+      "kind": "object3d",
+      "id": "torx_callout",
+      "name": "T20 Torx Screw",
+      "role": "callout",
+      "targetRef": "air_filter_housing",
+      "finding": "Single retaining screw on the intake side."
+    },
+
+    {
+      "kind": "steps",
+      "title": "Repair Steps",
+      "placementHint": "right_of_user",
+      "targetRef": "air_filter_housing",
+      "steps": [
+        "Open the hood and prop it.",
+        "Locate the air filter housing on the passenger side of the engine bay.",
+        "Release the four spring clips around the airbox lid.",
+        "Loosen the single T20 Torx retaining screw.",
+        "Lift the airbox lid and remove the dirty filter.",
+        "Seat the new filter with the rubber gasket facing down.",
+        "Replace the lid, retighten the screw, and re-seat all four clips."
+      ]
+    },
+
+    {
+      "kind": "list",
+      "title": "Materials & Tools",
+      "placementHint": "right_of_user",
+      "items": [
+        "Replacement engine air filter (Motorcraft FA-1883)",
+        "Phillips-head screwdriver",
+        "T20 Torx driver",
+        "Clean shop rag"
+      ]
+    }
+  ]
+}

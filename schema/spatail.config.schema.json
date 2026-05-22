@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "spatail.config",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "animation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frameRate": {
+          "type": "integer", "minimum": 1, "maximum": 120, "default": 30
+        },
+        "bakeStepFrames": {
+          "type": "integer", "minimum": 1, "maximum": 10, "default": 1
+        },
+        "materialBakeMode": {
+          "enum": ["keyframe", "continuous"], "default": "continuous"
+        },
+        "cameraPathSamples": {
+          "type": "integer", "minimum": 1, "maximum": 240, "default": 60
+        }
+      }
+    }
+  }
+}

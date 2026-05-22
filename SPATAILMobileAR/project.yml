@@ -1,0 +1,60 @@
+# XcodeGen project definition for SPATAILMobileAR.
+#
+# Why XcodeGen: keeps the Xcode project file out of source control and
+# makes the structure reproducible from this YAML. Run `xcodegen generate`
+# on a Mac to materialize SPATAILMobileAR.xcodeproj from this file.
+#
+# Install: `brew install xcodegen`
+
+name: SPATAILMobileAR
+options:
+  bundleIdPrefix: com.spatail
+  deploymentTarget:
+    iOS: "16.0"
+  developmentLanguage: en
+settings:
+  base:
+    # Swift 6.1 (Xcode 16.3+) is required because the source uses
+    # trailing commas in function-argument lists (SE-0439). If you must
+    # build on an older toolchain, remove the trailing commas before
+    # `)` in function/init calls — they're cosmetic.
+    SWIFT_VERSION: "6.1"
+    ENABLE_BITCODE: NO
+targets:
+  SPATAILMobileAR:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Models
+      - path: Services
+      - path: Views
+      - path: Reality
+    resources:
+      - path: Resources
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: SPATAIL
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UIRequiredDeviceCapabilities:
+          - arkit
+        NSCameraUsageDescription: >
+          SPATAIL uses the camera to place spatial experiences in your
+          environment. We do not record, store, or transmit camera frames.
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: NO
+        PRODUCT_BUNDLE_IDENTIFIER: com.spatail.SPATAILMobileAR
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        DEVELOPMENT_TEAM: ""  # Fill in on first build (Signing & Capabilities)
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_PREVIEWS: YES
+    dependencies: []

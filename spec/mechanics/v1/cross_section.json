@@ -1,0 +1,24 @@
+{
+  "kind": "cross_section",
+  "status": "shipped",
+  "version": 1,
+  "description": "Slice a target 3D object with a clipping plane and expose the cut silhouette. Used to reveal internal geometry without disassembling.",
+  "expectedSourceShape": {
+    "target": "elementId of a 3D model element OR an inline mesh ref",
+    "axis": "x | y | z (plane normal)",
+    "offset": "metres along axis where the plane sits"
+  },
+  "params": {
+    "axis":         { "type": "enum",   "values": ["x","y","z"], "default": "z" },
+    "offset":       { "type": "number", "default": 0.0, "units": "metres" },
+    "silhouette":   { "type": "boolean","default": true, "desc": "draw a coloured outline along the cut edge" },
+    "sectionTint":  { "type": "string", "default": "#6ea8ff" },
+    "innerOpacity": { "type": "number", "default": 1.0, "desc": "interior reveal opacity; 1.0 = fully visible" }
+  },
+  "output": "A single spatialElement with representationMode `three_d_model` that wraps the target with clipping enabled. Emits a sibling element with representationMode `guide_line` for the cut silhouette.",
+  "qualityBar": {
+    "reference": "Steering wheel center console, cut along Z at offset 0.0 — outer shell remains, PCB layer reads as a coloured ribbon along the cut edge.",
+    "renderer": "viewer/mechanics/handlers/cross_section.js",
+    "notes": "Use renderer.localClippingEnabled = true and set THREE.Plane on each material in the target's mesh subtree. Add a thin coloured tube along the visible cut for emphasis."
+  }
+}

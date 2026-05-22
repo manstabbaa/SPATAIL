@@ -1,0 +1,37 @@
+{
+  "primitive": "explode",
+  "version": 1,
+  "description": "Spread the target's animatable child parts outward from the parent's local centroid along local +Y. Used to take an assembly apart for inspection. Reverse is `assemble`.",
+  "appliesTo": ["exploded_view", "three_d_model", "tabletop_model"],
+  "params": {
+    "spread": {
+      "type": "number",
+      "default": 0.18,
+      "units": "metres",
+      "desc": "Maximum additional distance each part lifts away from the centroid."
+    },
+    "axis": {
+      "type": "enum",
+      "values": ["y", "x", "z", "radial"],
+      "default": "y",
+      "desc": "Direction parts spread along. `radial` spreads outward from the centroid in all 3 axes proportional to the part's offset."
+    },
+    "stagger": {
+      "type": "number",
+      "default": 0.06,
+      "units": "seconds",
+      "desc": "Delay between successive parts so they ripple instead of all moving together."
+    }
+  },
+  "duration": {
+    "default": 1.6,
+    "units": "seconds"
+  },
+  "easing": {
+    "default": "ease-out-cubic"
+  },
+  "notes": [
+    "The handler reads `target.userData.explodableChildren` if set; otherwise it walks immediate children that are Mesh nodes.",
+    "Original transforms are snapshotted on first play so `assemble` (or any reset) can return to rest."
+  ]
+}

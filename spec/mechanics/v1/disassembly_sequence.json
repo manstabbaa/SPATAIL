@@ -1,0 +1,9 @@
+{
+  "kind": "disassembly_sequence",
+  "status": "placeholder",
+  "placeholderFor": "exploded_view",
+  "version": 1,
+  "description": "Reverse of assembly_sequence. Routes to exploded_view's forward beat until dedicated renderer lands.",
+  "expectedSourceShape": { "target": "elementId", "steps": "[{ id, partRef, instruction }]" },
+  "params": { "stagger": { "type": "number", "default": 0.4, "units": "seconds" } }
+}

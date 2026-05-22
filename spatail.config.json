@@ -1,0 +1,9 @@
+{
+  "$schema": "./schema/spatail.config.schema.json",
+  "animation": {
+    "frameRate": 30,
+    "bakeStepFrames": 1,
+    "materialBakeMode": "continuous",
+    "cameraPathSamples": 60
+  }
+}

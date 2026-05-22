@@ -1,0 +1,8 @@
+{
+  "kind": "xray_layer_stack",
+  "status": "placeholder",
+  "placeholderFor": "exploded_view",
+  "version": 1,
+  "description": "Peeling layers like an isometric stack — each shell pulls outward in sequence with low opacity.",
+  "expectedSourceShape": { "target": "elementId", "layers": "[{ partRef, depth }]" }
+}

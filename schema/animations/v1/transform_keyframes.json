@@ -1,0 +1,24 @@
+{
+  "primitive": "transform_keyframes",
+  "version": 1,
+  "description": "Plays a baked translate / rotate / scale animation track on the target. The track is expected to be embedded in the glTF (standard glTF animation, played via Three.js AnimationMixer / RealityKit AnimationResource) OR provided inline in params.tracks for procedural cases.",
+  "appliesTo": ["any"],
+  "params": {
+    "trackName": {
+      "type": "string",
+      "desc": "Name of the embedded glTF animation track to play. If omitted, the first track on the target is used."
+    },
+    "tracks": {
+      "type": "object",
+      "desc": "Optional inline { translation: [[t, x,y,z], ...], rotation: ..., scale: ... } when there's no glTF track."
+    },
+    "loop": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "duration": {
+    "default": null,
+    "desc": "Defaults to the natural length of the embedded track."
+  }
+}

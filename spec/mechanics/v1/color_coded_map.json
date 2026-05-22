@@ -1,0 +1,8 @@
+{
+  "kind": "color_coded_map",
+  "status": "placeholder",
+  "placeholderFor": "highlighted_region",
+  "version": 1,
+  "description": "Semantic colors applied to regions with a legend.",
+  "expectedSourceShape": { "regions": "[{ partRef, color, label }]", "legendTitle": "optional" }
+}

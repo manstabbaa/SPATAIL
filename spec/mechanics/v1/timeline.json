@@ -1,0 +1,13 @@
+{
+  "kind": "timeline",
+  "status": "shipped",
+  "version": 1,
+  "description": "Ordered events along a 1D axis. Pre-existing renderer (floor_timeline representationMode).",
+  "expectedSourceShape": {
+    "events": "[{ when, label, detail? }]",
+    "title":  "optional"
+  },
+  "params": { "orientation": { "type": "enum", "values": ["horizontal","floor_path"], "default": "horizontal" } },
+  "output": "One spatialElement with representationMode `floor_timeline`.",
+  "qualityBar": { "reference": "Q3 events — 5 stepping-stone plates on the floor with date subtitles." }
+}

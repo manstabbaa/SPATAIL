@@ -1,0 +1,3854 @@
+{
+  "schemaVersion": "0.5.0-spatail",
+  "createdAt": "2026-05-20T18:48:33.964Z",
+  "experienceId": "mercedes-f1-wheel",
+  "title": "Mercedes F1 Wheel — Walkthrough",
+  "sourcePrompt": "Walk me through this Mercedes-AMG F1 steering wheel.",
+  "sourceInputs": [
+    {
+      "kind": "fact",
+      "key": "Team",
+      "title": null
+    },
+    {
+      "kind": "fact",
+      "key": "Era",
+      "title": null
+    },
+    {
+      "kind": "fact",
+      "key": "Material",
+      "title": null
+    },
+    {
+      "kind": "fact",
+      "key": "Mass",
+      "title": null
+    },
+    {
+      "kind": "summary",
+      "key": null,
+      "title": "Why this wheel is its own computer"
+    },
+    {
+      "kind": "list",
+      "key": null,
+      "title": "Race-day adjustments"
+    },
+    {
+      "kind": "list",
+      "key": null,
+      "title": "What this CAD does NOT model"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Mercedes F1 Steering Wheel"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Left Grip Handle"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Right Grip Handle"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Center Console / Display Bay"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Top-Left Control Bay"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Top-Right Control Bay"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Mercedes Star — Quick-Release Nut"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Lower Rim Bar"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "DRS Button"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "PC Button (Pit Confirm)"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "PL Button (Pit Limiter)"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "+1 Button"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "BB+ / BB- (Brake Bias) Rotary"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Differential Rotary (DIFF)"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "Strategy Rotary (STRAT)"
+    },
+    {
+      "kind": "object3d",
+      "key": null,
+      "title": "RS Button (Radio / Talk)"
+    },
+    {
+      "kind": "diagnostic",
+      "key": null,
+      "title": "Rotaries change car behaviour mid-corner"
+    },
+    {
+      "kind": "decisions",
+      "key": null,
+      "title": "Explore by region"
+    }
+  ],
+  "sourceFiles": [],
+  "detectedDomain": {
+    "name": "motorsport_engineering",
+    "confidence": "high",
+    "source": "card.domain"
+  },
+  "environmentAssumptions": {
+    "kind": "workbench",
+    "anchorObject": "steering_wheel",
+    "source": "card.environment"
+  },
+  "spatialElements": [
+    {
+      "id": "elem_wheel_identity_0",
+      "title": "Wheel Identity",
+      "contentType": "summary_panel",
+      "representationMode": "two_d_panel",
+      "placement": {
+        "kind": "left_of_user",
+        "anchor": "left_of_user",
+        "position": [
+          -2.4,
+          1.5,
+          1.2999999999999998
+        ],
+        "rotationDeg": [
+          0,
+          55,
+          0
+        ],
+        "sizeMeters": [
+          1,
+          0.8
+        ]
+      },
+      "anchorStrategy": "user_relative",
+      "scaleMode": "compact_panel",
+      "priority": 40,
+      "sourceContent": {
+        "facts": [
+          {
+            "key": "Team",
+            "value": "Mercedes-AMG Petronas F1"
+          },
+          {
+            "key": "Era",
+            "value": "Hybrid V6 turbo, 2014-2025 generation"
+          },
+          {
+            "key": "Material",
+            "value": "Carbon-fibre chassis, suede grips, magnesium quick-release"
+          },
+          {
+            "key": "Mass",
+            "value": "~1.3 kg (FIA-regulated)"
+          }
+        ],
+        "placementHint": "left_of_user"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "expand this panel to a fuller view"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "wall.north",
+        "kind": "wall",
+        "areaMeters2": 16.2,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "centroid": [
+          0,
+          1.35,
+          -2
+        ],
+        "heightMeters": null,
+        "facingUser": true,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "Short readable text — a 2D panel keeps it scannable without occupying physical workspace.",
+      "whyThisPlacement": "Persistent reference content (status, insurance, history) belongs to the user's left so it stays glanceable without competing with the repair target straight ahead. — Resolved to wall.north (wall, 6.0m × 2.7m, area 16.2m²)."
+    },
+    {
+      "id": "elem_why_this_wheel_is_its_own_computer_1",
+      "title": "Why this wheel is its own computer",
+      "contentType": "summary_panel",
+      "representationMode": "two_d_panel",
+      "placement": {
+        "kind": "left_of_user",
+        "anchor": "left_of_user",
+        "position": [
+          -2.4,
+          1.5,
+          1.2499999999999998
+        ],
+        "rotationDeg": [
+          0,
+          55,
+          0
+        ],
+        "sizeMeters": [
+          1,
+          0.8
+        ]
+      },
+      "anchorStrategy": "user_relative",
+      "scaleMode": "compact_panel",
+      "priority": 40,
+      "sourceContent": {
+        "title": "Why this wheel is its own computer",
+        "placementHint": "left_of_user",
+        "body": "An F1 wheel is the driver's primary interface to a ~$15M race car. It carries the dash display, every in-race adjustment (brake bias, differential, fuel mix, ERS deployment, torque maps, DRS, pit limiter), the radio, and the clutch + shift mechanics. The driver makes 50-100 mid-lap inputs without taking their hands off the grips."
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "expand this panel to a fuller view"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "wall.north",
+        "kind": "wall",
+        "areaMeters2": 16.2,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "centroid": [
+          0,
+          1.35,
+          -2
+        ],
+        "heightMeters": null,
+        "facingUser": true,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "Short readable text — a 2D panel keeps it scannable without occupying physical workspace.",
+      "whyThisPlacement": "Persistent reference content (status, insurance, history) belongs to the user's left so it stays glanceable without competing with the repair target straight ahead. — Resolved to wall.north (wall, 6.0m × 2.7m, area 16.2m²)."
+    },
+    {
+      "id": "elem_race_day_adjustments_2",
+      "title": "Race-day adjustments",
+      "contentType": "list",
+      "representationMode": "two_d_panel",
+      "placement": {
+        "kind": "right_of_user",
+        "anchor": "right_of_user",
+        "position": [
+          2.4,
+          1.5,
+          1.2999999999999998
+        ],
+        "rotationDeg": [
+          0,
+          -55,
+          0
+        ],
+        "sizeMeters": [
+          1,
+          0.8
+        ]
+      },
+      "anchorStrategy": "user_relative",
+      "scaleMode": "compact_panel",
+      "priority": 40,
+      "sourceContent": {
+        "title": "Race-day adjustments",
+        "placementHint": "right_of_user",
+        "items": [
+          "Brake bias — rotary, shifts F/R brake pressure split",
+          "Differential — rotary, locks/opens the diff for corner entry / mid / exit",
+          "Fuel mix — multifunction switch, lean ↔ rich",
+          "Torque map — multifunction, engine character per stint",
+          "Strat mode — multifunction, race-vs-quali-vs-safety-car mapping",
+          "ERS deployment — paddle / button, harvests + deploys battery",
+          "DRS — button or paddle, opens rear wing on straights",
+          "Pit limiter — button, caps speed in pit lane",
+          "Drink — button, releases water from helmet bladder",
+          "Radio — button, talks to the pit wall"
+        ]
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "expand this panel to a fuller view"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "wall.north",
+        "kind": "wall",
+        "areaMeters2": 16.2,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "centroid": [
+          0,
+          1.35,
+          -2
+        ],
+        "heightMeters": null,
+        "facingUser": true,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A list is read top-to-bottom — a vertical 2D panel beats any 3D arrangement.",
+      "whyThisPlacement": "Active instructions (steps, tools list) live to the user's right — the dominant working side — so they stay in peripheral view while the user looks at the target. — Resolved to wall.north (wall, 6.0m × 2.7m, area 16.2m²)."
+    },
+    {
+      "id": "elem_what_this_cad_does_not_model_3",
+      "title": "What this CAD does NOT model",
+      "contentType": "list",
+      "representationMode": "two_d_panel",
+      "placement": {
+        "kind": "right_of_user",
+        "anchor": "right_of_user",
+        "position": [
+          2.4,
+          1.5,
+          1.2499999999999998
+        ],
+        "rotationDeg": [
+          0,
+          -55,
+          0
+        ],
+        "sizeMeters": [
+          1,
+          0.8
+        ]
+      },
+      "anchorStrategy": "user_relative",
+      "scaleMode": "compact_panel",
+      "priority": 40,
+      "sourceContent": {
+        "title": "What this CAD does NOT model",
+        "placementHint": "right_of_user",
+        "items": [
+          "Individual button surfaces (the real wheel has ~25 buttons; here they are decals on a flat plastic face)",
+          "LED rev strip across the top",
+          "LCD dash display backlight",
+          "Suede / Alcantara grip texture",
+          "Quick-release internal mechanism",
+          "Paddle-shift internal linkages",
+          "Carbon-fibre weave detail (treated as plain matte black plastic for v0.1 visualisation)"
+        ]
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "expand this panel to a fuller view"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "wall.north",
+        "kind": "wall",
+        "areaMeters2": 16.2,
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "centroid": [
+          0,
+          1.35,
+          -2
+        ],
+        "heightMeters": null,
+        "facingUser": true,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A list is read top-to-bottom — a vertical 2D panel beats any 3D arrangement.",
+      "whyThisPlacement": "Active instructions (steps, tools list) live to the user's right — the dominant working side — so they stay in peripheral view while the user looks at the target. — Resolved to wall.north (wall, 6.0m × 2.7m, area 16.2m²)."
+    },
+    {
+      "id": "elem_steering_wheel_4",
+      "title": "Mercedes F1 Steering Wheel",
+      "contentType": "physical_target",
+      "representationMode": "highlighted_target",
+      "placement": {
+        "kind": "table",
+        "anchor": "table_center",
+        "position": [
+          0,
+          0.8,
+          0
+        ],
+        "sizeMeters": [
+          0.6,
+          0.3,
+          0.6
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 90,
+      "sourceContent": {
+        "name": "Mercedes F1 Steering Wheel",
+        "role": "target",
+        "assetGroupRef": "car-engine",
+        "components": [],
+        "targetRef": null,
+        "finding": "The centrepiece. Sits on the workbench so the driver-controls layout is readable from the user's seat. Bright translucent shader is the spatial-language signal that this is the subject of every other element in the scene.",
+        "placementHint": "table",
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [
+        {
+          "id": "car-engine",
+          "preferredSource": "cad_folder",
+          "hint": "car-engine",
+          "fallback": "placeholder_box",
+          "resolvedAssetGroup": {
+            "groupKey": "car-engine",
+            "items": [
+              {
+                "fileName": "Steering Wheel.obj",
+                "relativePath": "car-engine\\Steering Wheel.obj",
+                "extension": ".obj",
+                "role": "primary_object"
+              }
+            ]
+          },
+          "processedAssetPath": "/assets_processed/animations/wheel/wheel.glb",
+          "importer": "spatail_animation_export",
+          "_replacedByAuthoredBundle": "wheel"
+        }
+      ],
+      "fallbackGeometry": "box",
+      "interactions": [
+        {
+          "id": "highlight_current_part",
+          "type": "highlight",
+          "behavior": "tint the target with the bright blue shader"
+        },
+        {
+          "id": "isolate_target_part",
+          "type": "isolate",
+          "behavior": "hide every other element so only the target remains"
+        },
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show a fuller label panel for this target"
+        }
+      ],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": "anim.pulse.elem_steering_wheel_4",
+      "respondsTo": [],
+      "fidelity": "authored",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "The user is acting on a real / simulated object — emphasize it in place with a bright shader so the serviced part is unmistakable, rather than describing it in text.",
+      "whyThisPlacement": "Hero object sits on a clean workbench — no host vehicle to anchor to, so the user can walk around the whole part for inspection."
+    },
+    {
+      "id": "elem_mark_left_grip_5",
+      "title": "Left Grip Handle",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          0.98,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Left Grip Handle",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Suede-wrapped handle the driver's left hand never leaves. Behind it: the left paddle (downshift) and the left clutch paddle (bite-point control on race starts).",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_left_grip_5",
+      "respondsTo": [
+        "tap.elem_mark_left_grip_5"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_right_grip_6",
+      "title": "Right Grip Handle",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          1.16,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Right Grip Handle",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Right-hand grip. Behind it: the right paddle (upshift) and the right clutch paddle. On many seasons the DRS button also lives on the back of this grip.",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_right_grip_6",
+      "respondsTo": [
+        "tap.elem_mark_right_grip_6"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_center_console_7",
+      "title": "Center Console / Display Bay",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          1.3399999999999999,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Center Console / Display Bay",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Houses the LCD dash readout (gear, speed, lap delta, tyre temps, fuel, ERS state). Surrounded by the most frequently-used buttons: radio, OK / confirm, drink, BB+ / BB-.",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_center_console_7",
+      "respondsTo": [
+        "tap.elem_mark_center_console_7"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_top_left_bay_8",
+      "title": "Top-Left Control Bay",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          1.52,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Top-Left Control Bay",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "On most Mercedes wheels this carries the brake-bias rotary and the clutch-bite rotary. Brake bias is adjusted into and out of slow corners; bite-point is set on the formation lap.",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_top_left_bay_8",
+      "respondsTo": [
+        "tap.elem_mark_top_left_bay_8"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_top_right_bay_9",
+      "title": "Top-Right Control Bay",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          1.7,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Top-Right Control Bay",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Differential rotary + strategy multifunction. Diff entry / mid / exit settings get touched on every lap. Strategy mode swaps the whole map set: race / qualifying / safety car / cool-down.",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_top_right_bay_9",
+      "respondsTo": [
+        "tap.elem_mark_top_right_bay_9"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_quick_release_10",
+      "title": "Mercedes Star — Quick-Release Nut",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          1.88,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Mercedes Star — Quick-Release Nut",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "The team logo is the visible face of the quick-release collar. Pull, the wheel comes off in ~1 second — required by FIA regulation so a driver can egress in <5 seconds.",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_quick_release_10",
+      "respondsTo": [
+        "tap.elem_mark_quick_release_10"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_mark_lower_rim_11",
+      "title": "Lower Rim Bar",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          2.06,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Lower Rim Bar",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "The structural cross-piece that joins the left and right grip handles into one composite chassis. Typically holds the pit-limiter button + the burnout / start-mode trigger in a centre position.",
+        "placementHint": null,
+        "spotlightOnHero": null,
+        "mechanismKind": null
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_mark_lower_rim_11",
+      "respondsTo": [
+        "tap.elem_mark_lower_rim_11"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_btn_drs_12",
+      "title": "DRS Button",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          2.24,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "DRS Button",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Drag Reduction System. A single press opens the rear-wing upper flap, stalling the wing and shedding ~15% of drag for ~9 m/s top-end on a long straight. Hold-to-arm on some wheels; close happens automatically on brake or lift.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          0.052,
+          0.005,
+          0.018
+        ],
+        "mechanismKind": "button"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_btn_drs_12",
+      "respondsTo": [
+        "tap.elem_btn_drs_12"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_btn_pc_13",
+      "title": "PC Button (Pit Confirm)",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          2.42,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "PC Button (Pit Confirm)",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Pit confirm. Latches the pit-lane strategy preset the engineer just radio'd in (tyre compound, fuel plan, front-wing setting), so the driver enters the pit window with the right map already loaded.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          0.018,
+          0.038,
+          0.02
+        ],
+        "mechanismKind": "button"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_btn_pc_13",
+      "respondsTo": [
+        "tap.elem_btn_pc_13"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_btn_pl_14",
+      "title": "PL Button (Pit Limiter)",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          2.5999999999999996,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "PL Button (Pit Limiter)",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Pit limiter. Caps the car's throttle so it can't exceed the regulated pit-lane speed (80 km/h race / 60 km/h practice). Latches on at the entry line; the driver flicks it off at the exit.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          -0.012,
+          0.038,
+          0.02
+        ],
+        "mechanismKind": "button"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_btn_pl_14",
+      "respondsTo": [
+        "tap.elem_btn_pl_14"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_btn_plus_one_15",
+      "title": "+1 Button",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          2.78,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "+1 Button",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Generic +1 increment. Bumps whichever rotary is currently selected on the dash by one position without rotating the dial — used when the driver can't take a hand off the grip to twist.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          0.03,
+          0.038,
+          0.02
+        ],
+        "mechanismKind": "button"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_btn_plus_one_15",
+      "respondsTo": [
+        "tap.elem_btn_plus_one_15"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_rot_bbw_16",
+      "title": "BB+ / BB- (Brake Bias) Rotary",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          2.96,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "BB+ / BB- (Brake Bias) Rotary",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Brake bias adjustment. Each click shifts the front/rear hydraulic pressure split by ~0.5%. Drivers wind bias rearward into slow corners (rotation), forward into fast corners (stability).",
+        "placementHint": null,
+        "spotlightOnHero": [
+          -0.038,
+          -0.005,
+          0.018
+        ],
+        "mechanismKind": "rotary"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_rot_bbw_16",
+      "respondsTo": [
+        "tap.elem_rot_bbw_16"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_rot_diff_17",
+      "title": "Differential Rotary (DIFF)",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          3.14,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Differential Rotary (DIFF)",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Differential lock setting. Three sub-rotaries (ENTRY, MID, EXIT) control how locked the diff is at each corner phase. Looser entry = more rotation. Tighter exit = traction off the corner.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          0.04,
+          -0.005,
+          0.018
+        ],
+        "mechanismKind": "rotary"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_rot_diff_17",
+      "respondsTo": [
+        "tap.elem_rot_diff_17"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_rot_strat_18",
+      "title": "Strategy Rotary (STRAT)",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          3.32,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "Strategy Rotary (STRAT)",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Whole-car mode swap. Each position is a pre-baked map for race / quali / safety-car / VSC / formation-lap / cool-down. Changes torque map, ERS deploy, fuel mix, brake-by-wire, all in one click.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          0.062,
+          -0.028,
+          0.018
+        ],
+        "mechanismKind": "rotary"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_rot_strat_18",
+      "respondsTo": [
+        "tap.elem_rot_strat_18"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_btn_rs_19",
+      "title": "RS Button (Radio / Talk)",
+      "contentType": "anchored_marker",
+      "representationMode": "anchored_callout",
+      "placement": {
+        "kind": "object_anchored",
+        "anchor": "on_target:elem_steering_wheel_4",
+        "position": [
+          0.35,
+          3.5,
+          0.2
+        ],
+        "sizeMeters": [
+          0.35,
+          0.18
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 65,
+      "sourceContent": {
+        "name": "RS Button (Radio / Talk)",
+        "role": "callout",
+        "assetGroupRef": null,
+        "components": [],
+        "targetRef": "steering_wheel",
+        "finding": "Press-to-talk radio. Opens the link to the pit wall; release closes it. Engineers radio anytime, but the driver only transmits while pressing this.",
+        "placementHint": null,
+        "spotlightOnHero": [
+          -0.06,
+          -0.03,
+          0.018
+        ],
+        "mechanismKind": "button"
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "show fuller detail about this anchored marker"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_btn_rs_19",
+      "respondsTo": [
+        "tap.elem_btn_rs_19"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A physical interaction point (clip, screw, port) only makes sense when pinned directly to the part it sits on.",
+      "whyThisPlacement": "Physical interaction points (clips, screws, ports) only make sense pinned directly on the target — the label sits *on* the part it names. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_rotaries_change_car_behaviour_mid_corner_20",
+      "title": "Rotaries change car behaviour mid-corner",
+      "contentType": "diagnostic_finding",
+      "representationMode": "diagnostic_overlay",
+      "placement": {
+        "kind": "above_target",
+        "anchor": "diag_above_target:elem_steering_wheel_4",
+        "position": [
+          -0.5,
+          1.4500000000000002,
+          -0.05
+        ],
+        "sizeMeters": [
+          0.7,
+          0.22
+        ]
+      },
+      "anchorStrategy": "relative_to_target",
+      "scaleMode": "compact_panel",
+      "priority": 78,
+      "sourceContent": {
+        "title": "Rotaries change car behaviour mid-corner",
+        "targetRef": "steering_wheel",
+        "finding": "Every rotary affects the chassis dynamic. A mis-clicked differential setting on corner entry can rotate the car off line. Drivers train these positions by feel — that is why the labels are recessed into the chassis, not raised: the finger reads the click, not the eyes."
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "tap_part_to_show_label",
+          "type": "expand",
+          "behavior": "expand the diagnostic finding into a fuller panel"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": "anim.pulse.elem_rotaries_change_car_behaviour_mid_corner_20",
+      "respondsTo": [
+        "tap.elem_rotaries_change_car_behaviour_mid_corner_20"
+      ],
+      "fidelity": "committed",
+      "resolvedSurface": {
+        "surfaceId": "table.workbench",
+        "kind": "table",
+        "areaMeters2": 1.6,
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "heightMeters": 0.75,
+        "facingUser": null,
+        "source": "room_scan"
+      },
+      "whyThisRepresentation": "A diagnosis explains *why* the user is here — float it above the target so it reads as commentary on the physical part, not as another anchored sticker.",
+      "whyThisPlacement": "A diagnosis explains *why* the user is here — floated above the target so it reads as commentary on the physical part rather than as another sticker on it. — Resolved to table.workbench (table, 1.6m × 1.0m, area 1.6m²)."
+    },
+    {
+      "id": "elem_explore_by_region_21",
+      "title": "Explore by region",
+      "contentType": "decision_set",
+      "representationMode": "floating_decision_card",
+      "placement": {
+        "kind": "near_user",
+        "anchor": "hand_reach",
+        "position": [
+          -0.6,
+          1.3,
+          1.2
+        ],
+        "sizeMeters": [
+          0.45,
+          0.3
+        ]
+      },
+      "anchorStrategy": "user_relative",
+      "scaleMode": "compact_panel",
+      "priority": 55,
+      "sourceContent": {
+        "title": "Explore by region",
+        "options": [
+          {
+            "id": "focus_grips",
+            "label": "Focus on grips + paddles",
+            "detail": "Walk the user through the left/right handles and the paddles immediately behind them."
+          },
+          {
+            "id": "focus_top_bays",
+            "label": "Focus on top control bays",
+            "detail": "Brake bias, differential, strategy, clutch bite — the rotary cluster region."
+          },
+          {
+            "id": "focus_display",
+            "label": "Focus on the dash",
+            "detail": "What the LCD shows during a lap; the buttons around it that the driver hits without looking."
+          },
+          {
+            "id": "focus_quick_release",
+            "label": "Focus on the quick-release",
+            "detail": "Explain the 1-second wheel removal and FIA egress timing rule."
+          }
+        ]
+      },
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [
+        {
+          "id": "select_decision",
+          "type": "select",
+          "behavior": "pick this option and advance the experience"
+        }
+      ],
+      "attentionBehavior": "on_demand",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "committed",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "A small set of next-actions belongs in the user's hand-reach zone, not on a wall — floating selectable cards.",
+      "whyThisPlacement": "Decisions need to be touched / selected, so they live in the user's hand-reach zone, not on a distant wall."
+    }
+  ],
+  "relationships": [
+    {
+      "from": "elem_mark_left_grip_5",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_mark_right_grip_6",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_mark_center_console_7",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_mark_top_left_bay_8",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_mark_top_right_bay_9",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_mark_quick_release_10",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_mark_lower_rim_11",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_btn_drs_12",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_btn_pc_13",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_btn_pl_14",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_btn_plus_one_15",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_rot_bbw_16",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_rot_diff_17",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_rot_strat_18",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_btn_rs_19",
+      "to": "elem_steering_wheel_4",
+      "type": "attached_to",
+      "note": "Marker (clip / screw / port) is anchored on the target part itself."
+    },
+    {
+      "from": "elem_rotaries_change_car_behaviour_mid_corner_20",
+      "to": "elem_steering_wheel_4",
+      "type": "diagnoses",
+      "note": "Finding is floated above the diagnosed part as commentary."
+    }
+  ],
+  "interactionPlan": {
+    "interactions": [
+      {
+        "id": "elem_wheel_identity_0::tap_part_to_show_label",
+        "elementId": "elem_wheel_identity_0",
+        "type": "expand",
+        "behavior": "expand this panel to a fuller view",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_why_this_wheel_is_its_own_computer_1::tap_part_to_show_label",
+        "elementId": "elem_why_this_wheel_is_its_own_computer_1",
+        "type": "expand",
+        "behavior": "expand this panel to a fuller view",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_race_day_adjustments_2::tap_part_to_show_label",
+        "elementId": "elem_race_day_adjustments_2",
+        "type": "expand",
+        "behavior": "expand this panel to a fuller view",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_what_this_cad_does_not_model_3::tap_part_to_show_label",
+        "elementId": "elem_what_this_cad_does_not_model_3",
+        "type": "expand",
+        "behavior": "expand this panel to a fuller view",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_steering_wheel_4::highlight_current_part",
+        "elementId": "elem_steering_wheel_4",
+        "type": "highlight",
+        "behavior": "tint the target with the bright blue shader",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_steering_wheel_4::isolate_target_part",
+        "elementId": "elem_steering_wheel_4",
+        "type": "isolate",
+        "behavior": "hide every other element so only the target remains",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_steering_wheel_4::tap_part_to_show_label",
+        "elementId": "elem_steering_wheel_4",
+        "type": "expand",
+        "behavior": "show a fuller label panel for this target",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_left_grip_5::tap_part_to_show_label",
+        "elementId": "elem_mark_left_grip_5",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_right_grip_6::tap_part_to_show_label",
+        "elementId": "elem_mark_right_grip_6",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_center_console_7::tap_part_to_show_label",
+        "elementId": "elem_mark_center_console_7",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_top_left_bay_8::tap_part_to_show_label",
+        "elementId": "elem_mark_top_left_bay_8",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_top_right_bay_9::tap_part_to_show_label",
+        "elementId": "elem_mark_top_right_bay_9",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_quick_release_10::tap_part_to_show_label",
+        "elementId": "elem_mark_quick_release_10",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_mark_lower_rim_11::tap_part_to_show_label",
+        "elementId": "elem_mark_lower_rim_11",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_btn_drs_12::tap_part_to_show_label",
+        "elementId": "elem_btn_drs_12",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_btn_pc_13::tap_part_to_show_label",
+        "elementId": "elem_btn_pc_13",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_btn_pl_14::tap_part_to_show_label",
+        "elementId": "elem_btn_pl_14",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_btn_plus_one_15::tap_part_to_show_label",
+        "elementId": "elem_btn_plus_one_15",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_rot_bbw_16::tap_part_to_show_label",
+        "elementId": "elem_rot_bbw_16",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_rot_diff_17::tap_part_to_show_label",
+        "elementId": "elem_rot_diff_17",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_rot_strat_18::tap_part_to_show_label",
+        "elementId": "elem_rot_strat_18",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_btn_rs_19::tap_part_to_show_label",
+        "elementId": "elem_btn_rs_19",
+        "type": "expand",
+        "behavior": "show fuller detail about this anchored marker",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_rotaries_change_car_behaviour_mid_corner_20::tap_part_to_show_label",
+        "elementId": "elem_rotaries_change_car_behaviour_mid_corner_20",
+        "type": "expand",
+        "behavior": "expand the diagnostic finding into a fuller panel",
+        "trigger": "ui"
+      },
+      {
+        "id": "elem_explore_by_region_21::select_decision",
+        "elementId": "elem_explore_by_region_21",
+        "type": "select",
+        "behavior": "pick this option and advance the experience",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::reset_view",
+        "elementId": null,
+        "type": "reset_view",
+        "behavior": "restore camera and every element's original state",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::next_step",
+        "elementId": null,
+        "type": "next_step",
+        "behavior": "advance the attention plan by one step",
+        "trigger": "ui"
+      },
+      {
+        "id": "scene::previous_step",
+        "elementId": null,
+        "type": "previous_step",
+        "behavior": "step the attention plan back by one",
+        "trigger": "ui"
+      }
+    ]
+  },
+  "attentionPlan": [
+    {
+      "step": 1,
+      "focusElementId": "elem_steering_wheel_4",
+      "narration": "Focus on Mercedes F1 Steering Wheel."
+    },
+    {
+      "step": 2,
+      "focusElementId": "elem_rotaries_change_car_behaviour_mid_corner_20",
+      "narration": "Finding: Rotaries change car behaviour mid-corner."
+    },
+    {
+      "step": 3,
+      "focusElementId": "elem_mark_left_grip_5",
+      "narration": "Marker: Left Grip Handle."
+    },
+    {
+      "step": 4,
+      "focusElementId": "elem_mark_right_grip_6",
+      "narration": "Marker: Right Grip Handle."
+    },
+    {
+      "step": 5,
+      "focusElementId": "elem_mark_center_console_7",
+      "narration": "Marker: Center Console / Display Bay."
+    },
+    {
+      "step": 6,
+      "focusElementId": "elem_mark_top_left_bay_8",
+      "narration": "Marker: Top-Left Control Bay."
+    },
+    {
+      "step": 7,
+      "focusElementId": "elem_mark_top_right_bay_9",
+      "narration": "Marker: Top-Right Control Bay."
+    },
+    {
+      "step": 8,
+      "focusElementId": "elem_mark_quick_release_10",
+      "narration": "Marker: Mercedes Star — Quick-Release Nut."
+    },
+    {
+      "step": 9,
+      "focusElementId": "elem_mark_lower_rim_11",
+      "narration": "Marker: Lower Rim Bar."
+    },
+    {
+      "step": 10,
+      "focusElementId": "elem_btn_drs_12",
+      "narration": "Marker: DRS Button."
+    },
+    {
+      "step": 11,
+      "focusElementId": "elem_btn_pc_13",
+      "narration": "Marker: PC Button (Pit Confirm)."
+    },
+    {
+      "step": 12,
+      "focusElementId": "elem_btn_pl_14",
+      "narration": "Marker: PL Button (Pit Limiter)."
+    },
+    {
+      "step": 13,
+      "focusElementId": "elem_btn_plus_one_15",
+      "narration": "Marker: +1 Button."
+    },
+    {
+      "step": 14,
+      "focusElementId": "elem_rot_bbw_16",
+      "narration": "Marker: BB+ / BB- (Brake Bias) Rotary."
+    },
+    {
+      "step": 15,
+      "focusElementId": "elem_rot_diff_17",
+      "narration": "Marker: Differential Rotary (DIFF)."
+    },
+    {
+      "step": 16,
+      "focusElementId": "elem_rot_strat_18",
+      "narration": "Marker: Strategy Rotary (STRAT)."
+    },
+    {
+      "step": 17,
+      "focusElementId": "elem_btn_rs_19",
+      "narration": "Marker: RS Button (Radio / Talk)."
+    },
+    {
+      "step": 18,
+      "focusElementId": "elem_explore_by_region_21",
+      "narration": "Choose what to do next — Explore by region."
+    },
+    {
+      "step": 19,
+      "focusElementId": "elem_wheel_identity_0",
+      "narration": "Reference: Wheel Identity."
+    },
+    {
+      "step": 20,
+      "focusElementId": "elem_why_this_wheel_is_its_own_computer_1",
+      "narration": "Reference: Why this wheel is its own computer."
+    },
+    {
+      "step": 21,
+      "focusElementId": "elem_race_day_adjustments_2",
+      "narration": "Race-day adjustments."
+    },
+    {
+      "step": 22,
+      "focusElementId": "elem_what_this_cad_does_not_model_3",
+      "narration": "What this CAD does NOT model."
+    }
+  ],
+  "assetRequirements": [
+    {
+      "id": "car-engine",
+      "preferredSource": "cad_folder",
+      "hint": "car-engine",
+      "fallback": "placeholder_box",
+      "resolvedAssetGroup": {
+        "groupKey": "car-engine",
+        "items": [
+          {
+            "fileName": "Steering Wheel.obj",
+            "relativePath": "car-engine\\Steering Wheel.obj",
+            "extension": ".obj",
+            "role": "primary_object"
+          }
+        ]
+      },
+      "processedAssetPath": "/assets_processed/spatail__car_engine__Steering_Wheel_obj.glb",
+      "importer": "presegmented"
+    },
+    {
+      "id": "f1-car",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "futuristic-egg-shaped-gaming-pod-chair-concept-interior-design-cad-model-1.snapshot.2",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "lego-minifig-3.snapshot.9",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "r-c-8-automodell-1.snapshot.3",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    },
+    {
+      "id": "yamaha-tdm-850-1.snapshot.3",
+      "preferredSource": "cad_folder",
+      "fallback": "placeholder_box",
+      "unused": true,
+      "note": "Detected in /assets_raw but not referenced by this card."
+    }
+  ],
+  "animations": [
+    {
+      "id": "anim.pulse.elem_steering_wheel_4",
+      "primitive": "highlight_pulse",
+      "target": "elem_steering_wheel_4",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.4,
+        "pulses": 1
+      }
+    },
+    {
+      "id": "anim.explode.elem_steering_wheel_4",
+      "primitive": "explode",
+      "target": "elem_steering_wheel_4",
+      "duration": 1.6,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.18,
+        "axis": "y",
+        "stagger": 0.06
+      }
+    },
+    {
+      "id": "anim.assemble.elem_steering_wheel_4",
+      "primitive": "assemble",
+      "target": "elem_steering_wheel_4",
+      "duration": 1.4,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.04
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_left_grip_5",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_left_grip_5",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_left_grip_5",
+      "primitive": "explode",
+      "target": "elem_mark_left_grip_5",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_left_grip_5",
+      "primitive": "assemble",
+      "target": "elem_mark_left_grip_5",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_right_grip_6",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_right_grip_6",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_right_grip_6",
+      "primitive": "explode",
+      "target": "elem_mark_right_grip_6",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_right_grip_6",
+      "primitive": "assemble",
+      "target": "elem_mark_right_grip_6",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_center_console_7",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_center_console_7",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_center_console_7",
+      "primitive": "explode",
+      "target": "elem_mark_center_console_7",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_center_console_7",
+      "primitive": "assemble",
+      "target": "elem_mark_center_console_7",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_top_left_bay_8",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_top_left_bay_8",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_top_left_bay_8",
+      "primitive": "explode",
+      "target": "elem_mark_top_left_bay_8",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_top_left_bay_8",
+      "primitive": "assemble",
+      "target": "elem_mark_top_left_bay_8",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_top_right_bay_9",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_top_right_bay_9",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_top_right_bay_9",
+      "primitive": "explode",
+      "target": "elem_mark_top_right_bay_9",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_top_right_bay_9",
+      "primitive": "assemble",
+      "target": "elem_mark_top_right_bay_9",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_quick_release_10",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_quick_release_10",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_quick_release_10",
+      "primitive": "explode",
+      "target": "elem_mark_quick_release_10",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_quick_release_10",
+      "primitive": "assemble",
+      "target": "elem_mark_quick_release_10",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_mark_lower_rim_11",
+      "primitive": "highlight_pulse",
+      "target": "elem_mark_lower_rim_11",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_mark_lower_rim_11",
+      "primitive": "explode",
+      "target": "elem_mark_lower_rim_11",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_mark_lower_rim_11",
+      "primitive": "assemble",
+      "target": "elem_mark_lower_rim_11",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_btn_drs_12",
+      "primitive": "highlight_pulse",
+      "target": "elem_btn_drs_12",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_btn_drs_12",
+      "primitive": "explode",
+      "target": "elem_btn_drs_12",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_btn_drs_12",
+      "primitive": "assemble",
+      "target": "elem_btn_drs_12",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_btn_pc_13",
+      "primitive": "highlight_pulse",
+      "target": "elem_btn_pc_13",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_btn_pc_13",
+      "primitive": "explode",
+      "target": "elem_btn_pc_13",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_btn_pc_13",
+      "primitive": "assemble",
+      "target": "elem_btn_pc_13",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_btn_pl_14",
+      "primitive": "highlight_pulse",
+      "target": "elem_btn_pl_14",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_btn_pl_14",
+      "primitive": "explode",
+      "target": "elem_btn_pl_14",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_btn_pl_14",
+      "primitive": "assemble",
+      "target": "elem_btn_pl_14",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_btn_plus_one_15",
+      "primitive": "highlight_pulse",
+      "target": "elem_btn_plus_one_15",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_btn_plus_one_15",
+      "primitive": "explode",
+      "target": "elem_btn_plus_one_15",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_btn_plus_one_15",
+      "primitive": "assemble",
+      "target": "elem_btn_plus_one_15",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_rot_bbw_16",
+      "primitive": "highlight_pulse",
+      "target": "elem_rot_bbw_16",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_rot_bbw_16",
+      "primitive": "explode",
+      "target": "elem_rot_bbw_16",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_rot_bbw_16",
+      "primitive": "assemble",
+      "target": "elem_rot_bbw_16",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_rot_diff_17",
+      "primitive": "highlight_pulse",
+      "target": "elem_rot_diff_17",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_rot_diff_17",
+      "primitive": "explode",
+      "target": "elem_rot_diff_17",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_rot_diff_17",
+      "primitive": "assemble",
+      "target": "elem_rot_diff_17",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_rot_strat_18",
+      "primitive": "highlight_pulse",
+      "target": "elem_rot_strat_18",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_rot_strat_18",
+      "primitive": "explode",
+      "target": "elem_rot_strat_18",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_rot_strat_18",
+      "primitive": "assemble",
+      "target": "elem_rot_strat_18",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_btn_rs_19",
+      "primitive": "highlight_pulse",
+      "target": "elem_btn_rs_19",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_btn_rs_19",
+      "primitive": "explode",
+      "target": "elem_btn_rs_19",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_btn_rs_19",
+      "primitive": "assemble",
+      "target": "elem_btn_rs_19",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.pulse.elem_rotaries_change_car_behaviour_mid_corner_20",
+      "primitive": "highlight_pulse",
+      "target": "elem_rotaries_change_car_behaviour_mid_corner_20",
+      "duration": 1.2,
+      "easing": "sine-in-out",
+      "params": {
+        "intensity": 1.6,
+        "pulses": 2
+      }
+    },
+    {
+      "id": "anim.explode.elem_rotaries_change_car_behaviour_mid_corner_20",
+      "primitive": "explode",
+      "target": "elem_rotaries_change_car_behaviour_mid_corner_20",
+      "duration": 0.55,
+      "easing": "ease-out-cubic",
+      "params": {
+        "spread": 0.08,
+        "axis": "radial",
+        "stagger": 0.03
+      }
+    },
+    {
+      "id": "anim.assemble.elem_rotaries_change_car_behaviour_mid_corner_20",
+      "primitive": "assemble",
+      "target": "elem_rotaries_change_car_behaviour_mid_corner_20",
+      "duration": 0.45,
+      "easing": "ease-in-out-cubic",
+      "params": {
+        "stagger": 0.02
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_02_explode_radial",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 2.5,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.02.explode_radial",
+        "actionName": "act_seq.steering_walkthrough.02.explode_radial_rig_slot.06",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.02.explode_radial",
+        "frameStart": 86,
+        "frameEnd": 146
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 2.5,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.03.assemble_finale",
+        "actionName": "act_seq.steering_walkthrough.03.assemble_finale_rig_slot.06",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.03.assemble_finale",
+        "frameStart": 151,
+        "frameEnd": 211
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_00_intro_fade_in",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 1.25,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.00.intro_fade_in",
+        "actionName": "act_intro",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.00.intro_fade_in",
+        "frameStart": 1,
+        "frameEnd": 31
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_01_look_at_whole_wheel",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 1.875,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.01.look_at_whole_wheel",
+        "actionName": "act_look",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.01.look_at_whole_wheel",
+        "frameStart": 36,
+        "frameEnd": 81
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_02_explode_radial__master",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 2.5,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.02.explode_radial__master",
+        "actionName": "act_explode_master",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.02.explode_radial__master",
+        "frameStart": 86,
+        "frameEnd": 146
+      }
+    },
+    {
+      "id": "anim.transform.seq_steering_walkthrough_03_assemble_finale__master",
+      "primitive": "transform_keyframes",
+      "target": "elem_steering_wheel_4",
+      "duration": 2.5,
+      "easing": "linear",
+      "params": {
+        "trackName": "seq.steering_walkthrough.03.assemble_finale__master",
+        "actionName": "act_assemble_master",
+        "loop": false
+      },
+      "_authoring": {
+        "stripName": "seq.steering_walkthrough.03.assemble_finale__master",
+        "frameStart": 151,
+        "frameEnd": 211
+      }
+    },
+    {
+      "id": "anim.loop.default_idle_rotation",
+      "primitive": "loop",
+      "target": "elem_steering_wheel_4",
+      "duration": 14.9583,
+      "easing": "linear",
+      "params": {
+        "wraps": "gltf_track",
+        "trackName": "act_idle_rotation",
+        "fps": 24
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "id": "tap.next",
+      "trigger": {
+        "type": "scene_event",
+        "target": "transport_next"
+      },
+      "actions": [
+        {
+          "type": "advance_step"
+        }
+      ],
+      "note": "Fired by the transport bar Next button (and tap on the scene background)."
+    },
+    {
+      "id": "tap.previous",
+      "trigger": {
+        "type": "scene_event",
+        "target": "transport_previous"
+      },
+      "actions": [
+        {
+          "type": "previous_step"
+        }
+      ],
+      "note": "Fired by the transport bar Previous button."
+    },
+    {
+      "id": "tap.elem_mark_left_grip_5",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_left_grip_5"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_left_grip_5"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_left_grip_5"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_mark_right_grip_6",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_right_grip_6"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_right_grip_6"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_right_grip_6"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_mark_center_console_7",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_center_console_7"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_center_console_7"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_center_console_7"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_mark_top_left_bay_8",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_top_left_bay_8"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_top_left_bay_8"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_top_left_bay_8"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_mark_top_right_bay_9",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_top_right_bay_9"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_top_right_bay_9"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_top_right_bay_9"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_mark_quick_release_10",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_quick_release_10"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_quick_release_10"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_quick_release_10"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_mark_lower_rim_11",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_mark_lower_rim_11"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_mark_lower_rim_11"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_mark_lower_rim_11"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_btn_drs_12",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_btn_drs_12"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_btn_drs_12"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_btn_drs_12"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_btn_pc_13",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_btn_pc_13"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_btn_pc_13"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_btn_pc_13"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_btn_pl_14",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_btn_pl_14"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_btn_pl_14"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_btn_pl_14"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_btn_plus_one_15",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_btn_plus_one_15"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_btn_plus_one_15"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_btn_plus_one_15"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_rot_bbw_16",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_rot_bbw_16"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_rot_bbw_16"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_rot_bbw_16"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_rot_diff_17",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_rot_diff_17"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_rot_diff_17"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_rot_diff_17"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_rot_strat_18",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_rot_strat_18"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_rot_strat_18"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_rot_strat_18"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_btn_rs_19",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_btn_rs_19"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_btn_rs_19"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_btn_rs_19"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.elem_rotaries_change_car_behaviour_mid_corner_20",
+      "trigger": {
+        "type": "tap",
+        "target": "elem_rotaries_change_car_behaviour_mid_corner_20"
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.pulse.elem_rotaries_change_car_behaviour_mid_corner_20"
+        },
+        {
+          "type": "play_animation",
+          "ref": "anim.explode.elem_rotaries_change_car_behaviour_mid_corner_20"
+        }
+      ],
+      "note": "Tap a callout to inquire about it. The callout itself pulses and explodes in; the camera stays where the user put it."
+    },
+    {
+      "id": "tap.rim",
+      "trigger": {
+        "type": "tap",
+        "target": null
+      },
+      "actions": [
+        {
+          "type": "play_animation",
+          "ref": "anim.interaction.interaction_tap_rim"
+        }
+      ],
+      "_authoring": {
+        "object": "wheel_assembly",
+        "strip": "interaction.tap.rim",
+        "frameStart": 1,
+        "frameEnd": 16
+      },
+      "_authoredFrom": "wheel"
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq.mercedes-f1-wheel.walkthrough",
+      "title": "Default walkthrough",
+      "generatedFromAttentionPlan": true,
+      "steps": [
+        {
+          "atSecond": 0,
+          "label": "Settle into the room.",
+          "wait": 0.5
+        },
+        {
+          "afterPrevious": true,
+          "label": "Look at the hero.",
+          "play": "anim.pulse.elem_steering_wheel_4"
+        },
+        {
+          "afterPrevious": true,
+          "label": "Take the assembly apart.",
+          "play": "anim.explode.elem_steering_wheel_4"
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Left Grip Handle.",
+          "play": [
+            "anim.pulse.elem_mark_left_grip_5",
+            "anim.explode.elem_mark_left_grip_5"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Right Grip Handle.",
+          "play": [
+            "anim.pulse.elem_mark_right_grip_6",
+            "anim.explode.elem_mark_right_grip_6"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Center Console / Display Bay.",
+          "play": [
+            "anim.pulse.elem_mark_center_console_7",
+            "anim.explode.elem_mark_center_console_7"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Top-Left Control Bay.",
+          "play": [
+            "anim.pulse.elem_mark_top_left_bay_8",
+            "anim.explode.elem_mark_top_left_bay_8"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Top-Right Control Bay.",
+          "play": [
+            "anim.pulse.elem_mark_top_right_bay_9",
+            "anim.explode.elem_mark_top_right_bay_9"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Mercedes Star — Quick-Release Nut.",
+          "play": [
+            "anim.pulse.elem_mark_quick_release_10",
+            "anim.explode.elem_mark_quick_release_10"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Lower Rim Bar.",
+          "play": [
+            "anim.pulse.elem_mark_lower_rim_11",
+            "anim.explode.elem_mark_lower_rim_11"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on DRS Button.",
+          "play": [
+            "anim.pulse.elem_btn_drs_12",
+            "anim.explode.elem_btn_drs_12"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on PC Button (Pit Confirm).",
+          "play": [
+            "anim.pulse.elem_btn_pc_13",
+            "anim.explode.elem_btn_pc_13"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on PL Button (Pit Limiter).",
+          "play": [
+            "anim.pulse.elem_btn_pl_14",
+            "anim.explode.elem_btn_pl_14"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on +1 Button.",
+          "play": [
+            "anim.pulse.elem_btn_plus_one_15",
+            "anim.explode.elem_btn_plus_one_15"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on BB+ / BB- (Brake Bias) Rotary.",
+          "play": [
+            "anim.pulse.elem_rot_bbw_16",
+            "anim.explode.elem_rot_bbw_16"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Differential Rotary (DIFF).",
+          "play": [
+            "anim.pulse.elem_rot_diff_17",
+            "anim.explode.elem_rot_diff_17"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Strategy Rotary (STRAT).",
+          "play": [
+            "anim.pulse.elem_rot_strat_18",
+            "anim.explode.elem_rot_strat_18"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on RS Button (Radio / Talk).",
+          "play": [
+            "anim.pulse.elem_btn_rs_19",
+            "anim.explode.elem_btn_rs_19"
+          ]
+        },
+        {
+          "interactive": true,
+          "advanceOn": "tap.next",
+          "label": "Focus on Rotaries change car behaviour mid-corner.",
+          "play": [
+            "anim.pulse.elem_rotaries_change_car_behaviour_mid_corner_20",
+            "anim.explode.elem_rotaries_change_car_behaviour_mid_corner_20"
+          ]
+        },
+        {
+          "afterPrevious": true,
+          "label": "Put it back together.",
+          "play": "anim.assemble.elem_steering_wheel_4"
+        },
+        {
+          "afterPrevious": true,
+          "label": "Done — restart to walk through again.",
+          "wait": 0.6
+        }
+      ]
+    },
+    {
+      "id": "seq.steering_walkthrough",
+      "title": "steering walkthrough",
+      "fromBlend": true,
+      "steps": [
+        {
+          "order": 0,
+          "label": "intro fade in",
+          "duration": 1.25,
+          "frameStart": 1,
+          "frameEnd": 31,
+          "play": [
+            "anim.transform.seq_steering_walkthrough_00_intro_fade_in"
+          ],
+          "afterPrevious": true
+        },
+        {
+          "order": 1,
+          "label": "look at whole wheel",
+          "duration": 1.875,
+          "frameStart": 36,
+          "frameEnd": 81,
+          "play": [
+            "anim.transform.seq_steering_walkthrough_01_look_at_whole_wheel"
+          ],
+          "afterPrevious": true
+        },
+        {
+          "order": 2,
+          "label": "explode radial",
+          "duration": 2.5,
+          "frameStart": 86,
+          "frameEnd": 146,
+          "play": [
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial",
+            "anim.transform.seq_steering_walkthrough_02_explode_radial"
+          ],
+          "afterPrevious": true
+        },
+        {
+          "order": 3,
+          "label": "assemble finale",
+          "duration": 2.5,
+          "frameStart": 151,
+          "frameEnd": 211,
+          "play": [
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale",
+            "anim.transform.seq_steering_walkthrough_03_assemble_finale"
+          ],
+          "afterPrevious": true
+        }
+      ]
+    }
+  ],
+  "defaultSequenceId": "seq.steering_walkthrough",
+  "roomContract": {
+    "schemaVersion": "0.4.0-room",
+    "roomId": "mock-default-room",
+    "capturedAt": "2026-05-18T00:00:00Z",
+    "source": "mock",
+    "label": "Mock workshop — desktop simulator",
+    "boundingBox": {
+      "min": [
+        -3,
+        0,
+        -2
+      ],
+      "max": [
+        3,
+        2.7,
+        2
+      ]
+    },
+    "userPose": {
+      "position": [
+        0,
+        1.6,
+        1.4
+      ],
+      "forward": [
+        0,
+        0,
+        -1
+      ]
+    },
+    "surfaces": [
+      {
+        "id": "floor.main",
+        "kind": "floor",
+        "polygon": [
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            -3,
+            0,
+            2
+          ]
+        ],
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "areaMeters2": 24,
+        "confidence": 0.95,
+        "facingUser": false
+      },
+      {
+        "id": "wall.north",
+        "kind": "wall",
+        "polygon": [
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            -2
+          ]
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "areaMeters2": 16.2,
+        "confidence": 0.92,
+        "facingUser": true,
+        "note": "Largest user-facing wall — preferred mount for wall_dashboard elements."
+      },
+      {
+        "id": "wall.west",
+        "kind": "wall",
+        "polygon": [
+          [
+            -3,
+            0,
+            2
+          ],
+          [
+            -3,
+            0,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            -2
+          ],
+          [
+            -3,
+            2.7,
+            2
+          ]
+        ],
+        "normal": [
+          1,
+          0,
+          0
+        ],
+        "areaMeters2": 10.8,
+        "confidence": 0.88,
+        "facingUser": false
+      },
+      {
+        "id": "wall.east",
+        "kind": "wall",
+        "polygon": [
+          [
+            3,
+            0,
+            -2
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            3,
+            2.7,
+            2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ]
+        ],
+        "normal": [
+          -1,
+          0,
+          0
+        ],
+        "areaMeters2": 10.8,
+        "confidence": 0.88,
+        "facingUser": false
+      },
+      {
+        "id": "ceiling.main",
+        "kind": "ceiling",
+        "polygon": [
+          [
+            -3,
+            2.7,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            -2
+          ],
+          [
+            3,
+            2.7,
+            2
+          ],
+          [
+            -3,
+            2.7,
+            2
+          ]
+        ],
+        "normal": [
+          0,
+          -1,
+          0
+        ],
+        "areaMeters2": 24,
+        "confidence": 0.9,
+        "facingUser": false
+      },
+      {
+        "id": "table.workbench",
+        "kind": "table",
+        "polygon": [
+          [
+            -0.8,
+            0.75,
+            -0.5
+          ],
+          [
+            0.8,
+            0.75,
+            -0.5
+          ],
+          [
+            0.8,
+            0.75,
+            0.5
+          ],
+          [
+            -0.8,
+            0.75,
+            0.5
+          ]
+        ],
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "areaMeters2": 1.6,
+        "heightMeters": 0.75,
+        "confidence": 0.96,
+        "note": "Hero workbench — primary surface for tabletop_model + highlighted_target."
+      }
+    ],
+    "anchorPoints": [
+      {
+        "id": "anchor.user_front",
+        "position": [
+          0,
+          1.4,
+          0.3
+        ],
+        "kind": "user_relative"
+      },
+      {
+        "id": "anchor.user_left",
+        "position": [
+          -0.8,
+          1.4,
+          0.6
+        ],
+        "kind": "user_relative"
+      },
+      {
+        "id": "anchor.user_right",
+        "position": [
+          0.8,
+          1.4,
+          0.6
+        ],
+        "kind": "user_relative"
+      }
+    ]
+  },
+  "explanation": {
+    "intentSummary": "Make the prompt's subject visible and inspectable.",
+    "written": "The prompt \"Walk me through this Mercedes-AMG F1 steering wheel.\" doesn't fit a recognised explanation pattern, so we fall back to the highest-leverage default: render the subject as a 3D object the user can inspect, with labelled callouts on its salient features and a short written explanation alongside."
+  },
+  "mechanics": [
+    {
+      "id": "mech.1.highlighted_region",
+      "kind": "highlighted_region",
+      "requestedKind": "highlighted_region",
+      "target": "elem_steering_wheel_4",
+      "anchorsOn": null,
+      "params": {},
+      "why": "Make the subject salient.",
+      "placeholderRouted": false,
+      "placeholderReason": null,
+      "_sourceTarget": "steering_wheel"
+    },
+    {
+      "id": "mech.2.annotated_callouts",
+      "kind": "annotated_callouts",
+      "requestedKind": "annotated_callouts",
+      "target": "elem_steering_wheel_4",
+      "anchorsOn": null,
+      "params": {},
+      "why": "Label its features.",
+      "placeholderRouted": false,
+      "placeholderReason": null,
+      "_sourceTarget": "steering_wheel"
+    }
+  ],
+  "presentation": {
+    "layout": "stage_in_front",
+    "ordering": [
+      "mech.1.highlighted_region",
+      "mech.2.annotated_callouts"
+    ],
+    "note": "Default flat stage 1.5m ahead of the user. Room-aware composition is a wrapper for later."
+  },
+  "reasoningSummary": "Prompt \"Walk me through this Mercedes-AMG F1 steering wheel.\" was understood as domain \"motorsport_engineering\" with 22 content items. Spatial mix: 4× two_d_panel, 1× highlighted_target, 15× anchored_callout, 1× diagnostic_overlay, 1× floating_decision_card. Textual and numeric content stayed as readable panels rather than being forced into 3D widgets. Diagnoses were floated above the diagnosed part as commentary, not stickers on it. Decisions were placed in the user's hand-reach zone for direct selection.",
+  "vocabularies": {
+    "contentTypes": [
+      "summary_panel",
+      "numeric_summary",
+      "list",
+      "step_sequence",
+      "timeline",
+      "decision_set",
+      "physical_target",
+      "assembly_explode",
+      "diagnostic_finding",
+      "anchored_marker",
+      "alignment_guide",
+      "airflow_streamlines",
+      "process_model",
+      "environment"
+    ],
+    "representationModes": [
+      "two_d_panel",
+      "wall_dashboard",
+      "three_d_model",
+      "tabletop_model",
+      "floor_timeline",
+      "floating_decision_card",
+      "highlighted_target",
+      "exploded_view",
+      "anchored_callout",
+      "guide_line",
+      "diagnostic_overlay",
+      "airflow_field"
+    ],
+    "placements": [
+      "wall",
+      "table",
+      "floor",
+      "object_anchored",
+      "above_target",
+      "near_user",
+      "near_presenter",
+      "left_of_user",
+      "right_of_user",
+      "in_front_of_user",
+      "room_center"
+    ],
+    "anchorStrategies": [
+      "world_anchor",
+      "plane_anchor",
+      "object_anchor",
+      "relative_to_target",
+      "user_relative",
+      "simulated_anchor"
+    ],
+    "scaleModes": [
+      "real_scale",
+      "tabletop_scale",
+      "enlarged_detail",
+      "compact_panel",
+      "room_scale"
+    ],
+    "attentionBehaviors": [
+      "ambient",
+      "persistent_context",
+      "active_focus",
+      "peripheral",
+      "on_demand",
+      "guiding"
+    ],
+    "animationPrimitives": [
+      "transform_keyframes",
+      "explode",
+      "assemble",
+      "highlight_pulse",
+      "fade",
+      "set_visible",
+      "attention_camera_hint"
+    ],
+    "interactionTriggers": [
+      "tap",
+      "hover",
+      "dwell",
+      "scene_event"
+    ],
+    "interactionActions": [
+      "play_animation",
+      "stop_animation",
+      "advance_step",
+      "previous_step",
+      "restart_sequence",
+      "set_visible"
+    ],
+    "fidelities": [
+      "ghost",
+      "draft",
+      "committed",
+      "authored"
+    ],
+    "mechanicKinds": [
+      "exploded_view",
+      "annotated_callouts",
+      "highlighted_region",
+      "timeline",
+      "cross_section",
+      "assembly_sequence",
+      "ghosted_internal",
+      "flow_diagram",
+      "process_animation",
+      "cutaway",
+      "disassembly_sequence",
+      "before_after",
+      "comparison_grid",
+      "metric_dashboard",
+      "cross_reference",
+      "scale_reference",
+      "color_coded_map",
+      "force_arrows",
+      "particle_flow",
+      "cutaway_orbit",
+      "xray_layer_stack",
+      "interactive_dissection",
+      "placeholder_mechanic"
+    ],
+    "presentationLayouts": [
+      "stage_in_front",
+      "flat_grid",
+      "scene_floor",
+      "wall_room"
+    ]
+  }
+}

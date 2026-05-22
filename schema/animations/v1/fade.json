@@ -1,0 +1,15 @@
+{
+  "primitive": "fade",
+  "version": 1,
+  "description": "Smooth opacity transition between 0 and 1 across the target's materials. Used for intros / outros and any 'arrive on screen' moment.",
+  "appliesTo": ["any"],
+  "params": {
+    "from": { "type": "number", "default": 0, "desc": "Starting opacity (0..1)." },
+    "to":   { "type": "number", "default": 1, "desc": "Ending opacity (0..1)." }
+  },
+  "duration": { "default": 0.6, "units": "seconds" },
+  "easing":   { "default": "ease-out-cubic" },
+  "notes": [
+    "Forces every material under the target to `transparent: true` for the duration; restores the original transparent flag after the tween if the original was opaque."
+  ]
+}

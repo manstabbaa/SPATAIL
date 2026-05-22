@@ -1,0 +1,279 @@
+{
+  "sceneName": "futuristic egg shaped gaming pod chair concept interior design cad model 1",
+  "version": "0.1.0",
+  "createdAt": "2026-05-17T02:57:03.216Z",
+  "assets": [
+    {
+      "id": "futuristic_egg_shaped_gaming_pod_chair_c__ADJ__0",
+      "fileName": "ADJ.stl",
+      "fileType": "stl",
+      "sourcePath": "futuristic-egg-shaped-gaming-pod-chair-concept-interior-design-cad-model-1.snapshot.2\\CAD\\ADJ.stl",
+      "processedPath": "assets_processed/futuristic_egg_shaped_gaming_pod_chair_c__ADJ__0.glb",
+      "detectedObjectName": "ADJ",
+      "role": "primary_object",
+      "status": "processed"
+    },
+    {
+      "id": "futuristic_egg_shaped_gaming_pod_chair_c__BACK__1",
+      "fileName": "BACK.stl",
+      "fileType": "stl",
+      "sourcePath": "futuristic-egg-shaped-gaming-pod-chair-concept-interior-design-cad-model-1.snapshot.2\\CAD\\BACK.stl",
+      "processedPath": "assets_processed/futuristic_egg_shaped_gaming_pod_chair_c__BACK__1.glb",
+      "detectedObjectName": "BACK",
+      "role": "component",
+      "status": "processed"
+    },
+    {
+      "id": "futuristic_egg_shaped_gaming_pod_chair_c__FRONT__2",
+      "fileName": "FRONT.stl",
+      "fileType": "stl",
+      "sourcePath": "futuristic-egg-shaped-gaming-pod-chair-concept-interior-design-cad-model-1.snapshot.2\\CAD\\FRONT.stl",
+      "processedPath": "assets_processed/futuristic_egg_shaped_gaming_pod_chair_c__FRONT__2.glb",
+      "detectedObjectName": "FRONT",
+      "role": "component",
+      "status": "processed"
+    },
+    {
+      "id": "futuristic_egg_shaped_gaming_pod_chair_c__SIDE__3",
+      "fileName": "SIDE.stl",
+      "fileType": "stl",
+      "sourcePath": "futuristic-egg-shaped-gaming-pod-chair-concept-interior-design-cad-model-1.snapshot.2\\CAD\\SIDE.stl",
+      "processedPath": "assets_processed/futuristic_egg_shaped_gaming_pod_chair_c__SIDE__3.glb",
+      "detectedObjectName": "SIDE",
+      "role": "component",
+      "status": "processed"
+    }
+  ],
+  "assetAnalysis": [
+    {
+      "assetId": "futuristic_egg_shaped_gaming_pod_chair_c__ADJ__0",
+      "importer": "wm.stl_import",
+      "status": "ok",
+      "reason": null,
+      "objectCount": 1,
+      "vertexCount": 15727,
+      "faceCount": 31474,
+      "dimensionsMeters": [
+        1830,
+        1000,
+        1778.7581787109375
+      ],
+      "bbox": {
+        "min": [
+          -915,
+          -500,
+          -60
+        ],
+        "max": [
+          915,
+          500,
+          1718.7581787109375
+        ]
+      }
+    },
+    {
+      "assetId": "futuristic_egg_shaped_gaming_pod_chair_c__BACK__1",
+      "importer": "wm.stl_import",
+      "status": "ok",
+      "reason": null,
+      "objectCount": 1,
+      "vertexCount": 15783,
+      "faceCount": 31582,
+      "dimensionsMeters": [
+        1830,
+        1000,
+        1778.7581787109375
+      ],
+      "bbox": {
+        "min": [
+          -915,
+          -500,
+          -60
+        ],
+        "max": [
+          915,
+          500,
+          1718.7581787109375
+        ]
+      }
+    },
+    {
+      "assetId": "futuristic_egg_shaped_gaming_pod_chair_c__FRONT__2",
+      "importer": "wm.stl_import",
+      "status": "ok",
+      "reason": null,
+      "objectCount": 1,
+      "vertexCount": 15783,
+      "faceCount": 31582,
+      "dimensionsMeters": [
+        1830,
+        1000,
+        1778.7581787109375
+      ],
+      "bbox": {
+        "min": [
+          -915,
+          -500,
+          -60
+        ],
+        "max": [
+          915,
+          500,
+          1718.7581787109375
+        ]
+      }
+    },
+    {
+      "assetId": "futuristic_egg_shaped_gaming_pod_chair_c__SIDE__3",
+      "importer": "wm.stl_import",
+      "status": "ok",
+      "reason": null,
+      "objectCount": 1,
+      "vertexCount": 15783,
+      "faceCount": 31582,
+      "dimensionsMeters": [
+        1830,
+        1000,
+        1778.7581787109375
+      ],
+      "bbox": {
+        "min": [
+          -915,
+          -500,
+          -60
+        ],
+        "max": [
+          915,
+          500,
+          1718.7581787109375
+        ]
+      }
+    }
+  ],
+  "spatialUnderstanding": {
+    "detectedDomain": "furniture",
+    "domainConfidence": "high",
+    "primaryObject": "ADJ",
+    "likelyUseCase": "spatial placement preview",
+    "representationMode": "exploded_view"
+  },
+  "placement": {
+    "anchorType": "table",
+    "positionStrategy": "in_front_of_user",
+    "scaleMode": "fit_to_volume",
+    "safeDistanceMeters": 1.5,
+    "facesUser": true
+  },
+  "orientationRules": {
+    "upAxis": "+Y",
+    "forwardAxis": "-Z",
+    "autoCorrect": true,
+    "notes": "STEP/STP imports may arrive with +Z up; the viewer auto-frames so this mostly self-corrects. Tighter handling lands in v0.2."
+  },
+  "interactionBricks": [
+    {
+      "id": "reset_view",
+      "type": "reset_view",
+      "target": "scene",
+      "trigger": "ui",
+      "behavior": "reset camera and object transforms",
+      "purpose": "return user to the default view"
+    },
+    {
+      "id": "highlight_primary",
+      "type": "highlight",
+      "target": "primary_object",
+      "trigger": "ui",
+      "behavior": "visually highlight the primary object",
+      "purpose": "help user identify the main asset"
+    },
+    {
+      "id": "isolate_primary",
+      "type": "isolate",
+      "target": "primary_object",
+      "trigger": "ui",
+      "behavior": "hide non-primary objects if present",
+      "purpose": "focus user attention"
+    },
+    {
+      "id": "explode_view",
+      "type": "explode",
+      "target": "all_components",
+      "trigger": "ui",
+      "behavior": "move components outward from center if multiple objects exist; otherwise no-op",
+      "purpose": "show part relationships"
+    }
+  ],
+  "uiElements": [
+    {
+      "id": "btn_reset_view",
+      "type": "button",
+      "label": "Reset View",
+      "action": "reset_view",
+      "target": "scene",
+      "visibleIn": [
+        "viewer",
+        "vision_pro"
+      ]
+    },
+    {
+      "id": "btn_highlight",
+      "type": "button",
+      "label": "Highlight",
+      "action": "highlight_primary",
+      "target": "primary_object",
+      "visibleIn": [
+        "viewer",
+        "vision_pro"
+      ]
+    },
+    {
+      "id": "btn_isolate",
+      "type": "button",
+      "label": "Isolate",
+      "action": "isolate_primary",
+      "target": "primary_object",
+      "visibleIn": [
+        "viewer",
+        "vision_pro"
+      ]
+    },
+    {
+      "id": "btn_explode",
+      "type": "button",
+      "label": "Explode",
+      "action": "explode_view",
+      "target": "all_components",
+      "visibleIn": [
+        "viewer",
+        "vision_pro"
+      ]
+    }
+  ],
+  "storySequence": [
+    {
+      "id": "step_overview",
+      "title": "Overview",
+      "description": "Inspect the futuristic egg shaped gaming pod chair concept interior design cad model 1.",
+      "suggestedAction": "highlight_primary"
+    },
+    {
+      "id": "step_explore",
+      "title": "Explore",
+      "description": "Use Explode to see how the parts fit together.",
+      "suggestedAction": "explode_view"
+    }
+  ],
+  "validationRules": [
+    {
+      "id": "must_have_loadable_asset",
+      "rule": "at least one asset must have status='processed'",
+      "severity": "error"
+    },
+    {
+      "id": "warn_no_primary",
+      "rule": "scene should mark exactly one asset as primary_object",
+      "severity": "warn"
+    }
+  ]
+}

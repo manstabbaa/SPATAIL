@@ -1,0 +1,9 @@
+{
+  "kind": "comparison_grid",
+  "status": "placeholder",
+  "placeholderFor": "metric_dashboard",
+  "version": 1,
+  "description": "N variants in a row with shared axes (price / spec / weight ...).",
+  "expectedSourceShape": { "columns": "[{ id, label }]", "rows": "[{ key, values: [string|number] }]" },
+  "params": { "highlightRow": { "type": "string", "default": null } }
+}

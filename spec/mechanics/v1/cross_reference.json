@@ -1,0 +1,7 @@
+{
+  "kind": "cross_reference",
+  "status": "placeholder",
+  "placeholderFor": "annotated_callouts",
+  "version": 1,
+  "description": "Connecting lines between two views (e.g. callout on 3D ↔ row in spec table)."
+}

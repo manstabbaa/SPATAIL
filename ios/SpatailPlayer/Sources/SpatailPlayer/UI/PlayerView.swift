@@ -176,14 +176,28 @@ private struct ARViewContainer: UIViewRepresentable {
                 let wrapper = ModelEntity()
                 wrapper.addChild(entity)
 
+                // Compute scale from the entity's ACTUAL bounds, not from
+                // manifest.scene.boundingBoxMeters — the Blender export
+                // pipeline writes those values in source units (often cm)
+                // while labeling them as meters. RealityKit consumes the
+                // USDZ at its declared metersPerUnit, so visualBounds is
+                // the ground truth.
                 let localBounds = entity.visualBounds(relativeTo: wrapper)
+                let largestExtent = Swift.max(localBounds.extents.x,
+                                              Swift.max(localBounds.extents.y,
+                                                        localBounds.extents.z))
+                let targetSize = SceneController.tabletopTargetSizeMeters
+                let initialScale: Float = (largestExtent > 0.0001)
+                    ? targetSize / largestExtent
+                    : 1.0
+                wrapper.scale = SIMD3<Float>(repeating: initialScale)
+
+                // Collision shape must be sized in wrapper-LOCAL units (pre-scale),
+                // because RealityKit applies wrapper.scale to the shape at render.
                 let collisionShape = ShapeResource.generateBox(
                     size: max(localBounds.extents, SIMD3<Float>(repeating: 0.01)))
                 wrapper.components.set(CollisionComponent(shapes: [collisionShape]))
                 entity.generateCollisionShapes(recursive: true)
-
-                let initialScale = SceneController.initialScale(for: bundle.manifest)
-                wrapper.scale = SIMD3<Float>(repeating: initialScale)
 
                 let anchor = AnchorEntity(plane: .horizontal,
                                           classification: .any,
@@ -198,8 +212,10 @@ private struct ARViewContainer: UIViewRepresentable {
                 status = "Aim at a flat surface — \(bundle.manifest.title) will land on it. Pinch / drag / rotate to adjust."
 
                 print("[ARViewContainer][SPATAIL-DIAG] anchored exp='\(expId)' " +
+                      "rawExtents=\(localBounds.extents) " +
+                      "manifestBbox=\(bundle.manifest.scene.boundingBoxMeters) " +
                       "initialScale=\(initialScale) " +
-                      "localBounds.extents=\(localBounds.extents)")
+                      "finalSizeMeters=\(localBounds.extents * initialScale)")
             } catch {
                 status = "Load failed: \(error.localizedDescription)"
                 print("[ARViewContainer] load failed: \(error)")

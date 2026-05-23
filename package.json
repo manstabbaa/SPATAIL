@@ -18,8 +18,9 @@
     "spatail:authoring:bootstrap": "node pipeline/blender/run_bootstrap_wheel.js",
     "spatail:segment": "node pipeline/blender/run_segment_and_analyze.js",
     "sync:swift-vocab": "node tools/sync/gen_swift_vocab.mjs",
+    "sync:demo-bundle": "node tools/sync/copy_demo_bundle.mjs",
     "sync:check": "node tools/sync/check_protocol_sync.mjs",
-    "sync": "npm run sync:swift-vocab && npm run sync:check",
+    "sync": "npm run sync:swift-vocab && npm run sync:demo-bundle && npm run sync:check",
     "git:sync": "bash tools/sync/git-sync.sh",
     "git:push": "bash tools/sync/git-push.sh"
   },

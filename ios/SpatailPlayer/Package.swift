@@ -25,7 +25,13 @@ let package = Package(
             dependencies: [
                 .product(name: "ZIPFoundation", package: "ZIPFoundation"),
             ],
-            path: "Sources/SpatailPlayer"),
+            path: "Sources/SpatailPlayer",
+            resources: [
+                // Demo .spatail bundles shipped inside the app binary so the
+                // player can load them without AirDrop / Files. Refresh with
+                // `npm run sync:demo-bundle` after re-exporting from Blender.
+                .copy("Resources"),
+            ]),
         .testTarget(
             name: "SpatailPlayerTests",
             dependencies: ["SpatailPlayer"],

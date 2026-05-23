@@ -15,11 +15,23 @@ public final class SceneController {
     public private(set) var root: Entity = Entity()
     public private(set) var registry = EntityRegistry()
 
+    /// Target size for `supportsTabletop` bundles, in meters along the longest axis.
+    public static let tabletopTargetSizeMeters: Float = 0.25
+
     /// Load a bundle into the scene. Returns the root entity to anchor.
     public func load(_ bundle: LoadedBundle) async throws -> Entity {
         let usdz = bundle.folder.appendingPathComponent(bundle.manifest.files.scene)
         let entity = try await Entity(contentsOf: usdz)
         entity.name = "spatail.scene"
+
+        if bundle.manifest.scene.supportsTabletop {
+            let bbox = bundle.manifest.scene.boundingBoxMeters
+            if let largest = bbox.max(), largest > 0 {
+                let factor = Self.tabletopTargetSizeMeters / largest
+                entity.scale = SIMD3<Float>(repeating: factor)
+            }
+        }
+
         registry.bind(entity, primsIndex: bundle.primsIndex)
         root = entity
         return entity

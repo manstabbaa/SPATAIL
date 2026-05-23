@@ -31,7 +31,7 @@ public struct PlayerView: View {
 
     public var body: some View {
         ZStack(alignment: .bottom) {
-            ARViewContainer(bundle: bundle)
+            ARViewContainer(bundle: bundle, status: $status)
                 .ignoresSafeArea()
 
             VStack(spacing: 12) {
@@ -133,39 +133,83 @@ extension UTType {
 }
 
 // MARK: - ARView container
+//
+// AR Quick Look-equivalent placement: horizontal plane detection, gesture
+// recognizers for drag / pinch / rotate, environment-texturing IBL.
+// Pattern follows Apple's RealityKit guidance:
+//   - https://developer.apple.com/documentation/realitykit/arview/installgestures(_:for:)
+//   - https://developer.apple.com/documentation/realitykit/anchorentity/init(plane:classification:minimumbounds:)
+// The loaded USDZ is wrapped in a ModelEntity so gestures attach to a
+// single HasCollision parent. Scale is applied on the wrapper (not the raw
+// entity) because USDZ animation tracks can override transforms written
+// directly to `Entity(contentsOf:)`'s root.
 
 private struct ARViewContainer: UIViewRepresentable {
     let bundle: LoadedBundle?
+    @Binding var status: String
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+    final class Coordinator {
+        var loadedExperienceId: String? = nil
+    }
 
     func makeUIView(context: Context) -> ARView {
-        let view = ARView(frame: .zero, cameraMode: .ar,
-                           automaticallyConfigureSession: true)
+        let view = ARView(frame: .zero)
         let config = ARWorldTrackingConfiguration()
-        config.planeDetection = [.horizontal, .vertical]
+        config.planeDetection = [.horizontal]
+        config.environmentTexturing = .automatic
         view.session.run(config)
         return view
     }
 
     func updateUIView(_ view: ARView, context: Context) {
         guard let bundle else { return }
+        let expId = bundle.manifest.experienceId
+        guard context.coordinator.loadedExperienceId != expId else { return }
+        context.coordinator.loadedExperienceId = expId
+
         Task { @MainActor in
-            let controller = SceneController()
             do {
+                let controller = SceneController()
                 let entity = try await controller.load(bundle)
-                let anchor = AnchorEntity(world: .init(0, 0, -0.6))
-                anchor.addChild(entity)
+
+                let wrapper = ModelEntity()
+                wrapper.addChild(entity)
+
+                let localBounds = entity.visualBounds(relativeTo: wrapper)
+                let collisionShape = ShapeResource.generateBox(
+                    size: max(localBounds.extents, SIMD3<Float>(repeating: 0.01)))
+                wrapper.components.set(CollisionComponent(shapes: [collisionShape]))
+                entity.generateCollisionShapes(recursive: true)
+
+                let initialScale = SceneController.initialScale(for: bundle.manifest)
+                wrapper.scale = SIMD3<Float>(repeating: initialScale)
+
+                let anchor = AnchorEntity(plane: .horizontal,
+                                          classification: .any,
+                                          minimumBounds: [0.1, 0.1])
+                anchor.addChild(wrapper)
                 view.scene.anchors.removeAll()
                 view.scene.anchors.append(anchor)
-                print("[PlayerView][SPATAIL-DIAG] post-attach " +
-                      "entity.scale=\(entity.scale) " +
-                      "entity.transformMatrix(world)=\(entity.transformMatrix(relativeTo: nil)) " +
-                      "anchor.scale=\(anchor.scale) " +
-                      "view.cameraMode=\(String(describing: view.cameraMode)) " +
-                      "sessionRunning=\(view.session.currentFrame != nil)")
+
+                view.installGestures([.translation, .rotation, .scale],
+                                     for: wrapper)
+
+                status = "Aim at a flat surface — \(bundle.manifest.title) will land on it. Pinch / drag / rotate to adjust."
+
+                print("[ARViewContainer][SPATAIL-DIAG] anchored exp='\(expId)' " +
+                      "initialScale=\(initialScale) " +
+                      "localBounds.extents=\(localBounds.extents)")
             } catch {
-                print("[PlayerView] scene load failed: \(error)")
+                status = "Load failed: \(error.localizedDescription)"
+                print("[ARViewContainer] load failed: \(error)")
             }
         }
     }
+}
+
+/// Element-wise max for clamping near-zero bounding boxes.
+private func max(_ a: SIMD3<Float>, _ b: SIMD3<Float>) -> SIMD3<Float> {
+    SIMD3<Float>(Swift.max(a.x, b.x), Swift.max(a.y, b.y), Swift.max(a.z, b.z))
 }
 #endif

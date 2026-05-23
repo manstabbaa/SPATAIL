@@ -24,13 +24,16 @@ public final class SceneController {
         let entity = try await Entity(contentsOf: usdz)
         entity.name = "spatail.scene"
 
-        if bundle.manifest.scene.supportsTabletop {
-            let bbox = bundle.manifest.scene.boundingBoxMeters
-            if let largest = bbox.max(), largest > 0 {
-                let factor = Self.tabletopTargetSizeMeters / largest
-                entity.scale = SIMD3<Float>(repeating: factor)
-            }
+        let bbox = bundle.manifest.scene.boundingBoxMeters
+        let supportsTabletop = bundle.manifest.scene.supportsTabletop
+        var appliedFactor: Float = 1.0
+        if supportsTabletop, let largest = bbox.max(), largest > 0 {
+            appliedFactor = Self.tabletopTargetSizeMeters / largest
+            entity.scale = SIMD3<Float>(repeating: appliedFactor)
         }
+        print("[SceneController][SPATAIL-DIAG] loaded='\(bundle.manifest.title)' " +
+              "supportsTabletop=\(supportsTabletop) bbox=\(bbox) " +
+              "appliedScaleFactor=\(appliedFactor) entity.scale=\(entity.scale)")
 
         registry.bind(entity, primsIndex: bundle.primsIndex)
         root = entity

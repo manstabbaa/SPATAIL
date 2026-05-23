@@ -156,6 +156,12 @@ private struct ARViewContainer: UIViewRepresentable {
                 anchor.addChild(entity)
                 view.scene.anchors.removeAll()
                 view.scene.anchors.append(anchor)
+                print("[PlayerView][SPATAIL-DIAG] post-attach " +
+                      "entity.scale=\(entity.scale) " +
+                      "entity.transformMatrix(world)=\(entity.transformMatrix(relativeTo: nil)) " +
+                      "anchor.scale=\(anchor.scale) " +
+                      "view.cameraMode=\(String(describing: view.cameraMode)) " +
+                      "sessionRunning=\(view.session.currentFrame != nil)")
             } catch {
                 print("[PlayerView] scene load failed: \(error)")
             }

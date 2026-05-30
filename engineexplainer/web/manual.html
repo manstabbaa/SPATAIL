@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SPATAIL · Manual → XR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@200;300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="src/styles.css" />
+  <style>
+    /* ── Manual → XR mini-app specifics ──────────────────────────────── */
+    .mx-wordmark {
+      font-family: "Geist Mono", monospace; font-size: 12px; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--ink-60, #6b6862); white-space: nowrap;
+    }
+    .mx-wordmark b { color: var(--ink, #1c1b18); font-weight: 600; }
+
+    /* Intake — full-bleed landing state that sits over the (empty) scene
+       until a walkthrough is built. Cream paper to match the design system. */
+    .mx-intake {
+      position: fixed; inset: 0; z-index: 40;
+      display: grid; place-items: center; padding: 24px;
+      background:
+        radial-gradient(1200px 600px at 50% -10%, #FBFAF6 0%, #F5F4EF 60%, #EFEDE6 100%);
+      transition: opacity .35s ease;
+    }
+    .mx-intake.hidden { opacity: 0; pointer-events: none; }
+    .mx-intake-card {
+      width: min(680px, 94vw); max-height: 92vh; overflow: auto;
+    }
+    .mx-intake-card.dragover { outline: 2px dashed var(--accent, #5046E5); outline-offset: 6px; }
+    .mx-droprow {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 14px;
+    }
+    .mx-log {
+      margin-top: 14px; font-family: "Geist Mono", monospace; font-size: 12px;
+      line-height: 1.7; color: var(--ink-60, #6b6862); white-space: pre-wrap;
+      min-height: 1.2em; max-height: 26vh; overflow: auto;
+    }
+    .mx-log .ok   { color: #1f7a3d; }
+    .mx-log .err  { color: #b5341f; }
+    .mx-log .step { color: var(--ink, #1c1b18); }
+    .mx-spin {
+      display: inline-block; width: 11px; height: 11px; margin-right: 7px;
+      border: 2px solid rgba(80,70,229,.25); border-top-color: #5046E5;
+      border-radius: 50%; vertical-align: -1px; animation: mxspin .8s linear infinite;
+    }
+    @keyframes mxspin { to { transform: rotate(360deg); } }
+
+    /* The scene fills the viewport behind the intake. */
+    .scene-frame.mx-full { position: fixed; inset: 0; border-radius: 0; }
+    #mx-new { left: 18px; right: auto; }
+  </style>
+</head>
+<body>
+  <main id="app">
+
+    <header class="chrome-bar" id="chrome-bar">
+      <div class="brandlock">SPAT<span class="ai">AI</span>L</div>
+      <div class="chrome-sep"></div>
+      <div class="mx-wordmark">Manual&nbsp;<b>→</b>&nbsp;XR</div>
+      <div class="chrome-sep"></div>
+      <div class="status-tag" id="status-pill"><span class="dot"></span><span id="status-label">Ready</span></div>
+    </header>
+
+    <!-- 3D scene — full-bleed; revealed once a walkthrough is built. -->
+    <section class="scene-frame mx-full">
+      <canvas id="three-canvas"></canvas>
+      <div id="overlay-root" class="overlay"></div>
+      <div id="subtitle" class="subtitle hidden"></div>
+      <div id="transport" class="transport hidden">
+        <button id="transport-prev" aria-label="Previous step">‹</button>
+        <div id="transport-progress"><div id="transport-fill"></div></div>
+        <button id="transport-next" aria-label="Next step">›</button>
+        <span id="transport-label"></span>
+      </div>
+    </section>
+
+    <!-- Walkthrough step rail (left) -->
+    <aside id="step-rail" class="step-rail hidden" aria-label="Walkthrough steps"></aside>
+
+    <!-- Return to intake -->
+    <button type="button" id="mx-new" class="manual-fab hidden" title="Build another manual">
+      <span class="manual-fab-glyph">↻</span> New&nbsp;manual
+    </button>
+
+    <!-- Intake — landing state -->
+    <div id="mx-intake" class="mx-intake">
+      <div class="mx-intake-card manual-card" id="mx-card">
+        <div class="manual-head">
+          <div class="eyebrow inline">usermanualXR</div>
+        </div>
+        <h2 class="manual-title">Drop a user manual.</h2>
+        <p class="manual-sub">
+          We read the manual, segment it into <b>parts</b> and <b>steps</b>, then
+          <b>build the product part-by-part</b> in 3D and play an interactive
+          step-by-step XR walkthrough. Drop a <code>.txt</code>, <code>.md</code>,
+          or <code>.pdf</code> — or paste the text.
+        </p>
+        <textarea id="manual-text" class="manual-textarea" spellcheck="false"
+          placeholder="Drop a .txt / .md / .pdf here, or paste user-manual text…"></textarea>
+        <input type="file" id="manual-file"
+          accept=".txt,.md,.text,.pdf,text/plain,text/markdown,application/pdf" hidden />
+        <div class="mx-droprow">
+          <button type="button" id="manual-upload" class="btn-secondary">Upload file</button>
+          <button type="button" id="manual-sample" class="btn-secondary">Load KALLAX sample</button>
+          <button type="button" id="manual-build" class="btn-primary">Build walkthrough</button>
+        </div>
+        <div id="mx-log" class="mx-log"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/",
+      "pdfjs": "https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.min.mjs"
+    }
+  }
+  </script>
+  <script type="module">
+    const cb = new URLSearchParams(location.search).get("cb");
+    const q = cb ? `?cb=${cb}` : "";
+    await import(`./src/manual_app.js${q}`);
+  </script>
+</body>
+</html>

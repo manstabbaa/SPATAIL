@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SPATAIL · Explainer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@200;300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="src/styles.css" />
+</head>
+<body>
+  <main id="app">
+
+    <!-- TOP CHROME — single skinny overlay pill: brand · switcher · status -->
+    <header class="chrome-bar" id="chrome-bar">
+      <div class="brandlock">SPAT<span class="ai">AI</span>L</div>
+
+      <div class="chrome-sep"></div>
+
+      <nav class="asset-switcher" id="asset-switcher" role="tablist" aria-label="Asset">
+        <button type="button" class="seg active" data-asset="fan"      role="tab" aria-selected="true">Fan</button>
+        <button type="button" class="seg"        data-asset="engine"   role="tab" aria-selected="false">Engine</button>
+        <button type="button" class="seg"        data-asset="shelving" role="tab" aria-selected="false">Shelving</button>
+      </nav>
+
+      <div class="chrome-sep"></div>
+
+      <div class="status-tag" id="status-pill"><span class="dot"></span><span id="status-label">Ready</span></div>
+    </header>
+
+    <!-- 3D SCENE — paper-toned canvas, sits in the page like a slide on cream stock -->
+    <section class="scene-frame">
+      <canvas id="three-canvas"></canvas>
+      <!-- HTML overlay layer: panels + part labels live here, positioned absolutely -->
+      <div id="overlay-root" class="overlay"></div>
+      <!-- Subtitle / narration bar (anchored within the scene frame) -->
+      <div id="subtitle" class="subtitle hidden"></div>
+      <!-- Beat scrubber -->
+      <div id="transport" class="transport hidden">
+        <button id="transport-prev" aria-label="Previous beat">‹</button>
+        <div id="transport-progress"><div id="transport-fill"></div></div>
+        <button id="transport-next" aria-label="Next beat">›</button>
+        <span id="transport-label"></span>
+      </div>
+    </section>
+
+    <!-- usermanualXR — manual-drop drawer trigger (floating, bottom-left) -->
+    <button type="button" id="manual-open" class="manual-fab" title="Drop a user manual → XR walkthrough">
+      <span class="manual-fab-glyph">▤</span> Manual&nbsp;→&nbsp;XR
+    </button>
+
+    <!-- usermanualXR — step rail (left), shown during a walkthrough -->
+    <aside id="step-rail" class="step-rail hidden" aria-label="Walkthrough steps"></aside>
+
+    <!-- usermanualXR — drawer with manual text input -->
+    <div id="manual-drawer" class="manual-drawer hidden" role="dialog" aria-label="Drop a user manual">
+      <div class="manual-card">
+        <div class="manual-head">
+          <div class="eyebrow inline">usermanualXR</div>
+          <button type="button" id="manual-close" class="manual-x" aria-label="Close">×</button>
+        </div>
+        <h2 class="manual-title">Drop a user manual.</h2>
+        <p class="manual-sub">Upload or drop a manual file (.txt, .md, .pdf) — or paste the text. We classify the product, match a 3D model, and build a step-by-step XR walkthrough.</p>
+        <textarea id="manual-text" class="manual-textarea" spellcheck="false"
+          placeholder="Drop a .txt / .md / .pdf here, or paste user-manual text…"></textarea>
+        <input type="file" id="manual-file" accept=".txt,.md,.text,.pdf,text/plain,text/markdown,application/pdf" hidden />
+        <div class="manual-actions">
+          <button type="button" id="manual-upload" class="btn-secondary">Upload file</button>
+          <button type="button" id="manual-sample" class="btn-secondary">Load fan sample</button>
+          <button type="button" id="manual-build" class="btn-primary">Build walkthrough</button>
+        </div>
+        <div id="manual-status" class="manual-status caption"></div>
+      </div>
+    </div>
+
+    <!-- BOTTOM PROMPT — ink-fill primary button with → glyph -->
+    <form id="prompt-form" class="prompt-bar">
+      <label class="caption" for="prompt-input">Ask</label>
+      <input id="prompt-input" type="text"
+             placeholder="Ask anything about this fan…"
+             autocomplete="off" spellcheck="false" />
+      <button type="submit" id="prompt-submit" class="btn-primary">Ask</button>
+    </form>
+
+  </main>
+
+  <!-- import map → no build step needed, just open in a browser via a local server -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/",
+      "pdfjs": "https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.min.mjs"
+    }
+  }
+  </script>
+  <script type="module">
+    const cb = new URLSearchParams(location.search).get("cb");
+    const q = cb ? `?cb=${cb}` : "";
+    await import(`./src/main.js${q}`);
+  </script>
+</body>
+</html>

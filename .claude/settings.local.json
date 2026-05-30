@@ -78,7 +78,17 @@
       "Bash(git gc *)",
       "Bash(git commit -m 'windows: add git:sync + git:push npm scripts for two-machine workflow *)",
       "Bash(git commit -m 'windows: add .gitattributes for cross-platform line-ending normalization *)",
-      "Bash(git commit --amend -m 'spatail: initial commit — Blender pipeline + iOS scaffold + sync infra *)"
+      "Bash(git commit --amend -m 'spatail: initial commit — Blender pipeline + iOS scaffold + sync infra *)",
+      "Bash(dir /b \"C:\\\\Windows\\\\Fonts\")",
+      "Bash(findstr /i \"Inter Geist Arial Helvetica Consolas Cascadia Garamond Instrument Cambria Calibri Segoe\")",
+      "PowerShell(Get-ChildItem 'C:\\\\Windows\\\\Fonts' | Where-Object { $_.Name -match 'Inter|Geist|Arial|Helvetica|Consolas|Cascadia|Garamond|Instrument|Cambria|Calibri|Segoe' } | Select-Object -ExpandProperty Name -First 30)",
+      "Bash(dir \"C:\\\\Users\\\\manst\\\\.claude\\\\projects\\\\C--SPATAIL_MAX\\\\memory\")",
+      "PowerShell(winget install --id Gyan.FFmpeg --silent --accept-package-agreements --accept-source-agreements 2>&1)",
+      "PowerShell(Get-Command ffmpeg -ErrorAction SilentlyContinue | Select-Object Source; $found = Get-ChildItem \"$env:LOCALAPPDATA\\\\Microsoft\\\\WinGet\\\\Packages\" -Recurse -Filter ffmpeg.exe -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName; $found)",
+      "PowerShell($ffmpegPath = \"C:\\\\tmp\\\\ffmpeg\"; New-Item -ItemType Directory -Path $ffmpegPath -Force | Out-Null; $zip = \"$ffmpegPath\\\\ffmpeg.zip\"; Invoke-WebRequest -Uri \"https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip\" -OutFile $zip -UseBasicParsing; Expand-Archive -Path $zip -DestinationPath $ffmpegPath -Force; $exe = Get-ChildItem $ffmpegPath -Recurse -Filter ffmpeg.exe | Select-Object -First 1 -ExpandProperty FullName; $exe; if \\($exe\\) { & $exe -version | Select-Object -First 1 })",
+      "PowerShell($f = \"C:\\\\Users\\\\manst\\\\.claude\\\\projects\\\\C--SPATAIL-MAX\\\\d3b8f767-62af-43aa-b363-c6a8af875e90\\\\tool-results\\\\mcp-Blender-execute_blender_code-1779746030029.txt\"; \\(Get-Content $f -Raw | ConvertFrom-Json\\).result | ConvertTo-Json; if \\(Test-Path \"C:\\\\SPATAIL_MAX\\\\engineexplainer\\\\engine\\\\v8_engine.glb\"\\) { \"GLB size: $\\([math]::Round\\(\\(Get-Item 'C:\\\\SPATAIL_MAX\\\\engineexplainer\\\\engine\\\\v8_engine.glb'\\).Length/1MB,2\\)\\) MB\" })",
+      "Bash(chmod 600 \"C:/SPATAIL_MAX/engineexplainer/intelligence/.env\")",
+      "PowerShell($body = '{\"prompt\":\"How does a piston work?\"}'; try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:5175/api/ask\" -Method POST -Body $body -ContentType \"application/json\" -UseBasicParsing -TimeoutSec 240; \"STATUS: $\\($r.StatusCode\\)\"; $j = $r.Content | ConvertFrom-Json; \"ID: $\\($j.meta.id\\)\"; \"TITLE: $\\($j.explanation.title\\)\"; \"SUMMARY: $\\($j.explanation.summary\\)\"; \"BEATS \\($\\($j.beats.Count\\)\\):\"; foreach \\($b in $j.beats\\) { $narr = if \\($b.narration\\) { $b.narration.Substring\\(0, [Math]::Min\\(80, $b.narration.Length\\)\\) } else { \"\\(no narration\\)\" }; \"  '$\\($b.id\\)' \\($\\($b.actions.Count\\) actions, $\\($b.duration\\)s\\) — $narr\"; foreach \\($a in $b.actions\\) { \"      - $\\($a.type\\)\" } }; if \\($j.meta._critic_issues\\) { \"\"; \"CRITIC ISSUES:\"; $j.meta._critic_issues | ForEach-Object { \"  - $_\" } } } catch { \"FAILED: $\\($_.Exception.Message\\)\"; if \\($_.Exception.Response\\) { $sr = New-Object System.IO.StreamReader\\($_.Exception.Response.GetResponseStream\\(\\)\\); $sr.ReadToEnd\\(\\) } })"
     ]
   }
 }

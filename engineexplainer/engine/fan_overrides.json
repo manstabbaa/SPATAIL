@@ -1,0 +1,25 @@
+{
+  "_notes": "Hand-verified fan part-id mappings. The fan is an electronics axial cooling fan (60×60×10mm) imported from Onshape. The OBJ ships with generic mesh0..mesh94 names; the 7 blades all share 168 verts, the hub is mesh1 (1350 verts), the front/back frame plates are mesh81/mesh82 (60×60mm flat squares, 360 verts). Rotation axis is the Y axis (air-flow direction).",
+  "asset": "fan.glb",
+  "verified_at": "2026-05-27",
+  "verification_method": "color-segment by vertex-count bucket + render orthographic; the 168-vert bucket is the 7 blades",
+
+  "rotor": {
+    "blade_1": "mesh48",
+    "blade_2": "mesh55",
+    "blade_3": "mesh34",
+    "blade_4": "mesh62",
+    "blade_5": "mesh27",
+    "blade_6": "mesh76",
+    "blade_7": "mesh6",
+    "hub":     "mesh1"
+  },
+
+  "stator": {
+    "frame_front": "mesh81",
+    "frame_back":  "mesh82"
+  },
+
+  "rotation_axis_world": [0, 1, 0],
+  "rotation_pivot_world": [0, -0.005, 0]
+}

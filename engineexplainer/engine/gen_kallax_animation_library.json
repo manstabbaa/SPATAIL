@@ -1,0 +1,73 @@
+{
+  "assetId": "gen_kallax",
+  "_notes": "Generated flat-pack asset. Assembly is a runtime tween (explode/assemble actions over per-part offsets), so no baked glTF clips.",
+  "animations": {},
+  "assembly": {
+    "order": [
+      "bottom",
+      "side_left",
+      "side_right",
+      "shelf_1",
+      "shelf_2",
+      "shelf_3",
+      "top"
+    ],
+    "offsets": {
+      "side_left": [
+        -0.67375,
+        0.0,
+        0.0
+      ],
+      "side_right": [
+        0.67375,
+        0.0,
+        0.0
+      ],
+      "bottom": [
+        0.0,
+        -0.80998,
+        0.0
+      ],
+      "top": [
+        0.0,
+        0.80998,
+        0.0
+      ],
+      "shelf_1": [
+        0.0,
+        0.0,
+        1.1136
+      ],
+      "shelf_2": [
+        0.0,
+        0.0,
+        1.1136
+      ],
+      "shelf_3": [
+        0.0,
+        0.0,
+        1.1136
+      ],
+      "cam_lock": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "dowel": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "screw": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cover_cap": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  }
+}

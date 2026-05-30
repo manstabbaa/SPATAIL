@@ -1,0 +1,28 @@
+{
+  "asset": "fan.glb",
+  "_notes": "Per-clip animation library for the axial cooling fan. Currently one clip: blade_spin (rotor revolves around Y axis once over 120 frames). Add more clips by re-running spatail-animate-from-rest with new bake_* functions.",
+  "fps": 24,
+  "frames_per_cycle": 120,
+  "animations": {
+    "blade_spin": {
+      "depicts": "Rotor (7 blades + hub) revolving once around the airflow axis (Y). One full revolution per loop.",
+      "loopable": true,
+      "duration_s": 5.0,
+      "moving_parts": ["blade_1","blade_2","blade_3","blade_4","blade_5","blade_6","blade_7","hub"],
+      "axis_world": [0, 1, 0],
+      "pivot_world": [0, 0.005, 0]
+    }
+  },
+  "composability": {
+    "loop_only": ["blade_spin"],
+    "narratable_motion_phrases": {
+      "blade_spin": [
+        "the blades spin",
+        "the fan turns",
+        "the rotor revolves",
+        "air is pushed through the housing",
+        "the impeller rotates"
+      ]
+    }
+  }
+}

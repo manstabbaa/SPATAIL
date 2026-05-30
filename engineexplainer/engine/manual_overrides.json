@@ -1,0 +1,37 @@
+{
+  "_notes": "Hand-verified part-id mappings. Verified against the V8 CAD by color-segmenting + rendering in Blender. The 8 piston crowns are confirmed (V banks visible in 3/4 view). The crank throws were CORRECTED on 2026-05-27 — the original .162/.160/.158/.156 group was at Z=0.297 (top of engine) and is actually the CAM LOBES on the cylinder heads. The real crankshaft throws are .536/.537/.538/.539 — four identical 6cm posts evenly spaced 10cm apart at the BOTTOM of the engine (Z=0.073) in the valley of the V, exactly where a crankshaft should sit. See C:/tmp/v8_seg_verify/compare_3q.png for the proof render (red=new throws, blue=pistons, green=oil pan).",
+  "asset": "v8_engine.glb",
+  "verified_at": "2026-05-27",
+  "verification_method": "color-segment all candidates + render orthographic + visually confirm V8 layout (banks of pistons above oil pan, crankshaft posts in the V valley)",
+
+  "pistons": {
+    "piston_1A": "V8 Engine-.281",
+    "piston_1B": "V8 Engine-.287",
+    "piston_2A": "V8 Engine-.279",
+    "piston_2B": "V8 Engine-.283",
+    "piston_3A": "V8 Engine-.276",
+    "piston_3B": "V8 Engine-.285",
+    "piston_4A": "V8 Engine-.275",
+    "piston_4B": "V8 Engine-.286"
+  },
+
+  "crank_throws": {
+    "crank_throw_1": "V8 Engine-.536",
+    "crank_throw_2": "V8 Engine-.539",
+    "crank_throw_3": "V8 Engine-.537",
+    "crank_throw_4": "V8 Engine-.538"
+  },
+
+  "rods": {
+    "_disabled": true,
+    "_reason": "This CAD does not model connecting rods as separate meshes; classifier 'connecting_rod' hits are spark-plug wires / hoses. Director should narrate around this (e.g. 'the connecting rod inside the block transmits the force...') without trying to highlight a rod mesh that doesn't exist."
+  },
+
+  "oil_pan_hint": "V8 Engine-.481",
+  "cam_lobes_hint": ["V8 Engine-.156", "V8 Engine-.158", "V8 Engine-.160", "V8 Engine-.162"],
+
+  "exterior_shell_hints": [
+    "V8 Engine-.083", "V8 Engine-.099", "V8 Engine-.118", "V8 Engine-.119",
+    "V8 Engine-.120", "V8 Engine-.121", "V8 Engine-.122"
+  ]
+}

@@ -78,3 +78,7 @@ dist/
 # ─── OS-specific runtime junk ──────────────────────
 *.log
 *.tmp
+
+# ─── Files exceeding GitHub's 100MB hard limit (use LFS/external if needed) ─
+engineexplainer/engine/v8_engine.glb
+renders/kitchen_xr_risotto_step5.glb

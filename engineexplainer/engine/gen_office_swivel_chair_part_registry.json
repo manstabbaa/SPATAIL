@@ -1,0 +1,389 @@
+{
+  "asset": "gen_office_swivel_chair.glb",
+  "assetId": "gen_office_swivel_chair",
+  "_generated": true,
+  "_generatedAt": "2026-05-30T01:42:49.858843+00:00",
+  "units": "m",
+  "up_axis": "z",
+  "kind": "office swivel chair",
+  "parts": {
+    "base_5_star": {
+      "role": "base",
+      "aliases": [
+        "base",
+        "five-star base",
+        "star base"
+      ],
+      "primitive": "cylinder",
+      "cad": true,
+      "location": [
+        0.0,
+        0.0,
+        0.015
+      ],
+      "assembly_offset": [
+        0.0,
+        -0.465,
+        0.0
+      ]
+    },
+    "gas_lift_cylinder": {
+      "role": "part",
+      "aliases": [
+        "gas cylinder",
+        "gas lift",
+        "height adjustment",
+        "piston",
+        "energy accumulator"
+      ],
+      "primitive": "cylinder",
+      "cad": true,
+      "location": [
+        0.0,
+        0.0,
+        0.195
+      ],
+      "assembly_offset": [
+        0.0,
+        -0.465,
+        0.0
+      ]
+    },
+    "seat_mechanism": {
+      "role": "part",
+      "aliases": [
+        "mechanism",
+        "tilt mechanism",
+        "seat tilt"
+      ],
+      "primitive": "box",
+      "cad": true,
+      "location": [
+        0.0,
+        0.0,
+        0.38
+      ],
+      "assembly_offset": [
+        0.0,
+        -0.465,
+        0.0
+      ]
+    },
+    "seat_cushion": {
+      "role": "part",
+      "aliases": [
+        "seat",
+        "seat pad",
+        "cushion"
+      ],
+      "primitive": "box",
+      "cad": true,
+      "location": [
+        0.0,
+        0.0,
+        0.43
+      ],
+      "assembly_offset": [
+        0.0,
+        0.465,
+        0.0
+      ]
+    },
+    "backrest_support": {
+      "role": "frame",
+      "aliases": [
+        "back support",
+        "backrest frame",
+        "back frame"
+      ],
+      "primitive": "box",
+      "cad": true,
+      "location": [
+        0.0,
+        -0.18,
+        0.6
+      ],
+      "assembly_offset": [
+        0.0,
+        0.465,
+        0.0
+      ]
+    },
+    "backrest_cushion": {
+      "role": "part",
+      "aliases": [
+        "backrest",
+        "back cushion",
+        "back pad"
+      ],
+      "primitive": "box",
+      "cad": true,
+      "location": [
+        0.0,
+        -0.2,
+        0.6
+      ],
+      "assembly_offset": [
+        0.0,
+        0.465,
+        0.0
+      ]
+    },
+    "left_armrest": {
+      "role": "part",
+      "aliases": [
+        "left arm",
+        "armrest left"
+      ],
+      "primitive": "box",
+      "cad": true,
+      "location": [
+        -0.22,
+        -0.05,
+        0.5
+      ],
+      "assembly_offset": [
+        -0.465,
+        0.0,
+        0.0
+      ]
+    },
+    "right_armrest": {
+      "role": "part",
+      "aliases": [
+        "right arm",
+        "armrest right"
+      ],
+      "primitive": "box",
+      "cad": true,
+      "location": [
+        0.22,
+        -0.05,
+        0.5
+      ],
+      "assembly_offset": [
+        0.465,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "aliases": {
+    "base": "base_5_star",
+    "five-star base": "base_5_star",
+    "star base": "base_5_star",
+    "gas cylinder": "gas_lift_cylinder",
+    "gas lift": "gas_lift_cylinder",
+    "height adjustment": "gas_lift_cylinder",
+    "piston": "gas_lift_cylinder",
+    "energy accumulator": "gas_lift_cylinder",
+    "mechanism": "seat_mechanism",
+    "tilt mechanism": "seat_mechanism",
+    "seat tilt": "seat_mechanism",
+    "seat": "seat_cushion",
+    "seat pad": "seat_cushion",
+    "cushion": "seat_cushion",
+    "back support": "backrest_support",
+    "backrest frame": "backrest_support",
+    "back frame": "backrest_support",
+    "backrest": "backrest_cushion",
+    "back cushion": "backrest_cushion",
+    "back pad": "backrest_cushion",
+    "left arm": "left_armrest",
+    "armrest left": "left_armrest",
+    "right arm": "right_armrest",
+    "armrest right": "right_armrest"
+  },
+  "kinematicGroups": [
+    {
+      "group_id": "frame",
+      "members": [
+        "base_5_star",
+        "gas_lift_cylinder",
+        "seat_mechanism"
+      ],
+      "driven_by_action": null,
+      "pivot_world": null,
+      "rotation_axis_world": null
+    },
+    {
+      "group_id": "seat_assembly",
+      "members": [
+        "seat_mechanism",
+        "seat_cushion"
+      ],
+      "driven_by_action": null,
+      "pivot_world": null,
+      "rotation_axis_world": null
+    },
+    {
+      "group_id": "back_assembly",
+      "members": [
+        "backrest_support",
+        "backrest_cushion"
+      ],
+      "driven_by_action": null,
+      "pivot_world": null,
+      "rotation_axis_world": null
+    },
+    {
+      "group_id": "armrests",
+      "members": [
+        "left_armrest",
+        "right_armrest"
+      ],
+      "driven_by_action": null,
+      "pivot_world": null,
+      "rotation_axis_world": null
+    }
+  ],
+  "engine_bbox": {
+    "min": [
+      -0.3,
+      -0.3,
+      0.0
+    ],
+    "max": [
+      0.3,
+      0.3,
+      0.775
+    ],
+    "size": [
+      0.6,
+      0.6,
+      0.775
+    ],
+    "center": [
+      0.0,
+      0.0,
+      0.3875
+    ]
+  },
+  "assembly_order": [
+    "base_5_star",
+    "gas_lift_cylinder",
+    "seat_mechanism",
+    "seat_cushion",
+    "backrest_support",
+    "backrest_cushion",
+    "left_armrest",
+    "right_armrest"
+  ],
+  "director_hints": {
+    "asset_kind": "office swivel chair",
+    "background_default": "#F5F4EF",
+    "narration_tone": "calm, instructional \u2014 an assembly walkthrough",
+    "preferred_camera_presets": [
+      "hero_threequarter"
+    ]
+  },
+  "_n_cad_parts": 8,
+  "assembly": {
+    "order": [
+      "base_5_star",
+      "gas_lift_cylinder",
+      "seat_mechanism",
+      "seat_cushion",
+      "backrest_support",
+      "backrest_cushion",
+      "left_armrest",
+      "right_armrest"
+    ],
+    "offsets": {
+      "base_5_star": [
+        0.0,
+        -0.465,
+        0.0
+      ],
+      "gas_lift_cylinder": [
+        0.0,
+        -0.465,
+        0.0
+      ],
+      "seat_mechanism": [
+        0.0,
+        -0.465,
+        0.0
+      ],
+      "seat_cushion": [
+        0.0,
+        0.465,
+        0.0
+      ],
+      "backrest_support": [
+        0.0,
+        0.465,
+        0.0
+      ],
+      "backrest_cushion": [
+        0.0,
+        0.465,
+        0.0
+      ],
+      "left_armrest": [
+        -0.465,
+        0.0,
+        0.0
+      ],
+      "right_armrest": [
+        0.465,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "camera_presets": {
+    "hero_threequarter": {
+      "from": [
+        1.2112,
+        1.0536,
+        1.2112
+      ],
+      "to": [
+        0.0,
+        0.3875,
+        -0.0
+      ],
+      "fov": 34.0
+    },
+    "hero_front": {
+      "from": [
+        0.0,
+        0.8332,
+        1.7829
+      ],
+      "to": [
+        0.0,
+        0.3875,
+        -0.0
+      ],
+      "fov": 34.0
+    },
+    "topdown": {
+      "from": [
+        0.0,
+        2.2253,
+        0.01
+      ],
+      "to": [
+        0.0,
+        0.3875,
+        -0.0
+      ],
+      "fov": 34.0
+    },
+    "section_side": {
+      "from": [
+        1.797,
+        0.7726,
+        0.0
+      ],
+      "to": [
+        0.0,
+        0.3875,
+        -0.0
+      ],
+      "fov": 34.0
+    }
+  }
+}

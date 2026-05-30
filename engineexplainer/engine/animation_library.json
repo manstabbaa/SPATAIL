@@ -1,0 +1,36 @@
+{
+  "asset": "v8_engine.glb",
+  "_notes": "Each entry's `id` matches a glTF Animation clip name in the GLB. The runtime's player.play_animation(id) loads the matching THREE.AnimationAction. fps is 24 (Blender scene fps); duration is the clip's natural length in seconds.",
+  "fps": 24,
+  "frames_per_cycle": 120,
+  "animations": {
+    "crank_rotation": {
+      "id": "crank_rotation",
+      "description": "All 4 crank throws rotate around the crank axis. Two full revolutions over the clip (one 4-stroke cycle).",
+      "drives": ["crank_throw_1", "crank_throw_2", "crank_throw_3", "crank_throw_4"],
+      "duration_sec": 5.0,
+      "loopable": true,
+      "use_when": "Showing the crankshaft turning, or as the master 'engine running' visual."
+    },
+    "fan_spin": {
+      "id": "fan_spin",
+      "description": "Front cooling fan rotates around its hub. Six revolutions over the clip - visibly faster than the crank.",
+      "drives": ["fan_assembly"],
+      "duration_sec": 5.0,
+      "loopable": true,
+      "use_when": "Showing the cooling system or as ambient motion in a wide shot."
+    },
+    "piston_1A_stroke": {"id": "piston_1A_stroke", "description": "Cylinder 1, bank A piston reciprocates over one full cycle.", "drives": ["piston_1A"], "duration_sec": 5.0, "loopable": true},
+    "piston_1B_stroke": {"id": "piston_1B_stroke", "description": "Cylinder 1, bank B piston reciprocates over one full cycle.", "drives": ["piston_1B"], "duration_sec": 5.0, "loopable": true},
+    "piston_2A_stroke": {"id": "piston_2A_stroke", "description": "Cylinder 2, bank A piston reciprocates.", "drives": ["piston_2A"], "duration_sec": 5.0, "loopable": true},
+    "piston_2B_stroke": {"id": "piston_2B_stroke", "description": "Cylinder 2, bank B piston reciprocates.", "drives": ["piston_2B"], "duration_sec": 5.0, "loopable": true},
+    "piston_3A_stroke": {"id": "piston_3A_stroke", "description": "Cylinder 3, bank A piston reciprocates.", "drives": ["piston_3A"], "duration_sec": 5.0, "loopable": true},
+    "piston_3B_stroke": {"id": "piston_3B_stroke", "description": "Cylinder 3, bank B piston reciprocates.", "drives": ["piston_3B"], "duration_sec": 5.0, "loopable": true},
+    "piston_4A_stroke": {"id": "piston_4A_stroke", "description": "Cylinder 4, bank A piston reciprocates.", "drives": ["piston_4A"], "duration_sec": 5.0, "loopable": true},
+    "piston_4B_stroke": {"id": "piston_4B_stroke", "description": "Cylinder 4, bank B piston reciprocates.", "drives": ["piston_4B"], "duration_sec": 5.0, "loopable": true}
+  },
+  "composability": {
+    "engine_running_set": ["crank_rotation", "piston_1A_stroke", "piston_1B_stroke", "piston_2A_stroke", "piston_2B_stroke", "piston_3A_stroke", "piston_3B_stroke", "piston_4A_stroke", "piston_4B_stroke", "fan_spin"],
+    "_note": "Play all of engine_running_set in parallel for the full V8 cycle. The piston phases are pre-baked so they cycle as a group."
+  }
+}

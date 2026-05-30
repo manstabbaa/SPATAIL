@@ -1,0 +1,39 @@
+name: SpatailEducator
+options:
+  bundleIdPrefix: dev.spatail
+  deploymentTarget:
+    iOS: "17.0"
+    visionOS: "1.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.9"
+    GENERATE_INFOPLIST_FILE: YES
+    TARGETED_DEVICE_FAMILY: "1,2,7"   # iPhone, iPad, Vision
+
+targets:
+  SpatailEducator:
+    type: application
+    platform: [iOS, visionOS]
+    sources:
+      - path: Sources
+      - path: Resources
+        buildPhase: resources
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleDisplayName: SPATAIL Educator
+        UILaunchScreen: {}
+        NSCameraUsageDescription: "SPATAIL uses the camera to scan your space and place 3D demos in augmented reality."
+        UIRequiredDeviceCapabilities: [arkit]
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.spatail.educator
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES

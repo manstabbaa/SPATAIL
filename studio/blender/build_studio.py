@@ -34,12 +34,23 @@ _argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 SCENE_SPEC = Path(_argv[0])
 OUT_DIR = Path(_argv[1])
 OUT_DIR.mkdir(parents=True, exist_ok=True)
+# optional flags after the two positionals:
+#   --exhibit <beat_id>   build only that beat (single-exhibit AR mode)
+#   --ar                  AR mode: exhibit + ground contact only, no room shell
+#   --usdz                also export an AR-ready scene.usdz alongside the GLB
+_FLAGS = _argv[2:]
+ONLY_EXHIBIT = (_FLAGS[_FLAGS.index("--exhibit") + 1]
+                if "--exhibit" in _FLAGS and _FLAGS.index("--exhibit") + 1 < len(_FLAGS)
+                else None)
+AR_MODE = "--ar" in _FLAGS
+WANT_USDZ = "--usdz" in _FLAGS
 
 STUDIO_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(STUDIO_DIR))
 sys.path.insert(0, str(STUDIO_DIR / "blender"))
 import xr_design as xr  # noqa: E402
 import realworld as rw  # noqa: E402
+import motion as mo  # noqa: E402
 
 FPS = 30
 CYCLE = 120                  # frames -> 4.0 s seamless loop
@@ -164,7 +175,12 @@ COL = {
 
 # --- room ---------------------------------------------------------------------
 
-def build_room():
+def build_room(ar_mode=False):
+    """The tester-room shell. In AR mode we build NO room (the user's real room IS
+    the environment — AR Quick Look / RealityKit add the contact shadow), which is
+    the correct AR convention. In studio/web mode we build floor + soft back wall."""
+    if ar_mode:
+        return {"floor_far": xr.ROOM_D - 1.5, "ar": True}
     floor_far = xr.ROOM_D - 1.5            # floor spans y in [-1.5, far]
     cy = (floor_far + -1.5) / 2.0
     _obj("studio_floor", _mesh_box("studio_floor", xr.ROOM_W, xr.ROOM_D, 0.04),
@@ -185,14 +201,12 @@ def demo_constant_velocity_puck(root, params):
     L = float(params.get("surface_len_m", 0.9))
     table = rw.air_hockey_table(root, "law1", length=L, width=0.46)
     p = rw.puck(root, "law1", radius=0.045, surface_z=table["surface_z"])
-    puck = p["obj"]
     z = p["z"]
-    travel = L / 2 - p["radius"] - 0.03
-    mid = CYCLE // 2
-    _key_loc(puck, 1, (-travel, 0, z))
-    _key_loc(puck, mid, (travel, 0, z))
-    _key_loc(puck, CYCLE, (-travel, 0, z))
-    return {"footprint_w": table["footprint_w"], "min_z": 0.0, "max_z": z + p["radius"]}
+    travel = L - 2 * p["radius"] - 0.06
+    mod = mo.constant_velocity(p["obj"], 1, CYCLE, axis=(1, 0, 0),
+                               span_m=travel, origin=(0, 0, z))
+    return {"footprint_w": table["footprint_w"], "min_z": 0.0,
+            "max_z": z + p["radius"], "motion": [mod]}
 
 
 def demo_inclined_plane(root, params):
@@ -203,28 +217,16 @@ def demo_inclined_plane(root, params):
     r = float(params.get("ball_radius_m", 0.05))
     ramp = rw.wooden_ramp(root, "law2", length=L, angle_deg=angle)
     b = rw.ball(root, "law2", radius=r)
-    ball = b["obj"]
     theta = ramp["theta"]
     down, normal, top = ramp["down"], ramp["normal"], ramp["top"]
     top = top + normal * (ramp["plank_t"] / 2 + r)      # rest on the plank surface
-    a = G * math.sin(theta)
-    t_bottom = math.sqrt(2 * L / a)
-    f_down = int(CYCLE * SLOWMO_DOWN_FRAC)
-    min_z, max_z = 1e9, -1e9
-    for f in range(1, f_down + 1):
-        tau = (f - 1) / (f_down - 1) * t_bottom
-        s = min(0.5 * a * tau * tau, L)
-        pos = top + down * s
-        _key_loc(ball, f, (pos.x, pos.y, pos.z))
-        _key_rot(ball, f, (0.0, -s / r, 0.0))           # rolling without slipping
-        min_z = min(min_z, pos.z - r); max_z = max(max_z, pos.z + r)
-    for k, f in enumerate(range(f_down + 1, CYCLE + 1)):
-        g = k / (CYCLE - f_down)
-        pos = top + down * (L * (1 - g))
-        _key_loc(ball, f, (pos.x, pos.y, pos.z))
-        _key_rot(ball, f, (0.0, -(L * (1 - g)) / r, 0.0))
+    mod = mo.accelerate_down_slope(b["obj"], 1, CYCLE, top, down, L, r, theta,
+                                   down_frac=SLOWMO_DOWN_FRAC)
+    # z-extent from the slope geometry (top to bottom of travel)
+    bottom = top + down * L
     return {"footprint_w": ramp["footprint_w"],
-            "min_z": min(min_z, ramp["min_z"]), "max_z": max(max_z, ramp["max_z"])}
+            "min_z": min(bottom.z - r, ramp["min_z"]),
+            "max_z": max(top.z + r, ramp["max_z"]), "motion": [mod]}
 
 
 def demo_spring_carts(root, params):
@@ -245,18 +247,14 @@ def demo_spring_carts(root, params):
     dA = dB * ratio
     apart = int(CYCLE * 0.46)
     hold = int(CYCLE * 0.12)
-    # cart bodies move apart then return (perfect loop)
-    _key_loc(ra, 1, (ax0, 0, zc));                _key_loc(rb, 1, (bx0, 0, zc))
-    _key_loc(ra, apart, (ax0 - dA, 0, zc));       _key_loc(rb, apart, (bx0 + dB, 0, zc))
-    _key_loc(ra, apart + hold, (ax0 - dA, 0, zc)); _key_loc(rb, apart + hold, (bx0 + dB, 0, zc))
-    _key_loc(ra, CYCLE, (ax0, 0, zc));            _key_loc(rb, CYCLE, (bx0, 0, zc))
-    # wheels roll: angle = distance / wheel_r, lighter cart spins ratio x more
+    # cart bodies recoil equal-and-opposite: lighter cart A travels ratio x farther
+    mA = mo.equal_opposite_recoil(ra, 1, CYCLE, (ax0, 0, zc), (-1, 0, 0), dA)
+    mB = mo.equal_opposite_recoil(rb, 1, CYCLE, (bx0, 0, zc), (1, 0, 0), dB)
+    # wheels roll, coupled to each cart's travel distance (angle = dist / radius)
     for w in cart_a["wheels"]:
-        _key_rot(w, 1, (0, 0, 0)); _key_rot(w, apart, (0, -dA / cart_a["wheel_r"], 0))
-        _key_rot(w, apart + hold, (0, -dA / cart_a["wheel_r"], 0)); _key_rot(w, CYCLE, (0, 0, 0))
+        mo.spin(w, 1, CYCLE, axis="y", distance_coupled_m=-dA, radius_m=cart_a["wheel_r"])
     for w in cart_b["wheels"]:
-        _key_rot(w, 1, (0, 0, 0)); _key_rot(w, apart, (0, dB / cart_b["wheel_r"], 0))
-        _key_rot(w, apart + hold, (0, dB / cart_b["wheel_r"], 0)); _key_rot(w, CYCLE, (0, 0, 0))
+        mo.spin(w, 1, CYCLE, axis="y", distance_coupled_m=dB, radius_m=cart_b["wheel_r"])
     # spring sits centred, compressed at rest then releases (scale along its X axis)
     sp.location = (0, 0, spring_z); sp.keyframe_insert("location", frame=1)
     sp.scale = (0.5, 1, 1); sp.keyframe_insert("scale", frame=1)
@@ -264,7 +262,8 @@ def demo_spring_carts(root, params):
     sp.scale = (1.0, 1, 1); sp.keyframe_insert("scale", frame=apart + hold)
     sp.scale = (0.5, 1, 1); sp.keyframe_insert("scale", frame=CYCLE)
     return {"footprint_w": gap0 * 2 + dA + dB + cart_a["deck"],
-            "min_z": 0.0, "max_z": max(cart_a["top_z"], cart_b["top_z"]) + 0.05}
+            "min_z": 0.0, "max_z": max(cart_a["top_z"], cart_b["top_z"]) + 0.05,
+            "motion": [mA, mB]}
 
 
 DEMOS = {
@@ -338,6 +337,10 @@ def blender_to_yup(p):
 def main():
     spec = json.loads(SCENE_SPEC.read_text(encoding="utf-8"))
     beats = spec["beats"]
+    if ONLY_EXHIBIT:
+        beats = [b for b in beats if b["id"] == ONLY_EXHIBIT]
+        if not beats:
+            raise SystemExit(f"[build_studio] FATAL: no beat {ONLY_EXHIBIT!r} in scene.")
 
     # clean slate + linear keyframes (constant velocity must stay constant)
     bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -347,7 +350,7 @@ def main():
     scene.frame_start = 1
     scene.frame_end = CYCLE
 
-    build_room()
+    build_room(ar_mode=AR_MODE)
 
     built = []
     for beat in beats:
@@ -367,7 +370,22 @@ def main():
                              f"no geometry (footprint 0).")
         built.append(geo)
 
-    staging = stage_beats(beats, built)
+    if ONLY_EXHIBIT or AR_MODE:
+        # single exhibit: centre it on the origin (its own root), sitting on the
+        # ground plane, so the AR/USDZ anchor lands cleanly under it.
+        for geo in built:
+            geo["root"].location = Vector((0, 0, 0))
+            geo.setdefault("anchor_blender", [0, 0, 0])
+        staging = {"distance_m": None, "spread_deg": 0.0,
+                   "baseline_z": 0.0, "records": [
+                       {"id": b["id"], "anchor_blender": [0, 0, 0],
+                        "label_anchor_blender": [0, g["max_z"] + 0.1, 0],
+                        "distance_m": None, "in_comfort_cone": True,
+                        "footprint_w": g["footprint_w"]}
+                       for b, g in zip(beats, built)],
+                   "reasoning": "Single exhibit centred for AR; device places it via SPATAIL ANALYSIS."}
+    else:
+        staging = stage_beats(beats, built)
 
     # global bbox at rest
     scene.frame_set(1)
@@ -382,15 +400,26 @@ def main():
             lo = Vector(map(min, lo, w))
             hi = Vector(map(max, hi, w))
 
-    glb_path = OUT_DIR / "studio.glb"
+    suffix = f"_{ONLY_EXHIBIT}" if ONLY_EXHIBIT else ""
+    glb_path = OUT_DIR / f"studio{suffix}.glb"
     _export_glb(glb_path)
+    usdz_rel = None
+    if WANT_USDZ:
+        usdz_path = OUT_DIR / f"studio{suffix}.usdz"
+        if _export_usdz(usdz_path):
+            usdz_rel = f"studio/out/{usdz_path.name}"
+            print(f"[build_studio] wrote {usdz_path}")
 
-    # metadata: the Developer's handoff note
+    geo_by_id = {b["id"]: g for b, g in zip(beats, built)}
+
+    # metadata: the Developer's handoff note + SPATAIL ANALYSIS inputs
     meta = {
         "sceneId": spec.get("sceneId"),
         "title": spec.get("title"),
-        "glb": "studio/out/studio.glb",
+        "glb": f"studio/out/{glb_path.name}",
+        "usdz": usdz_rel,
         "frame": "y_up_m",
+        "mode": "ar_single" if (ONLY_EXHIBIT or AR_MODE) else "studio",
         "animation": {"clip": "studio_demo", "fps": FPS, "frames": CYCLE,
                       "seconds": round(CYCLE / FPS, 2), "loop": True},
         "room": {"w": xr.ROOM_W, "d": xr.ROOM_D, "h": xr.ROOM_H},
@@ -406,6 +435,10 @@ def main():
     rec_by_id = {r["id"]: r for r in staging["records"]}
     for beat in beats:
         r = rec_by_id.get(beat["id"], {})
+        g = geo_by_id.get(beat["id"], {})
+        # real footprint (metres) for SPATAIL ANALYSIS scale estimation
+        fw = g.get("footprint_w", 0.0)
+        fh = (g.get("max_z", 0.0) - g.get("min_z", 0.0))
         meta["beats"].append({
             "id": beat["id"],
             "law": beat.get("law"),
@@ -413,16 +446,23 @@ def main():
             "title": beat.get("title"),
             "narration": beat.get("narration"),
             "demo": beat.get("demo"),
+            "motion": g.get("motion", []),
+            "footprint_m": {"w": round(fw, 4), "d": round(fw * 0.4, 4),
+                            "h": round(fh, 4)},
             "anchor_yup_m": blender_to_yup(r.get("anchor_blender", [0, 0, 0])),
             "label_anchor_yup_m": blender_to_yup(r.get("label_anchor_blender", [0, 0, 0])),
             "distance_m": r.get("distance_m"),
             "in_comfort_cone": r.get("in_comfort_cone"),
         })
 
-    (OUT_DIR / "studio_metadata.json").write_text(
-        json.dumps(meta, indent=2), encoding="utf-8")
+    meta_path = OUT_DIR / (f"studio{suffix}_metadata.json")
+    meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    # also write the canonical name for the web viewer when building the full studio
+    if not (ONLY_EXHIBIT or AR_MODE):
+        (OUT_DIR / "studio_metadata.json").write_text(
+            json.dumps(meta, indent=2), encoding="utf-8")
     print(f"[build_studio] wrote {glb_path}")
-    print(f"[build_studio] wrote {OUT_DIR / 'studio_metadata.json'}")
+    print(f"[build_studio] wrote {meta_path}")
     print(f"[build_studio] staging: {staging['reasoning']}")
 
 
@@ -443,6 +483,39 @@ def _export_glb(path):
         except TypeError:
             continue
     raise RuntimeError("glTF export failed")
+
+
+def _export_usdz(path):
+    """AR-ready USDZ for AR Quick Look (iPhone) and RealityKit (Vision Pro):
+    Y-up, metres, baked animation. Verified to run headless in Blender 5.1 on
+    Windows. Returns True on success. Authored in metres so meters_per_unit=1."""
+    scene = bpy.context.scene
+    scene.frame_set(1)
+    rna = set(bpy.ops.wm.usd_export.get_rna_type().properties.keys())
+    desired = {
+        "filepath": str(path),
+        "selected_objects_only": False,
+        "export_animation": True,
+        "export_uvmaps": True,
+        "export_normals": True,
+        "export_materials": True,
+        "export_meshes": True,
+        "generate_preview_surface": True,
+        "convert_orientation": True,
+        "export_global_forward_selection": "NEGATIVE_Z",
+        "export_global_up_selection": "Y",
+        "meters_per_unit": 1.0,
+        "root_prim_path": "/Scene",
+        "overwrite_textures": True,
+    }
+    kwargs = {k: v for k, v in desired.items() if k in rna}
+    kwargs["filepath"] = str(path)
+    try:
+        bpy.ops.wm.usd_export(**kwargs)
+        return path.exists()
+    except Exception as e:  # noqa: BLE001
+        print(f"[build_studio] USDZ export failed: {e!r}")
+        return False
 
 
 main()

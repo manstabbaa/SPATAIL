@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "studio-viewer",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["studio/viewer/server.py"],
+      "port": 5180
+    },
+    {
       "name": "spatial-viewer",
       "runtimeExecutable": "node",
       "runtimeArgs": ["viewer/server.js"],

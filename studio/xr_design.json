@@ -1,0 +1,50 @@
+{
+  "frame": {
+    "units": "m",
+    "up": "+Z",
+    "forward": "+Y",
+    "note": "Blender-native; glTF +Y-up export maps +Y->-Z, +Z->+Y for three.js"
+  },
+  "distances_m": {
+    "near_clip": 0.37,
+    "focal_plane": 0.74,
+    "read_near": 1.0,
+    "read_far": 1.5,
+    "far_max": 10.0,
+    "direct_reach": [
+      0.4,
+      0.6
+    ],
+    "indirect": [
+      0.8,
+      1.5
+    ],
+    "max_reach": 0.75
+  },
+  "angles_deg": {
+    "ocpa_cone": 30.0,
+    "eye_comfort": 15.0,
+    "gaze_down": 12.0,
+    "min_target": 2.5
+  },
+  "user": {
+    "eye_height_m": 1.45
+  },
+  "room_m": {
+    "w": 6.0,
+    "d": 6.0,
+    "h": 3.0
+  },
+  "render": {
+    "target_fps": 90
+  },
+  "citations": {
+    "NEAR_CLIP_M": "Magic Leap \u2014 Display Zone / Vergence-Accommodation Conflict",
+    "FOCAL_PLANE_M": "Magic Leap \u2014 Display Zone (comfort focal plane)",
+    "READ_NEAR_M": "Apple visionOS HIG \u2014 text beyond arm's reach reads best",
+    "OCPA_CONE_DEG": "Magic Leap \u2014 Optimal Content Placement Area (30 deg cone)",
+    "GAZE_DOWN_DEG": "Magic Leap \u2014 natural line of sight 10-15 deg below horizon",
+    "MIN_TARGET_DEG": "Apple visionOS HIG \u2014 60 pt minimum interactive target",
+    "TARGET_FPS": "Magic Leap \u2014 90-120 fps for comfort"
+  }
+}

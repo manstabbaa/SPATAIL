@@ -1,0 +1,182 @@
+{
+  "asset": "fan.glb",
+  "_notes": "Hand-curated part registry for the axial cooling fan (60×60×10mm). The rotor consists of ALL meshes within radius<24mm of the spin axis (Y) — 69 sub-meshes total because each curved blade is composed of front face + back face + 8.5mm-thick body, all imported as separate OBJ surface groups. The stator is everything outside that radius (frame plates + mounting tabs + outer ring).",
+  "rotation_axis_world": [0, 1, 0],
+  "rotation_pivot_world": [0, 0.005, 0],
+
+  "kinematicGroups": [
+    {
+      "group_id": "rotor",
+      "pivot_world": [0, 0.005, 0],
+      "rotation_axis_world": [0, 1, 0],
+      "driven_by_action": "blade_spin",
+      "members": [
+        "mesh0", "mesh1", "mesh2", "mesh3", "mesh4", "mesh5", "mesh6", "mesh7",
+        "mesh8", "mesh9", "mesh10", "mesh11", "mesh12", "mesh13", "mesh14",
+        "mesh15", "mesh16", "mesh17", "mesh18", "mesh19", "mesh20", "mesh21",
+        "mesh22", "mesh23", "mesh24", "mesh25", "mesh26", "mesh27", "mesh28",
+        "mesh29", "mesh30", "mesh31", "mesh32", "mesh33", "mesh34", "mesh35",
+        "mesh36", "mesh37", "mesh38", "mesh39", "mesh40", "mesh41", "mesh42",
+        "mesh43", "mesh44", "mesh45", "mesh46", "mesh47", "mesh48", "mesh49",
+        "mesh50", "mesh51", "mesh52", "mesh53", "mesh54", "mesh55", "mesh56",
+        "mesh57", "mesh58", "mesh59", "mesh60", "mesh61", "mesh62", "mesh63",
+        "mesh64", "mesh65", "mesh66", "mesh67", "mesh68", "mesh69", "mesh70",
+        "mesh71", "mesh72", "mesh73", "mesh74", "mesh75", "mesh76", "mesh77",
+        "mesh78", "mesh79"
+      ],
+      "_notes": "All 80 children of the fan_hub Empty. Each blade is 7 sub-meshes (front face + back face + 8.5mm body + tip cap) so the rotor is densely populated. Auto-derived by listing fan_hub.children in Blender on 2026-05-27."
+    },
+    {
+      "group_id": "stator",
+      "pivot_world": [0, 0, 0],
+      "rotation_axis_world": null,
+      "driven_by_action": null,
+      "members": [
+        "mesh80", "mesh81", "mesh82", "mesh83", "mesh84", "mesh85", "mesh86",
+        "mesh87", "mesh88", "mesh89", "mesh90", "mesh91", "mesh92", "mesh93",
+        "mesh94"
+      ],
+      "_notes": "Frame body + front/back plates + 4 outer rails + 4 corner mounting tabs."
+    }
+  ],
+  "engine_bbox": {
+    "min": [-0.030, 0.000, -0.030],
+    "max": [ 0.030, 0.010,  0.030],
+    "size": [0.060, 0.010, 0.060],
+    "center": [0.0, 0.005, 0.0]
+  },
+  "_glb_name_convention": "Onshape OBJ → Blender → glTF: mesh names like mesh1, mesh48, etc. Aliases map friendly names to mesh ids.",
+
+  "director_hints": {
+    "asset_kind": "small axial cooling fan",
+    "scale": "60mm × 60mm × 10mm — pocket-sized component, no internal anatomy",
+    "background_default": "#F5F4EF",
+    "preferred_camera_presets": ["hero_front", "hero_threequarter"],
+    "avoid_presets": ["section_side", "cylinder_close", "topdown"],
+    "preset_notes": "topdown looks along the airflow axis and shows only the 10mm-thick edge of the housing — useless. section_side shows just the frame's profile. Stick to hero_front (head-on at the blades) and hero_threequarter (3/4 angled view).",
+    "dim_others_max_factor": 0.6,
+    "dim_others_min_factor": 0.45,
+    "key_moves": [
+      "the rotor spins (blade_spin)",
+      "the angled blades scoop air through the frame",
+      "the hub drives all blades as a rigid group"
+    ],
+    "narration_tone": "concise — this is a simple machine, not a deep cutaway. 4-5 beats max.",
+    "do_not": [
+      "do NOT set scene.environment.background to a dark color — this asset lives on cream paper",
+      "do NOT use section_side or cylinder_close presets — there is no useful side-profile or internal close-up on a thin axial fan",
+      "do NOT call show_only — there is no shell to hide, the whole fan is hero geometry"
+    ]
+  },
+
+  "parts": {
+    "mesh1":  {"role": "hub",         "region": "center",     "world_position": [0.0, 0.0, 0.0],        "size_m": 0.030, "alias": "hub"},
+    "mesh48": {"role": "blade",       "region": "rotor",      "world_position": [0.005,  -0.0005, -0.0208], "size_m": 0.012, "alias": "blade_1"},
+    "mesh55": {"role": "blade",       "region": "rotor",      "world_position": [0.0154, -0.0005, -0.0148], "size_m": 0.013, "alias": "blade_2"},
+    "mesh34": {"role": "blade",       "region": "rotor",      "world_position": [-0.0168,-0.0005, -0.0132], "size_m": 0.012, "alias": "blade_3"},
+    "mesh62": {"role": "blade",       "region": "rotor",      "world_position": [0.0209, -0.0005, -0.0042], "size_m": 0.013, "alias": "blade_4"},
+    "mesh27": {"role": "blade",       "region": "rotor",      "world_position": [-0.0213,-0.0005, -0.002 ], "size_m": 0.013, "alias": "blade_5"},
+    "mesh76": {"role": "blade",       "region": "rotor",      "world_position": [0.0124, -0.0005,  0.0174], "size_m": 0.013, "alias": "blade_6"},
+    "mesh6":  {"role": "blade",       "region": "rotor",      "world_position": [0.001,  -0.0005,  0.0213], "size_m": 0.013, "alias": "blade_7"},
+    "mesh81": {"role": "frame_plate", "region": "front_face", "world_position": [0.0, -0.010, 0.0],     "size_m": 0.060, "alias": "frame_front"},
+    "mesh82": {"role": "frame_plate", "region": "back_face",  "world_position": [0.0,  0.0,  0.0],      "size_m": 0.060, "alias": "frame_back"}
+  },
+
+  "aliases": {
+    "blade_1": "mesh48",
+    "blade_2": "mesh55",
+    "blade_3": "mesh34",
+    "blade_4": "mesh62",
+    "blade_5": "mesh27",
+    "blade_6": "mesh76",
+    "blade_7": "mesh6",
+    "hub":            "mesh1",
+    "rotor":          "fan_hub",
+    "frame_front":    "mesh81",
+    "frame_back":     "mesh82"
+  },
+
+  "hero_parts": {
+    "mesh1": {
+      "role": "hub",
+      "region": "center",
+      "world_position": [0.0, 0.0, 0.0],
+      "size_m": 0.030,
+      "alias": "hub"
+    },
+    "mesh48": {
+      "role": "blade",
+      "region": "rotor",
+      "world_position": [0.005, -0.0005, -0.0208],
+      "size_m": 0.012,
+      "alias": "blade_1"
+    },
+    "mesh55": {
+      "role": "blade",
+      "region": "rotor",
+      "world_position": [0.0154, -0.0005, -0.0148],
+      "size_m": 0.013,
+      "alias": "blade_2"
+    },
+    "mesh34": {
+      "role": "blade",
+      "region": "rotor",
+      "world_position": [-0.0168, -0.0005, -0.0132],
+      "size_m": 0.012,
+      "alias": "blade_3"
+    },
+    "mesh62": {
+      "role": "blade",
+      "region": "rotor",
+      "world_position": [0.0209, -0.0005, -0.0042],
+      "size_m": 0.013,
+      "alias": "blade_4"
+    },
+    "mesh27": {
+      "role": "blade",
+      "region": "rotor",
+      "world_position": [-0.0213, -0.0005, -0.002],
+      "size_m": 0.013,
+      "alias": "blade_5"
+    },
+    "mesh76": {
+      "role": "blade",
+      "region": "rotor",
+      "world_position": [0.0124, -0.0005, 0.0174],
+      "size_m": 0.013,
+      "alias": "blade_6"
+    },
+    "mesh6": {
+      "role": "blade",
+      "region": "rotor",
+      "world_position": [0.001, -0.0005, 0.0213],
+      "size_m": 0.013,
+      "alias": "blade_7"
+    },
+    "mesh81": {
+      "role": "frame_plate",
+      "region": "front_face",
+      "world_position": [0.0, -0.010, 0.0],
+      "size_m": 0.060,
+      "alias": "frame_front"
+    },
+    "mesh82": {
+      "role": "frame_plate",
+      "region": "back_face",
+      "world_position": [0.0, 0.0, 0.0],
+      "size_m": 0.060,
+      "alias": "frame_back"
+    }
+  },
+
+  "_curated": true,
+
+  "internal_anatomy": {
+    "blades": ["blade_1","blade_2","blade_3","blade_4","blade_5","blade_6","blade_7"],
+    "hub": "hub",
+    "rotor_group": ["blade_1","blade_2","blade_3","blade_4","blade_5","blade_6","blade_7","hub"],
+    "stator_group": ["frame_front","frame_back"],
+    "rotation_axis_world": [0, 1, 0],
+    "rotation_pivot_world": [0, 0.005, 0]
+  }
+}

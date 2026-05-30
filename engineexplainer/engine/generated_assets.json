@@ -1,0 +1,54 @@
+{
+  "gen_kallax": {
+    "asset_id": "gen_kallax",
+    "kind": "shelving unit (IKEA KALLAX 1x4)",
+    "keywords": [
+      "kallax",
+      "shelving unit",
+      "1x4",
+      "open shelf",
+      "flat-pack",
+      "four compartment",
+      "flat-pack open shelving unit",
+      "shelving unit (ikea kallax 1x4)"
+    ],
+    "glb": "../engine/gen_kallax.glb",
+    "registry": "gen_kallax_part_registry.json",
+    "animation_library": "gen_kallax_animation_library.json",
+    "notes": "Generated from a manual (11 parts, 11 modelled as real CAD, built in 1.4s).",
+    "_generated": true
+  },
+  "gen_side_table": {
+    "asset_id": "gen_side_table",
+    "kind": "side table",
+    "keywords": [
+      "nordli",
+      "side table",
+      "square table",
+      "four legs"
+    ],
+    "glb": "../engine/gen_side_table.glb",
+    "registry": "gen_side_table_part_registry.json",
+    "animation_library": "gen_side_table_animation_library.json",
+    "notes": "Generated from a manual (5 parts, built in 1.4s).",
+    "_generated": true
+  },
+  "gen_office_swivel_chair": {
+    "asset_id": "gen_office_swivel_chair",
+    "kind": "office swivel chair",
+    "keywords": [
+      "office chair",
+      "swivel chair",
+      "desk chair",
+      "ergonomic chair",
+      "gas lift chair",
+      "l\u00f6parbana",
+      "office swivel chair"
+    ],
+    "glb": "../engine/gen_office_swivel_chair.glb",
+    "registry": "gen_office_swivel_chair_part_registry.json",
+    "animation_library": "gen_office_swivel_chair_animation_library.json",
+    "notes": "Generated from a manual (8 parts, 8 modelled as real CAD, built in 1.4s).",
+    "_generated": true
+  }
+}

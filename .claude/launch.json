@@ -6,6 +6,18 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["viewer/server.js"],
       "port": 5173
+    },
+    {
+      "name": "engineexplainer",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5174", "--directory", "engineexplainer"],
+      "port": 5174
+    },
+    {
+      "name": "engineexplainer-intelligence",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["engineexplainer/intelligence/server.py"],
+      "port": 5175
     }
   ]
 }

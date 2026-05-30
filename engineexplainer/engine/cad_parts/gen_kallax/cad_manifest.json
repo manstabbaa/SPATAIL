@@ -1,0 +1,165 @@
+{
+  "assetId": "gen_kallax",
+  "out_dir": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax",
+  "ok": true,
+  "n_ok": 11,
+  "n_failed": 0,
+  "parts": {
+    "side_left": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\side_left.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\side_left.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\side_left.py",
+      "shape": "panel",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\side_left.mesh.npz",
+      "bbox_m": [
+        0.038,
+        0.39,
+        1.47
+      ],
+      "n_verts": 1840,
+      "n_faces": 2796
+    },
+    "side_right": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\side_right.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\side_right.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\side_right.py",
+      "shape": "panel",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\side_right.mesh.npz",
+      "bbox_m": [
+        0.038,
+        0.39,
+        1.47
+      ],
+      "n_verts": 1840,
+      "n_faces": 2796
+    },
+    "bottom": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\bottom.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\bottom.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\bottom.py",
+      "shape": "panel",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\bottom.mesh.npz",
+      "bbox_m": [
+        0.344,
+        0.39,
+        0.038
+      ],
+      "n_verts": 1840,
+      "n_faces": 2796
+    },
+    "top": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\top.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\top.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\top.py",
+      "shape": "panel",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\top.mesh.npz",
+      "bbox_m": [
+        0.344,
+        0.39,
+        0.038
+      ],
+      "n_verts": 1840,
+      "n_faces": 2796
+    },
+    "shelf_1": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_1.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_1.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_1.py",
+      "shape": "panel",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_1.mesh.npz",
+      "bbox_m": [
+        0.344,
+        0.39,
+        0.038
+      ],
+      "n_verts": 1840,
+      "n_faces": 2796
+    },
+    "shelf_2": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_2.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_2.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_2.py",
+      "shape": "panel",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_2.mesh.npz",
+      "bbox_m": [
+        0.344,
+        0.39,
+        0.038
+      ],
+      "n_verts": 1840,
+      "n_faces": 2796
+    },
+    "shelf_3": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_3.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_3.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_3.py",
+      "shape": "panel",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\shelf_3.mesh.npz",
+      "bbox_m": [
+        0.344,
+        0.39,
+        0.038
+      ],
+      "n_verts": 1840,
+      "n_faces": 2796
+    },
+    "cam_lock": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\cam_lock.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\cam_lock.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\cam_lock.py",
+      "shape": "camlock",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\cam_lock.mesh.npz",
+      "bbox_m": [
+        0.01499,
+        0.015,
+        0.013
+      ],
+      "n_verts": 508,
+      "n_faces": 504
+    },
+    "dowel": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\dowel.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\dowel.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\dowel.py",
+      "shape": "dowel",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\dowel.mesh.npz",
+      "bbox_m": [
+        0.035,
+        0.008,
+        0.008
+      ],
+      "n_verts": 254,
+      "n_faces": 248
+    },
+    "screw": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\screw.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\screw.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\screw.py",
+      "shape": "screw",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\screw.mesh.npz",
+      "bbox_m": [
+        0.0456,
+        0.0114,
+        0.01139
+      ],
+      "n_verts": 508,
+      "n_faces": 500
+    },
+    "cover_cap": {
+      "glb": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\cover_cap.glb",
+      "step": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\cover_cap.step",
+      "generator": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\cover_cap.py",
+      "shape": "cap",
+      "mesh": "C:\\SPATAIL_MAX\\engineexplainer\\engine\\cad_parts\\gen_kallax\\cover_cap.mesh.npz",
+      "bbox_m": [
+        0.01199,
+        0.012,
+        0.0045
+      ],
+      "n_verts": 254,
+      "n_faces": 248
+    }
+  },
+  "failed": {},
+  "_units": "Baked mesh payloads (.npz) are METRES, Blender Z-up, centred on origin; the Blender stage imports them at x1.0 and seats by plan location. (scripts/step GLBs are metres-magnitude, Y-up.)"
+}

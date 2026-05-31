@@ -27,9 +27,21 @@ struct ARContainerView: UIViewRepresentable {
         // place/replace the exhibit when the user has chosen a variant
         if model.stage == .placed, let entry = model.selected, let v = model.chosen,
            context.coordinator.placedId != entry.id + v.name {
-            context.coordinator.place(entry: entry, variant: v)
+            context.coordinator.place(url: Bundle.main.url(forResource: entry.usdzName,
+                                                           withExtension: "usdz"),
+                                      id: entry.id + v.name,
+                                      scale: Float(v.scale))
         }
-        if model.stage == .choosing { context.coordinator.clear() }
+        // place a freshly generated USDZ downloaded from the PC
+        if model.stage == .placed, let gen = model.generatedURL,
+           context.coordinator.placedId != "gen:" + gen.lastPathComponent {
+            context.coordinator.place(url: gen,
+                                      id: "gen:" + gen.lastPathComponent,
+                                      scale: 1.0, autoFit: true)
+        }
+        if model.stage == .choosing || model.stage == .prompting {
+            context.coordinator.clear()
+        }
     }
 
     func makeCoordinator() -> Coordinator { Coordinator(model: model) }
@@ -76,32 +88,54 @@ struct ARContainerView: UIViewRepresentable {
             }
         }
 
-        // --- place the chosen exhibit ---------------------------------------
-        func place(entry: CatalogEntry, variant: ScaleVariant) {
-            guard let view else { return }
+        // --- place a USDZ (bundled exhibit OR downloaded generated file) -----
+        func place(url: URL?, id: String, scale: Float, autoFit: Bool = false) {
+            guard let view, let url else { return }
             clear()
-            let anchor = AnchorEntity(plane: variant.anchor == "table"
-                                      ? .horizontal : .horizontal,
-                                      minimumBounds: [0.1, 0.1])
+            let anchor = AnchorEntity(plane: .horizontal, minimumBounds: [0.1, 0.1])
             self.anchor = anchor
             view.scene.addAnchor(anchor)
-            placedId = entry.id + variant.name
+            placedId = id
 
-            guard let url = Bundle.main.url(forResource: entry.usdzName,
-                                            withExtension: "usdz") else { return }
             Task { @MainActor in
                 do {
-                    let model = try await Entity(contentsOf: url)
-                    model.scale = SIMD3<Float>(repeating: Float(variant.scale))
-                    // sit it slightly in front along -Z at the variant distance
+                    let model: Entity
+                    if #available(iOS 18.0, *) {
+                        model = try await Entity(contentsOf: url)
+                    } else {
+                        model = try Entity.load(contentsOf: url)
+                    }
+                    var s = scale
+                    if autoFit {
+                        // Generated content has unknown size — fit largest dim to ~0.4 m.
+                        let b = model.visualBounds(relativeTo: nil)
+                        let maxDim = max(b.extents.x, max(b.extents.y, b.extents.z))
+                        if maxDim > 0 { s = 0.4 / maxDim }
+                    }
+                    model.scale = SIMD3<Float>(repeating: s)
                     model.position = SIMD3<Float>(0, 0, 0)
                     anchor.addChild(model)
-                    for anim in model.availableAnimations {
-                        model.playAnimation(anim.repeat(), transitionDuration: 0.2,
+
+                    // Play every baked clip found ANYWHERE in the hierarchy.
+                    // USDZ transform-track ("xformOp.timeSamples") animation is
+                    // surfaced on root AND child entities; play all of them.
+                    var clips = 0
+                    func playAll(_ e: Entity) {
+                        for anim in e.availableAnimations {
+                            e.playAnimation(anim.repeat(),
+                                            transitionDuration: 0.2,
                                             startsPaused: false)
+                            clips += 1
+                        }
+                        for child in e.children { playAll(child) }
+                    }
+                    playAll(model)
+                    print("SPATAIL: \(id) — played \(clips) animation clip(s)")
+                    if clips == 0 {
+                        print("SPATAIL: WARNING no animations on \(id); model is static.")
                     }
                 } catch {
-                    print("SPATAIL: failed to load \(entry.usdzName): \(error)")
+                    print("SPATAIL: failed to load \(id): \(error)")
                 }
             }
         }

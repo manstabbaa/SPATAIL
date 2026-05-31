@@ -7,7 +7,7 @@ import SwiftUI
 //  3. Analyze   — SPATAIL ANALYSIS proposes scale variants for YOUR room.
 //  4. Place     — tap a variant; the exhibit anchors + plays.
 
-enum Stage { case scanning, choosing, analyzing, placed }
+enum Stage { case scanning, choosing, prompting, generating, analyzing, placed }
 
 @MainActor
 final class SessionModel: ObservableObject {
@@ -18,6 +18,14 @@ final class SessionModel: ObservableObject {
     @Published var variants: [ScaleVariant] = []
     @Published var chosen: ScaleVariant?
     @Published var statusText = "Move your phone slowly to scan the space…"
+
+    // generative loop
+    @Published var prompt = ""
+    @Published var genStage = ""
+    @Published var genError: String?
+    @Published var generatedURL: URL?
+    @Published var serverURL = GenerativeClient.baseURL
+    private let gen = GenerativeClient()
 
     func roomScanned(_ r: RoomProfile) {
         room = r
@@ -36,7 +44,36 @@ final class SessionModel: ObservableObject {
     }
 
     func choose(_ v: ScaleVariant) { chosen = v; stage = .placed }
-    func reset() { selected = nil; chosen = nil; variants = []; stage = .choosing }
+    func reset() {
+        selected = nil; chosen = nil; variants = []; generatedURL = nil
+        genError = nil; genStage = ""; stage = .choosing
+    }
+
+    // --- generative AR ----------------------------------------------------
+    func startPrompting() { genError = nil; stage = .prompting }
+
+    func saveServer() { GenerativeClient.baseURL = serverURL }
+
+    func generate() {
+        saveServer()
+        let p = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !p.isEmpty else { return }
+        genError = nil; genStage = "submitting…"; generatedURL = nil
+        stage = .generating
+        Task {
+            do {
+                let url = try await gen.generate(prompt: p) { [weak self] s in
+                    Task { @MainActor in self?.genStage = s }
+                }
+                generatedURL = url
+                selected = nil; chosen = nil
+                stage = .placed
+            } catch {
+                genError = error.localizedDescription
+                stage = .prompting
+            }
+        }
+    }
 }
 
 struct ContentView: View {
@@ -58,6 +95,19 @@ struct ContentView: View {
                 card {
                     Text("What do you want to see?").font(.headline)
                     Text(model.statusText).font(.caption).foregroundStyle(.secondary)
+                    Button {
+                        model.startPrompting()
+                    } label: {
+                        HStack {
+                            Image(systemName: "sparkles")
+                            Text("Generate something new…").bold()
+                            Spacer(); Image(systemName: "chevron.right")
+                        }
+                    }.buttonStyle(.borderedProminent)
+                    if !model.catalog.isEmpty {
+                        Text("or pick a built-in demo")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
                     ForEach(model.catalog) { e in
                         Button { model.pick(e) } label: {
                             HStack {
@@ -69,10 +119,41 @@ struct ContentView: View {
                             }
                         }.buttonStyle(.bordered)
                     }
-                    if model.catalog.isEmpty {
-                        Text("No demos bundled. Run the studio's iOS sync.")
-                            .font(.caption).foregroundStyle(.secondary)
+                }
+            case .prompting:
+                card {
+                    Text("Describe what to create").font(.headline)
+                    TextField("e.g. a bouncing red rubber ball", text: $model.prompt,
+                              axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+                        .lineLimit(1...3)
+                    DisclosureGroup("Server") {
+                        TextField("http://your-pc.tailnet:8787", text: $model.serverURL)
+                            .textFieldStyle(.roundedBorder)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                    }.font(.caption)
+                    if let e = model.genError {
+                        Text(e).font(.caption).foregroundStyle(.red)
                     }
+                    HStack {
+                        Button("Back") { model.reset() }.font(.caption)
+                        Spacer()
+                        Button("Generate") { model.generate() }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(model.prompt.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                }
+            case .generating:
+                card {
+                    HStack(spacing: 10) {
+                        ProgressView()
+                        VStack(alignment: .leading) {
+                            Text("Generating…").font(.headline)
+                            Text(model.genStage).font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    Text("“\(model.prompt)”").font(.caption2).foregroundStyle(.secondary)
                 }
             case .analyzing:
                 card {
@@ -99,8 +180,13 @@ struct ContentView: View {
                 }
             case .placed:
                 card {
-                    Text(model.selected?.title ?? "").font(.headline)
-                    Text(model.selected?.narration ?? "").font(.caption)
+                    if model.generatedURL != nil {
+                        Text("Generated").font(.headline)
+                        Text("“\(model.prompt)”").font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        Text(model.selected?.title ?? "").font(.headline)
+                        Text(model.selected?.narration ?? "").font(.caption)
+                    }
                     Button("Show something else") { model.reset() }
                         .buttonStyle(.borderedProminent)
                 }

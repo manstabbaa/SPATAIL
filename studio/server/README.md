@@ -65,14 +65,20 @@ do { Start-Sleep 2; $s = Invoke-RestMethod "$b/jobs/$id"; $s.stage } while ($s.s
 Invoke-WebRequest "$b$($s.usdz_url)" -OutFile "$env:TEMP\$id.usdz"
 ```
 
-## Prompt vocabulary (v0.1)
+## Prompts (v0.2 - LLM-authored)
 
-- **shapes**: ball/sphere, cube/box, cylinder/can, cone, pyramid, torus/donut/ring
-- **colours**: red, orange, yellow, gold, green, blue, purple, pink, cyan, white,
-  black, grey, silver, brown, ...
-- **motion**: bounce, spin, roll, orbit, hover/float, pulse, wobble (default: spin)
-- **size**: tiny, small, (default), big/large, huge/giant
+Prompts are **open-ended natural language** - Claude authors the geometry +
+animation, so there is no fixed shape/colour/motion vocabulary. Describe an object
+and an action: "an apple falling from a tree", "a red rubber ball bouncing",
+"a spinning globe on a stand", "a rocket lifting off".
 
-Unknown prompt -> sensible default (a spinning object). The `parse_prompt` front end
-is intentionally swappable for an LLM-backed generator later without touching the
-server or the export path.
+Authoring backend:
+- Uses the local **`claude` CLI** in headless mode with your existing Claude Code
+  login - **no API key needed**. The CLI path auto-resolves to the newest installed
+  version; override with `SPATAIL_CLAUDE_CLI`.
+- Override the model with `SPATAIL_GEN_MODEL` (else the CLI default).
+- If the `claude` CLI is missing, jobs error - there is **no primitive fallback**
+  (we never silently ship a grey box).
+
+Each job first **wipes the Blender scene** to a clean `gen_root`, so nothing from a
+previous prompt leaks through.

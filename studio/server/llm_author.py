@@ -18,17 +18,37 @@ import os
 import re
 import subprocess
 
-# Resolve the claude CLI: env override, else the known install, else PATH.
-_DEFAULT_CLI = r"C:\Users\manst\AppData\Roaming\Claude\claude-code\2.1.156\claude.exe"
+# Resolve the claude CLI: env override -> newest versioned install -> PATH.
+# The Claude Code app installs to ...\Claude\claude-code\<version>\claude.exe and
+# auto-updates, so we glob for the newest version dir rather than pin one.
+def _newest_app_cli() -> str | None:
+    import glob
+    roots = [
+        os.path.expandvars(r"%APPDATA%\Claude\claude-code"),
+        os.path.expandvars(r"%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude-code"),
+    ]
+    candidates = []
+    for r in roots:
+        candidates += glob.glob(os.path.join(r, "*", "claude.exe"))
+    if not candidates:
+        return None
+
+    def ver_key(path):
+        ver = os.path.basename(os.path.dirname(path))
+        parts = []
+        for chunk in ver.split("."):
+            parts.append(int(chunk) if chunk.isdigit() else 0)
+        return parts
+    return sorted(candidates, key=ver_key)[-1]
 
 
 def cli_path() -> str | None:
     p = os.environ.get("SPATAIL_CLAUDE_CLI")
     if p and os.path.exists(p):
         return p
-    if os.path.exists(_DEFAULT_CLI):
-        return _DEFAULT_CLI
-    # fall back to PATH lookup
+    newest = _newest_app_cli()
+    if newest:
+        return newest
     from shutil import which
     return which("claude")
 

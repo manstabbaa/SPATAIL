@@ -28,6 +28,16 @@ targets:
         CFBundleDisplayName: SPATAIL Educator
         UILaunchScreen: {}
         NSCameraUsageDescription: "SPATAIL uses the camera to scan your space and place 3D demos in augmented reality."
+        # The generative AR loop talks cleartext HTTP to the PC job server over
+        # Tailscale (e.g. http://mansourspc.<tailnet>.ts.net:8787 or http://100.x.y.z:8787).
+        # iOS App Transport Security blocks cleartext HTTP by default, so allow it.
+        # Dev setting: NSAllowsArbitraryLoads covers BOTH the MagicDNS hostname and the
+        # raw 100.x tailnet IP (ATS domain exceptions don't apply to IP literals).
+        # To tighten for production, drop NSAllowsArbitraryLoads and use instead:
+        #   NSExceptionDomains: { ts.net: { NSIncludesSubdomains: true,
+        #                                   NSExceptionAllowsInsecureHTTPLoads: true } }
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
         UIRequiredDeviceCapabilities: [arkit]
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

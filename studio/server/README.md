@@ -16,11 +16,21 @@ GET  /health                              -> liveness + Blender bridge status
 - Each job drives the **LIVE** first-party Blender MCP bridge (`localhost:9876`,
   the "MCP" add-on, auto-start) - **no headless Blender is spawned**; the user's
   open Blender does the work and stays open.
-- `generator.py` parses the prompt (shape, colour, motion, size), builds the
-  geometry, bakes a **seamless looping** animation, and exports USDZ using the
-  **exact** settings from `studio/blender/build_studio.py::_export_usdz`
-  (Y-up, `meters_per_unit=1`, `generate_preview_surface`, baked animation) so it
-  loads in AR Quick Look / RealityKit.
+- **Real generative authoring** (`generator.py` + `llm_author.py`): for each job
+  the scene is **cleared** to a single `gen_root` empty, then **Claude authors a
+  Blender-Python script** (via the local `claude` CLI in headless `-p` mode, using
+  your existing Claude Code login — no API key) that *models a recognizable
+  representation of the subject and animates the described action* as a seamless
+  baked loop, parented to `gen_root`. The script runs in the live Blender with
+  **self-repair** (a Blender traceback is fed back for a corrected script, up to 3
+  tries). "an apple falling from a tree" → a modelled tree + apple that falls, not
+  a grey sphere. There is **no primitive fallback** — if authoring fails the job
+  errors rather than shipping a box.
+- The result is exported to USDZ using the **exact** settings from
+  `studio/blender/build_studio.py::_export_usdz` (Y-up, `meters_per_unit=1`,
+  `generate_preview_surface`, baked animation), measured/scaled over all of
+  `gen_root`'s descendants to a ≤0.9 m tabletop footprint, so it loads in AR Quick
+  Look / RealityKit.
 - Artifacts land in `studio/out/gen/<job>.usdz` (+ `<job>_metadata.json`).
 
 ## Run

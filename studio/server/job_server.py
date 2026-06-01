@@ -46,6 +46,66 @@ ARTIFACTS.mkdir(parents=True, exist_ok=True)
 
 CONTRACT_VERSION = "0.1"
 
+# Where Blender lives (override with BLENDER_EXE). Used by the keep-alive watchdog
+# so the always-on spine self-heals if Blender is closed/crashes.
+BLENDER_EXE = os.environ.get(
+    "BLENDER_EXE", r"C:\Program Files\Blender Foundation\Blender 5.1\blender.exe")
+
+
+def _keep_awake() -> None:
+    """Stop Windows from sleeping / blanking the display while the server runs, so
+    the phone can always reach the live Blender. Uses ctypes (stdlib) —
+    SetThreadExecutionState with CONTINUOUS keeps the request active for the life
+    of this process; cleared automatically when the process exits."""
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+        ES_CONTINUOUS = 0x80000000
+        ES_SYSTEM_REQUIRED = 0x00000001
+        ES_DISPLAY_REQUIRED = 0x00000002  # also keep the display on (passthrough demos)
+        ctypes.windll.kernel32.SetThreadExecutionState(
+            ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED)
+        print("[spine] keep-awake engaged (system + display)", flush=True)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[spine] keep-awake unavailable: {exc}", flush=True)
+
+
+def _blender_watchdog(poll_seconds: float = 15.0) -> None:
+    """Keep the live Blender bridge up. If the socket is unreachable for two
+    consecutive checks (Blender closed/crashed), relaunch Blender headed so its
+    MCP add-on auto-starts again. Never raises — the spine must not die."""
+    if sys.platform != "win32":
+        return
+    import subprocess
+    misses = 0
+    launched_at = 0.0
+    while True:
+        time.sleep(poll_seconds)
+        try:
+            up = blender_bridge.ping(timeout=4.0) is not None
+        except Exception:  # noqa: BLE001
+            up = False
+        if up:
+            misses = 0
+            continue
+        misses += 1
+        # need 2 misses (~30s) before acting, and don't relaunch within 90s of a launch
+        if misses < 2 or (time.time() - launched_at) < 90:
+            continue
+        if not os.path.exists(BLENDER_EXE):
+            print(f"[spine] Blender bridge DOWN and exe not found at {BLENDER_EXE}",
+                  flush=True)
+            misses = 0
+            continue
+        try:
+            print("[spine] Blender bridge DOWN — relaunching Blender…", flush=True)
+            subprocess.Popen([BLENDER_EXE], close_fds=True)
+            launched_at = time.time()
+            misses = 0
+        except Exception as exc:  # noqa: BLE001
+            print(f"[spine] relaunch failed: {exc}", flush=True)
+
 _JOBS: dict[str, dict] = {}
 _LOCK = threading.Lock()
 _QUEUE: "Queue[str]" = Queue()
@@ -209,7 +269,17 @@ def main() -> None:
     ap.add_argument("--host", default="0.0.0.0",
                     help="bind address (default 0.0.0.0 = all interfaces incl. Tailscale)")
     ap.add_argument("--port", type=int, default=8787)
+    ap.add_argument("--no-keep-awake", action="store_true",
+                    help="don't prevent Windows sleep/display-off while serving")
+    ap.add_argument("--no-watchdog", action="store_true",
+                    help="don't auto-relaunch Blender if its bridge goes down")
     args = ap.parse_args()
+
+    if not args.no_keep_awake:
+        _keep_awake()
+    if not args.no_watchdog:
+        threading.Thread(target=_blender_watchdog, daemon=True,
+                         name="blender-watchdog").start()
 
     threading.Thread(target=_worker, daemon=True, name="gen-worker").start()
 
@@ -227,6 +297,9 @@ def main() -> None:
           flush=True)
     print(f"  artifacts       : {ARTIFACTS}", flush=True)
     print(f"  Blender bridge  : {'UP - ' + (bridge or {}).get('blender', '') if bridge else 'DOWN (open Blender + start MCP add-on)'}",
+          flush=True)
+    print(f"  keep-awake      : {'off' if args.no_keep_awake else 'on'}", flush=True)
+    print(f"  blender watchdog: {'off' if args.no_watchdog else 'on (relaunch if bridge drops)'}",
           flush=True)
     print("=" * 64, flush=True)
     try:

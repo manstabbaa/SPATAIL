@@ -7,7 +7,7 @@ import SwiftUI
 //  3. Analyze   — SPATAIL ANALYSIS proposes scale variants for YOUR room.
 //  4. Place     — tap a variant; the exhibit anchors + plays.
 
-enum Stage { case scanning, choosing, prompting, generating, analyzing, placed }
+enum Stage { case scanning, choosing, prompting, generating, analyzing, placed, experiencing }
 
 @MainActor
 final class SessionModel: ObservableObject {
@@ -25,6 +25,16 @@ final class SessionModel: ObservableObject {
     @Published var genError: String?
     @Published var generatedURL: URL?
     @Published var serverURL = GenerativeClient.baseURL
+    @Published var makeExperience = true        // true = full multi-station experience
+
+    // experience loop (post-compile XR): the downloaded spec the runtime presents
+    @Published var experience: DownloadedExperience?
+    @Published var focusedStation = 0
+    /// Bumped whenever the runtime should (re)present the current experience.
+    @Published var experienceEpoch = 0
+    /// Set by the view layer; lets the model drive station focus on the runtime.
+    var onFocusStation: ((Int) -> Void)?
+
     private let gen = GenerativeClient()
 
     func roomScanned(_ r: RoomProfile) {
@@ -46,6 +56,7 @@ final class SessionModel: ObservableObject {
     func choose(_ v: ScaleVariant) { chosen = v; stage = .placed }
     func reset() {
         selected = nil; chosen = nil; variants = []; generatedURL = nil
+        experience = nil; focusedStation = 0
         genError = nil; genStage = ""; stage = .choosing
     }
 
@@ -58,21 +69,50 @@ final class SessionModel: ObservableObject {
         saveServer()
         let p = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !p.isEmpty else { return }
-        genError = nil; genStage = "submitting…"; generatedURL = nil
+        genError = nil; genStage = "submitting…"
+        generatedURL = nil; experience = nil
         stage = .generating
+        let wantExperience = makeExperience
         Task {
             do {
-                let url = try await gen.generate(prompt: p) { [weak self] s in
-                    Task { @MainActor in self?.genStage = s }
+                if wantExperience {
+                    let exp = try await gen.generateExperience(prompt: p) { [weak self] s in
+                        Task { @MainActor in self?.genStage = s }
+                    }
+                    experience = exp
+                    focusedStation = 0
+                    selected = nil; chosen = nil
+                    experienceEpoch += 1
+                    stage = .experiencing
+                } else {
+                    let url = try await gen.generate(prompt: p) { [weak self] s in
+                        Task { @MainActor in self?.genStage = s }
+                    }
+                    generatedURL = url
+                    selected = nil; chosen = nil
+                    stage = .placed
                 }
-                generatedURL = url
-                selected = nil; chosen = nil
-                stage = .placed
             } catch {
                 genError = error.localizedDescription
                 stage = .prompting
             }
         }
+    }
+
+    // station navigation in a guided experience
+    func focusStation(_ i: Int) {
+        guard let exp = experience else { return }
+        let n = exp.spec.stations.count
+        focusedStation = min(max(i, 0), n - 1)
+        onFocusStation?(focusedStation)
+    }
+    func nextStation() { focusStation(focusedStation + 1) }
+    func prevStation() { focusStation(focusedStation - 1) }
+    var stationCount: Int { experience?.spec.stations.count ?? 0 }
+    var currentStation: ExperienceSpec.Station? {
+        guard let exp = experience, focusedStation < exp.spec.orderedStations.count
+        else { return nil }
+        return exp.spec.orderedStations[focusedStation]
     }
 }
 
@@ -122,11 +162,17 @@ struct ContentView: View {
                 }
             case .prompting:
                 card {
-                    Text("Describe what to create").font(.headline)
-                    TextField("e.g. a bouncing red rubber ball", text: $model.prompt,
-                              axis: .vertical)
+                    Text(model.makeExperience ? "What do you want to learn?"
+                                              : "Describe what to create").font(.headline)
+                    TextField(model.makeExperience ? "e.g. teach me how a lever works"
+                                                   : "e.g. a bouncing red rubber ball",
+                              text: $model.prompt, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
                         .lineLimit(1...3)
+                    Toggle(isOn: $model.makeExperience) {
+                        Label("Build a full lesson (multi-station)", systemImage: "sparkles")
+                            .font(.caption)
+                    }.toggleStyle(.switch)
                     DisclosureGroup("Server") {
                         TextField("http://your-pc.tailnet:8787", text: $model.serverURL)
                             .textFieldStyle(.roundedBorder)
@@ -136,12 +182,18 @@ struct ContentView: View {
                     if let e = model.genError {
                         Text(e).font(.caption).foregroundStyle(.red)
                     }
+                    if model.makeExperience {
+                        Text("Builds an interactive lesson in your room — takes a few minutes.")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
                     HStack {
                         Button("Back") { model.reset() }.font(.caption)
                         Spacer()
-                        Button("Generate") { model.generate() }
-                            .buttonStyle(.borderedProminent)
-                            .disabled(model.prompt.trimmingCharacters(in: .whitespaces).isEmpty)
+                        Button(model.makeExperience ? "Build lesson" : "Generate") {
+                            model.generate()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(model.prompt.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
                 }
             case .generating:
@@ -189,6 +241,41 @@ struct ContentView: View {
                     }
                     Button("Show something else") { model.reset() }
                         .buttonStyle(.borderedProminent)
+                }
+            case .experiencing:
+                card {
+                    if let exp = model.experience, let st = model.currentStation {
+                        HStack {
+                            Text(exp.spec.title).font(.headline)
+                            Spacer()
+                            Text("\(model.focusedStation + 1)/\(model.stationCount)")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        Text(st.title).font(.subheadline).bold()
+                        if !st.subtitle.isEmpty {
+                            Text(st.subtitle).font(.caption).foregroundStyle(.secondary)
+                        }
+                        if !st.narration.isEmpty {
+                            Text(st.narration).font(.caption)
+                        }
+                        HStack {
+                            Button { model.prevStation() } label: {
+                                Image(systemName: "chevron.left")
+                            }.disabled(model.focusedStation == 0)
+                            Spacer()
+                            if model.focusedStation < model.stationCount - 1 {
+                                Button("Next") { model.nextStation() }
+                                    .buttonStyle(.borderedProminent)
+                            } else {
+                                Button("Finish") { model.reset() }
+                                    .buttonStyle(.borderedProminent)
+                            }
+                            Spacer()
+                            Button { model.reset() } label: { Image(systemName: "xmark") }
+                        }.padding(.top, 2)
+                    } else {
+                        Text("Preparing experience…").font(.headline)
+                    }
                 }
             }
         }

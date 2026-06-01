@@ -20,32 +20,43 @@ struct ARContainerView: UIViewRepresentable {
         view.session.run(cfg)
         view.session.delegate = context.coordinator
         context.coordinator.view = view
+        // tap → experience mechanics (tap_reveal / on_tap play / grab)
+        let tap = UITapGestureRecognizer(target: context.coordinator,
+                                         action: #selector(Coordinator.onTap(_:)))
+        view.addGestureRecognizer(tap)
         return view
     }
 
     func updateUIView(_ view: ARView, context: Context) {
+        let coord = context.coordinator
         // place/replace the exhibit when the user has chosen a variant
         if model.stage == .placed, let entry = model.selected, let v = model.chosen,
-           context.coordinator.placedId != entry.id + v.name {
-            context.coordinator.place(url: Bundle.main.url(forResource: entry.usdzName,
-                                                           withExtension: "usdz"),
-                                      id: entry.id + v.name,
-                                      scale: Float(v.scale))
+           coord.placedId != entry.id + v.name {
+            coord.place(url: Bundle.main.url(forResource: entry.usdzName,
+                                             withExtension: "usdz"),
+                        id: entry.id + v.name,
+                        scale: Float(v.scale))
         }
         // place a freshly generated USDZ downloaded from the PC
         if model.stage == .placed, let gen = model.generatedURL,
-           context.coordinator.placedId != "gen:" + gen.lastPathComponent {
-            context.coordinator.place(url: gen,
-                                      id: "gen:" + gen.lastPathComponent,
-                                      scale: 1.0, autoFit: true)
+           coord.placedId != "gen:" + gen.lastPathComponent {
+            coord.place(url: gen,
+                        id: "gen:" + gen.lastPathComponent,
+                        scale: 1.0, autoFit: true)
+        }
+        // present a downloaded multi-station EXPERIENCE (post-compile XR)
+        if model.stage == .experiencing, let exp = model.experience,
+           coord.presentedEpoch != model.experienceEpoch {
+            coord.present(exp, epoch: model.experienceEpoch)
         }
         if model.stage == .choosing || model.stage == .prompting {
-            context.coordinator.clear()
+            coord.clear()
         }
     }
 
     func makeCoordinator() -> Coordinator { Coordinator(model: model) }
 
+    @MainActor
     final class Coordinator: NSObject, ARSessionDelegate {
         let model: SessionModel
         weak var view: ARView?
@@ -55,10 +66,42 @@ struct ARContainerView: UIViewRepresentable {
         private var maxFloorArea: Float = 0
         private var tableH: Float?
 
+        // post-compile XR: the experience interpreter + which epoch is presented
+        private var runtime: ExperienceRuntime?
+        var presentedEpoch: Int = -1
+
         init(model: SessionModel) { self.model = model }
 
+        // MARK: - present a downloaded multi-station experience
+        func present(_ exp: DownloadedExperience, epoch: Int) {
+            guard let view else { return }
+            presentedEpoch = epoch
+            clear()
+            let rt = ExperienceRuntime(view: view, usdzDir: exp.folder)
+            runtime = rt
+            // let the model drive station focus through the runtime
+            model.onFocusStation = { [weak rt] i in rt?.focus(i) }
+            Task { @MainActor in await rt.present(exp.spec) }
+        }
+
+        // route a tap to the runtime's mechanics
+        @MainActor func handleTap(at point: CGPoint) {
+            guard let view, let rt = runtime else { return }
+            if let tapped = view.entity(at: point) {
+                rt.handleTap(on: tapped)
+            }
+        }
+
+        // per-frame: face iOS-17 billboard panels toward the camera.
+        // nonisolated (ARKit calls off the main actor); hop to MainActor for state.
+        nonisolated func session(_ s: ARSession, didUpdate frame: ARFrame) {
+            let t = frame.camera.transform.columns.3
+            let cam = SIMD3<Float>(t.x, t.y, t.z)
+            Task { @MainActor in self.runtime?.faceBillboards(toward: cam) }
+        }
+
         // --- room estimation from detected planes ---------------------------
-        func session(_ s: ARSession, didUpdate anchors: [ARAnchor]) {
+        nonisolated func session(_ s: ARSession, didUpdate anchors: [ARAnchor]) {
             var floorW: Float = 0, floorD: Float = 0, area: Float = 0
             var foundTable: Float?
             for a in anchors.compactMap({ $0 as? ARPlaneAnchor }) {
@@ -73,9 +116,16 @@ struct ARContainerView: UIViewRepresentable {
                     }
                 }
             }
+            // hand the per-frame reading to the main actor for all state mutation
+            Task { @MainActor in self.ingestPlaneReading(area: area, floorW: floorW,
+                                                         floorD: floorD, tableH: foundTable) }
+        }
+
+        // MainActor-isolated state update from a plane reading
+        private func ingestPlaneReading(area: Float, floorW: Float, floorD: Float,
+                                        tableH foundTable: Float?) {
             if area > maxFloorArea { maxFloorArea = area }
             if let t = foundTable { tableH = t }
-            // emit an updated profile (debounced to first solid read)
             if area > 0.5 && !scanned {
                 scanned = true
                 var r = RoomProfile()
@@ -84,7 +134,7 @@ struct ARContainerView: UIViewRepresentable {
                 r.tablePresent = tableH != nil
                 if let t = tableH { r.tableTopH = Double(t) }
                 r.source = "arkit"
-                Task { @MainActor in self.model.roomScanned(r) }
+                model.roomScanned(r)
             }
         }
 
@@ -140,9 +190,18 @@ struct ARContainerView: UIViewRepresentable {
             }
         }
 
+        @objc func onTap(_ g: UITapGestureRecognizer) {
+            guard let view else { return }
+            let p = g.location(in: view)
+            Task { @MainActor in self.handleTap(at: p) }
+        }
+
         func clear() {
             if let a = anchor { view?.scene.removeAnchor(a) }
             anchor = nil; placedId = nil
+            runtime?.clear()
+            runtime = nil
+            model.onFocusStation = nil
         }
     }
 }

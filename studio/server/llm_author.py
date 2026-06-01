@@ -66,8 +66,13 @@ def _run_cli(prompt_text: str, timeout: float) -> str:
     model = os.environ.get("SPATAIL_GEN_MODEL")
     if model:
         args += ["--model", model]
+    # Force UTF-8 for the CLI's stdin/stdout. Without this, subprocess uses the
+    # Windows ANSI code page (cp1252) and mangles any non-ASCII the model emits
+    # (arrows →, em-dashes —, emoji) into mojibake that then gets baked into the
+    # Experience Spec / Blender code. errors="replace" so a stray byte never crashes.
     proc = subprocess.run(args, input=prompt_text, capture_output=True,
-                          text=True, timeout=timeout)
+                          text=True, timeout=timeout,
+                          encoding="utf-8", errors="replace")
     if proc.returncode != 0:
         raise RuntimeError(
             f"claude CLI exit {proc.returncode}: {(proc.stderr or '').strip()[:500]}")
@@ -82,6 +87,36 @@ def _strip_fences(text: str) -> str:
     t = re.sub(r"^```[a-zA-Z0-9]*\s*\n", "", t)
     t = re.sub(r"\n```\s*$", "", t)
     return t.strip()
+
+
+def ask_json(system_prompt: str, user_prompt: str, *, timeout: float = 180.0,
+             max_attempts: int = 2) -> dict:
+    """Ask Claude (headless CLI) for a JSON object and return it parsed.
+
+    Used by the Director to PLAN an experience (structure), distinct from
+    author_scene which writes Blender code. Retries once if the reply doesn't
+    parse as JSON. Raises RuntimeError if the CLI is unavailable or no valid
+    JSON is produced.
+    """
+    import json
+    if not available():
+        raise RuntimeError("claude CLI not available")
+    text = system_prompt + "\n\n" + user_prompt
+    last = ""
+    for attempt in range(1, max_attempts + 1):
+        raw = _run_cli(text, timeout=timeout)
+        body = _strip_fences(raw)
+        # tolerate prose around the object: grab the outermost {...}
+        start, end = body.find("{"), body.rfind("}")
+        candidate = body[start:end + 1] if (start != -1 and end > start) else body
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError as e:
+            last = f"{e}: {candidate[:200]}"
+            text = (system_prompt + "\n\n" + user_prompt +
+                    "\n\n---\nYour previous reply was not valid JSON (" + str(e) +
+                    "). Return ONLY a single valid JSON object, no prose, no fences.")
+    raise RuntimeError(f"could not get valid JSON from Claude: {last}")
 
 
 _RULES = """You are a senior technical 3D artist authoring scenes in Blender 5.1 via \

@@ -39,6 +39,7 @@ from urllib.parse import unquote, urlsplit
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import blender_bridge  # noqa: E402
 import generator  # noqa: E402
+import director  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]            # C:\SPATAIL_MAX
 ARTIFACTS = ROOT / "studio" / "out" / "gen"
@@ -131,19 +132,34 @@ def _worker() -> None:
             job = _snapshot(job_id)
             if not job:
                 continue
-            _update(job_id, status="running", stage="modeling", message=None)
-            res = generator.generate(
-                job["prompt"], job_id, ARTIFACTS,
-                on_stage=lambda s, _id=job_id: _update(_id, stage=s),
-            )
-            _update(
-                job_id, status="done", stage="ready", message=None,
-                usdz=res["usdz_name"], metadata=res["metadata_name"],
-                bbox_yup=res.get("bbox_yup"), max_dim=res.get("max_dim"),
-                spec=res.get("spec"), finished=time.time(),
-            )
-            print(f"[job] {job_id} done -> {res['usdz_name']} "
-                  f"(max_dim {res.get('max_dim')} m)", flush=True)
+            _update(job_id, status="running", stage="planning", message=None)
+            if job.get("mode") == "experience":
+                # Director: prompt -> multi-station Experience Spec + N USDZs
+                res = director.generate_experience(
+                    job["prompt"], job_id, ARTIFACTS,
+                    on_stage=lambda s, _id=job_id: _update(_id, stage=s),
+                )
+                _update(
+                    job_id, status="done", stage="ready", message=None,
+                    experience=res["experience_name"], stations=res["stations"],
+                    title=res["title"], finished=time.time(),
+                )
+                print(f"[job] {job_id} done -> {res['experience_name']} "
+                      f"({res['stations']} stations)", flush=True)
+            else:
+                # single-object generator (back-compat)
+                res = generator.generate(
+                    job["prompt"], job_id, ARTIFACTS,
+                    on_stage=lambda s, _id=job_id: _update(_id, stage=s),
+                )
+                _update(
+                    job_id, status="done", stage="ready", message=None,
+                    usdz=res["usdz_name"], metadata=res["metadata_name"],
+                    bbox_yup=res.get("bbox_yup"), max_dim=res.get("max_dim"),
+                    spec=res.get("spec"), finished=time.time(),
+                )
+                print(f"[job] {job_id} done -> {res['usdz_name']} "
+                      f"(max_dim {res.get('max_dim')} m)", flush=True)
         except Exception as exc:  # noqa: BLE001
             _update(job_id, status="error", stage=None, message=str(exc),
                     finished=time.time())
@@ -183,11 +199,16 @@ class Handler(BaseHTTPRequestHandler):
         prompt = (data.get("prompt") or "").strip()
         if not prompt:
             return self._send(400, obj={"error": "missing 'prompt'"})
-        job_id = "job_" + uuid.uuid4().hex[:8]
+        # mode: "experience" -> Director (multi-station); anything else -> single object.
+        mode = data.get("mode")
+        if mode not in ("experience", "object", None):
+            mode = None
+        prefix = "exp_" if mode == "experience" else "job_"
+        job_id = prefix + uuid.uuid4().hex[:8]
         with _LOCK:
             _JOBS[job_id] = {
                 "id": job_id, "status": "queued", "stage": "queued",
-                "message": None, "prompt": prompt,
+                "message": None, "prompt": prompt, "mode": mode,
                 "client": data.get("client"), "created": time.time(),
                 "usdz": None, "metadata": None,
             }
@@ -223,9 +244,16 @@ class Handler(BaseHTTPRequestHandler):
                 "stage": job.get("stage"), "message": job.get("message"),
             }
             if job["status"] == "done":
-                out["usdz_url"] = f"/artifacts/{job['usdz']}"
-                if job.get("metadata"):
-                    out["metadata_url"] = f"/artifacts/{job['metadata']}"
+                if job.get("experience"):
+                    # Director job: point the client at the Experience Spec
+                    out["experience_url"] = f"/artifacts/{job['experience']}"
+                    out["usdz_base"] = "/artifacts/"
+                    out["stations"] = job.get("stations")
+                    out["title"] = job.get("title")
+                else:
+                    out["usdz_url"] = f"/artifacts/{job['usdz']}"
+                    if job.get("metadata"):
+                        out["metadata_url"] = f"/artifacts/{job['metadata']}"
             return self._send(200, obj=out)
 
         if path.startswith("/artifacts/"):

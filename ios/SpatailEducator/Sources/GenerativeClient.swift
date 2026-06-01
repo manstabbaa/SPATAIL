@@ -24,6 +24,17 @@ struct JobState: Decodable {
     let message: String?
     let usdz_url: String?
     let metadata_url: String?
+    // experience jobs (mode == "experience"):
+    var experience_url: String? = nil
+    var usdz_base: String? = nil
+    var stations: Int? = nil
+    var title: String? = nil
+}
+
+/// A downloaded experience: the decoded spec + a local folder holding all station USDZs.
+struct DownloadedExperience {
+    let spec: ExperienceSpec
+    let folder: URL          // station USDZs live here, named per spec hero.usdz
 }
 
 enum GenError: LocalizedError {
@@ -91,12 +102,61 @@ final class GenerativeClient {
         return try await download(path: usdz, id: create.id)
     }
 
-    private func submit(prompt: String) async throws -> CreateJobResponse {
+    /// Submit a prompt as a full multi-station EXPERIENCE, poll to completion,
+    /// download the spec + every station USDZ, and return them. Longer cap because
+    /// the Director drives Blender once per station.
+    func generateExperience(prompt: String,
+                            onStage: @escaping (String) -> Void) async throws -> DownloadedExperience {
+        let create = try await submit(prompt: prompt, mode: "experience")
+        onStage("planning…")
+
+        let deadline = Date().addingTimeInterval(600) // 10 min — multi-station build
+        var state = try await poll(id: create.id)
+        while state.status != .done {
+            if Date() > deadline { throw GenError.timeout }
+            if state.status == .error { throw GenError.server(state.message ?? "Generation failed.") }
+            try await Task.sleep(nanoseconds: 2_500_000_000)
+            state = try await poll(id: create.id)
+            onStage(state.stage ?? state.status.rawValue)
+        }
+        guard let expURL = state.experience_url else {
+            throw GenError.server("Job done but no experience produced.")
+        }
+        onStage("downloading experience…")
+
+        // download + decode the spec
+        let specURL = try resolve(expURL)
+        let (specData, specResp) = try await URLSession.shared.data(from: specURL)
+        try check(specResp)
+        let spec = try ExperienceSpec.decode(specData)
+
+        // a dedicated folder for this experience's USDZs
+        let folder = FileManager.default.temporaryDirectory
+            .appendingPathComponent("exp_\(create.id)", isDirectory: true)
+        try? FileManager.default.removeItem(at: folder)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+
+        // download each station hero USDZ into the folder under its spec name
+        let base = state.usdz_base ?? "/artifacts/"
+        for (i, station) in spec.orderedStations.enumerated() {
+            onStage("downloading model \(i + 1)/\(spec.stations.count)…")
+            let url = try resolve(base + station.hero.usdz)
+            let (tmp, resp) = try await URLSession.shared.download(from: url)
+            try check(resp)
+            let dst = folder.appendingPathComponent(station.hero.usdz)
+            try? FileManager.default.removeItem(at: dst)
+            try FileManager.default.moveItem(at: tmp, to: dst)
+        }
+        return DownloadedExperience(spec: spec, folder: folder)
+    }
+
+    private func submit(prompt: String, mode: String? = nil) async throws -> CreateJobResponse {
         var req = URLRequest(url: try base().appendingPathComponent("jobs"))
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.httpBody = try JSONSerialization.data(
-            withJSONObject: ["prompt": prompt, "client": "ios"])
+        var payload: [String: Any] = ["prompt": prompt, "client": "ios"]
+        if let mode { payload["mode"] = mode }
+        req.httpBody = try JSONSerialization.data(withJSONObject: payload)
         let (data, resp) = try await URLSession.shared.data(for: req)
         try check(resp)
         return try JSONDecoder().decode(CreateJobResponse.self, from: data)

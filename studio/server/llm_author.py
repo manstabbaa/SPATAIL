@@ -58,19 +58,26 @@ def available() -> bool:
 
 
 def _run_cli(prompt_text: str, timeout: float) -> str:
-    """Run `claude -p` headlessly, prompt on stdin, return stdout text."""
+    """Run `claude -p <prompt>` headlessly, return stdout text.
+
+    The prompt is passed as a POSITIONAL ARG, not on stdin. Measured on this CLI
+    build (2.1.156): the stdin form is ~2.5x slower (58s vs 23s on the real
+    authoring prompt) because the CLI waits on stdin buffering/EOF before starting.
+    All our prompts are <=~11KB, far under Windows' 32767-char command-line limit,
+    so the arg form is safe and much faster. stdin is closed to avoid any wait.
+    """
     cli = cli_path()
     if not cli:
         raise RuntimeError("claude CLI not found (set SPATAIL_CLAUDE_CLI)")
-    args = [cli, "-p", "--output-format", "text"]
+    args = [cli, "-p", prompt_text, "--output-format", "text"]
     model = os.environ.get("SPATAIL_GEN_MODEL")
     if model:
         args += ["--model", model]
-    # Force UTF-8 for the CLI's stdin/stdout. Without this, subprocess uses the
-    # Windows ANSI code page (cp1252) and mangles any non-ASCII the model emits
-    # (arrows →, em-dashes —, emoji) into mojibake that then gets baked into the
-    # Experience Spec / Blender code. errors="replace" so a stray byte never crashes.
-    proc = subprocess.run(args, input=prompt_text, capture_output=True,
+    # Force UTF-8 for the CLI's stdout. Without this, subprocess uses the Windows
+    # ANSI code page (cp1252) and mangles non-ASCII the model emits (arrows →,
+    # em-dashes —, emoji) into mojibake baked into the spec / Blender code.
+    # stdin=DEVNULL so the CLI never blocks waiting for input.
+    proc = subprocess.run(args, stdin=subprocess.DEVNULL, capture_output=True,
                           text=True, timeout=timeout,
                           encoding="utf-8", errors="replace")
     if proc.returncode != 0:

@@ -190,10 +190,11 @@ struct ARContainerView: UIViewRepresentable {
             }
         }
 
+        // UIKit delivers gesture callbacks on the main thread; the class is
+        // @MainActor, so call handleTap directly (no async hop needed).
         @objc func onTap(_ g: UITapGestureRecognizer) {
             guard let view else { return }
-            let p = g.location(in: view)
-            Task { @MainActor in self.handleTap(at: p) }
+            handleTap(at: g.location(in: view))
         }
 
         func clear() {

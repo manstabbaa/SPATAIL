@@ -2,6 +2,7 @@ import SwiftUI
 #if os(iOS)
 import RealityKit
 import ARKit
+import simd
 
 // ExperienceRuntime — reads an ExperienceSpec and assembles it in the user's room:
 // places each station's hero USDZ on a comfort arc (StationLayout), attaches its
@@ -87,8 +88,14 @@ final class ExperienceRuntime {
                 let target = Float(max(station.hero.footprintM.w, 0.2))
                 if maxDim > 0 { hero.scale = SIMD3(repeating: target / maxDim) }
             }
-            hero.generateCollisionShapes(recursive: true)  // enable tap/grab mechanics
-            hero.components.set(InputTargetComponent())
+            // collision shapes drive ARView.entity(at:) hit-testing for taps (iOS 13+).
+            hero.generateCollisionShapes(recursive: true)
+            // InputTargetComponent is iOS 18+ and only needed for RealityKit-native
+            // .gesture(targetedToAnyEntity); our taps go through entity(at:) so this
+            // is optional. Gate it so the iOS-17 deployment floor still builds.
+            if #available(iOS 18.0, *) {
+                hero.components.set(InputTargetComponent())
+            }
             hero.name = "hero:\(station.id)"
             holder.addChild(hero)
 

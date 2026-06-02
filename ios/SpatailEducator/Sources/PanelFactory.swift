@@ -20,13 +20,16 @@ enum PanelFactory {
         let heightM = widthM * aspect
 
         let mesh = MeshResource.generatePlane(width: widthM, height: heightM, cornerRadius: 0.012)
-        var material = UnlitMaterial()
+        // UnlitMaterial(color:) is the iOS-17-safe initializer. The card PNG is
+        // rendered with a transparent background, and UnlitMaterial honors the
+        // texture's alpha, so the rounded corners read as transparent without the
+        // iOS-18 `.blending = .transparent(opacity:)` API.
+        var material = UnlitMaterial(color: .white)
         if let cg = img.cgImage, let tex = makeTexture(cg) {
             material.color = .init(tint: .white, texture: .init(tex))
         } else {
-            material.color = .init(tint: .white.withAlphaComponent(0.9))
+            material.color = .init(tint: UIColor.white.withAlphaComponent(0.9))
         }
-        material.blending = .transparent(opacity: 1.0)
 
         let entity = ModelEntity(mesh: mesh, materials: [material])
         entity.name = "panel:\(panel.id)"

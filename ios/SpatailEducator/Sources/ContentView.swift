@@ -33,7 +33,9 @@ final class SessionModel: ObservableObject {
     /// Bumped whenever the runtime should (re)present the current experience.
     @Published var experienceEpoch = 0
     /// Set by the view layer; lets the model drive station focus on the runtime.
-    var onFocusStation: ((Int) -> Void)?
+    /// @MainActor because it calls the @MainActor ExperienceRuntime; only ever
+    /// invoked from focusStation() which is already main-actor isolated.
+    var onFocusStation: (@MainActor (Int) -> Void)?
 
     private let gen = GenerativeClient()
 

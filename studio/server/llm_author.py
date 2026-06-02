@@ -177,9 +177,19 @@ def _repair_prompt(prompt, frames, fps, code, error):
 
 
 def author_scene(prompt, frames, fps, run_code, on_stage=lambda s: None,
-                 max_attempts=3, gen_timeout=240.0, exec_timeout=150.0):
+                 max_attempts=2, gen_timeout=130.0, exec_timeout=120.0):
     """Author + execute the scene in live Blender. Returns a dict; raises
-    RuntimeError if the CLI is unavailable or all attempts fail."""
+    RuntimeError if the CLI is unavailable or all attempts fail.
+
+    Latency on this CLI varies a lot (measured 27s–132s for the same prompt class,
+    and the heavy default/sonnet model can exceed 300s). So:
+      - gen_timeout is a TIGHTER per-call cap (default 130s) and a timeout is a
+        RETRYABLE attempt, not a fatal error — a slow roll gets a fresh, faster try
+        rather than burning the whole budget.
+      - fewer attempts (2) keeps the worst case bounded for the total experience
+        budget (the iOS client caps a full lesson at 600s).
+    Set SPATAIL_GEN_MODEL to force a faster model for authoring.
+    """
     if not available():
         raise RuntimeError("claude CLI not available for authoring")
 
@@ -191,7 +201,11 @@ def author_scene(prompt, frames, fps, run_code, on_stage=lambda s: None,
             else _repair_prompt(prompt, frames, fps, code, last_err)
         try:
             raw = _run_cli(text, timeout=gen_timeout)
-        except Exception as e:  # noqa: BLE001
+        except subprocess.TimeoutExpired:
+            # a slow roll — retry (don't kill the station) unless out of attempts
+            last_err = f"authoring call exceeded {gen_timeout:.0f}s"
+            continue
+        except Exception as e:  # noqa: BLE001 — CLI/process failure
             raise RuntimeError(f"authoring call failed: {type(e).__name__}: {e}") from e
 
         code = _strip_fences(raw)

@@ -32,8 +32,50 @@ import llm_author  # noqa: E402
 import experience_spec as es  # noqa: E402
 import generator  # noqa: E402  (reuse PREPARE + EXPORT Blender code + FPS/FRAMES)
 
-MAX_STATIONS = 5
+# Authoring latency on this CLI is high and variable (measured 27s–132s per hero,
+# heavy model can exceed 300s). The iOS client caps a full experience at 600s, so
+# bound the total: at most 3 stations, each authored within author_scene's tighter
+# per-call budget, with a placeholder fallback so one slow hero can't kill the lesson.
+MAX_STATIONS = 3
 MIN_STATIONS = 1
+
+# A simple labelled placeholder hero, built in-Blender WITHOUT the LLM, used when a
+# station's real authoring times out/fails. Keeps the lesson shippable (the panels +
+# narration still teach) instead of erroring the whole experience. A slow gentle spin
+# so it isn't inert. Self-imports; parents to the existing gen_root.
+_PLACEHOLDER = r"""
+import bpy, math
+from mathutils import Vector
+root = bpy.data.objects.get("gen_root")
+N = %(FRAMES)d
+# a rounded pedestal + floating marker sphere (recognizably a "stand-in")
+bpy.ops.mesh.primitive_cylinder_add(radius=0.18, depth=0.06, vertices=48)
+base = bpy.context.active_object; base.name = "ph_base"
+bpy.ops.mesh.primitive_uv_sphere_add(radius=0.12, segments=40, ring_count=20,
+                                     location=(0, 0, 0.28))
+orb = bpy.context.active_object; orb.name = "ph_orb"
+for ob, rgba, rough in ((base, (0.32, 0.34, 0.40, 1.0), 0.7),
+                        (orb, (0.20, 0.55, 0.95, 1.0), 0.35)):
+    m = bpy.data.materials.new(ob.name + "_mat"); m.use_nodes = True
+    b = m.node_tree.nodes.get("Principled BSDF")
+    if b:
+        b.inputs["Base Color"].default_value = rgba
+        if "Roughness" in b.inputs: b.inputs["Roughness"].default_value = rough
+    m.diffuse_color = rgba
+    ob.data.materials.append(ob.data.materials and m or m)
+    if root: ob.parent = root
+try: bpy.ops.object.shade_smooth()
+except Exception: pass
+# gentle seamless spin of the orb about Z
+ed = bpy.context.preferences.edit
+prev = ed.keyframe_new_interpolation_type
+ed.keyframe_new_interpolation_type = 'LINEAR'
+for f in range(1, N + 1):
+    orb.rotation_euler = (0.0, 0.0, 2.0 * math.pi * (f - 1) / N)
+    orb.keyframe_insert("rotation_euler", frame=f)
+ed.keyframe_new_interpolation_type = prev
+result = {"objects": ["ph_base", "ph_orb"], "summary": "placeholder hero (authoring fell back)"}
+""" % {"FRAMES": generator.FRAMES}
 
 _PLAN_SYSTEM = """You are the SPATAIL Director: a curriculum + spatial-experience \
 designer. You turn a learning prompt into a SHORT, vivid, GAME-LIKE education \
@@ -89,15 +131,28 @@ def _plan(prompt: str) -> dict:
 
 
 def _author_hero(hero_prompt: str, usdz_path: str, on_stage) -> dict:
-    """Clear the live scene, author one hero from hero_prompt, export its USDZ.
-    Reuses generator's PREPARE + EXPORT Blender code (exact studio settings)."""
+    """Clear the live scene, author one hero, export its USDZ. Reuses generator's
+    PREPARE + EXPORT (exact studio settings). If LLM authoring times out/fails, fall
+    back to a simple placeholder hero so the station — and the whole lesson — still
+    ships. Returns the export result with a 'placeholder' flag."""
     bridge.run_code(generator._PREPARE, timeout=60.0)
-    llm_author.author_scene(hero_prompt, generator.FRAMES, generator.FPS,
-                            bridge.run_code, on_stage=on_stage)
+    placeholder = False
+    try:
+        llm_author.author_scene(hero_prompt, generator.FRAMES, generator.FPS,
+                                bridge.run_code, on_stage=on_stage)
+    except Exception as exc:  # noqa: BLE001 — authoring exhausted/timed out
+        placeholder = True
+        on_stage("placeholder (authoring fell back)")
+        # rebuild a clean scene, then drop in the no-LLM placeholder hero
+        bridge.run_code(generator._PREPARE, timeout=60.0)
+        bridge.run_code(_PLACEHOLDER, timeout=60.0)
+        print(f"[director] hero authoring fell back to placeholder: {exc}", flush=True)
+
     export_code = generator._EXPORT.replace("{USDZ}", usdz_path.replace("\\", "/"))
     res = bridge.run_code(export_code, timeout=180.0)
     if not res.get("exported"):
         raise RuntimeError(f"hero USDZ export failed: {res.get('error')}")
+    res["placeholder"] = placeholder
     return res
 
 

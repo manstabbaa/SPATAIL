@@ -7,7 +7,21 @@ import SwiftUI
 //  3. Analyze   — SPATAIL ANALYSIS proposes scale variants for YOUR room.
 //  4. Place     — tap a variant; the exhibit anchors + plays.
 
-enum Stage { case scanning, choosing, prompting, generating, analyzing, placed, experiencing }
+enum Stage { case scanning, choosing, prompting, generating, analyzing, placed, experiencing, representing }
+
+// How a prompt is realised: a full multi-station Lesson (Director), a single
+// generated Object, or a Representation (the brain → progressive runtime contract).
+enum GenMode: String, CaseIterable, Identifiable {
+    case lesson, representation, object
+    var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .lesson: return "Lesson"
+        case .representation: return "Representation"
+        case .object: return "Object"
+        }
+    }
+}
 
 @MainActor
 final class SessionModel: ObservableObject {
@@ -25,7 +39,7 @@ final class SessionModel: ObservableObject {
     @Published var genError: String?
     @Published var generatedURL: URL?
     @Published var serverURL = GenerativeClient.baseURL
-    @Published var makeExperience = true        // true = full multi-station experience
+    @Published var genMode: GenMode = .lesson   // lesson | representation | object
 
     // experience loop (post-compile XR): the downloaded spec the runtime presents
     @Published var experience: DownloadedExperience?
@@ -36,6 +50,14 @@ final class SessionModel: ObservableObject {
     /// @MainActor because it calls the @MainActor ExperienceRuntime; only ever
     /// invoked from focusStation() which is already main-actor isolated.
     var onFocusStation: (@MainActor (Int) -> Void)?
+
+    // representation loop (the Representation Engine): the downloaded bundle the
+    // RepresentationRuntime presents, plus beat navigation.
+    @Published var representation: RepresentationBundle?
+    @Published var representationEpoch = 0
+    @Published var beatIndex = 0
+    /// Set by the view layer; drives beat focus on the RepresentationRuntime.
+    var onFocusBeat: (@MainActor (Int) -> Void)?
 
     private let gen = GenerativeClient()
 
@@ -59,6 +81,7 @@ final class SessionModel: ObservableObject {
     func reset() {
         selected = nil; chosen = nil; variants = []; generatedURL = nil
         experience = nil; focusedStation = 0
+        representation = nil; beatIndex = 0
         genError = nil; genStage = ""; stage = .choosing
     }
 
@@ -72,27 +95,29 @@ final class SessionModel: ObservableObject {
         let p = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !p.isEmpty else { return }
         genError = nil; genStage = "submitting…"
-        generatedURL = nil; experience = nil
+        generatedURL = nil; experience = nil; representation = nil
         stage = .generating
-        let wantExperience = makeExperience
+        let mode = genMode
         Task {
             do {
-                if wantExperience {
+                switch mode {
+                case .lesson:
                     let exp = try await gen.generateExperience(prompt: p) { [weak self] s in
                         Task { @MainActor in self?.genStage = s }
                     }
-                    experience = exp
-                    focusedStation = 0
-                    selected = nil; chosen = nil
-                    experienceEpoch += 1
-                    stage = .experiencing
-                } else {
+                    experience = exp; focusedStation = 0; selected = nil; chosen = nil
+                    experienceEpoch += 1; stage = .experiencing
+                case .object:
                     let url = try await gen.generate(prompt: p) { [weak self] s in
                         Task { @MainActor in self?.genStage = s }
                     }
-                    generatedURL = url
-                    selected = nil; chosen = nil
-                    stage = .placed
+                    generatedURL = url; selected = nil; chosen = nil; stage = .placed
+                case .representation:
+                    let bundle = try await gen.generateRepresentation(prompt: p) { [weak self] s in
+                        Task { @MainActor in self?.genStage = s }
+                    }
+                    representation = bundle; beatIndex = 0; selected = nil; chosen = nil
+                    representationEpoch += 1; stage = .representing
                 }
             } catch {
                 genError = error.localizedDescription
@@ -116,6 +141,21 @@ final class SessionModel: ObservableObject {
         else { return nil }
         return exp.spec.orderedStations[focusedStation]
     }
+
+    // beat navigation in a representation
+    var beatCount: Int { representation?.contract.beats.count ?? 0 }
+    var currentBeat: RuntimeSceneContract.Beat? {
+        guard let beats = representation?.contract.beats, beatIndex < beats.count
+        else { return nil }
+        return beats[beatIndex]
+    }
+    func showBeat(_ i: Int) {
+        let n = beatCount; guard n > 0 else { return }
+        beatIndex = min(max(i, 0), n - 1)
+        onFocusBeat?(beatIndex)
+    }
+    func nextBeat() { showBeat(beatIndex + 1) }
+    func prevBeat() { showBeat(beatIndex - 1) }
 }
 
 struct ContentView: View {
@@ -164,17 +204,13 @@ struct ContentView: View {
                 }
             case .prompting:
                 card {
-                    Text(model.makeExperience ? "What do you want to learn?"
-                                              : "Describe what to create").font(.headline)
-                    TextField(model.makeExperience ? "e.g. teach me how a lever works"
-                                                   : "e.g. a bouncing red rubber ball",
-                              text: $model.prompt, axis: .vertical)
+                    Text(promptTitle).font(.headline)
+                    TextField(promptPlaceholder, text: $model.prompt, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
                         .lineLimit(1...3)
-                    Toggle(isOn: $model.makeExperience) {
-                        Label("Build a full lesson (multi-station)", systemImage: "sparkles")
-                            .font(.caption)
-                    }.toggleStyle(.switch)
+                    Picker("Mode", selection: $model.genMode) {
+                        ForEach(GenMode.allCases) { m in Text(m.label).tag(m) }
+                    }.pickerStyle(.segmented)
                     DisclosureGroup("Server") {
                         TextField("http://your-pc.tailnet:8787", text: $model.serverURL)
                             .textFieldStyle(.roundedBorder)
@@ -184,16 +220,11 @@ struct ContentView: View {
                     if let e = model.genError {
                         Text(e).font(.caption).foregroundStyle(.red)
                     }
-                    if model.makeExperience {
-                        Text("Builds an interactive lesson in your room — takes a few minutes.")
-                            .font(.caption2).foregroundStyle(.secondary)
-                    }
+                    Text(promptNote).font(.caption2).foregroundStyle(.secondary)
                     HStack {
                         Button("Back") { model.reset() }.font(.caption)
                         Spacer()
-                        Button(model.makeExperience ? "Build lesson" : "Generate") {
-                            model.generate()
-                        }
+                        Button(buildLabel) { model.generate() }
                         .buttonStyle(.borderedProminent)
                         .disabled(model.prompt.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
@@ -279,9 +310,69 @@ struct ContentView: View {
                         Text("Preparing experience…").font(.headline)
                     }
                 }
+            case .representing:
+                card {
+                    if let rep = model.representation, let beat = model.currentBeat {
+                        HStack {
+                            Text(rep.contract.title).font(.headline)
+                            Spacer()
+                            Text("\(model.beatIndex + 1)/\(model.beatCount)")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        Text("\(rep.contract.representation.domain) · \(rep.contract.representation.intent) · \(rep.contract.representation.strategy)")
+                            .font(.caption2).foregroundStyle(.secondary)
+                        Text(beat.title).font(.subheadline).bold()
+                        Text(beat.narration).font(.caption)
+                        HStack {
+                            Button { model.prevBeat() } label: { Image(systemName: "chevron.left") }
+                                .disabled(model.beatIndex == 0)
+                            Spacer()
+                            if model.beatIndex < model.beatCount - 1 {
+                                Button("Next") { model.nextBeat() }.buttonStyle(.borderedProminent)
+                            } else {
+                                Button("Finish") { model.reset() }.buttonStyle(.borderedProminent)
+                            }
+                            Spacer()
+                            Button { model.reset() } label: { Image(systemName: "xmark") }
+                        }.padding(.top, 2)
+                        Text("Tap the model to explode / isolate parts.")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    } else {
+                        Text(model.genStage.isEmpty ? "Preparing…" : model.genStage).font(.headline)
+                    }
+                }
             }
         }
         .padding()
+    }
+
+    private var promptTitle: String {
+        switch model.genMode {
+        case .lesson: return "What do you want to learn?"
+        case .representation: return "What should I represent?"
+        case .object: return "Describe what to create"
+        }
+    }
+    private var promptPlaceholder: String {
+        switch model.genMode {
+        case .lesson: return "e.g. teach me how a lever works"
+        case .representation: return "e.g. explain a V8 engine on my table"
+        case .object: return "e.g. a bouncing red rubber ball"
+        }
+    }
+    private var promptNote: String {
+        switch model.genMode {
+        case .lesson: return "Builds an interactive lesson in your room — takes a few minutes."
+        case .representation: return "Plans the spatial experience and shows it progressively — fast, no waiting on Blender."
+        case .object: return "Generates a single animated object."
+        }
+    }
+    private var buildLabel: String {
+        switch model.genMode {
+        case .lesson: return "Build lesson"
+        case .representation: return "Represent"
+        case .object: return "Generate"
+        }
     }
 
     private func card<C: View>(@ViewBuilder _ c: () -> C) -> some View {

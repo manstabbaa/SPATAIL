@@ -29,6 +29,11 @@ struct JobState: Decodable {
     var usdz_base: String? = nil
     var stations: Int? = nil
     var title: String? = nil
+    // representation jobs (mode == "representation"):
+    var runtime_url: String? = nil
+    var delivery_url: String? = nil
+    var progressive_url: String? = nil
+    var plan_url: String? = nil
 }
 
 /// A downloaded experience: the decoded spec + a local folder holding all station USDZs.
@@ -148,6 +153,42 @@ final class GenerativeClient {
             try FileManager.default.moveItem(at: tmp, to: dst)
         }
         return DownloadedExperience(spec: spec, folder: folder)
+    }
+
+    /// Submit a prompt as a REPRESENTATION job (the new brain), poll (short cap —
+    /// the server runs dry-run, so it's seconds not minutes), then download the
+    /// three artifacts concurrently and decode them into a RepresentationBundle.
+    func generateRepresentation(prompt: String,
+                                onStage: @escaping (String) -> Void) async throws -> RepresentationBundle {
+        let create = try await submit(prompt: prompt, mode: "representation")
+        onStage("planning…")
+        let deadline = Date().addingTimeInterval(120)
+        var state = try await poll(id: create.id)
+        while state.status != .done {
+            if Date() > deadline { throw GenError.timeout }
+            if state.status == .error { throw GenError.server(state.message ?? "Generation failed.") }
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            state = try await poll(id: create.id)
+            onStage(state.stage ?? state.status.rawValue)
+        }
+        guard let rURL = state.runtime_url, let pURL = state.progressive_url,
+              let dURL = state.delivery_url else {
+            throw GenError.server("Job done but no representation produced.")
+        }
+        onStage("downloading…")
+        async let contract: RuntimeSceneContract = fetchJSON(rURL)
+        async let progressive: ProgressiveBundle = fetchJSON(pURL)
+        async let delivery: DeliveryPackage = fetchJSON(dURL)
+        return RepresentationBundle(contract: try await contract,
+                                    progressive: try await progressive,
+                                    delivery: try await delivery)
+    }
+
+    private func fetchJSON<T: Decodable>(_ path: String) async throws -> T {
+        let url = try resolve(path)
+        let (data, resp) = try await URLSession.shared.data(from: url)
+        try check(resp)
+        return try JSONDecoder().decode(T.self, from: data)
     }
 
     private func submit(prompt: String, mode: String? = nil) async throws -> CreateJobResponse {

@@ -49,6 +49,11 @@ struct ARContainerView: UIViewRepresentable {
            coord.presentedEpoch != model.experienceEpoch {
             coord.present(exp, epoch: model.experienceEpoch)
         }
+        // present a REPRESENTATION (the brain → progressive runtime contract)
+        if model.stage == .representing, let rep = model.representation,
+           coord.presentedRepEpoch != model.representationEpoch {
+            coord.presentRepresentation(rep, epoch: model.representationEpoch)
+        }
         if model.stage == .choosing || model.stage == .prompting {
             coord.clear()
         }
@@ -69,6 +74,9 @@ struct ARContainerView: UIViewRepresentable {
         // post-compile XR: the experience interpreter + which epoch is presented
         private var runtime: ExperienceRuntime?
         var presentedEpoch: Int = -1
+        // the Representation Engine interpreter + its epoch
+        private var repRuntime: RepresentationRuntime?
+        var presentedRepEpoch: Int = -1
 
         init(model: SessionModel) { self.model = model }
 
@@ -84,12 +92,24 @@ struct ARContainerView: UIViewRepresentable {
             Task { @MainActor in await rt.present(exp.spec) }
         }
 
-        // route a tap to the runtime's mechanics
-        @MainActor func handleTap(at point: CGPoint) {
-            guard let view, let rt = runtime else { return }
-            if let tapped = view.entity(at: point) {
-                rt.handleTap(on: tapped)
+        // MARK: - present a representation (brain → progressive runtime contract)
+        func presentRepresentation(_ rep: RepresentationBundle, epoch: Int) {
+            guard let view else { return }
+            presentedRepEpoch = epoch
+            clear()
+            let rt = RepresentationRuntime(view: view) { [weak self] s in
+                Task { @MainActor in self?.model.genStage = s }
             }
+            repRuntime = rt
+            model.onFocusBeat = { [weak rt] i in rt?.showBeat(i) }
+            rt.present(rep)
+        }
+
+        // route a tap to the active runtime's mechanics (representation first)
+        @MainActor func handleTap(at point: CGPoint) {
+            guard let view, let tapped = view.entity(at: point) else { return }
+            if let rt = repRuntime { rt.handleTap(on: tapped) }
+            else if let rt = runtime { rt.handleTap(on: tapped) }
         }
 
         // per-frame: face iOS-17 billboard panels toward the camera.
@@ -97,7 +117,10 @@ struct ARContainerView: UIViewRepresentable {
         nonisolated func session(_ s: ARSession, didUpdate frame: ARFrame) {
             let t = frame.camera.transform.columns.3
             let cam = SIMD3<Float>(t.x, t.y, t.z)
-            Task { @MainActor in self.runtime?.faceBillboards(toward: cam) }
+            Task { @MainActor in
+                self.runtime?.faceBillboards(toward: cam)
+                self.repRuntime?.faceBillboards(toward: cam)
+            }
         }
 
         // --- room estimation from detected planes ---------------------------
@@ -202,7 +225,10 @@ struct ARContainerView: UIViewRepresentable {
             anchor = nil; placedId = nil
             runtime?.clear()
             runtime = nil
+            repRuntime?.clear()
+            repRuntime = nil
             model.onFocusStation = nil
+            model.onFocusBeat = nil
         }
     }
 }

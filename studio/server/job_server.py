@@ -41,6 +41,16 @@ import blender_bridge  # noqa: E402
 import generator  # noqa: E402
 import director  # noqa: E402
 
+# Representation Engine — opt-in mode="representation". Purely additive: the
+# existing "experience"/"object" modes are untouched. Imported defensively so a
+# fault in the optional subsystem can never take down the always-on spine.
+try:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from representation import job_entry  # noqa: E402
+except Exception as _rep_exc:  # noqa: BLE001
+    job_entry = None
+    print(f"[spine] representation mode unavailable: {_rep_exc}", flush=True)
+
 ROOT = Path(__file__).resolve().parents[2]            # C:\SPATAIL_MAX
 ARTIFACTS = ROOT / "studio" / "out" / "gen"
 ARTIFACTS.mkdir(parents=True, exist_ok=True)
@@ -133,7 +143,25 @@ def _worker() -> None:
             if not job:
                 continue
             _update(job_id, status="running", stage="planning", message=None)
-            if job.get("mode") == "experience":
+            if job.get("mode") == "representation":
+                # Representation Engine: prompt -> Experience Plan + Asset Request
+                # Manifest + Runtime Scene Contract + Progressive Load Plan.
+                if job_entry is None:
+                    raise RuntimeError("representation mode unavailable on this server")
+                res = job_entry.run_job(
+                    job["prompt"], job_id, ARTIFACTS,
+                    on_stage=lambda s, _id=job_id: _update(_id, stage=s),
+                )
+                _update(
+                    job_id, status="done", stage="ready", message=None,
+                    representation=res["experience_name"], runtime=res["runtime_name"],
+                    delivery=res["delivery_name"], progressive=res["progressive_name"],
+                    plan_artifact=res["plan_name"], title=res.get("title"),
+                    stations=res.get("stations"), finished=time.time(),
+                )
+                print(f"[job] {job_id} done -> representation {res.get('title')!r} "
+                      f"({res.get('strategy')}, {res.get('stations')} assets)", flush=True)
+            elif job.get("mode") == "experience":
                 # Director: prompt -> multi-station Experience Spec + N USDZs
                 res = director.generate_experience(
                     job["prompt"], job_id, ARTIFACTS,
@@ -201,9 +229,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(400, obj={"error": "missing 'prompt'"})
         # mode: "experience" -> Director (multi-station); anything else -> single object.
         mode = data.get("mode")
-        if mode not in ("experience", "object", None):
+        if mode not in ("experience", "object", "representation", None):
             mode = None
-        prefix = "exp_" if mode == "experience" else "job_"
+        prefix = ("exp_" if mode == "experience"
+                  else "rep_" if mode == "representation" else "job_")
         job_id = prefix + uuid.uuid4().hex[:8]
         with _LOCK:
             _JOBS[job_id] = {
@@ -244,7 +273,15 @@ class Handler(BaseHTTPRequestHandler):
                 "stage": job.get("stage"), "message": job.get("message"),
             }
             if job["status"] == "done":
-                if job.get("experience"):
+                if job.get("representation"):
+                    # Representation Engine job: plan + manifest + runtime + progressive
+                    out["runtime_url"] = f"/artifacts/{job['runtime']}"
+                    out["delivery_url"] = f"/artifacts/{job['delivery']}"
+                    out["progressive_url"] = f"/artifacts/{job['progressive']}"
+                    out["plan_url"] = f"/artifacts/{job.get('plan_artifact')}"
+                    out["title"] = job.get("title")
+                    out["stations"] = job.get("stations")
+                elif job.get("experience"):
                     # Director job: point the client at the Experience Spec
                     out["experience_url"] = f"/artifacts/{job['experience']}"
                     out["usdz_base"] = "/artifacts/"

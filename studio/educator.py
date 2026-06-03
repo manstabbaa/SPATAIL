@@ -91,11 +91,34 @@ def run(brief_path: Path):
     print("    open http://localhost:5180/studio/viewer/studio.html")
 
 
+def run_representation(question: str):
+    """Route the question through the Representation Engine instead of the Blender
+    build: emit the Experience Plan + Asset Request Manifest + Runtime Scene
+    Contract + Progressive Load Plan as data the runtime consumes. Additive — the
+    default educator path (run) is unchanged."""
+    sys.path.insert(0, str(STUDIO))
+    from representation import job_entry
+    out_dir = STUDIO / "out" / "representation"
+    res = job_entry.run_job(question, slugify(question), out_dir,
+                            on_stage=lambda s: print(f"[educator] {s}"))
+    print(f"[educator] representation ready: {res['title']!r} "
+          f"({res['domain']}/{res['intent']}/{res['strategy']}, {res['stations']} assets)")
+    for label, key in (("plan", "plan_name"), ("runtime", "runtime_name"),
+                       ("delivery", "delivery_name"), ("progressive", "progressive_name")):
+        print(f"    {label:11}: {out_dir / res[key]}")
+
+
 def main():
     ap = argparse.ArgumentParser(description="SPATAIL EDUCATOR — ask anything, get a spatial demo.")
     ap.add_argument("question", help="what to explain, in plain language")
     ap.add_argument("--image", default=None, help="optional reference image path")
+    ap.add_argument("--representation", action="store_true",
+                    help="route through the Representation Engine (Experience Plan + "
+                         "Asset Request Manifest + Runtime Scene Contract + progressive "
+                         "plan) instead of the deterministic Blender build")
     a = ap.parse_args()
+    if a.representation:
+        return run_representation(a.question)
     brief_path = make_brief(a.question, a.image)
     print(f"[educator] brief: {brief_path}")
     run(brief_path)

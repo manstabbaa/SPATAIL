@@ -1,6 +1,6 @@
 {
   "category": "generated",
-  "count": 118,
+  "count": 113,
   "assets": [
     {
       "assetId": "cube",
@@ -4257,6 +4257,95 @@
       }
     },
     {
+      "assetId": "colosseum",
+      "name": "Roman Colosseum",
+      "category": "architecture",
+      "semanticTags": [
+        "colosseum",
+        "amphitheater",
+        "arena",
+        "roman",
+        "stadium",
+        "ruins"
+      ],
+      "path": "/assets/spatail-library/architecture/colosseum.glb",
+      "usdzPath": "/assets/spatail-library/architecture/colosseum.usdz",
+      "scaleMeters": [
+        0.6,
+        0.28,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.6,
+          0.28,
+          0.5
+        ]
+      }
+    },
+    {
+      "assetId": "skyscraper",
+      "name": "Skyscraper",
+      "category": "architecture",
+      "semanticTags": [
+        "skyscraper",
+        "tower",
+        "highrise",
+        "building",
+        "office"
+      ],
+      "path": "/assets/spatail-library/architecture/skyscraper.glb",
+      "usdzPath": "/assets/spatail-library/architecture/skyscraper.usdz",
+      "scaleMeters": [
+        0.32,
+        1.2,
+        0.32
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.32,
+          1.2,
+          0.32
+        ]
+      }
+    },
+    {
       "assetId": "tv_55_inch",
       "name": "TV 55\"",
       "category": "product-preview",
@@ -4697,289 +4786,6 @@
           0.12,
           0.02,
           0.12
-        ]
-      }
-    },
-    {
-      "assetId": "generic_object_placeholder",
-      "name": "Generic Object Placeholder",
-      "category": "placeholders",
-      "semanticTags": [
-        "placeholder",
-        "generic",
-        "loading"
-      ],
-      "path": "/assets/spatail-library/placeholders/generic_object_placeholder.glb",
-      "usdzPath": "/assets/spatail-library/placeholders/generic_object_placeholder.usdz",
-      "scaleMeters": [
-        0.3,
-        0.3,
-        0.3
-      ],
-      "pivot": "center_bottom",
-      "placementTypes": [
-        "table",
-        "floor",
-        "floating"
-      ],
-      "representationUses": [
-        "real_scale_preview",
-        "guided_tour"
-      ],
-      "supportsHighlight": true,
-      "supportsTransparency": true,
-      "supportsAnimation": true,
-      "fallbackPrimitive": "cube",
-      "qualityLevel": "generated",
-      "license": "internal_generated",
-      "assetState": "generated",
-      "boundingBoxMeters": {
-        "size": [
-          0.3,
-          0.3,
-          0.3
-        ]
-      }
-    },
-    {
-      "assetId": "mechanical_placeholder",
-      "name": "Mechanical Placeholder",
-      "category": "placeholders",
-      "semanticTags": [
-        "placeholder",
-        "mechanical"
-      ],
-      "path": "/assets/spatail-library/placeholders/mechanical_placeholder.glb",
-      "usdzPath": "/assets/spatail-library/placeholders/mechanical_placeholder.usdz",
-      "scaleMeters": [
-        0.3,
-        0.3,
-        0.3
-      ],
-      "pivot": "center_bottom",
-      "placementTypes": [
-        "table",
-        "floor",
-        "floating"
-      ],
-      "representationUses": [
-        "real_scale_preview",
-        "guided_tour"
-      ],
-      "supportsHighlight": true,
-      "supportsTransparency": true,
-      "supportsAnimation": true,
-      "fallbackPrimitive": "cylinder",
-      "qualityLevel": "generated",
-      "license": "internal_generated",
-      "assetState": "generated",
-      "boundingBoxMeters": {
-        "size": [
-          0.3,
-          0.3,
-          0.3
-        ]
-      }
-    },
-    {
-      "assetId": "biological_placeholder",
-      "name": "Biological Placeholder",
-      "category": "placeholders",
-      "semanticTags": [
-        "placeholder",
-        "biology"
-      ],
-      "path": "/assets/spatail-library/placeholders/biological_placeholder.glb",
-      "usdzPath": "/assets/spatail-library/placeholders/biological_placeholder.usdz",
-      "scaleMeters": [
-        0.3,
-        0.3,
-        0.3
-      ],
-      "pivot": "center_bottom",
-      "placementTypes": [
-        "table",
-        "floor",
-        "floating"
-      ],
-      "representationUses": [
-        "real_scale_preview",
-        "guided_tour"
-      ],
-      "supportsHighlight": true,
-      "supportsTransparency": true,
-      "supportsAnimation": true,
-      "fallbackPrimitive": "sphere",
-      "qualityLevel": "generated",
-      "license": "internal_generated",
-      "assetState": "generated",
-      "boundingBoxMeters": {
-        "size": [
-          0.3,
-          0.3,
-          0.3
-        ]
-      }
-    },
-    {
-      "assetId": "architecture_placeholder",
-      "name": "Architecture Placeholder",
-      "category": "placeholders",
-      "semanticTags": [
-        "placeholder",
-        "architecture"
-      ],
-      "path": "/assets/spatail-library/placeholders/architecture_placeholder.glb",
-      "usdzPath": "/assets/spatail-library/placeholders/architecture_placeholder.usdz",
-      "scaleMeters": [
-        0.5,
-        0.5,
-        0.5
-      ],
-      "pivot": "center_bottom",
-      "placementTypes": [
-        "table",
-        "floor",
-        "floating"
-      ],
-      "representationUses": [
-        "real_scale_preview",
-        "guided_tour"
-      ],
-      "supportsHighlight": true,
-      "supportsTransparency": true,
-      "supportsAnimation": true,
-      "fallbackPrimitive": "cube",
-      "qualityLevel": "generated",
-      "license": "internal_generated",
-      "assetState": "generated",
-      "boundingBoxMeters": {
-        "size": [
-          0.5,
-          0.5,
-          0.5
-        ]
-      }
-    },
-    {
-      "assetId": "product_placeholder",
-      "name": "Product Placeholder",
-      "category": "placeholders",
-      "semanticTags": [
-        "placeholder",
-        "product"
-      ],
-      "path": "/assets/spatail-library/placeholders/product_placeholder.glb",
-      "usdzPath": "/assets/spatail-library/placeholders/product_placeholder.usdz",
-      "scaleMeters": [
-        0.3,
-        0.3,
-        0.3
-      ],
-      "pivot": "center_bottom",
-      "placementTypes": [
-        "table",
-        "floor",
-        "floating"
-      ],
-      "representationUses": [
-        "real_scale_preview",
-        "guided_tour"
-      ],
-      "supportsHighlight": true,
-      "supportsTransparency": true,
-      "supportsAnimation": true,
-      "fallbackPrimitive": "rounded_cube",
-      "qualityLevel": "generated",
-      "license": "internal_generated",
-      "assetState": "generated",
-      "boundingBoxMeters": {
-        "size": [
-          0.3,
-          0.3,
-          0.3
-        ]
-      }
-    },
-    {
-      "assetId": "planet_placeholder",
-      "name": "Planet Placeholder",
-      "category": "placeholders",
-      "semanticTags": [
-        "placeholder",
-        "planet",
-        "astronomy"
-      ],
-      "path": "/assets/spatail-library/placeholders/planet_placeholder.glb",
-      "usdzPath": "/assets/spatail-library/placeholders/planet_placeholder.usdz",
-      "scaleMeters": [
-        0.3,
-        0.3,
-        0.3
-      ],
-      "pivot": "center",
-      "placementTypes": [
-        "table",
-        "floor",
-        "floating"
-      ],
-      "representationUses": [
-        "real_scale_preview",
-        "guided_tour"
-      ],
-      "supportsHighlight": true,
-      "supportsTransparency": true,
-      "supportsAnimation": true,
-      "fallbackPrimitive": "sphere",
-      "qualityLevel": "generated",
-      "license": "internal_generated",
-      "assetState": "generated",
-      "boundingBoxMeters": {
-        "size": [
-          0.3,
-          0.3,
-          0.3
-        ]
-      }
-    },
-    {
-      "assetId": "process_placeholder",
-      "name": "Process Placeholder",
-      "category": "placeholders",
-      "semanticTags": [
-        "placeholder",
-        "process",
-        "flow"
-      ],
-      "path": "/assets/spatail-library/placeholders/process_placeholder.glb",
-      "usdzPath": "/assets/spatail-library/placeholders/process_placeholder.usdz",
-      "scaleMeters": [
-        0.3,
-        0.3,
-        0.3
-      ],
-      "pivot": "center_bottom",
-      "placementTypes": [
-        "table",
-        "floor",
-        "floating"
-      ],
-      "representationUses": [
-        "real_scale_preview",
-        "guided_tour"
-      ],
-      "supportsHighlight": true,
-      "supportsTransparency": true,
-      "supportsAnimation": true,
-      "fallbackPrimitive": "cylinder",
-      "qualityLevel": "generated",
-      "license": "internal_generated",
-      "assetState": "generated",
-      "boundingBoxMeters": {
-        "size": [
-          0.3,
-          0.3,
-          0.3
         ]
       }
     }

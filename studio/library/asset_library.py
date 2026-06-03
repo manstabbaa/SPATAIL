@@ -4,10 +4,9 @@ Loads the JSON manifests built by build_library.py and answers:
   find_asset(domain, semantic_tags, representation_use) -> AssetMatch
   resolve(asset_id, subject, domain, semantic_role, strategy) -> Resolution
 
-Resolution tiers (the spec's hierarchy):
+Resolution tiers (NO placeholders — every miss becomes real geometry):
   library    — an exact/close catalog asset that has a real GLB (assetState generated/cached)
   primitive  — best semantic catalog match; use its fallbackPrimitive + scale + pivot
-  placeholder— a per-domain placeholder shown immediately
   generate   — nothing fit; hand off to the Blender factory (which then register_generated)
 
 Mirrors the proven engineexplainer/.../asset_library.py pattern (keyword scorer +
@@ -35,19 +34,6 @@ DOMAIN_TO_CATEGORIES = {
     "data_visualization": ["data-visualization"],
     "educational": ["education"],
     "general_knowledge": [],
-}
-
-DOMAIN_TO_PLACEHOLDER = {
-    "mechanical": "mechanical_placeholder",
-    "biological": "biological_placeholder",
-    "scientific": "planet_placeholder",
-    "architectural": "architecture_placeholder",
-    "product": "product_placeholder",
-    "manufacturing": "mechanical_placeholder",
-    "data_visualization": "data_placeholder",
-    "educational": "generic_object_placeholder",
-    "historical": "generic_object_placeholder",
-    "general_knowledge": "generic_object_placeholder",
 }
 
 _FLOOR = 1.5            # minimum score to claim a semantic (non-placeholder) match
@@ -80,7 +66,7 @@ class AssetMatch:
 
 @dataclass
 class Resolution:
-    source: str                 # library | primitive | placeholder | generate
+    source: str                 # library | primitive | generate
     libraryAssetId: str = ""
     glbPath: str = ""           # web path if a real GLB exists
     usdzPath: str = ""          # web path to the cached USDZ (for the iOS runtime)
@@ -206,15 +192,10 @@ class AssetLibrary:
                               pivot=a.get("pivot", "center"),
                               reason=f"primitive enriched by {a['assetId']} ({m.reason})")
 
-        ph_id = DOMAIN_TO_PLACEHOLDER.get(domain or "", "generic_object_placeholder")
-        ph = self.assets.get(ph_id)
-        if ph:
-            return Resolution(source="placeholder", libraryAssetId=ph_id,
-                              fallbackPrimitive=ph.get("fallbackPrimitive", "cube"),
-                              scaleMeters=ph.get("scaleMeters", [0.3, 0.3, 0.3]),
-                              pivot=ph.get("pivot", "center_bottom"),
-                              reason=f"no semantic match (best {m.score:.2f} < {_FLOOR}) -> {ph_id}")
-        return Resolution(source="generate", reason="no library or placeholder match -> generate")
+        # NO PLACEHOLDERS: nothing in the library fit → hand off to the Blender factory
+        # to MAKE it; register_generated() then feeds the result back as a library asset.
+        return Resolution(source="generate",
+                          reason=f"no library match (best {m.score:.2f} < {_FLOOR}) -> generate in Blender")
 
     # -- tier-5 feedback: a generated asset becomes a library asset -----------
     def register_generated(self, asset_id: str, glb_path: str, *,

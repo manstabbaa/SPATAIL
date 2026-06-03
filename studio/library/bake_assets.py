@@ -17,9 +17,24 @@ import bpy
 import json
 import sys
 import math
+import random
 from pathlib import Path
 
 from mathutils import Vector
+
+# Make the sibling builders.py importable when Blender runs this script directly
+# (blender --background --python studio/library/bake_assets.py). builders.BUILDERS
+# maps assetId -> a detailed multi-part model builder; when present we use it
+# instead of a primitive, so the library holds recognizable geometry, not boxes.
+try:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+except Exception:
+    pass
+try:
+    import builders  # noqa: E402
+except Exception as _e:  # pragma: no cover
+    builders = None
+    print(f"[bake] builders.py unavailable — primitive fallback only: {_e!r}")
 
 # ── colours (Principled base color rgba) ─────────────────────────────────────
 _CAT_COLOR = {
@@ -141,25 +156,78 @@ def _compose(asset_id: str):
     return None
 
 
-def _build(entry):
-    composed = _compose(entry["assetId"])
-    obj = _join(composed) if composed else _prim(entry.get("fallbackPrimitive"))
-    if obj is None:
-        raise RuntimeError("no geometry")
-    # size to the target bounding box (metres), then seat by pivot
-    dims = entry.get("scaleMeters") or [0.2, 0.2, 0.2]
-    dims = [max(float(d), 0.01) for d in dims]
-    bpy.context.view_layer.update()
-    obj.dimensions = Vector(dims)
+def _seat(obj, pivot):
+    """Centre X/Y; rest on z=0 (center_bottom) or centre on Z (anything else)."""
     bpy.context.view_layer.update()
     bb = [obj.matrix_world @ Vector(c) for c in obj.bound_box]
     xs = [v.x for v in bb]; ys = [v.y for v in bb]; zs = [v.z for v in bb]
     cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
-    if (entry.get("pivot") or "center_bottom") == "center_bottom":
+    if (pivot or "center_bottom") == "center_bottom":
         obj.location -= Vector((cx, cy, min(zs)))            # centre X/Y, rest on z=0
     else:
         obj.location -= Vector((cx, cy, (min(zs) + max(zs)) / 2))
     bpy.context.view_layer.update()
+
+
+def _apply_and_join(objs):
+    """Apply every part's modifiers (BEVEL/DISPLACE/SUBSURF) THEN join — a plain
+    join would drop the modifiers of the non-active parts. Preserves all the
+    per-part materials the builder assigned (join keeps material slots)."""
+    objs = [o for o in objs if o]
+    if not objs:
+        return None
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+    try:
+        bpy.ops.object.convert(target="MESH")               # bakes modifiers per-part
+    except Exception as e:  # noqa: BLE001
+        print(f"[bake] convert warning: {e!r}")
+    if len(objs) > 1:
+        bpy.ops.object.join()
+    return bpy.context.active_object
+
+
+def _fit_uniform(obj, entry):
+    """Scale UNIFORMLY so the largest dimension equals max(scaleMeters) — keeps the
+    builder's real proportions (a crankshaft stays long, a planet stays round)
+    instead of stretching it to fill a box. Then seat by pivot."""
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True); bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+    bpy.context.view_layer.update()
+    dims = [max(float(d), 0.01) for d in (entry.get("scaleMeters") or [0.2, 0.2, 0.2])]
+    cur = obj.dimensions
+    cur_max = max(cur.x, cur.y, cur.z) or 1.0
+    s = max(dims) / cur_max
+    obj.scale = (s, s, s)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    _seat(obj, entry.get("pivot"))
+
+
+def _build(entry):
+    aid = entry["assetId"]
+    if builders is not None and aid in builders.BUILDERS:
+        try:
+            random.seed(aid)                                # deterministic re-bakes
+        except Exception:
+            pass
+        parts = builders.BUILDERS[aid]()
+        obj = _apply_and_join(parts)
+        if obj is None:
+            raise RuntimeError("builder produced no geometry")
+        _fit_uniform(obj, entry)
+        return obj                                          # keep the builder's materials
+    # ── fallback: composed primitive recipe, or the plain fallbackPrimitive ──
+    composed = _compose(aid)
+    obj = _join(composed) if composed else _prim(entry.get("fallbackPrimitive"))
+    if obj is None:
+        raise RuntimeError("no geometry")
+    dims = [max(float(d), 0.01) for d in (entry.get("scaleMeters") or [0.2, 0.2, 0.2])]
+    bpy.context.view_layer.update()
+    obj.dimensions = Vector(dims)
+    _seat(obj, entry.get("pivot"))
     _material(obj, entry)
     return obj
 

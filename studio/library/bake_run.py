@@ -48,11 +48,9 @@ CURATED = [
     "neptune", "orbit_ring", "asteroid",
     "bridge_deck", "bridge_pillar", "suspension_cable", "cable_stayed_tower",
     "foundation_block", "truss_segment", "column", "beam", "steel_i_beam", "floor_slab",
-    "arch", "brick", "traffic_cone", "wall_segment",
+    "arch", "brick", "traffic_cone", "wall_segment", "colosseum", "skyscraper",
     "tv_55_inch", "phone", "laptop", "monitor", "speaker", "chair", "sofa", "desk",
     "bar_chart_bar", "axis_line", "percentage_ring",
-    "generic_object_placeholder", "mechanical_placeholder", "biological_placeholder",
-    "architecture_placeholder", "product_placeholder", "planet_placeholder", "process_placeholder",
 ]
 
 

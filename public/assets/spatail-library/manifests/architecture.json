@@ -1,6 +1,6 @@
 {
   "category": "architecture",
-  "count": 32,
+  "count": 34,
   "assets": [
     {
       "assetId": "wall_segment",
@@ -553,6 +553,79 @@
         0.2,
         1.5,
         0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "colosseum",
+      "name": "Roman Colosseum",
+      "category": "architecture",
+      "semanticTags": [
+        "colosseum",
+        "amphitheater",
+        "arena",
+        "roman",
+        "stadium",
+        "ruins"
+      ],
+      "path": "/assets/spatail-library/architecture/colosseum.glb",
+      "scaleMeters": [
+        0.6,
+        0.28,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "skyscraper",
+      "name": "Skyscraper",
+      "category": "architecture",
+      "semanticTags": [
+        "skyscraper",
+        "tower",
+        "highrise",
+        "building",
+        "office"
+      ],
+      "path": "/assets/spatail-library/architecture/skyscraper.glb",
+      "scaleMeters": [
+        0.32,
+        1.2,
+        0.32
       ],
       "pivot": "center_bottom",
       "placementTypes": [

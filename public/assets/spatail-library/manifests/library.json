@@ -11,7 +11,7 @@
     "biology": 36,
     "physics": 33,
     "astronomy": 23,
-    "architecture": 32,
+    "architecture": 34,
     "furniture": 28,
     "product-preview": 22,
     "data-visualization": 24,
@@ -4830,6 +4830,45 @@
       ]
     },
     {
+      "assetId": "colosseum",
+      "category": "architecture",
+      "semanticTags": [
+        "colosseum",
+        "amphitheater",
+        "arena",
+        "roman",
+        "stadium",
+        "ruins"
+      ],
+      "path": "/assets/spatail-library/architecture/colosseum.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "skyscraper",
+      "category": "architecture",
+      "semanticTags": [
+        "skyscraper",
+        "tower",
+        "highrise",
+        "building",
+        "office"
+      ],
+      "path": "/assets/spatail-library/architecture/skyscraper.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
       "assetId": "bridge_truss",
       "category": "architecture",
       "semanticTags": [
@@ -6804,5 +6843,5 @@
       ]
     }
   ],
-  "total": 410
+  "total": 412
 }

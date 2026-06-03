@@ -485,6 +485,8 @@ CATEGORIES = {
             ("bridge_pillar", "Bridge Pillar", ["bridge", "pillar", "pier"], {"fallbackPrimitive": "cylinder", "scaleMeters": [0.2, 1.0, 0.2]}),
             ("suspension_cable", "Suspension Cable", ["bridge", "cable", "suspension"], {"fallbackPrimitive": "cylinder", "scaleMeters": [0.02, 1.0, 0.02]}),
             ("cable_stayed_tower", "Cable-Stayed Tower", ["bridge", "tower", "pylon"], {"scaleMeters": [0.2, 1.5, 0.2]}),
+            ("colosseum", "Roman Colosseum", ["colosseum", "amphitheater", "arena", "roman", "stadium", "ruins"], {"scaleMeters": [0.6, 0.28, 0.5]}),
+            ("skyscraper", "Skyscraper", ["skyscraper", "tower", "highrise", "building", "office"], {"scaleMeters": [0.32, 1.2, 0.32]}),
             ("bridge_truss", "Bridge Truss", ["bridge", "truss", "frame"], {"scaleMeters": [1.0, 0.4, 0.1]}),
             ("road_segment", "Road Segment", ["road", "asphalt", "lane"], {"fallbackPrimitive": "plane", "scaleMeters": [1.0, 0.02, 0.5]}),
             ("sidewalk_segment", "Sidewalk Segment", ["sidewalk", "pavement"], {"fallbackPrimitive": "cube", "scaleMeters": [1.0, 0.05, 0.3]}),

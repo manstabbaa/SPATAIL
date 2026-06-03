@@ -62,7 +62,8 @@ DOMAIN_SIGNALS = {
     "architectural": [
         "building", "bridge", "house", "structure", "beam", "truss", "arch",
         "skyscraper", "floor plan", "column", "foundation", "roof", "dome",
-        "tower", "facade", "cantilever",
+        "tower", "facade", "cantilever", "colosseum", "amphitheater", "amphitheatre",
+        "aqueduct", "monument", "cathedral", "stadium", "arena",
     ],
     "historical": [
         "history", "ancient", "war", "empire", "century", "era", "dynasty",

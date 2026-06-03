@@ -161,6 +161,27 @@ def _worker() -> None:
                 )
                 print(f"[job] {job_id} done -> representation {res.get('title')!r} "
                       f"({res.get('strategy')}, {res.get('stations')} assets)", flush=True)
+            elif job.get("mode") == "educational":
+                # Educational Wrapper: a selected concept -> EducationalExperiencePlan,
+                # reusing the representation pipeline (same runtime contract artifacts).
+                if job_entry is None:
+                    raise RuntimeError("educational mode unavailable on this server")
+                res = job_entry.run_educational_job(
+                    job.get("selectedText") or job["prompt"], job_id, ARTIFACTS,
+                    surrounding_context=job.get("surroundingContext") or "",
+                    learning_goal=job.get("learningGoal"),
+                    on_stage=lambda s, _id=job_id: _update(_id, stage=s),
+                )
+                _update(
+                    job_id, status="done", stage="ready", message=None,
+                    representation=res["experience_name"], runtime=res["runtime_name"],
+                    delivery=res["delivery_name"], progressive=res["progressive_name"],
+                    plan_artifact=res["plan_name"], educational=res["educational_name"],
+                    title=res.get("title"), stations=res.get("stations"),
+                    concept=res.get("conceptId"), finished=time.time(),
+                )
+                print(f"[job] {job_id} done -> educational {res.get('conceptId')!r} "
+                      f"({res.get('strategy')})", flush=True)
             elif job.get("mode") == "experience":
                 # Director: prompt -> multi-station Experience Spec + N USDZs
                 res = director.generate_experience(
@@ -229,10 +250,11 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(400, obj={"error": "missing 'prompt'"})
         # mode: "experience" -> Director (multi-station); anything else -> single object.
         mode = data.get("mode")
-        if mode not in ("experience", "object", "representation", None):
+        if mode not in ("experience", "object", "representation", "educational", None):
             mode = None
         prefix = ("exp_" if mode == "experience"
-                  else "rep_" if mode == "representation" else "job_")
+                  else "rep_" if mode == "representation"
+                  else "edu_" if mode == "educational" else "job_")
         job_id = prefix + uuid.uuid4().hex[:8]
         with _LOCK:
             _JOBS[job_id] = {
@@ -240,6 +262,10 @@ class Handler(BaseHTTPRequestHandler):
                 "message": None, "prompt": prompt, "mode": mode,
                 "client": data.get("client"), "created": time.time(),
                 "usdz": None, "metadata": None,
+                # educational wrapper inputs (mode == "educational"):
+                "selectedText": data.get("selectedText"),
+                "surroundingContext": data.get("surroundingContext"),
+                "learningGoal": data.get("learningGoal"),
             }
         _QUEUE.put(job_id)
         print(f"[job] {job_id} queued: {prompt!r}", flush=True)
@@ -274,13 +300,16 @@ class Handler(BaseHTTPRequestHandler):
             }
             if job["status"] == "done":
                 if job.get("representation"):
-                    # Representation Engine job: plan + manifest + runtime + progressive
+                    # Representation / Educational job: plan + manifest + runtime + progressive
                     out["runtime_url"] = f"/artifacts/{job['runtime']}"
                     out["delivery_url"] = f"/artifacts/{job['delivery']}"
                     out["progressive_url"] = f"/artifacts/{job['progressive']}"
                     out["plan_url"] = f"/artifacts/{job.get('plan_artifact')}"
                     out["title"] = job.get("title")
                     out["stations"] = job.get("stations")
+                    if job.get("educational"):
+                        out["educational_url"] = f"/artifacts/{job['educational']}"
+                        out["concept"] = job.get("concept")
                 elif job.get("experience"):
                     # Director job: point the client at the Experience Spec
                     out["experience_url"] = f"/artifacts/{job['experience']}"

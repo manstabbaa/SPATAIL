@@ -24,8 +24,9 @@ class RepresentationEngine:
         use_llm). Sufficient to render the <1 s placeholder scene."""
         return self._planner.plan(prompt, experience_id=experience_id)
 
-    def run(self, prompt: str, *,
-            experience_id: str | None = None) -> tuple[ExperiencePlan, AssetRequestManifest]:
-        plan = self._planner.plan(prompt, experience_id=experience_id)
+    def run(self, prompt: str, *, experience_id: str | None = None,
+            strategy_override: str | None = None) -> tuple[ExperiencePlan, AssetRequestManifest]:
+        plan = self._planner.plan(prompt, experience_id=experience_id,
+                                  strategy_override=strategy_override)
         manifest = build_manifest(plan)
         return plan, manifest

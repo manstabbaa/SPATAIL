@@ -1,0 +1,637 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "gravity pulls objects toward Earth",
+  "surroundingContext": "Gravity pulls objects toward Earth because Earth has mass and attracts nearby objects. When an object like an apple is unsupported, gravity causes it to accelerate downward. The apple does not move because it wants to go down; it moves because a force acts on it.\n\nA spatial scene should make the invisible force visible. The apple, Earth, ground, and a force arrow are enough for the first version. Later, SPATAIL can add a path trail, a velocity arrow, and a comparison mode showing different planets.",
+  "learningGoal": "Show why unsupported objects accelerate downward near Earth.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "cause_effect_visualization",
+  "conceptId": "gravity",
+  "spatailPrompt": "Create an educational spatial explanation of \"gravity pulls objects toward Earth\". Learning goal: Show why unsupported objects accelerate downward near Earth. Prefer a cause effect visualization with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"Gravity pulls objects toward Earth because Earth has mass and attracts nearby objects. When an object like an apple is unsupported, gravity causes it to accelerate downward. The apple does not move because it wants to go down; it moves because a force acts on it.\n\nA spatial scene should make the invisible force visible. The apple, Earth, ground, and a force arrow are enough for the first version. \".",
+  "experienceBeats": [
+    "Place an apple above the ground",
+    "Draw a force arrow toward Earth",
+    "Animate the apple falling",
+    "Compare weak and strong gravity arrows",
+    "Reset and replay the fall"
+  ],
+  "interactions": [
+    "step_through_explanation",
+    "tap_to_highlight",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_gravity",
+    "domain": "scientific",
+    "intent": "explain",
+    "strategy": "cause_and_effect",
+    "subject": "Gravity",
+    "placement": {
+      "anchor": "floor",
+      "layout": "cluster",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.95,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> cause_and_effect. Stage a trigger and its consequence so the link is seen, not told — best for mechanisms of influence.",
+    "experienceBeats": [
+      {
+        "id": "place_an_apple_above_the_ground",
+        "title": "Place an apple above the ground",
+        "narration": "Place an apple above the ground",
+        "focus": "gravity",
+        "reveal": "auto"
+      },
+      {
+        "id": "draw_a_force_arrow_toward_earth",
+        "title": "Draw a force arrow toward Earth",
+        "narration": "Draw a force arrow toward Earth",
+        "focus": "gravity",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_the_apple_falling",
+        "title": "Animate the apple falling",
+        "narration": "Animate the apple falling",
+        "focus": "gravity",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "compare_weak_and_strong_gravity_arrows",
+        "title": "Compare weak and strong gravity arrows",
+        "narration": "Compare weak and strong gravity arrows",
+        "focus": "gravity",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "reset_and_replay_the_fall",
+        "title": "Reset and replay the fall",
+        "narration": "Reset and replay the fall",
+        "focus": "gravity",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "gravity",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "gravity_context",
+        "type": "environment",
+        "priority": 2
+      }
+    ],
+    "requiredAnimations": [],
+    "interactions": [
+      {
+        "id": "reveal",
+        "type": "tap_reveal",
+        "label": "Tap to reveal more",
+        "params": {}
+      },
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        }
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_gravity",
+    "subject": "Gravity",
+    "strategy": "cause_and_effect",
+    "assetRequests": [
+      {
+        "assetId": "gravity",
+        "description": "complete Gravity, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "default"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "gravity_context",
+        "description": "contextual environment / staging for the Gravity",
+        "semanticRole": "context_environment",
+        "requiredVariants": [
+          "default"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T17:48:40.362757+00:00",
+    "sceneId": "edu_gravity",
+    "title": "Gravity",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"gravity pulls objects toward Earth\". Learning goal: Show why unsupported objects accelerate downward near Earth. Prefer a cause effect visualization with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"Gravity pulls objects toward Earth because Earth has mass and attracts nearby objects. When an object like an apple is unsupported, gravity causes it to accelerate downward. The apple does not move because it wants to go down; it moves because a force acts on it.\n\nA spatial scene should make the invisible force visible. The apple, Earth, ground, and a force arrow are enough for the first version. \".",
+      "subject": "Gravity",
+      "domain": "scientific",
+      "intent": "explain",
+      "strategy": "cause_and_effect"
+    },
+    "domain": {
+      "name": "scientific",
+      "confidence": "high",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "scientific",
+      "intent": "explain",
+      "strategy": "cause_and_effect",
+      "subject": "Gravity",
+      "reasoning": "caller override -> cause_and_effect. Stage a trigger and its consequence so the link is seen, not told — best for mechanisms of influence.",
+      "domainConfidence": 0.95,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "floor",
+      "layout": "cluster",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": null,
+        "fps": 30,
+        "loop": true,
+        "count": 0
+      },
+      "bbox": {
+        "min": [
+          -0.04,
+          0.0,
+          -0.04
+        ],
+        "max": [
+          0.04,
+          0.08,
+          0.04
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 2.5,
+      "baseline_z_m": 0.9186
+    },
+    "staging": {
+      "distance_m": 2.5,
+      "spread_deg": 30.0,
+      "reasoning": "2 exhibit(s) on a cluster at 2.5 m, dropped 12.0 deg along the natural gaze; anchor=floor."
+    },
+    "beats": [
+      {
+        "id": "place_an_apple_above_the_ground",
+        "title": "Place an apple above the ground",
+        "narration": "Place an apple above the ground",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "draw_a_force_arrow_toward_earth",
+        "title": "Draw a force arrow toward Earth",
+        "narration": "Draw a force arrow toward Earth",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_the_apple_falling",
+        "title": "Animate the apple falling",
+        "narration": "Animate the apple falling",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "compare_weak_and_strong_gravity_arrows",
+        "title": "Compare weak and strong gravity arrows",
+        "narration": "Compare weak and strong gravity arrows",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "reset_and_replay_the_fall",
+        "title": "Reset and replay the fall",
+        "narration": "Reset and replay the fall",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "place_an_apple_above_the_ground",
+        "title": "Place an apple above the ground",
+        "description": "Place an apple above the ground",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "draw_a_force_arrow_toward_earth",
+        "title": "Draw a force arrow toward Earth",
+        "description": "Draw a force arrow toward Earth",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "animate_the_apple_falling",
+        "title": "Animate the apple falling",
+        "description": "Animate the apple falling",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "compare_weak_and_strong_gravity_arrows",
+        "title": "Compare weak and strong gravity arrows",
+        "description": "Compare weak and strong gravity arrows",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "reset_and_replay_the_fall",
+        "title": "Reset and replay the fall",
+        "description": "Reset and replay the fall",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "reveal",
+        "type": "tap_reveal",
+        "label": "Tap to reveal more",
+        "params": {},
+        "trigger": "on_tap"
+      },
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        },
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "gravity",
+        "role": "primary_object",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.08,
+          "h": 0.08,
+          "d": 0.08
+        },
+        "position_yup": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true
+      },
+      {
+        "id": "gravity_context",
+        "role": "environment",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.08,
+          "h": 0.08,
+          "d": 0.08
+        },
+        "position_yup": [
+          0.647,
+          0.9186,
+          -2.4148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "gravity pulls objects toward Earth",
+      "surroundingContext": "Gravity pulls objects toward Earth because Earth has mass and attracts nearby objects. When an object like an apple is unsupported, gravity causes it to accelerate downward. The apple does not move because it wants to go down; it moves because a force acts on it.\n\nA spatial scene should make the invisible force visible. The apple, Earth, ground, and a force arrow are enough for the first version. Later, SPATAIL can add a path trail, a velocity arrow, and a comparison mode showing different planets.",
+      "learningGoal": "Show why unsupported objects accelerate downward near Earth.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "cause_effect_visualization",
+      "conceptId": "gravity",
+      "spatailPrompt": "Create an educational spatial explanation of \"gravity pulls objects toward Earth\". Learning goal: Show why unsupported objects accelerate downward near Earth. Prefer a cause effect visualization with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"Gravity pulls objects toward Earth because Earth has mass and attracts nearby objects. When an object like an apple is unsupported, gravity causes it to accelerate downward. The apple does not move because it wants to go down; it moves because a force acts on it.\n\nA spatial scene should make the invisible force visible. The apple, Earth, ground, and a force arrow are enough for the first version. \"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_gravity",
+    "assets": [
+      {
+        "assetId": "gravity",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.04,
+              -0.04,
+              0.0
+            ],
+            "max": [
+              0.04,
+              0.04,
+              0.08
+            ],
+            "size": [
+              0.08,
+              0.08,
+              0.08
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.04
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.08,
+            0.08,
+            0.08
+          ]
+        },
+        "status": "primitive",
+        "source": "primitive",
+        "libraryAssetId": "apple",
+        "fallbackPrimitive": "sphere"
+      },
+      {
+        "assetId": "gravity_context",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.04,
+              -0.04,
+              0.0
+            ],
+            "max": [
+              0.04,
+              0.04,
+              0.08
+            ],
+            "size": [
+              0.08,
+              0.08,
+              0.08
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.04
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "context_environment",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.08,
+            0.08,
+            0.08
+          ]
+        },
+        "status": "primitive",
+        "source": "primitive",
+        "libraryAssetId": "apple",
+        "fallbackPrimitive": "sphere"
+      }
+    ],
+    "animations": []
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "gravity"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream gravity",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "gravity"
+          ],
+          "unlocks": [
+            "swap_placeholder:gravity"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream gravity_context",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "gravity_context"
+          ],
+          "unlocks": [
+            "swap_placeholder:gravity_context"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "interaction:reveal",
+            "interaction:play_pause"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "floor",
+      "title": "Gravity",
+      "firstBeat": "Place an apple above the ground",
+      "placeholders": [
+        {
+          "assetId": "gravity",
+          "primitive": "box",
+          "position_yup": [
+            -0.647,
+            0.9186,
+            -2.4148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "gravity"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "reveal": {
+        "enabledAfterPhase": 3,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "gravity",
+          "gravity_context"
+        ]
+      },
+      "play_pause": {
+        "enabledAfterPhase": 3,
+        "type": "play_baked",
+        "targetAssets": [
+          "gravity",
+          "gravity_context"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "reveal",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "play_pause",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

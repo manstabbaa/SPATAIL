@@ -202,10 +202,16 @@ class ExperiencePlanner:
         self._intent = IntentClassifier(use_llm=use_llm)
         self._strategy = StrategySelector()
 
-    def plan(self, prompt: str, *, experience_id: str | None = None) -> ExperiencePlan:
+    def plan(self, prompt: str, *, experience_id: str | None = None,
+             strategy_override: str | None = None) -> ExperiencePlan:
         domain, dconf, dsrc = self._domain.classify(prompt)
         intent, iconf, isrc = self._intent.classify(prompt, domain)
-        strategy, reasoning = self._strategy.select(prompt, domain, intent)
+        if strategy_override and strategy_override in taxonomy.STRATEGIES:
+            strategy = strategy_override
+            reasoning = (f"caller override -> {strategy}. "
+                         + taxonomy.STRATEGY_CITATIONS.get(strategy, ""))
+        else:
+            strategy, reasoning = self._strategy.select(prompt, domain, intent)
 
         subject = _subject_of(prompt)
         placement = _placement_of(prompt, domain)

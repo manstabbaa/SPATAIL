@@ -1,0 +1,657 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "photosynthesis",
+  "surroundingContext": "Photosynthesis is the process plants use to convert light energy into stored chemical energy. In a simplified explanation, sunlight reaches the leaf, water enters through the roots, and carbon dioxide enters through small openings in the leaf. Inside chloroplasts, the plant uses these inputs to form glucose and release oxygen.\n\nA good spatial explanation should not only show a plant. It should show the flow of matter and energy: inputs moving toward the leaf and outputs leaving it. This makes the invisible chemical process easier to understand in space.",
+  "learningGoal": "Explain how plants transform light energy into chemical energy.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "animated_process",
+  "conceptId": "photosynthesis",
+  "spatailPrompt": "Create an educational spatial explanation of \"photosynthesis\". Learning goal: Explain how plants transform light energy into chemical energy. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"Photosynthesis is the process plants use to convert light energy into stored chemical energy. In a simplified explanation, sunlight reaches the leaf, water enters through the roots, and carbon dioxide enters through small openings in the leaf. Inside chloroplasts, the plant uses these inputs to form glucose and release oxygen.\n\nA good spatial explanation should not only show a plant. It should sho\".",
+  "experienceBeats": [
+    "Show the leaf as the main object",
+    "Reveal sunlight, water, and carbon dioxide as inputs",
+    "Animate the chloroplast as the conversion point",
+    "Show glucose and oxygen leaving as outputs",
+    "Tap each input or output for a short explanation"
+  ],
+  "interactions": [
+    "tap_to_highlight",
+    "step_through_explanation",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_photosynthesis",
+    "domain": "biological",
+    "intent": "explain",
+    "strategy": "animated_simulation",
+    "subject": "Photosynthesis",
+    "placement": {
+      "anchor": "table",
+      "layout": "cluster",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.95,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> animated_simulation. Show the process in motion as a seamless loop — best when the concept is a behaviour over time, not a static object.",
+    "experienceBeats": [
+      {
+        "id": "show_the_leaf_as_the_main_object",
+        "title": "Show the leaf as the main object",
+        "narration": "Show the leaf as the main object",
+        "focus": "photosynthesis",
+        "reveal": "auto"
+      },
+      {
+        "id": "reveal_sunlight_water_and_carbon_dioxide",
+        "title": "Reveal sunlight, water, and carbon dioxide as inputs",
+        "narration": "Reveal sunlight, water, and carbon dioxide as inputs",
+        "focus": "photosynthesis",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_the_chloroplast_as_the_conversio",
+        "title": "Animate the chloroplast as the conversion point",
+        "narration": "Animate the chloroplast as the conversion point",
+        "focus": "photosynthesis",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_glucose_and_oxygen_leaving_as_outpu",
+        "title": "Show glucose and oxygen leaving as outputs",
+        "narration": "Show glucose and oxygen leaving as outputs",
+        "focus": "photosynthesis",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "tap_each_input_or_output_for_a_short_exp",
+        "title": "Tap each input or output for a short explanation",
+        "narration": "Tap each input or output for a short explanation",
+        "focus": "photosynthesis",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "photosynthesis",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "photosynthesis_mover",
+        "type": "part",
+        "priority": 1
+      }
+    ],
+    "requiredAnimations": [
+      {
+        "id": "photosynthesis_sim",
+        "targetAsset": "photosynthesis",
+        "motion": "spin",
+        "note": "seamless looping process"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        }
+      },
+      {
+        "id": "highlight_phase",
+        "type": "tap_reveal",
+        "label": "Tap to highlight this phase",
+        "params": {}
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_photosynthesis",
+    "subject": "Photosynthesis",
+    "strategy": "animated_simulation",
+    "assetRequests": [
+      {
+        "assetId": "photosynthesis",
+        "description": "complete Photosynthesis, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "default"
+        ],
+        "requiredAnimations": [
+          "spin"
+        ]
+      },
+      {
+        "assetId": "photosynthesis_mover",
+        "description": "the photosynthesis mover component of the Photosynthesis",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "default",
+          "highlightable"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T17:48:40.356233+00:00",
+    "sceneId": "edu_photosynthesis",
+    "title": "Photosynthesis",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"photosynthesis\". Learning goal: Explain how plants transform light energy into chemical energy. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"Photosynthesis is the process plants use to convert light energy into stored chemical energy. In a simplified explanation, sunlight reaches the leaf, water enters through the roots, and carbon dioxide enters through small openings in the leaf. Inside chloroplasts, the plant uses these inputs to form glucose and release oxygen.\n\nA good spatial explanation should not only show a plant. It should sho\".",
+      "subject": "Photosynthesis",
+      "domain": "biological",
+      "intent": "explain",
+      "strategy": "animated_simulation"
+    },
+    "domain": {
+      "name": "biological",
+      "confidence": "high",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "biological",
+      "intent": "explain",
+      "strategy": "animated_simulation",
+      "subject": "Photosynthesis",
+      "reasoning": "caller override -> animated_simulation. Show the process in motion as a seamless loop — best when the concept is a behaviour over time, not a static object.",
+      "domainConfidence": 0.95,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "table",
+      "layout": "cluster",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": "photosynthesis_spin",
+        "fps": 30,
+        "loop": true,
+        "count": 1
+      },
+      "bbox": {
+        "min": [
+          -0.15,
+          0.0,
+          -0.15
+        ],
+        "max": [
+          0.15,
+          0.3,
+          0.15
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 0.74,
+      "baseline_z_m": 1.2927
+    },
+    "staging": {
+      "distance_m": 0.74,
+      "spread_deg": 30.0,
+      "reasoning": "2 exhibit(s) on a cluster at 0.74 m, dropped 12.0 deg along the natural gaze; anchor=table."
+    },
+    "beats": [
+      {
+        "id": "show_the_leaf_as_the_main_object",
+        "title": "Show the leaf as the main object",
+        "narration": "Show the leaf as the main object",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "reveal_sunlight_water_and_carbon_dioxide",
+        "title": "Reveal sunlight, water, and carbon dioxide as inputs",
+        "narration": "Reveal sunlight, water, and carbon dioxide as inputs",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_the_chloroplast_as_the_conversio",
+        "title": "Animate the chloroplast as the conversion point",
+        "narration": "Animate the chloroplast as the conversion point",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_glucose_and_oxygen_leaving_as_outpu",
+        "title": "Show glucose and oxygen leaving as outputs",
+        "narration": "Show glucose and oxygen leaving as outputs",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "tap_each_input_or_output_for_a_short_exp",
+        "title": "Tap each input or output for a short explanation",
+        "narration": "Tap each input or output for a short explanation",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "show_the_leaf_as_the_main_object",
+        "title": "Show the leaf as the main object",
+        "description": "Show the leaf as the main object",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "reveal_sunlight_water_and_carbon_dioxide",
+        "title": "Reveal sunlight, water, and carbon dioxide as inputs",
+        "description": "Reveal sunlight, water, and carbon dioxide as inputs",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "animate_the_chloroplast_as_the_conversio",
+        "title": "Animate the chloroplast as the conversion point",
+        "description": "Animate the chloroplast as the conversion point",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "show_glucose_and_oxygen_leaving_as_outpu",
+        "title": "Show glucose and oxygen leaving as outputs",
+        "description": "Show glucose and oxygen leaving as outputs",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "tap_each_input_or_output_for_a_short_exp",
+        "title": "Tap each input or output for a short explanation",
+        "description": "Tap each input or output for a short explanation",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        },
+        "trigger": "on_tap"
+      },
+      {
+        "id": "highlight_phase",
+        "type": "tap_reveal",
+        "label": "Tap to highlight this phase",
+        "params": {},
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "photosynthesis",
+        "role": "primary_object",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true
+      },
+      {
+        "id": "photosynthesis_mover",
+        "role": "part",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "photosynthesis",
+      "surroundingContext": "Photosynthesis is the process plants use to convert light energy into stored chemical energy. In a simplified explanation, sunlight reaches the leaf, water enters through the roots, and carbon dioxide enters through small openings in the leaf. Inside chloroplasts, the plant uses these inputs to form glucose and release oxygen.\n\nA good spatial explanation should not only show a plant. It should show the flow of matter and energy: inputs moving toward the leaf and outputs leaving it. This makes the invisible chemical process easier to understand in space.",
+      "learningGoal": "Explain how plants transform light energy into chemical energy.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "animated_process",
+      "conceptId": "photosynthesis",
+      "spatailPrompt": "Create an educational spatial explanation of \"photosynthesis\". Learning goal: Explain how plants transform light energy into chemical energy. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"Photosynthesis is the process plants use to convert light energy into stored chemical energy. In a simplified explanation, sunlight reaches the leaf, water enters through the roots, and carbon dioxide enters through small openings in the leaf. Inside chloroplasts, the plant uses these inputs to form glucose and release oxygen.\n\nA good spatial explanation should not only show a plant. It should sho\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_photosynthesis",
+    "assets": [
+      {
+        "assetId": "photosynthesis",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "biological_placeholder",
+        "fallbackPrimitive": "sphere"
+      },
+      {
+        "assetId": "photosynthesis_mover",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "biological_placeholder",
+        "fallbackPrimitive": "sphere"
+      }
+    ],
+    "animations": [
+      {
+        "animationId": "photosynthesis_spin",
+        "targetAssets": [
+          "photosynthesis"
+        ],
+        "type": "looping",
+        "path": ""
+      }
+    ]
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "photosynthesis"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream photosynthesis",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "photosynthesis"
+          ],
+          "unlocks": [
+            "swap_placeholder:photosynthesis"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream photosynthesis_mover",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "photosynthesis_mover"
+          ],
+          "unlocks": [
+            "swap_placeholder:photosynthesis_mover"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "animation:photosynthesis_spin",
+            "interaction:play_pause",
+            "interaction:highlight_phase"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "table",
+      "title": "Photosynthesis",
+      "firstBeat": "Show the leaf as the main object",
+      "placeholders": [
+        {
+          "assetId": "photosynthesis",
+          "primitive": "box",
+          "position_yup": [
+            -0.1915,
+            1.2927,
+            -0.7148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "photosynthesis"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "play_pause": {
+        "enabledAfterPhase": 3,
+        "type": "play_baked",
+        "targetAssets": [
+          "photosynthesis",
+          "photosynthesis_mover"
+        ]
+      },
+      "highlight_phase": {
+        "enabledAfterPhase": 3,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "photosynthesis",
+          "photosynthesis_mover"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "play_pause",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "highlight_phase",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

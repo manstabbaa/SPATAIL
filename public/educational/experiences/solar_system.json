@@ -1,0 +1,801 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "solar system",
+  "surroundingContext": "The solar system contains the Sun, planets, moons, asteroids, comets, and other objects held together by gravity. The planets orbit the Sun at very different distances. A perfectly accurate scale model would be too large for most rooms.\n\nFor XR, the best first representation is a compressed scale comparison. It should communicate order, relative size, and orbital relationships without pretending that the distances are fully accurate.",
+  "learningGoal": "Compare the Sun and planets while preserving conceptual relationships.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "scale_compression",
+  "conceptId": "solar_system",
+  "spatailPrompt": "Create an educational spatial explanation of \"solar system\". Learning goal: Compare the Sun and planets while preserving conceptual relationships. Prefer a scale compression with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"The solar system contains the Sun, planets, moons, asteroids, comets, and other objects held together by gravity. The planets orbit the Sun at very different distances. A perfectly accurate scale model would be too large for most rooms.\n\nFor XR, the best first representation is a compressed scale comparison. It should communicate order, relative size, and orbital relationships without pretending t\".",
+  "experienceBeats": [
+    "Place the Sun as the anchor object",
+    "Arrange planets outward in order",
+    "Use compressed spacing so the scene fits the room",
+    "Show orbit rings or trails",
+    "Tap planets for size and distance facts"
+  ],
+  "interactions": [
+    "tap_to_highlight",
+    "step_through_explanation",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_solar_system",
+    "domain": "scientific",
+    "intent": "explain",
+    "strategy": "real_scale_placement",
+    "subject": "Solar System",
+    "placement": {
+      "anchor": "floor",
+      "layout": "cluster",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.95,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> real_scale_placement. Place the subject at true scale in the room so the body reads proportion and presence directly — best when size and context ARE the lesson.",
+    "experienceBeats": [
+      {
+        "id": "place_the_sun_as_the_anchor_object",
+        "title": "Place the Sun as the anchor object",
+        "narration": "Place the Sun as the anchor object",
+        "focus": "solar_system",
+        "reveal": "auto"
+      },
+      {
+        "id": "arrange_planets_outward_in_order",
+        "title": "Arrange planets outward in order",
+        "narration": "Arrange planets outward in order",
+        "focus": "solar_system",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "use_compressed_spacing_so_the_scene_fits",
+        "title": "Use compressed spacing so the scene fits the room",
+        "narration": "Use compressed spacing so the scene fits the room",
+        "focus": "solar_system",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_orbit_rings_or_trails",
+        "title": "Show orbit rings or trails",
+        "narration": "Show orbit rings or trails",
+        "focus": "solar_system",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "tap_planets_for_size_and_distance_facts",
+        "title": "Tap planets for size and distance facts",
+        "narration": "Tap planets for size and distance facts",
+        "focus": "solar_system",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "solar_system",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "solar_system_orbiter_a",
+        "type": "part",
+        "priority": 1
+      },
+      {
+        "id": "solar_system_orbiter_b",
+        "type": "part",
+        "priority": 2
+      }
+    ],
+    "requiredAnimations": [
+      {
+        "id": "solar_system_orbiter_a_orbit",
+        "targetAsset": "solar_system_orbiter_a",
+        "motion": "orbit",
+        "note": "orbital motion overlay"
+      },
+      {
+        "id": "solar_system_orbiter_b_orbit",
+        "targetAsset": "solar_system_orbiter_b",
+        "motion": "orbit",
+        "note": "orbital motion overlay"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "orbit_toggle",
+        "type": "play_baked",
+        "label": "Play / pause motion",
+        "params": {
+          "loop": true
+        }
+      },
+      {
+        "id": "label_part",
+        "type": "tap_reveal",
+        "label": "Tap to label",
+        "params": {}
+      },
+      {
+        "id": "reposition",
+        "type": "grab_physics",
+        "label": "Move it",
+        "params": {
+          "body": "rigid"
+        }
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_solar_system",
+    "subject": "Solar System",
+    "strategy": "real_scale_placement",
+    "assetRequests": [
+      {
+        "assetId": "solar_system",
+        "description": "complete Solar System, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "default"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "solar_system_orbiter_a",
+        "description": "the solar system orbiter a component of the Solar System",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "default",
+          "highlightable"
+        ],
+        "requiredAnimations": [
+          "orbit"
+        ]
+      },
+      {
+        "assetId": "solar_system_orbiter_b",
+        "description": "the solar system orbiter b component of the Solar System",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "default",
+          "highlightable"
+        ],
+        "requiredAnimations": [
+          "orbit"
+        ]
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T17:48:40.371675+00:00",
+    "sceneId": "edu_solar_system",
+    "title": "Solar System",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"solar system\". Learning goal: Compare the Sun and planets while preserving conceptual relationships. Prefer a scale compression with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"The solar system contains the Sun, planets, moons, asteroids, comets, and other objects held together by gravity. The planets orbit the Sun at very different distances. A perfectly accurate scale model would be too large for most rooms.\n\nFor XR, the best first representation is a compressed scale comparison. It should communicate order, relative size, and orbital relationships without pretending t\".",
+      "subject": "Solar System",
+      "domain": "scientific",
+      "intent": "explain",
+      "strategy": "real_scale_placement"
+    },
+    "domain": {
+      "name": "scientific",
+      "confidence": "high",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "scientific",
+      "intent": "explain",
+      "strategy": "real_scale_placement",
+      "subject": "Solar System",
+      "reasoning": "caller override -> real_scale_placement. Place the subject at true scale in the room so the body reads proportion and presence directly — best when size and context ARE the lesson.",
+      "domainConfidence": 0.95,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "floor",
+      "layout": "cluster",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": "solar_system_orbiter_a_orbit",
+        "fps": 30,
+        "loop": true,
+        "count": 2
+      },
+      "bbox": {
+        "min": [
+          -0.2,
+          0.0,
+          -0.2
+        ],
+        "max": [
+          0.2,
+          0.4,
+          0.2
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 2.5,
+      "baseline_z_m": 0.9186
+    },
+    "staging": {
+      "distance_m": 2.5,
+      "spread_deg": 30.0,
+      "reasoning": "3 exhibit(s) on a cluster at 2.5 m, dropped 12.0 deg along the natural gaze; anchor=floor."
+    },
+    "beats": [
+      {
+        "id": "place_the_sun_as_the_anchor_object",
+        "title": "Place the Sun as the anchor object",
+        "narration": "Place the Sun as the anchor object",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "arrange_planets_outward_in_order",
+        "title": "Arrange planets outward in order",
+        "narration": "Arrange planets outward in order",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "use_compressed_spacing_so_the_scene_fits",
+        "title": "Use compressed spacing so the scene fits the room",
+        "narration": "Use compressed spacing so the scene fits the room",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_orbit_rings_or_trails",
+        "title": "Show orbit rings or trails",
+        "narration": "Show orbit rings or trails",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "tap_planets_for_size_and_distance_facts",
+        "title": "Tap planets for size and distance facts",
+        "narration": "Tap planets for size and distance facts",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "place_the_sun_as_the_anchor_object",
+        "title": "Place the Sun as the anchor object",
+        "description": "Place the Sun as the anchor object",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "arrange_planets_outward_in_order",
+        "title": "Arrange planets outward in order",
+        "description": "Arrange planets outward in order",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "use_compressed_spacing_so_the_scene_fits",
+        "title": "Use compressed spacing so the scene fits the room",
+        "description": "Use compressed spacing so the scene fits the room",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "show_orbit_rings_or_trails",
+        "title": "Show orbit rings or trails",
+        "description": "Show orbit rings or trails",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "tap_planets_for_size_and_distance_facts",
+        "title": "Tap planets for size and distance facts",
+        "description": "Tap planets for size and distance facts",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "orbit_toggle",
+        "type": "play_baked",
+        "label": "Play / pause motion",
+        "params": {
+          "loop": true
+        },
+        "trigger": "on_tap"
+      },
+      {
+        "id": "label_part",
+        "type": "tap_reveal",
+        "label": "Tap to label",
+        "params": {},
+        "trigger": "on_tap"
+      },
+      {
+        "id": "reposition",
+        "type": "grab_physics",
+        "label": "Move it",
+        "params": {
+          "body": "rigid"
+        },
+        "trigger": "on_grab"
+      }
+    ],
+    "assets": [
+      {
+        "id": "solar_system",
+        "role": "primary_object",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.4,
+          "h": 0.4,
+          "d": 0.4
+        },
+        "position_yup": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true
+      },
+      {
+        "id": "solar_system_orbiter_a",
+        "role": "part",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.4,
+          "h": 0.4,
+          "d": 0.4
+        },
+        "position_yup": [
+          0.0,
+          0.9186,
+          -2.5
+        ],
+        "yaw_rad": -0.0,
+        "inComfortCone": true
+      },
+      {
+        "id": "solar_system_orbiter_b",
+        "role": "part",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.4,
+          "h": 0.4,
+          "d": 0.4
+        },
+        "position_yup": [
+          0.647,
+          0.9186,
+          -2.4148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "solar system",
+      "surroundingContext": "The solar system contains the Sun, planets, moons, asteroids, comets, and other objects held together by gravity. The planets orbit the Sun at very different distances. A perfectly accurate scale model would be too large for most rooms.\n\nFor XR, the best first representation is a compressed scale comparison. It should communicate order, relative size, and orbital relationships without pretending that the distances are fully accurate.",
+      "learningGoal": "Compare the Sun and planets while preserving conceptual relationships.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "scale_compression",
+      "conceptId": "solar_system",
+      "spatailPrompt": "Create an educational spatial explanation of \"solar system\". Learning goal: Compare the Sun and planets while preserving conceptual relationships. Prefer a scale compression with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"The solar system contains the Sun, planets, moons, asteroids, comets, and other objects held together by gravity. The planets orbit the Sun at very different distances. A perfectly accurate scale model would be too large for most rooms.\n\nFor XR, the best first representation is a compressed scale comparison. It should communicate order, relative size, and orbital relationships without pretending t\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_solar_system",
+    "assets": [
+      {
+        "assetId": "solar_system",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.2,
+              -0.2,
+              0.0
+            ],
+            "max": [
+              0.2,
+              0.2,
+              0.4
+            ],
+            "size": [
+              0.4,
+              0.4,
+              0.4
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.2
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.4,
+            0.4,
+            0.4
+          ]
+        },
+        "status": "primitive",
+        "source": "primitive",
+        "libraryAssetId": "sun",
+        "fallbackPrimitive": "sphere"
+      },
+      {
+        "assetId": "solar_system_orbiter_a",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.2,
+              -0.2,
+              0.0
+            ],
+            "max": [
+              0.2,
+              0.2,
+              0.4
+            ],
+            "size": [
+              0.4,
+              0.4,
+              0.4
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.2
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.4,
+            0.4,
+            0.4
+          ]
+        },
+        "status": "primitive",
+        "source": "primitive",
+        "libraryAssetId": "sun",
+        "fallbackPrimitive": "sphere"
+      },
+      {
+        "assetId": "solar_system_orbiter_b",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.2,
+              -0.2,
+              0.0
+            ],
+            "max": [
+              0.2,
+              0.2,
+              0.4
+            ],
+            "size": [
+              0.4,
+              0.4,
+              0.4
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.2
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.4,
+            0.4,
+            0.4
+          ]
+        },
+        "status": "primitive",
+        "source": "primitive",
+        "libraryAssetId": "sun",
+        "fallbackPrimitive": "sphere"
+      }
+    ],
+    "animations": [
+      {
+        "animationId": "solar_system_orbiter_a_orbit",
+        "targetAssets": [
+          "solar_system_orbiter_a"
+        ],
+        "type": "looping",
+        "path": ""
+      },
+      {
+        "animationId": "solar_system_orbiter_b_orbit",
+        "targetAssets": [
+          "solar_system_orbiter_b"
+        ],
+        "type": "looping",
+        "path": ""
+      }
+    ]
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "solar_system"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream solar_system",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "solar_system"
+          ],
+          "unlocks": [
+            "swap_placeholder:solar_system"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream solar_system_orbiter_a",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "solar_system_orbiter_a"
+          ],
+          "unlocks": [
+            "swap_placeholder:solar_system_orbiter_a"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "stream solar_system_orbiter_b",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "solar_system_orbiter_b"
+          ],
+          "unlocks": [
+            "swap_placeholder:solar_system_orbiter_b"
+          ]
+        },
+        {
+          "phase": 4,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "animation:solar_system_orbiter_a_orbit",
+            "animation:solar_system_orbiter_b_orbit",
+            "interaction:orbit_toggle",
+            "interaction:label_part",
+            "interaction:reposition"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "floor",
+      "title": "Solar System",
+      "firstBeat": "Place the Sun as the anchor object",
+      "placeholders": [
+        {
+          "assetId": "solar_system",
+          "primitive": "box",
+          "position_yup": [
+            -0.647,
+            0.9186,
+            -2.4148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "solar system"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "orbit_toggle": {
+        "enabledAfterPhase": 4,
+        "type": "play_baked",
+        "targetAssets": [
+          "solar_system",
+          "solar_system_orbiter_a",
+          "solar_system_orbiter_b"
+        ]
+      },
+      "label_part": {
+        "enabledAfterPhase": 4,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "solar_system",
+          "solar_system_orbiter_a",
+          "solar_system_orbiter_b"
+        ]
+      },
+      "reposition": {
+        "enabledAfterPhase": 4,
+        "type": "grab_physics",
+        "targetAssets": [
+          "solar_system",
+          "solar_system_orbiter_a",
+          "solar_system_orbiter_b"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "orbit_toggle",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "label_part",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "reposition",
+        "type": "grab_physics",
+        "trigger": "on_grab"
+      }
+    ]
+  }
+}

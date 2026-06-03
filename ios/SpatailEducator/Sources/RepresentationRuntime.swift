@@ -22,7 +22,8 @@ final class RepresentationRuntime {
     private weak var view: ARView?
     private var rootAnchor: AnchorEntity?
     private var holders: [String: Entity] = [:]        // assetId -> holder (placed on arc)
-    private var boxes: [String: ModelEntity] = [:]      // assetId -> box
+    private var boxes: [String: ModelEntity] = [:]      // assetId -> primitive proxy box
+    private var models: [String: Entity] = [:]          // assetId -> loaded cached USDZ (overrides the box)
     private var billboardPanels: [Entity] = []
     private var titlePanel: Entity?
     private var narrationPanel: Entity?
@@ -76,6 +77,12 @@ final class RepresentationRuntime {
             box.isEnabled = false
             holder.addChild(box)
             boxes[asset.id] = box
+
+            // cached library asset → stream the real USDZ in behind the box
+            if !asset.usdzUrl.isEmpty {
+                let aid = asset.id, url = asset.usdzUrl, fw = Float(max(asset.footprint.w, 0.05))
+                Task { await self.loadCachedModel(aid, url, footprintW: fw) }
+            }
         }
 
         addScenePanels(c)
@@ -112,6 +119,10 @@ final class RepresentationRuntime {
     }
 
     private func reveal(_ id: String, color: UIColor, pop: Bool) {
+        if let m = models[id] {                          // a real cached model is in: show it
+            m.isEnabled = true
+            return
+        }
         guard let box = boxes[id] else { return }
         box.isEnabled = true
         setColor(box, color)
@@ -119,6 +130,40 @@ final class RepresentationRuntime {
             let final = box.transform
             box.scale = SIMD3(repeating: 0.82)
             box.move(to: final, relativeTo: box.parent, duration: 0.22, timingFunction: .easeOut)
+        }
+    }
+
+    /// Download a cached library USDZ from the PC and swap it in for the primitive box.
+    /// Falls back silently to the box on any failure (offline, bad asset, etc.).
+    private func loadCachedModel(_ assetId: String, _ urlString: String, footprintW: Float) async {
+        let baseStr = GenerativeClient.baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !baseStr.isEmpty, let base = URL(string: baseStr),
+              let url = URL(string: urlString, relativeTo: base) else { return }
+        do {
+            let (tmp, resp) = try await URLSession.shared.download(from: url)
+            if let http = resp as? HTTPURLResponse, !(200..<300).contains(http.statusCode) { return }
+            let dst = FileManager.default.temporaryDirectory.appendingPathComponent("repasset_\(assetId).usdz")
+            try? FileManager.default.removeItem(at: dst)
+            try FileManager.default.moveItem(at: tmp, to: dst)
+            let entity: Entity
+            if #available(iOS 18.0, *) { entity = try await Entity(contentsOf: dst) }
+            else { entity = try Entity.load(contentsOf: dst) }
+            guard let holder = holders[assetId], let box = boxes[assetId] else { return }
+            // fit the largest dimension to the footprint, then rest it on the plane
+            let b = entity.visualBounds(relativeTo: nil)
+            let maxDim = max(b.extents.x, max(b.extents.y, b.extents.z))
+            if maxDim > 0 { entity.scale = SIMD3(repeating: footprintW / maxDim) }
+            entity.position = SIMD3(0, footprintW / 2, 0)
+            entity.name = "rbox:\(assetId)"              // keep taps resolving to this asset
+            entity.generateCollisionShapes(recursive: true)
+            if #available(iOS 18.0, *) { entity.components.set(InputTargetComponent()) }
+            entity.isEnabled = box.isEnabled             // inherit the current reveal state
+            box.isEnabled = false
+            holder.addChild(entity)
+            models[assetId] = entity
+            onStatus("loaded \(assetId)")
+        } catch {
+            // keep the primitive box
         }
     }
 
@@ -296,7 +341,7 @@ final class RepresentationRuntime {
     func clear() {
         if let a = rootAnchor { view?.scene.removeAnchor(a) }
         rootAnchor = nil
-        holders.removeAll(); boxes.removeAll(); billboardPanels.removeAll()
+        holders.removeAll(); boxes.removeAll(); models.removeAll(); billboardPanels.removeAll()
         titlePanel = nil; narrationPanel = nil
         bundle = nil; heroId = ""; beatIndex = 0
         interactionsEnabled = false; exploded = false; isolatedId = nil

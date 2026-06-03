@@ -82,11 +82,13 @@ struct RuntimeSceneContract: Decodable {
         var positionYup: [Double] = []     // eye-relative y-up; AR placement uses StationLayout instead
         var yawRad: Double = 0
         var inComfortCone: Bool = true
+        var usdzUrl: String = ""           // cached library USDZ to load (else the primitive box)
+        var fallbackPrimitive: String = ""
         enum CodingKeys: String, CodingKey {
             case id, role, status, footprint
             case positionYup = "position_yup"
             case yawRad = "yaw_rad"
-            case inComfortCone
+            case inComfortCone, usdzUrl, fallbackPrimitive
         }
     }
 }

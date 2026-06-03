@@ -1,0 +1,888 @@
+{
+  "category": "furniture",
+  "count": 28,
+  "assets": [
+    {
+      "assetId": "chair",
+      "name": "Chair",
+      "category": "furniture",
+      "semanticTags": [
+        "chair",
+        "seat"
+      ],
+      "path": "/assets/spatail-library/furniture/chair.glb",
+      "scaleMeters": [
+        0.5,
+        0.9,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "sofa",
+      "name": "Sofa",
+      "category": "furniture",
+      "semanticTags": [
+        "sofa",
+        "couch"
+      ],
+      "path": "/assets/spatail-library/furniture/sofa.glb",
+      "scaleMeters": [
+        2.0,
+        0.85,
+        0.9
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "armchair",
+      "name": "Armchair",
+      "category": "furniture",
+      "semanticTags": [
+        "armchair",
+        "chair"
+      ],
+      "path": "/assets/spatail-library/furniture/armchair.glb",
+      "scaleMeters": [
+        0.8,
+        0.9,
+        0.8
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "coffee_table",
+      "name": "Coffee Table",
+      "category": "furniture",
+      "semanticTags": [
+        "coffee",
+        "table"
+      ],
+      "path": "/assets/spatail-library/furniture/coffee_table.glb",
+      "scaleMeters": [
+        1.1,
+        0.45,
+        0.6
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "dining_table",
+      "name": "Dining Table",
+      "category": "furniture",
+      "semanticTags": [
+        "dining",
+        "table"
+      ],
+      "path": "/assets/spatail-library/furniture/dining_table.glb",
+      "scaleMeters": [
+        1.6,
+        0.75,
+        0.9
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "desk",
+      "name": "Desk",
+      "category": "furniture",
+      "semanticTags": [
+        "desk",
+        "workstation"
+      ],
+      "path": "/assets/spatail-library/furniture/desk.glb",
+      "scaleMeters": [
+        1.4,
+        0.75,
+        0.7
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bed_twin",
+      "name": "Twin Bed",
+      "category": "furniture",
+      "semanticTags": [
+        "bed",
+        "twin",
+        "single"
+      ],
+      "path": "/assets/spatail-library/furniture/bed_twin.glb",
+      "scaleMeters": [
+        1.0,
+        0.5,
+        1.9
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bed_queen",
+      "name": "Queen Bed",
+      "category": "furniture",
+      "semanticTags": [
+        "bed",
+        "queen"
+      ],
+      "path": "/assets/spatail-library/furniture/bed_queen.glb",
+      "scaleMeters": [
+        1.5,
+        0.5,
+        2.0
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bed_king",
+      "name": "King Bed",
+      "category": "furniture",
+      "semanticTags": [
+        "bed",
+        "king"
+      ],
+      "path": "/assets/spatail-library/furniture/bed_king.glb",
+      "scaleMeters": [
+        1.93,
+        0.5,
+        2.0
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "nightstand",
+      "name": "Nightstand",
+      "category": "furniture",
+      "semanticTags": [
+        "nightstand",
+        "bedside"
+      ],
+      "path": "/assets/spatail-library/furniture/nightstand.glb",
+      "scaleMeters": [
+        0.45,
+        0.55,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "dresser",
+      "name": "Dresser",
+      "category": "furniture",
+      "semanticTags": [
+        "dresser",
+        "drawers"
+      ],
+      "path": "/assets/spatail-library/furniture/dresser.glb",
+      "scaleMeters": [
+        1.2,
+        0.8,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bookshelf",
+      "name": "Bookshelf",
+      "category": "furniture",
+      "semanticTags": [
+        "bookshelf",
+        "shelving",
+        "shelf"
+      ],
+      "path": "/assets/spatail-library/furniture/bookshelf.glb",
+      "scaleMeters": [
+        0.8,
+        1.8,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "cabinet",
+      "name": "Cabinet",
+      "category": "furniture",
+      "semanticTags": [
+        "cabinet",
+        "storage"
+      ],
+      "path": "/assets/spatail-library/furniture/cabinet.glb",
+      "scaleMeters": [
+        0.9,
+        0.9,
+        0.45
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "tv_stand",
+      "name": "TV Stand",
+      "category": "furniture",
+      "semanticTags": [
+        "tv",
+        "stand",
+        "media"
+      ],
+      "path": "/assets/spatail-library/furniture/tv_stand.glb",
+      "scaleMeters": [
+        1.5,
+        0.5,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "rug",
+      "name": "Rug",
+      "category": "furniture",
+      "semanticTags": [
+        "rug",
+        "carpet"
+      ],
+      "path": "/assets/spatail-library/furniture/rug.glb",
+      "scaleMeters": [
+        1.6,
+        0.02,
+        2.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "lamp_floor",
+      "name": "Floor Lamp",
+      "category": "furniture",
+      "semanticTags": [
+        "lamp",
+        "floor",
+        "light"
+      ],
+      "path": "/assets/spatail-library/furniture/lamp_floor.glb",
+      "scaleMeters": [
+        0.3,
+        1.5,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "lamp_table",
+      "name": "Table Lamp",
+      "category": "furniture",
+      "semanticTags": [
+        "lamp",
+        "table",
+        "light"
+      ],
+      "path": "/assets/spatail-library/furniture/lamp_table.glb",
+      "scaleMeters": [
+        0.25,
+        0.45,
+        0.25
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "mirror_furniture",
+      "name": "Wall Mirror",
+      "category": "furniture",
+      "semanticTags": [
+        "mirror",
+        "wall"
+      ],
+      "path": "/assets/spatail-library/furniture/mirror_furniture.glb",
+      "scaleMeters": [
+        0.6,
+        1.2,
+        0.03
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "framed_art_24x36",
+      "name": "Framed Art 24x36",
+      "category": "furniture",
+      "semanticTags": [
+        "art",
+        "frame",
+        "picture"
+      ],
+      "path": "/assets/spatail-library/furniture/framed_art_24x36.glb",
+      "scaleMeters": [
+        0.61,
+        0.91,
+        0.03
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "framed_art_36x48",
+      "name": "Framed Art 36x48",
+      "category": "furniture",
+      "semanticTags": [
+        "art",
+        "frame",
+        "picture"
+      ],
+      "path": "/assets/spatail-library/furniture/framed_art_36x48.glb",
+      "scaleMeters": [
+        0.91,
+        1.22,
+        0.03
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "plant_pot",
+      "name": "Plant Pot",
+      "category": "furniture",
+      "semanticTags": [
+        "plant",
+        "pot",
+        "decor"
+      ],
+      "path": "/assets/spatail-library/furniture/plant_pot.glb",
+      "scaleMeters": [
+        0.3,
+        0.6,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "kitchen_island",
+      "name": "Kitchen Island",
+      "category": "furniture",
+      "semanticTags": [
+        "kitchen",
+        "island",
+        "counter"
+      ],
+      "path": "/assets/spatail-library/furniture/kitchen_island.glb",
+      "scaleMeters": [
+        1.2,
+        0.9,
+        0.9
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "refrigerator_blockout",
+      "name": "Refrigerator",
+      "category": "furniture",
+      "semanticTags": [
+        "fridge",
+        "refrigerator",
+        "appliance"
+      ],
+      "path": "/assets/spatail-library/furniture/refrigerator_blockout.glb",
+      "scaleMeters": [
+        0.9,
+        1.8,
+        0.7
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "washer_blockout",
+      "name": "Washer",
+      "category": "furniture",
+      "semanticTags": [
+        "washer",
+        "laundry",
+        "appliance"
+      ],
+      "path": "/assets/spatail-library/furniture/washer_blockout.glb",
+      "scaleMeters": [
+        0.6,
+        0.9,
+        0.6
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "dryer_blockout",
+      "name": "Dryer",
+      "category": "furniture",
+      "semanticTags": [
+        "dryer",
+        "laundry",
+        "appliance"
+      ],
+      "path": "/assets/spatail-library/furniture/dryer_blockout.glb",
+      "scaleMeters": [
+        0.6,
+        0.9,
+        0.6
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bathtub_blockout",
+      "name": "Bathtub",
+      "category": "furniture",
+      "semanticTags": [
+        "bathtub",
+        "tub",
+        "bathroom"
+      ],
+      "path": "/assets/spatail-library/furniture/bathtub_blockout.glb",
+      "scaleMeters": [
+        1.5,
+        0.6,
+        0.75
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "sink_blockout",
+      "name": "Sink",
+      "category": "furniture",
+      "semanticTags": [
+        "sink",
+        "basin",
+        "bathroom"
+      ],
+      "path": "/assets/spatail-library/furniture/sink_blockout.glb",
+      "scaleMeters": [
+        0.6,
+        0.85,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "toilet_blockout",
+      "name": "Toilet",
+      "category": "furniture",
+      "semanticTags": [
+        "toilet",
+        "bathroom"
+      ],
+      "path": "/assets/spatail-library/furniture/toilet_blockout.glb",
+      "scaleMeters": [
+        0.4,
+        0.78,
+        0.7
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

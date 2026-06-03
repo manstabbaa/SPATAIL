@@ -1,0 +1,2059 @@
+{
+  "category": "mechanical",
+  "count": 59,
+  "assets": [
+    {
+      "assetId": "piston",
+      "name": "Piston",
+      "category": "mechanical",
+      "semanticTags": [
+        "piston",
+        "engine",
+        "reciprocating"
+      ],
+      "path": "/assets/spatail-library/mechanical/piston.glb",
+      "scaleMeters": [
+        0.08,
+        0.18,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "piston_ring",
+      "name": "Piston Ring",
+      "category": "mechanical",
+      "semanticTags": [
+        "piston",
+        "ring",
+        "seal"
+      ],
+      "path": "/assets/spatail-library/mechanical/piston_ring.glb",
+      "scaleMeters": [
+        0.08,
+        0.01,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "connecting_rod",
+      "name": "Connecting Rod",
+      "category": "mechanical",
+      "semanticTags": [
+        "conrod",
+        "rod",
+        "engine"
+      ],
+      "path": "/assets/spatail-library/mechanical/connecting_rod.glb",
+      "scaleMeters": [
+        0.04,
+        0.16,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "crankshaft",
+      "name": "Crankshaft",
+      "category": "mechanical",
+      "semanticTags": [
+        "crankshaft",
+        "crank",
+        "engine",
+        "rotating"
+      ],
+      "path": "/assets/spatail-library/mechanical/crankshaft.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "camshaft",
+      "name": "Camshaft",
+      "category": "mechanical",
+      "semanticTags": [
+        "camshaft",
+        "cam",
+        "valvetrain"
+      ],
+      "path": "/assets/spatail-library/mechanical/camshaft.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "valve",
+      "name": "Valve",
+      "category": "mechanical",
+      "semanticTags": [
+        "valve",
+        "intake",
+        "exhaust"
+      ],
+      "path": "/assets/spatail-library/mechanical/valve.glb",
+      "scaleMeters": [
+        0.02,
+        0.1,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "valve_spring",
+      "name": "Valve Spring",
+      "category": "mechanical",
+      "semanticTags": [
+        "valve",
+        "spring",
+        "coil"
+      ],
+      "path": "/assets/spatail-library/mechanical/valve_spring.glb",
+      "scaleMeters": [
+        0.025,
+        0.05,
+        0.025
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "cylinder_sleeve",
+      "name": "Cylinder Sleeve",
+      "category": "mechanical",
+      "semanticTags": [
+        "cylinder",
+        "sleeve",
+        "bore"
+      ],
+      "path": "/assets/spatail-library/mechanical/cylinder_sleeve.glb",
+      "scaleMeters": [
+        0.09,
+        0.16,
+        0.09
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "cylinder_block_simplified",
+      "name": "Cylinder Block",
+      "category": "mechanical",
+      "semanticTags": [
+        "cylinder",
+        "block",
+        "engine"
+      ],
+      "path": "/assets/spatail-library/mechanical/cylinder_block_simplified.glb",
+      "scaleMeters": [
+        0.3,
+        0.25,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "engine_block_simplified",
+      "name": "Engine Block",
+      "category": "mechanical",
+      "semanticTags": [
+        "engine",
+        "block",
+        "v8",
+        "motor"
+      ],
+      "path": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+      "scaleMeters": [
+        0.5,
+        0.4,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "spark_plug",
+      "name": "Spark Plug",
+      "category": "mechanical",
+      "semanticTags": [
+        "spark",
+        "plug",
+        "ignition"
+      ],
+      "path": "/assets/spatail-library/mechanical/spark_plug.glb",
+      "scaleMeters": [
+        0.02,
+        0.08,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "fuel_injector",
+      "name": "Fuel Injector",
+      "category": "mechanical",
+      "semanticTags": [
+        "fuel",
+        "injector",
+        "nozzle"
+      ],
+      "path": "/assets/spatail-library/mechanical/fuel_injector.glb",
+      "scaleMeters": [
+        0.02,
+        0.08,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "intake_manifold_simplified",
+      "name": "Intake Manifold",
+      "category": "mechanical",
+      "semanticTags": [
+        "intake",
+        "manifold",
+        "air"
+      ],
+      "path": "/assets/spatail-library/mechanical/intake_manifold_simplified.glb",
+      "scaleMeters": [
+        0.3,
+        0.15,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "exhaust_manifold_simplified",
+      "name": "Exhaust Manifold",
+      "category": "mechanical",
+      "semanticTags": [
+        "exhaust",
+        "manifold"
+      ],
+      "path": "/assets/spatail-library/mechanical/exhaust_manifold_simplified.glb",
+      "scaleMeters": [
+        0.3,
+        0.15,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "turbocharger_simplified",
+      "name": "Turbocharger",
+      "category": "mechanical",
+      "semanticTags": [
+        "turbo",
+        "charger",
+        "boost"
+      ],
+      "path": "/assets/spatail-library/mechanical/turbocharger_simplified.glb",
+      "scaleMeters": [
+        0.15,
+        0.15,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "turbine_wheel",
+      "name": "Turbine Wheel",
+      "category": "mechanical",
+      "semanticTags": [
+        "turbine",
+        "wheel",
+        "blade"
+      ],
+      "path": "/assets/spatail-library/mechanical/turbine_wheel.glb",
+      "scaleMeters": [
+        0.08,
+        0.04,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "compressor_wheel",
+      "name": "Compressor Wheel",
+      "category": "mechanical",
+      "semanticTags": [
+        "compressor",
+        "wheel",
+        "blade"
+      ],
+      "path": "/assets/spatail-library/mechanical/compressor_wheel.glb",
+      "scaleMeters": [
+        0.08,
+        0.04,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "gear_small",
+      "name": "Small Gear",
+      "category": "mechanical",
+      "semanticTags": [
+        "gear",
+        "cog",
+        "small"
+      ],
+      "path": "/assets/spatail-library/mechanical/gear_small.glb",
+      "scaleMeters": [
+        0.04,
+        0.02,
+        0.04
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "gear_medium",
+      "name": "Medium Gear",
+      "category": "mechanical",
+      "semanticTags": [
+        "gear",
+        "cog",
+        "medium"
+      ],
+      "path": "/assets/spatail-library/mechanical/gear_medium.glb",
+      "scaleMeters": [
+        0.08,
+        0.02,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "gear_large",
+      "name": "Large Gear",
+      "category": "mechanical",
+      "semanticTags": [
+        "gear",
+        "cog",
+        "large"
+      ],
+      "path": "/assets/spatail-library/mechanical/gear_large.glb",
+      "scaleMeters": [
+        0.14,
+        0.02,
+        0.14
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "gear_pair",
+      "name": "Gear Pair",
+      "category": "mechanical",
+      "semanticTags": [
+        "gear",
+        "mesh",
+        "pair"
+      ],
+      "path": "/assets/spatail-library/mechanical/gear_pair.glb",
+      "scaleMeters": [
+        0.2,
+        0.02,
+        0.12
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "gearbox_housing_simplified",
+      "name": "Gearbox Housing",
+      "category": "mechanical",
+      "semanticTags": [
+        "gearbox",
+        "housing",
+        "transmission"
+      ],
+      "path": "/assets/spatail-library/mechanical/gearbox_housing_simplified.glb",
+      "scaleMeters": [
+        0.25,
+        0.2,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "chain_link",
+      "name": "Chain Link",
+      "category": "mechanical",
+      "semanticTags": [
+        "chain",
+        "link"
+      ],
+      "path": "/assets/spatail-library/mechanical/chain_link.glb",
+      "scaleMeters": [
+        0.03,
+        0.01,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "belt_loop",
+      "name": "Belt Loop",
+      "category": "mechanical",
+      "semanticTags": [
+        "belt",
+        "loop",
+        "drive"
+      ],
+      "path": "/assets/spatail-library/mechanical/belt_loop.glb",
+      "scaleMeters": [
+        0.2,
+        0.02,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pulley",
+      "name": "Pulley",
+      "category": "mechanical",
+      "semanticTags": [
+        "pulley",
+        "wheel",
+        "belt"
+      ],
+      "path": "/assets/spatail-library/mechanical/pulley.glb",
+      "scaleMeters": [
+        0.08,
+        0.03,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bearing",
+      "name": "Bearing",
+      "category": "mechanical",
+      "semanticTags": [
+        "bearing",
+        "roller",
+        "ball"
+      ],
+      "path": "/assets/spatail-library/mechanical/bearing.glb",
+      "scaleMeters": [
+        0.05,
+        0.02,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "axle",
+      "name": "Axle",
+      "category": "mechanical",
+      "semanticTags": [
+        "axle",
+        "shaft",
+        "rotating"
+      ],
+      "path": "/assets/spatail-library/mechanical/axle.glb",
+      "scaleMeters": [
+        0.03,
+        0.03,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "shaft",
+      "name": "Shaft",
+      "category": "mechanical",
+      "semanticTags": [
+        "shaft",
+        "rod",
+        "drive"
+      ],
+      "path": "/assets/spatail-library/mechanical/shaft.glb",
+      "scaleMeters": [
+        0.03,
+        0.03,
+        0.25
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bolt",
+      "name": "Bolt",
+      "category": "mechanical",
+      "semanticTags": [
+        "bolt",
+        "fastener"
+      ],
+      "path": "/assets/spatail-library/mechanical/bolt.glb",
+      "scaleMeters": [
+        0.012,
+        0.05,
+        0.012
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "screw",
+      "name": "Screw",
+      "category": "mechanical",
+      "semanticTags": [
+        "screw",
+        "fastener"
+      ],
+      "path": "/assets/spatail-library/mechanical/screw.glb",
+      "scaleMeters": [
+        0.008,
+        0.04,
+        0.008
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "nut",
+      "name": "Nut",
+      "category": "mechanical",
+      "semanticTags": [
+        "nut",
+        "fastener"
+      ],
+      "path": "/assets/spatail-library/mechanical/nut.glb",
+      "scaleMeters": [
+        0.016,
+        0.01,
+        0.016
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "washer",
+      "name": "Washer",
+      "category": "mechanical",
+      "semanticTags": [
+        "washer",
+        "fastener"
+      ],
+      "path": "/assets/spatail-library/mechanical/washer.glb",
+      "scaleMeters": [
+        0.02,
+        0.003,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bracket",
+      "name": "Bracket",
+      "category": "mechanical",
+      "semanticTags": [
+        "bracket",
+        "mount"
+      ],
+      "path": "/assets/spatail-library/mechanical/bracket.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "hinge",
+      "name": "Hinge",
+      "category": "mechanical",
+      "semanticTags": [
+        "hinge",
+        "pivot",
+        "joint"
+      ],
+      "path": "/assets/spatail-library/mechanical/hinge.glb",
+      "scaleMeters": [
+        0.06,
+        0.02,
+        0.03
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "spring",
+      "name": "Spring",
+      "category": "mechanical",
+      "semanticTags": [
+        "spring",
+        "coil"
+      ],
+      "path": "/assets/spatail-library/mechanical/spring.glb",
+      "scaleMeters": [
+        0.03,
+        0.1,
+        0.03
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "damper",
+      "name": "Damper",
+      "category": "mechanical",
+      "semanticTags": [
+        "damper",
+        "shock"
+      ],
+      "path": "/assets/spatail-library/mechanical/damper.glb",
+      "scaleMeters": [
+        0.04,
+        0.16,
+        0.04
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "shock_absorber",
+      "name": "Shock Absorber",
+      "category": "mechanical",
+      "semanticTags": [
+        "shock",
+        "absorber",
+        "suspension"
+      ],
+      "path": "/assets/spatail-library/mechanical/shock_absorber.glb",
+      "scaleMeters": [
+        0.05,
+        0.25,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "brake_disc",
+      "name": "Brake Disc",
+      "category": "mechanical",
+      "semanticTags": [
+        "brake",
+        "disc",
+        "rotor"
+      ],
+      "path": "/assets/spatail-library/mechanical/brake_disc.glb",
+      "scaleMeters": [
+        0.24,
+        0.02,
+        0.24
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "brake_caliper",
+      "name": "Brake Caliper",
+      "category": "mechanical",
+      "semanticTags": [
+        "brake",
+        "caliper"
+      ],
+      "path": "/assets/spatail-library/mechanical/brake_caliper.glb",
+      "scaleMeters": [
+        0.1,
+        0.08,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "wheel_hub",
+      "name": "Wheel Hub",
+      "category": "mechanical",
+      "semanticTags": [
+        "wheel",
+        "hub"
+      ],
+      "path": "/assets/spatail-library/mechanical/wheel_hub.glb",
+      "scaleMeters": [
+        0.15,
+        0.1,
+        0.15
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "differential_simplified",
+      "name": "Differential",
+      "category": "mechanical",
+      "semanticTags": [
+        "differential",
+        "diff",
+        "axle"
+      ],
+      "path": "/assets/spatail-library/mechanical/differential_simplified.glb",
+      "scaleMeters": [
+        0.18,
+        0.18,
+        0.18
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "driveshaft",
+      "name": "Driveshaft",
+      "category": "mechanical",
+      "semanticTags": [
+        "driveshaft",
+        "prop",
+        "shaft"
+      ],
+      "path": "/assets/spatail-library/mechanical/driveshaft.glb",
+      "scaleMeters": [
+        0.04,
+        0.04,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "rack_and_pinion",
+      "name": "Rack and Pinion",
+      "category": "mechanical",
+      "semanticTags": [
+        "rack",
+        "pinion",
+        "steering"
+      ],
+      "path": "/assets/spatail-library/mechanical/rack_and_pinion.glb",
+      "scaleMeters": [
+        0.3,
+        0.04,
+        0.04
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "steering_wheel_simplified",
+      "name": "Steering Wheel",
+      "category": "mechanical",
+      "semanticTags": [
+        "steering",
+        "wheel"
+      ],
+      "path": "/assets/spatail-library/mechanical/steering_wheel_simplified.glb",
+      "scaleMeters": [
+        0.35,
+        0.05,
+        0.35
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "suspension_arm",
+      "name": "Suspension Arm",
+      "category": "mechanical",
+      "semanticTags": [
+        "suspension",
+        "arm",
+        "control"
+      ],
+      "path": "/assets/spatail-library/mechanical/suspension_arm.glb",
+      "scaleMeters": [
+        0.06,
+        0.04,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "coilover",
+      "name": "Coilover",
+      "category": "mechanical",
+      "semanticTags": [
+        "coilover",
+        "suspension",
+        "spring"
+      ],
+      "path": "/assets/spatail-library/mechanical/coilover.glb",
+      "scaleMeters": [
+        0.06,
+        0.3,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "radiator",
+      "name": "Radiator",
+      "category": "mechanical",
+      "semanticTags": [
+        "radiator",
+        "cooling"
+      ],
+      "path": "/assets/spatail-library/mechanical/radiator.glb",
+      "scaleMeters": [
+        0.4,
+        0.4,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "fan_blade",
+      "name": "Fan Blade",
+      "category": "mechanical",
+      "semanticTags": [
+        "fan",
+        "blade",
+        "cooling"
+      ],
+      "path": "/assets/spatail-library/mechanical/fan_blade.glb",
+      "scaleMeters": [
+        0.2,
+        0.02,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "battery_block",
+      "name": "Battery Block",
+      "category": "mechanical",
+      "semanticTags": [
+        "battery",
+        "cell",
+        "power"
+      ],
+      "path": "/assets/spatail-library/mechanical/battery_block.glb",
+      "scaleMeters": [
+        0.2,
+        0.18,
+        0.15
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "electric_motor_simplified",
+      "name": "Electric Motor",
+      "category": "mechanical",
+      "semanticTags": [
+        "motor",
+        "electric",
+        "ev"
+      ],
+      "path": "/assets/spatail-library/mechanical/electric_motor_simplified.glb",
+      "scaleMeters": [
+        0.15,
+        0.15,
+        0.25
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "rotor",
+      "name": "Rotor",
+      "category": "mechanical",
+      "semanticTags": [
+        "rotor",
+        "motor",
+        "rotating"
+      ],
+      "path": "/assets/spatail-library/mechanical/rotor.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "stator",
+      "name": "Stator",
+      "category": "mechanical",
+      "semanticTags": [
+        "stator",
+        "motor",
+        "winding"
+      ],
+      "path": "/assets/spatail-library/mechanical/stator.glb",
+      "scaleMeters": [
+        0.15,
+        0.2,
+        0.15
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "hydraulic_cylinder",
+      "name": "Hydraulic Cylinder",
+      "category": "mechanical",
+      "semanticTags": [
+        "hydraulic",
+        "cylinder",
+        "actuator"
+      ],
+      "path": "/assets/spatail-library/mechanical/hydraulic_cylinder.glb",
+      "scaleMeters": [
+        0.05,
+        0.3,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pump_simplified",
+      "name": "Pump",
+      "category": "mechanical",
+      "semanticTags": [
+        "pump",
+        "fluid"
+      ],
+      "path": "/assets/spatail-library/mechanical/pump_simplified.glb",
+      "scaleMeters": [
+        0.12,
+        0.12,
+        0.15
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pipe_straight",
+      "name": "Straight Pipe",
+      "category": "mechanical",
+      "semanticTags": [
+        "pipe",
+        "tube",
+        "straight"
+      ],
+      "path": "/assets/spatail-library/mechanical/pipe_straight.glb",
+      "scaleMeters": [
+        0.04,
+        0.04,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pipe_elbow",
+      "name": "Pipe Elbow",
+      "category": "mechanical",
+      "semanticTags": [
+        "pipe",
+        "elbow",
+        "bend"
+      ],
+      "path": "/assets/spatail-library/mechanical/pipe_elbow.glb",
+      "scaleMeters": [
+        0.08,
+        0.04,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pipe_tee",
+      "name": "Pipe Tee",
+      "category": "mechanical",
+      "semanticTags": [
+        "pipe",
+        "tee",
+        "junction"
+      ],
+      "path": "/assets/spatail-library/mechanical/pipe_tee.glb",
+      "scaleMeters": [
+        0.1,
+        0.04,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "flange",
+      "name": "Flange",
+      "category": "mechanical",
+      "semanticTags": [
+        "flange",
+        "pipe",
+        "connector"
+      ],
+      "path": "/assets/spatail-library/mechanical/flange.glb",
+      "scaleMeters": [
+        0.08,
+        0.02,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pressure_gauge",
+      "name": "Pressure Gauge",
+      "category": "mechanical",
+      "semanticTags": [
+        "gauge",
+        "pressure",
+        "meter"
+      ],
+      "path": "/assets/spatail-library/mechanical/pressure_gauge.glb",
+      "scaleMeters": [
+        0.06,
+        0.03,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

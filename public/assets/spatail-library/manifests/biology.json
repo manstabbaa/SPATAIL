@@ -1,0 +1,1263 @@
+{
+  "category": "biology",
+  "count": 36,
+  "assets": [
+    {
+      "assetId": "generic_cell",
+      "name": "Generic Cell",
+      "category": "biology",
+      "semanticTags": [
+        "cell",
+        "biology",
+        "division"
+      ],
+      "path": "/assets/spatail-library/biology/generic_cell.glb",
+      "scaleMeters": [
+        0.25,
+        0.25,
+        0.25
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "cell_membrane",
+      "name": "Cell Membrane",
+      "category": "biology",
+      "semanticTags": [
+        "membrane",
+        "cell",
+        "wall"
+      ],
+      "path": "/assets/spatail-library/biology/cell_membrane.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "nucleus",
+      "name": "Nucleus",
+      "category": "biology",
+      "semanticTags": [
+        "nucleus",
+        "cell",
+        "dna"
+      ],
+      "path": "/assets/spatail-library/biology/nucleus.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "mitochondria",
+      "name": "Mitochondria",
+      "category": "biology",
+      "semanticTags": [
+        "mitochondria",
+        "organelle",
+        "energy"
+      ],
+      "path": "/assets/spatail-library/biology/mitochondria.glb",
+      "scaleMeters": [
+        0.06,
+        0.04,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "ribosome_dots",
+      "name": "Ribosomes",
+      "category": "biology",
+      "semanticTags": [
+        "ribosome",
+        "organelle",
+        "protein"
+      ],
+      "path": "/assets/spatail-library/biology/ribosome_dots.glb",
+      "scaleMeters": [
+        0.02,
+        0.02,
+        0.02
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "dna_double_helix",
+      "name": "DNA Double Helix",
+      "category": "biology",
+      "semanticTags": [
+        "dna",
+        "helix",
+        "genetic"
+      ],
+      "path": "/assets/spatail-library/biology/dna_double_helix.glb",
+      "scaleMeters": [
+        0.08,
+        0.4,
+        0.08
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "chromosome",
+      "name": "Chromosome",
+      "category": "biology",
+      "semanticTags": [
+        "chromosome",
+        "dna",
+        "genetic"
+      ],
+      "path": "/assets/spatail-library/biology/chromosome.glb",
+      "scaleMeters": [
+        0.04,
+        0.16,
+        0.04
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "protein_chain",
+      "name": "Protein Chain",
+      "category": "biology",
+      "semanticTags": [
+        "protein",
+        "chain",
+        "amino"
+      ],
+      "path": "/assets/spatail-library/biology/protein_chain.glb",
+      "scaleMeters": [
+        0.1,
+        0.06,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "red_blood_cell",
+      "name": "Red Blood Cell",
+      "category": "biology",
+      "semanticTags": [
+        "rbc",
+        "blood",
+        "cell"
+      ],
+      "path": "/assets/spatail-library/biology/red_blood_cell.glb",
+      "scaleMeters": [
+        0.06,
+        0.02,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "white_blood_cell",
+      "name": "White Blood Cell",
+      "category": "biology",
+      "semanticTags": [
+        "wbc",
+        "blood",
+        "immune"
+      ],
+      "path": "/assets/spatail-library/biology/white_blood_cell.glb",
+      "scaleMeters": [
+        0.07,
+        0.07,
+        0.07
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "neuron",
+      "name": "Neuron",
+      "category": "biology",
+      "semanticTags": [
+        "neuron",
+        "brain",
+        "nerve"
+      ],
+      "path": "/assets/spatail-library/biology/neuron.glb",
+      "scaleMeters": [
+        0.2,
+        0.1,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "synapse",
+      "name": "Synapse",
+      "category": "biology",
+      "semanticTags": [
+        "synapse",
+        "neuron",
+        "connection"
+      ],
+      "path": "/assets/spatail-library/biology/synapse.glb",
+      "scaleMeters": [
+        0.06,
+        0.04,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bone_segment",
+      "name": "Bone Segment",
+      "category": "biology",
+      "semanticTags": [
+        "bone",
+        "skeleton"
+      ],
+      "path": "/assets/spatail-library/biology/bone_segment.glb",
+      "scaleMeters": [
+        0.05,
+        0.25,
+        0.05
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "vertebra",
+      "name": "Vertebra",
+      "category": "biology",
+      "semanticTags": [
+        "vertebra",
+        "spine",
+        "bone"
+      ],
+      "path": "/assets/spatail-library/biology/vertebra.glb",
+      "scaleMeters": [
+        0.06,
+        0.04,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "simplified_spine",
+      "name": "Simplified Spine",
+      "category": "biology",
+      "semanticTags": [
+        "spine",
+        "vertebrae",
+        "back"
+      ],
+      "path": "/assets/spatail-library/biology/simplified_spine.glb",
+      "scaleMeters": [
+        0.08,
+        0.5,
+        0.08
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "heart_simplified",
+      "name": "Heart",
+      "category": "biology",
+      "semanticTags": [
+        "heart",
+        "cardiac",
+        "organ"
+      ],
+      "path": "/assets/spatail-library/biology/heart_simplified.glb",
+      "scaleMeters": [
+        0.12,
+        0.14,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "lung_pair_simplified",
+      "name": "Lungs",
+      "category": "biology",
+      "semanticTags": [
+        "lung",
+        "respiratory",
+        "organ"
+      ],
+      "path": "/assets/spatail-library/biology/lung_pair_simplified.glb",
+      "scaleMeters": [
+        0.2,
+        0.24,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "stomach_simplified",
+      "name": "Stomach",
+      "category": "biology",
+      "semanticTags": [
+        "stomach",
+        "digestive",
+        "organ"
+      ],
+      "path": "/assets/spatail-library/biology/stomach_simplified.glb",
+      "scaleMeters": [
+        0.12,
+        0.16,
+        0.08
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "kidney_simplified",
+      "name": "Kidney",
+      "category": "biology",
+      "semanticTags": [
+        "kidney",
+        "organ"
+      ],
+      "path": "/assets/spatail-library/biology/kidney_simplified.glb",
+      "scaleMeters": [
+        0.06,
+        0.1,
+        0.04
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "brain_simplified",
+      "name": "Brain",
+      "category": "biology",
+      "semanticTags": [
+        "brain",
+        "neural",
+        "organ"
+      ],
+      "path": "/assets/spatail-library/biology/brain_simplified.glb",
+      "scaleMeters": [
+        0.16,
+        0.12,
+        0.18
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "muscle_fiber",
+      "name": "Muscle Fiber",
+      "category": "biology",
+      "semanticTags": [
+        "muscle",
+        "fiber",
+        "tissue"
+      ],
+      "path": "/assets/spatail-library/biology/muscle_fiber.glb",
+      "scaleMeters": [
+        0.04,
+        0.2,
+        0.04
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "tendon_strip",
+      "name": "Tendon",
+      "category": "biology",
+      "semanticTags": [
+        "tendon",
+        "connective",
+        "tissue"
+      ],
+      "path": "/assets/spatail-library/biology/tendon_strip.glb",
+      "scaleMeters": [
+        0.03,
+        0.15,
+        0.03
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "joint_ball_socket",
+      "name": "Ball & Socket Joint",
+      "category": "biology",
+      "semanticTags": [
+        "joint",
+        "ball",
+        "socket"
+      ],
+      "path": "/assets/spatail-library/biology/joint_ball_socket.glb",
+      "scaleMeters": [
+        0.08,
+        0.08,
+        0.08
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "virus_particle",
+      "name": "Virus Particle",
+      "category": "biology",
+      "semanticTags": [
+        "virus",
+        "pathogen"
+      ],
+      "path": "/assets/spatail-library/biology/virus_particle.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bacteria_rod",
+      "name": "Rod Bacteria",
+      "category": "biology",
+      "semanticTags": [
+        "bacteria",
+        "rod",
+        "microbe"
+      ],
+      "path": "/assets/spatail-library/biology/bacteria_rod.glb",
+      "scaleMeters": [
+        0.04,
+        0.12,
+        0.04
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bacteria_sphere",
+      "name": "Sphere Bacteria",
+      "category": "biology",
+      "semanticTags": [
+        "bacteria",
+        "coccus",
+        "microbe"
+      ],
+      "path": "/assets/spatail-library/biology/bacteria_sphere.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "petri_dish",
+      "name": "Petri Dish",
+      "category": "biology",
+      "semanticTags": [
+        "petri",
+        "dish",
+        "lab"
+      ],
+      "path": "/assets/spatail-library/biology/petri_dish.glb",
+      "scaleMeters": [
+        0.15,
+        0.02,
+        0.15
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "microscope",
+      "name": "Microscope",
+      "category": "biology",
+      "semanticTags": [
+        "microscope",
+        "lab",
+        "magnify"
+      ],
+      "path": "/assets/spatail-library/biology/microscope.glb",
+      "scaleMeters": [
+        0.15,
+        0.3,
+        0.15
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "molecule_ball",
+      "name": "Molecule Atom",
+      "category": "biology",
+      "semanticTags": [
+        "molecule",
+        "atom",
+        "ball"
+      ],
+      "path": "/assets/spatail-library/biology/molecule_ball.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "molecule_bond",
+      "name": "Molecule Bond",
+      "category": "biology",
+      "semanticTags": [
+        "molecule",
+        "bond",
+        "stick"
+      ],
+      "path": "/assets/spatail-library/biology/molecule_bond.glb",
+      "scaleMeters": [
+        0.01,
+        0.08,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "atom_nucleus",
+      "name": "Atom Nucleus",
+      "category": "biology",
+      "semanticTags": [
+        "atom",
+        "nucleus",
+        "proton"
+      ],
+      "path": "/assets/spatail-library/biology/atom_nucleus.glb",
+      "scaleMeters": [
+        0.05,
+        0.05,
+        0.05
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "electron_orbit",
+      "name": "Electron Orbit",
+      "category": "biology",
+      "semanticTags": [
+        "electron",
+        "orbit",
+        "shell"
+      ],
+      "path": "/assets/spatail-library/biology/electron_orbit.glb",
+      "scaleMeters": [
+        0.2,
+        0.01,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "water_molecule",
+      "name": "Water Molecule",
+      "category": "biology",
+      "semanticTags": [
+        "water",
+        "h2o",
+        "molecule"
+      ],
+      "path": "/assets/spatail-library/biology/water_molecule.glb",
+      "scaleMeters": [
+        0.1,
+        0.08,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "carbon_atom",
+      "name": "Carbon Atom",
+      "category": "biology",
+      "semanticTags": [
+        "carbon",
+        "atom",
+        "element"
+      ],
+      "path": "/assets/spatail-library/biology/carbon_atom.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "oxygen_atom",
+      "name": "Oxygen Atom",
+      "category": "biology",
+      "semanticTags": [
+        "oxygen",
+        "atom",
+        "element"
+      ],
+      "path": "/assets/spatail-library/biology/oxygen_atom.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "hydrogen_atom",
+      "name": "Hydrogen Atom",
+      "category": "biology",
+      "semanticTags": [
+        "hydrogen",
+        "atom",
+        "element"
+      ],
+      "path": "/assets/spatail-library/biology/hydrogen_atom.glb",
+      "scaleMeters": [
+        0.04,
+        0.04,
+        0.04
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

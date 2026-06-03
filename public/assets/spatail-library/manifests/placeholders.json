@@ -1,0 +1,495 @@
+{
+  "category": "placeholders",
+  "count": 15,
+  "assets": [
+    {
+      "assetId": "generic_object_placeholder",
+      "name": "Generic Object Placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "generic",
+        "loading"
+      ],
+      "path": "/assets/spatail-library/placeholders/generic_object_placeholder.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "mechanical_placeholder",
+      "name": "Mechanical Placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "mechanical"
+      ],
+      "path": "/assets/spatail-library/placeholders/mechanical_placeholder.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "biological_placeholder",
+      "name": "Biological Placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "biology"
+      ],
+      "path": "/assets/spatail-library/placeholders/biological_placeholder.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "architecture_placeholder",
+      "name": "Architecture Placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "architecture"
+      ],
+      "path": "/assets/spatail-library/placeholders/architecture_placeholder.glb",
+      "scaleMeters": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "product_placeholder",
+      "name": "Product Placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "product"
+      ],
+      "path": "/assets/spatail-library/placeholders/product_placeholder.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "rounded_cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "vehicle_placeholder",
+      "name": "Vehicle Placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "vehicle"
+      ],
+      "path": "/assets/spatail-library/placeholders/vehicle_placeholder.glb",
+      "scaleMeters": [
+        0.5,
+        0.25,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "furniture_placeholder",
+      "name": "Furniture Placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "furniture"
+      ],
+      "path": "/assets/spatail-library/placeholders/furniture_placeholder.glb",
+      "scaleMeters": [
+        0.6,
+        0.6,
+        0.6
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "planet_placeholder",
+      "name": "Planet Placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "planet",
+        "astronomy"
+      ],
+      "path": "/assets/spatail-library/placeholders/planet_placeholder.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "process_placeholder",
+      "name": "Process Placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "process",
+        "flow"
+      ],
+      "path": "/assets/spatail-library/placeholders/process_placeholder.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "data_placeholder",
+      "name": "Data Placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "data",
+        "chart"
+      ],
+      "path": "/assets/spatail-library/placeholders/data_placeholder.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "loading_skeleton_mesh",
+      "name": "Loading Skeleton Mesh",
+      "category": "placeholders",
+      "semanticTags": [
+        "loading",
+        "skeleton",
+        "wireframe"
+      ],
+      "path": "/assets/spatail-library/placeholders/loading_skeleton_mesh.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "low_poly_proxy_mesh",
+      "name": "Low-Poly Proxy Mesh",
+      "category": "placeholders",
+      "semanticTags": [
+        "lowpoly",
+        "proxy",
+        "lod"
+      ],
+      "path": "/assets/spatail-library/placeholders/low_poly_proxy_mesh.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "transparent_bounding_box",
+      "name": "Transparent Bounding Box",
+      "category": "placeholders",
+      "semanticTags": [
+        "bbox",
+        "bounds",
+        "transparent"
+      ],
+      "path": "/assets/spatail-library/placeholders/transparent_bounding_box.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "semantic_icon_marker",
+      "name": "Semantic Icon Marker",
+      "category": "placeholders",
+      "semanticTags": [
+        "icon",
+        "semantic",
+        "marker"
+      ],
+      "path": "/assets/spatail-library/placeholders/semantic_icon_marker.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "asset_generating_hologram",
+      "name": "Asset Generating Hologram",
+      "category": "placeholders",
+      "semanticTags": [
+        "generating",
+        "hologram",
+        "loading"
+      ],
+      "path": "/assets/spatail-library/placeholders/asset_generating_hologram.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

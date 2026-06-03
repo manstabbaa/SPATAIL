@@ -1,0 +1,346 @@
+{
+  "category": "education",
+  "count": 10,
+  "assets": [
+    {
+      "assetId": "chalkboard",
+      "name": "Chalkboard",
+      "category": "education",
+      "semanticTags": [
+        "board",
+        "chalk",
+        "teach"
+      ],
+      "path": "/assets/spatail-library/education/chalkboard.glb",
+      "scaleMeters": [
+        0.6,
+        0.4,
+        0.03
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "number_block",
+      "name": "Number Block",
+      "category": "education",
+      "semanticTags": [
+        "number",
+        "block",
+        "count"
+      ],
+      "path": "/assets/spatail-library/education/number_block.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "letter_block",
+      "name": "Letter Block",
+      "category": "education",
+      "semanticTags": [
+        "letter",
+        "block",
+        "alphabet"
+      ],
+      "path": "/assets/spatail-library/education/letter_block.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "diagram_plane",
+      "name": "Diagram Plane",
+      "category": "education",
+      "semanticTags": [
+        "diagram",
+        "plane",
+        "chart"
+      ],
+      "path": "/assets/spatail-library/education/diagram_plane.glb",
+      "scaleMeters": [
+        0.4,
+        0.3,
+        0.01
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pointer_stick",
+      "name": "Pointer Stick",
+      "category": "education",
+      "semanticTags": [
+        "pointer",
+        "stick",
+        "indicate"
+      ],
+      "path": "/assets/spatail-library/education/pointer_stick.glb",
+      "scaleMeters": [
+        0.01,
+        0.01,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "abacus_bead",
+      "name": "Abacus Bead",
+      "category": "education",
+      "semanticTags": [
+        "abacus",
+        "bead",
+        "count"
+      ],
+      "path": "/assets/spatail-library/education/abacus_bead.glb",
+      "scaleMeters": [
+        0.03,
+        0.03,
+        0.03
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "flashcard",
+      "name": "Flashcard",
+      "category": "education",
+      "semanticTags": [
+        "flashcard",
+        "card",
+        "quiz"
+      ],
+      "path": "/assets/spatail-library/education/flashcard.glb",
+      "scaleMeters": [
+        0.15,
+        0.1,
+        0.01
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "globe_stand",
+      "name": "Globe on Stand",
+      "category": "education",
+      "semanticTags": [
+        "globe",
+        "earth",
+        "geography"
+      ],
+      "path": "/assets/spatail-library/education/globe_stand.glb",
+      "scaleMeters": [
+        0.2,
+        0.28,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "magnifier",
+      "name": "Magnifier",
+      "category": "education",
+      "semanticTags": [
+        "magnify",
+        "lens",
+        "zoom"
+      ],
+      "path": "/assets/spatail-library/education/magnifier.glb",
+      "scaleMeters": [
+        0.1,
+        0.02,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "clipboard",
+      "name": "Clipboard",
+      "category": "education",
+      "semanticTags": [
+        "clipboard",
+        "notes",
+        "checklist"
+      ],
+      "path": "/assets/spatail-library/education/clipboard.glb",
+      "scaleMeters": [
+        0.2,
+        0.28,
+        0.01
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

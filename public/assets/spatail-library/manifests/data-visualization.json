@@ -1,0 +1,798 @@
+{
+  "category": "data-visualization",
+  "count": 24,
+  "assets": [
+    {
+      "assetId": "bar_chart_bar",
+      "name": "Bar (Chart)",
+      "category": "data-visualization",
+      "semanticTags": [
+        "bar",
+        "chart",
+        "column"
+      ],
+      "path": "/assets/spatail-library/data-visualization/bar_chart_bar.glb",
+      "scaleMeters": [
+        0.05,
+        0.2,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "stacked_bar_segment",
+      "name": "Stacked Bar Segment",
+      "category": "data-visualization",
+      "semanticTags": [
+        "stacked",
+        "bar",
+        "segment"
+      ],
+      "path": "/assets/spatail-library/data-visualization/stacked_bar_segment.glb",
+      "scaleMeters": [
+        0.05,
+        0.2,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "line_chart_point",
+      "name": "Line Chart Point",
+      "category": "data-visualization",
+      "semanticTags": [
+        "line",
+        "point",
+        "marker"
+      ],
+      "path": "/assets/spatail-library/data-visualization/line_chart_point.glb",
+      "scaleMeters": [
+        0.02,
+        0.02,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "line_chart_segment",
+      "name": "Line Chart Segment",
+      "category": "data-visualization",
+      "semanticTags": [
+        "line",
+        "segment",
+        "trend"
+      ],
+      "path": "/assets/spatail-library/data-visualization/line_chart_segment.glb",
+      "scaleMeters": [
+        0.005,
+        0.005,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pie_chart_slice",
+      "name": "Pie Slice",
+      "category": "data-visualization",
+      "semanticTags": [
+        "pie",
+        "slice",
+        "share"
+      ],
+      "path": "/assets/spatail-library/data-visualization/pie_chart_slice.glb",
+      "scaleMeters": [
+        0.2,
+        0.04,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "donut_chart_slice",
+      "name": "Donut Slice",
+      "category": "data-visualization",
+      "semanticTags": [
+        "donut",
+        "slice",
+        "ring"
+      ],
+      "path": "/assets/spatail-library/data-visualization/donut_chart_slice.glb",
+      "scaleMeters": [
+        0.2,
+        0.04,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "scatter_point",
+      "name": "Scatter Point",
+      "category": "data-visualization",
+      "semanticTags": [
+        "scatter",
+        "point",
+        "dot"
+      ],
+      "path": "/assets/spatail-library/data-visualization/scatter_point.glb",
+      "scaleMeters": [
+        0.02,
+        0.02,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "axis_line",
+      "name": "Axis Line",
+      "category": "data-visualization",
+      "semanticTags": [
+        "axis",
+        "line",
+        "scale"
+      ],
+      "path": "/assets/spatail-library/data-visualization/axis_line.glb",
+      "scaleMeters": [
+        0.005,
+        0.005,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "axis_label",
+      "name": "Axis Label",
+      "category": "data-visualization",
+      "semanticTags": [
+        "axis",
+        "label",
+        "text"
+      ],
+      "path": "/assets/spatail-library/data-visualization/axis_label.glb",
+      "scaleMeters": [
+        0.08,
+        0.03,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "tick_mark",
+      "name": "Tick Mark",
+      "category": "data-visualization",
+      "semanticTags": [
+        "tick",
+        "mark",
+        "scale"
+      ],
+      "path": "/assets/spatail-library/data-visualization/tick_mark.glb",
+      "scaleMeters": [
+        0.01,
+        0.02,
+        0.01
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "legend_card",
+      "name": "Legend Card",
+      "category": "data-visualization",
+      "semanticTags": [
+        "legend",
+        "key",
+        "card"
+      ],
+      "path": "/assets/spatail-library/data-visualization/legend_card.glb",
+      "scaleMeters": [
+        0.15,
+        0.12,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "numeric_value_card",
+      "name": "Numeric Value Card",
+      "category": "data-visualization",
+      "semanticTags": [
+        "number",
+        "value",
+        "card"
+      ],
+      "path": "/assets/spatail-library/data-visualization/numeric_value_card.glb",
+      "scaleMeters": [
+        0.12,
+        0.08,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "percentage_ring",
+      "name": "Percentage Ring",
+      "category": "data-visualization",
+      "semanticTags": [
+        "percent",
+        "ring",
+        "gauge"
+      ],
+      "path": "/assets/spatail-library/data-visualization/percentage_ring.glb",
+      "scaleMeters": [
+        0.12,
+        0.02,
+        0.12
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "progress_ring",
+      "name": "Progress Ring",
+      "category": "data-visualization",
+      "semanticTags": [
+        "progress",
+        "ring",
+        "loading"
+      ],
+      "path": "/assets/spatail-library/data-visualization/progress_ring.glb",
+      "scaleMeters": [
+        0.12,
+        0.02,
+        0.12
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "timeline_line",
+      "name": "Timeline Line",
+      "category": "data-visualization",
+      "semanticTags": [
+        "timeline",
+        "line",
+        "axis"
+      ],
+      "path": "/assets/spatail-library/data-visualization/timeline_line.glb",
+      "scaleMeters": [
+        0.005,
+        0.005,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "timeline_event_dot",
+      "name": "Timeline Event Dot",
+      "category": "data-visualization",
+      "semanticTags": [
+        "timeline",
+        "event",
+        "dot"
+      ],
+      "path": "/assets/spatail-library/data-visualization/timeline_event_dot.glb",
+      "scaleMeters": [
+        0.025,
+        0.025,
+        0.025
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "heatmap_tile",
+      "name": "Heatmap Tile",
+      "category": "data-visualization",
+      "semanticTags": [
+        "heatmap",
+        "tile",
+        "grid"
+      ],
+      "path": "/assets/spatail-library/data-visualization/heatmap_tile.glb",
+      "scaleMeters": [
+        0.05,
+        0.01,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "column_3d",
+      "name": "3D Column",
+      "category": "data-visualization",
+      "semanticTags": [
+        "column",
+        "3d",
+        "bar"
+      ],
+      "path": "/assets/spatail-library/data-visualization/column_3d.glb",
+      "scaleMeters": [
+        0.05,
+        0.2,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "data_surface_grid",
+      "name": "Data Surface Grid",
+      "category": "data-visualization",
+      "semanticTags": [
+        "surface",
+        "grid",
+        "mesh"
+      ],
+      "path": "/assets/spatail-library/data-visualization/data_surface_grid.glb",
+      "scaleMeters": [
+        0.4,
+        0.1,
+        0.4
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "flow_node",
+      "name": "Flow Node",
+      "category": "data-visualization",
+      "semanticTags": [
+        "flow",
+        "node",
+        "process"
+      ],
+      "path": "/assets/spatail-library/data-visualization/flow_node.glb",
+      "scaleMeters": [
+        0.08,
+        0.04,
+        0.08
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "flow_edge",
+      "name": "Flow Edge",
+      "category": "data-visualization",
+      "semanticTags": [
+        "flow",
+        "edge",
+        "arrow"
+      ],
+      "path": "/assets/spatail-library/data-visualization/flow_edge.glb",
+      "scaleMeters": [
+        0.02,
+        0.02,
+        0.15
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "arrow",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "hierarchy_node",
+      "name": "Hierarchy Node",
+      "category": "data-visualization",
+      "semanticTags": [
+        "hierarchy",
+        "node",
+        "tree"
+      ],
+      "path": "/assets/spatail-library/data-visualization/hierarchy_node.glb",
+      "scaleMeters": [
+        0.05,
+        0.05,
+        0.05
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "network_node",
+      "name": "Network Node",
+      "category": "data-visualization",
+      "semanticTags": [
+        "network",
+        "node",
+        "graph"
+      ],
+      "path": "/assets/spatail-library/data-visualization/network_node.glb",
+      "scaleMeters": [
+        0.05,
+        0.05,
+        0.05
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "network_link",
+      "name": "Network Link",
+      "category": "data-visualization",
+      "semanticTags": [
+        "network",
+        "link",
+        "edge"
+      ],
+      "path": "/assets/spatail-library/data-visualization/network_link.glb",
+      "scaleMeters": [
+        0.005,
+        0.005,
+        0.15
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

@@ -24,7 +24,10 @@ class DeliveredAsset:
     path: str                               # the modular GLB (complete/default variant)
     variants: dict = field(default_factory=dict)     # variant name -> glb path
     metadata: AssetMetadata | None = None
-    status: str = "dry_run"                 # dry_run | built | cached
+    status: str = "dry_run"                 # dry_run | built | cached | library | primitive | placeholder
+    source: str = "generate"                # which resolution tier produced it
+    libraryAssetId: str = ""                # the starter-library catalog asset that resolved it
+    fallbackPrimitive: str = ""             # runtime proxy shape when path is empty
 
 
 @dataclass

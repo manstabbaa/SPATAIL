@@ -1,0 +1,29 @@
+{
+  "title": "SPATAIL library asset metadata",
+  "fields": {
+    "assetId": "stable unique id (snake_case)",
+    "name": "human-readable name",
+    "category": "library folder / domain",
+    "semanticTags": "match terms for find_asset (lowercase)",
+    "path": "URL of the GLB within the public/ web root (may not exist yet)",
+    "scaleMeters": "[x,y,z] display size in metres (runtime rescales to room)",
+    "pivot": "center | center_bottom | \u2026",
+    "placementTypes": "where it can anchor: table | floor | floating",
+    "representationUses": "strategy ids (manifests/strategies.json) this asset suits",
+    "supportsHighlight": "can take a highlight outline/material",
+    "supportsTransparency": "can render transparent (cutaway/xray/ghost)",
+    "supportsAnimation": "can be animated by a behaviour",
+    "fallbackPrimitive": "runtime proxy shape when no GLB exists: arrow, capsule, cone, cube, cylinder, half_sphere, line, none, plane, ring, rounded_cube, sphere, torus",
+    "qualityLevel": "starter | refined | hero",
+    "license": "internal_generated | \u2026",
+    "assetState": "metadata (no GLB yet) | generated | cached",
+    "primitiveSpec": "(optional) extra dims/axis for the fallback primitive"
+  },
+  "resolutionOrder": [
+    "1 exact library asset (real GLB)",
+    "2 close semantic library asset (real GLB)",
+    "3 runtime primitive enriched by the matched catalog entry",
+    "4 placeholder (shown immediately)",
+    "5 generate in Blender -> cache back into the library"
+  ]
+}

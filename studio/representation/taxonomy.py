@@ -30,6 +30,11 @@ STRATEGIES = [
     "animated_simulation", "assembly_sequence", "timeline", "guided_narrative",
     "comparison_layout", "layered_breakdown", "flow_visualization",
     "cause_and_effect", "interactive_sandbox",
+    # Library-introduced strategies (studio/library/manifests/strategies.json) —
+    # catalogued + known, but NOT in STRATEGY_MATRIX/OVERRIDES, so the selector's
+    # existing behaviour is unchanged; they're available for explicit/library use.
+    "tabletop_miniature", "xray_view", "disassembly_sequence", "scale_compression",
+    "scale_expansion", "before_after_comparison", "system_map", "part_to_whole_explanation",
 ]
 
 DEFAULT_DOMAIN = "general_knowledge"
@@ -259,6 +264,14 @@ STRATEGY_CITATIONS = {
     "flow_visualization": "Visualise movement/quantity flowing through a system — best for processes, pipelines, and data movement.",
     "cause_and_effect": "Stage a trigger and its consequence so the link is seen, not told — best for mechanisms of influence.",
     "interactive_sandbox": "Give the user direct controls to manipulate the subject and observe outcomes — best when discovery beats narration.",
+    "tabletop_miniature": "Shrink a large subject onto the table so it's graspable and overviewable.",
+    "xray_view": "Make the shell transparent to see internals in place without removing them.",
+    "disassembly_sequence": "Take the subject apart step by step (reverse assembly).",
+    "scale_compression": "Compress an enormous subject to a comprehensible size.",
+    "scale_expansion": "Expand a tiny subject to room scale so it can be inspected.",
+    "before_after_comparison": "Show two states of the same subject side by side.",
+    "system_map": "Lay a system out as nodes and links the user can trace.",
+    "part_to_whole_explanation": "Move between a part and the whole it belongs to.",
 }
 
 # ── Per-strategy beat templates (the planner fills {subject}) ────────────────

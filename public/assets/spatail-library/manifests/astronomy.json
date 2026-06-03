@@ -1,0 +1,786 @@
+{
+  "category": "astronomy",
+  "count": 23,
+  "assets": [
+    {
+      "assetId": "sun",
+      "name": "Sun",
+      "category": "astronomy",
+      "semanticTags": [
+        "sun",
+        "star",
+        "solar"
+      ],
+      "path": "/assets/spatail-library/astronomy/sun.glb",
+      "scaleMeters": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "mercury",
+      "name": "Mercury",
+      "category": "astronomy",
+      "semanticTags": [
+        "mercury",
+        "planet"
+      ],
+      "path": "/assets/spatail-library/astronomy/mercury.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "venus",
+      "name": "Venus",
+      "category": "astronomy",
+      "semanticTags": [
+        "venus",
+        "planet"
+      ],
+      "path": "/assets/spatail-library/astronomy/venus.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "earth",
+      "name": "Earth",
+      "category": "astronomy",
+      "semanticTags": [
+        "earth",
+        "planet",
+        "globe"
+      ],
+      "path": "/assets/spatail-library/astronomy/earth.glb",
+      "scaleMeters": [
+        0.12,
+        0.12,
+        0.12
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "moon",
+      "name": "Moon",
+      "category": "astronomy",
+      "semanticTags": [
+        "moon",
+        "satellite",
+        "lunar"
+      ],
+      "path": "/assets/spatail-library/astronomy/moon.glb",
+      "scaleMeters": [
+        0.05,
+        0.05,
+        0.05
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "mars",
+      "name": "Mars",
+      "category": "astronomy",
+      "semanticTags": [
+        "mars",
+        "planet",
+        "red"
+      ],
+      "path": "/assets/spatail-library/astronomy/mars.glb",
+      "scaleMeters": [
+        0.08,
+        0.08,
+        0.08
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "jupiter",
+      "name": "Jupiter",
+      "category": "astronomy",
+      "semanticTags": [
+        "jupiter",
+        "planet",
+        "gas giant"
+      ],
+      "path": "/assets/spatail-library/astronomy/jupiter.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "saturn",
+      "name": "Saturn",
+      "category": "astronomy",
+      "semanticTags": [
+        "saturn",
+        "planet",
+        "rings"
+      ],
+      "path": "/assets/spatail-library/astronomy/saturn.glb",
+      "scaleMeters": [
+        0.28,
+        0.28,
+        0.28
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "uranus",
+      "name": "Uranus",
+      "category": "astronomy",
+      "semanticTags": [
+        "uranus",
+        "planet",
+        "ice giant"
+      ],
+      "path": "/assets/spatail-library/astronomy/uranus.glb",
+      "scaleMeters": [
+        0.18,
+        0.18,
+        0.18
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "neptune",
+      "name": "Neptune",
+      "category": "astronomy",
+      "semanticTags": [
+        "neptune",
+        "planet",
+        "ice giant"
+      ],
+      "path": "/assets/spatail-library/astronomy/neptune.glb",
+      "scaleMeters": [
+        0.17,
+        0.17,
+        0.17
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "asteroid",
+      "name": "Asteroid",
+      "category": "astronomy",
+      "semanticTags": [
+        "asteroid",
+        "rock",
+        "space"
+      ],
+      "path": "/assets/spatail-library/astronomy/asteroid.glb",
+      "scaleMeters": [
+        0.05,
+        0.04,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "comet",
+      "name": "Comet",
+      "category": "astronomy",
+      "semanticTags": [
+        "comet",
+        "ice",
+        "tail"
+      ],
+      "path": "/assets/spatail-library/astronomy/comet.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "orbit_ring",
+      "name": "Orbit Ring",
+      "category": "astronomy",
+      "semanticTags": [
+        "orbit",
+        "ring",
+        "path"
+      ],
+      "path": "/assets/spatail-library/astronomy/orbit_ring.glb",
+      "scaleMeters": [
+        0.6,
+        0.01,
+        0.6
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "orbit_path_trail",
+      "name": "Orbit Path Trail",
+      "category": "astronomy",
+      "semanticTags": [
+        "orbit",
+        "trail",
+        "path"
+      ],
+      "path": "/assets/spatail-library/astronomy/orbit_path_trail.glb",
+      "scaleMeters": [
+        0.6,
+        0.01,
+        0.6
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "star_field_dome",
+      "name": "Star Field Dome",
+      "category": "astronomy",
+      "semanticTags": [
+        "stars",
+        "sky",
+        "dome"
+      ],
+      "path": "/assets/spatail-library/astronomy/star_field_dome.glb",
+      "scaleMeters": [
+        3.0,
+        1.5,
+        3.0
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "half_sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "galaxy_disk",
+      "name": "Galaxy Disk",
+      "category": "astronomy",
+      "semanticTags": [
+        "galaxy",
+        "disk",
+        "spiral"
+      ],
+      "path": "/assets/spatail-library/astronomy/galaxy_disk.glb",
+      "scaleMeters": [
+        0.5,
+        0.02,
+        0.5
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "rocket_simplified",
+      "name": "Rocket",
+      "category": "astronomy",
+      "semanticTags": [
+        "rocket",
+        "launch",
+        "space"
+      ],
+      "path": "/assets/spatail-library/astronomy/rocket_simplified.glb",
+      "scaleMeters": [
+        0.1,
+        0.4,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "satellite",
+      "name": "Satellite",
+      "category": "astronomy",
+      "semanticTags": [
+        "satellite",
+        "orbit",
+        "space"
+      ],
+      "path": "/assets/spatail-library/astronomy/satellite.glb",
+      "scaleMeters": [
+        0.1,
+        0.06,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "space_probe",
+      "name": "Space Probe",
+      "category": "astronomy",
+      "semanticTags": [
+        "probe",
+        "space",
+        "explore"
+      ],
+      "path": "/assets/spatail-library/astronomy/space_probe.glb",
+      "scaleMeters": [
+        0.1,
+        0.08,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "astronaut_simplified",
+      "name": "Astronaut",
+      "category": "astronomy",
+      "semanticTags": [
+        "astronaut",
+        "space",
+        "suit"
+      ],
+      "path": "/assets/spatail-library/astronomy/astronaut_simplified.glb",
+      "scaleMeters": [
+        0.3,
+        0.6,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "lunar_lander",
+      "name": "Lunar Lander",
+      "category": "astronomy",
+      "semanticTags": [
+        "lander",
+        "moon",
+        "spacecraft"
+      ],
+      "path": "/assets/spatail-library/astronomy/lunar_lander.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "earth_atmosphere_shell",
+      "name": "Atmosphere Shell",
+      "category": "astronomy",
+      "semanticTags": [
+        "atmosphere",
+        "earth",
+        "shell"
+      ],
+      "path": "/assets/spatail-library/astronomy/earth_atmosphere_shell.glb",
+      "scaleMeters": [
+        0.14,
+        0.14,
+        0.14
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "day_night_terminator_overlay",
+      "name": "Day/Night Terminator",
+      "category": "astronomy",
+      "semanticTags": [
+        "day",
+        "night",
+        "terminator"
+      ],
+      "path": "/assets/spatail-library/astronomy/day_night_terminator_overlay.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

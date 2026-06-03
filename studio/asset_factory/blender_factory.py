@@ -37,48 +37,82 @@ _LOOPING = {"spin", "orbit", "reciprocate"}
 
 class BlenderAssetFactory:
     def __init__(self, cache: AssetCache | None = None, blender_exe: str | None = None,
-                 build_timeout: float = 600.0):
+                 build_timeout: float = 600.0, library=None):
         self.cache = cache or AssetCache()
         self.blender_exe = blender_exe or BLENDER_EXE
         self.build_timeout = build_timeout
+        self.library = library            # optional studio.library.AssetLibrary (tiers 1-4)
         self.builds_attempted = 0          # how many real Blender subprocesses ran
 
     # -- public ---------------------------------------------------------------
     def produce(self, manifest, *, subject: str | None = None, dry_run: bool = True,
-                only=None, placement: dict | None = None) -> AssetDeliveryPackage:
+                only=None, placement: dict | None = None,
+                domain: str | None = None) -> AssetDeliveryPackage:
         """Consume an AssetRequestManifest → AssetDeliveryPackage.
 
-        dry_run=True (default): emit full structure, no Blender. dry_run=False:
-        build for real (limit to `only` asset ids to keep a proof to one build)."""
+        Resolution order per asset: starter-library (tiers 1-4, no Blender) →
+        generate in Blender (tier 4) → cache (tier 5). dry_run=True (default) never
+        invokes Blender; dry_run=False builds for real (limit to `only` ids)."""
         subject = subject or manifest.subject
+        strategy = getattr(manifest, "strategy", None)
         only = set(only) if only else None
         pkg = AssetDeliveryPackage(experienceId=manifest.experienceId)
         for req in manifest.assetRequests:
             really = (not dry_run) and (only is None or req.assetId in only)
-            pkg.assets.append(self._produce_one(req, subject, really, placement))
+            pkg.assets.append(self._produce_one(req, subject, really, placement, domain, strategy))
         pkg.animations = self._animations(manifest)
         return pkg
 
     # -- per-asset ------------------------------------------------------------
-    def _produce_one(self, req, subject: str, really: bool,
-                     placement: dict | None) -> DeliveredAsset:
+    def _produce_one(self, req, subject: str, really: bool, placement: dict | None,
+                     domain: str | None = None, strategy: str | None = None) -> DeliveredAsset:
         plan = request_to_plan(req, subject=subject)
         key = content_key(req, plan)
 
+        # tier 5: already generated+cached
         hit = self.cache.lookup(key)
         if hit:
-            return self._assemble(req, hit.glb_path, hit.bbox_m, "cached", placement)
+            return self._assemble(req, hit.glb_path, hit.bbox_m, "cached", placement, source="cached")
 
-        if not really:
-            paths = self.cache.paths_for(req.assetId)
-            bbox = predict_bbox_from_plan(plan)
-            return self._assemble(req, paths["glb_path"], bbox, "dry_run", placement)
+        # tier 4: explicit real build -> register back into the library (tier 5)
+        if really:
+            outcome = self._build(req, plan, key, subject)
+            if self.library is not None:
+                try:
+                    self.library.register_generated(
+                        outcome.assetId, outcome.glb_path, name=subject,
+                        semantic_tags=[subject], scale_meters=outcome.bbox_m.get("size"),
+                        representation_uses=[strategy] if strategy else [])
+                except Exception:  # noqa: BLE001 — library write must never fail a build
+                    pass
+            return self._assemble(req, outcome.glb_path, outcome.bbox_m, "built", placement, source="built")
 
-        outcome = self._build(req, plan, key, subject)
-        return self._assemble(req, outcome.glb_path, outcome.bbox_m, "built", placement)
+        # tiers 1-4: consult the starter library first (no Blender)
+        if self.library is not None:
+            res = self.library.resolve(asset_id=req.assetId, subject=subject, domain=domain,
+                                       semantic_role=req.semanticRole, strategy=strategy)
+            if res.source in ("library", "primitive", "placeholder"):
+                return self._deliver_from_library(req, res, placement)
+
+        # nothing fit: the predicted primitive plan (would generate on a real pass)
+        bbox = predict_bbox_from_plan(plan)
+        return self._assemble(req, self.cache.paths_for(req.assetId)["glb_path"], bbox,
+                              "dry_run", placement, source="generate")
+
+    def _deliver_from_library(self, req, res, placement: dict | None) -> DeliveredAsset:
+        s = res.scaleMeters or [0.1, 0.1, 0.1]
+        sx, sy, sz = float(s[0]), float(s[1]), float(s[2])
+        bbox = {"min": [round(-sx / 2, 4), round(-sy / 2, 4), 0.0],
+                "max": [round(sx / 2, 4), round(sy / 2, 4), round(sz, 4)],
+                "size": [round(sx, 4), round(sy, 4), round(sz, 4)],
+                "center": [0.0, 0.0, round(sz / 2, 4)]}
+        path = res.glbPath if res.source == "library" else ""
+        return self._assemble(req, path, bbox, res.source, placement, source=res.source,
+                              library_id=res.libraryAssetId, fallback=res.fallbackPrimitive)
 
     def _assemble(self, req, glb_path: str, bbox_m: dict, status: str,
-                  placement: dict | None) -> DeliveredAsset:
+                  placement: dict | None, *, source: str = "generate",
+                  library_id: str = "", fallback: str = "") -> DeliveredAsset:
         bbox_m = bbox_m or {}
         size = bbox_m.get("size", [0.0, 0.0, 0.0])
         center = bbox_m.get("center", [0.0, 0.0, 0.0])
@@ -94,8 +128,9 @@ class BlenderAssetFactory:
             realWorldScale=[round(v, 4) for v in size],
         )
         return DeliveredAsset(assetId=req.assetId, path=glb_path,
-                              variants=self._variant_paths(req, glb_path),
-                              metadata=meta, status=status)
+                              variants=self._variant_paths(req, glb_path) if glb_path else {},
+                              metadata=meta, status=status, source=source,
+                              libraryAssetId=library_id, fallbackPrimitive=fallback)
 
     def _variant_paths(self, req, base_glb: str) -> dict:
         out = {}

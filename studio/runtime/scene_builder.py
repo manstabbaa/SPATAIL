@@ -77,7 +77,7 @@ class RuntimeSceneBuilder:
                 "yaw_rad": round(xr.yaw_to_face_user(pb[0], pb[1]), 4),
                 "footprint_m": footprint,
                 "in_comfort_cone": xr.in_comfort_cone(pb),
-                "status": "processed" if asset.status in ("built", "cached") else "placeholder",
+                "status": "processed" if asset.status in ("built", "cached", "library") else "placeholder",
                 "processedPath": asset.path,
             })
         placed_by_id = {p["assetId"]: p for p in placed}

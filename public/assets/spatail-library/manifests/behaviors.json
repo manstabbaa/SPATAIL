@@ -1,0 +1,155 @@
+{
+  "count": 25,
+  "behaviors": [
+    {
+      "id": "fade_in",
+      "name": "Fade In",
+      "interactionType": "auto",
+      "runtime": "todo"
+    },
+    {
+      "id": "fade_out",
+      "name": "Fade Out",
+      "interactionType": "auto",
+      "runtime": "todo"
+    },
+    {
+      "id": "scale_in",
+      "name": "Scale In",
+      "interactionType": "auto",
+      "runtime": "RepresentationRuntime"
+    },
+    {
+      "id": "scale_out",
+      "name": "Scale Out",
+      "interactionType": "auto",
+      "runtime": "todo"
+    },
+    {
+      "id": "rotate_slowly",
+      "name": "Rotate Slowly",
+      "interactionType": "play_baked",
+      "runtime": "RepresentationRuntime"
+    },
+    {
+      "id": "pulse_highlight",
+      "name": "Pulse Highlight",
+      "interactionType": "on_focus",
+      "runtime": "RepresentationRuntime"
+    },
+    {
+      "id": "explode_outward",
+      "name": "Explode Outward",
+      "interactionType": "play_baked",
+      "runtime": "RepresentationRuntime"
+    },
+    {
+      "id": "assemble_inward",
+      "name": "Assemble Inward",
+      "interactionType": "play_baked",
+      "runtime": "RepresentationRuntime"
+    },
+    {
+      "id": "isolate_selected_part",
+      "name": "Isolate Selected Part",
+      "interactionType": "tap_reveal",
+      "runtime": "RepresentationRuntime"
+    },
+    {
+      "id": "dim_non_selected_parts",
+      "name": "Dim Non-Selected",
+      "interactionType": "tap_reveal",
+      "runtime": "RepresentationRuntime"
+    },
+    {
+      "id": "reveal_layer_by_layer",
+      "name": "Reveal Layer by Layer",
+      "interactionType": "tap_reveal",
+      "runtime": "todo"
+    },
+    {
+      "id": "scrub_timeline",
+      "name": "Scrub Timeline",
+      "interactionType": "play_baked",
+      "runtime": "todo"
+    },
+    {
+      "id": "play_process_steps",
+      "name": "Play Process Steps",
+      "interactionType": "play_baked",
+      "runtime": "todo"
+    },
+    {
+      "id": "orbit_around_center",
+      "name": "Orbit Around Center",
+      "interactionType": "play_baked",
+      "runtime": "todo"
+    },
+    {
+      "id": "bounce_attention_cue",
+      "name": "Bounce Attention Cue",
+      "interactionType": "on_focus",
+      "runtime": "todo"
+    },
+    {
+      "id": "draw_path_line",
+      "name": "Draw Path Line",
+      "interactionType": "auto",
+      "runtime": "todo"
+    },
+    {
+      "id": "flow_particles_along_path",
+      "name": "Flow Particles Along Path",
+      "interactionType": "auto",
+      "runtime": "todo"
+    },
+    {
+      "id": "move_object_a_to_b",
+      "name": "Move A to B",
+      "interactionType": "play_baked",
+      "runtime": "todo"
+    },
+    {
+      "id": "shake_impact",
+      "name": "Shake Impact",
+      "interactionType": "on_tap",
+      "runtime": "todo"
+    },
+    {
+      "id": "snap_into_place",
+      "name": "Snap Into Place",
+      "interactionType": "play_baked",
+      "runtime": "todo"
+    },
+    {
+      "id": "transform_placeholder_to_final",
+      "name": "Placeholder -> Final",
+      "interactionType": "auto",
+      "runtime": "todo"
+    },
+    {
+      "id": "xray_transition",
+      "name": "X-Ray Transition",
+      "interactionType": "tap_reveal",
+      "runtime": "todo"
+    },
+    {
+      "id": "cutaway_transition",
+      "name": "Cutaway Transition",
+      "interactionType": "tap_reveal",
+      "runtime": "todo"
+    },
+    {
+      "id": "comparison_slide_in",
+      "name": "Comparison Slide-In",
+      "interactionType": "auto",
+      "runtime": "todo"
+    },
+    {
+      "id": "guided_camera_orbit",
+      "name": "Guided Camera Orbit",
+      "interactionType": "play_baked",
+      "runtime": "todo"
+    }
+  ]
+}

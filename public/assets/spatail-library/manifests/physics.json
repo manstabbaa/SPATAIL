@@ -1,0 +1,1129 @@
+{
+  "category": "physics",
+  "count": 33,
+  "assets": [
+    {
+      "assetId": "apple",
+      "name": "Apple",
+      "category": "physics",
+      "semanticTags": [
+        "apple",
+        "fruit",
+        "fall",
+        "gravity"
+      ],
+      "path": "/assets/spatail-library/physics/apple.glb",
+      "scaleMeters": [
+        0.08,
+        0.08,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "tree_simplified",
+      "name": "Tree",
+      "category": "physics",
+      "semanticTags": [
+        "tree",
+        "plant",
+        "nature"
+      ],
+      "path": "/assets/spatail-library/physics/tree_simplified.glb",
+      "scaleMeters": [
+        0.4,
+        0.6,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "falling_object",
+      "name": "Falling Object",
+      "category": "physics",
+      "semanticTags": [
+        "falling",
+        "drop",
+        "gravity"
+      ],
+      "path": "/assets/spatail-library/physics/falling_object.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "ramp",
+      "name": "Ramp",
+      "category": "physics",
+      "semanticTags": [
+        "ramp",
+        "incline",
+        "slope"
+      ],
+      "path": "/assets/spatail-library/physics/ramp.glb",
+      "scaleMeters": [
+        0.4,
+        0.15,
+        0.25
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pendulum",
+      "name": "Pendulum",
+      "category": "physics",
+      "semanticTags": [
+        "pendulum",
+        "swing",
+        "oscillate"
+      ],
+      "path": "/assets/spatail-library/physics/pendulum.glb",
+      "scaleMeters": [
+        0.05,
+        0.3,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "spring_mass_system",
+      "name": "Spring-Mass System",
+      "category": "physics",
+      "semanticTags": [
+        "spring",
+        "mass",
+        "oscillate"
+      ],
+      "path": "/assets/spatail-library/physics/spring_mass_system.glb",
+      "scaleMeters": [
+        0.1,
+        0.3,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "weight_block",
+      "name": "Weight Block",
+      "category": "physics",
+      "semanticTags": [
+        "weight",
+        "mass",
+        "block"
+      ],
+      "path": "/assets/spatail-library/physics/weight_block.glb",
+      "scaleMeters": [
+        0.08,
+        0.08,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "force_arrow",
+      "name": "Force Arrow",
+      "category": "physics",
+      "semanticTags": [
+        "force",
+        "arrow",
+        "vector"
+      ],
+      "path": "/assets/spatail-library/physics/force_arrow.glb",
+      "scaleMeters": [
+        0.04,
+        0.04,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "arrow",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "velocity_arrow",
+      "name": "Velocity Arrow",
+      "category": "physics",
+      "semanticTags": [
+        "velocity",
+        "arrow",
+        "vector"
+      ],
+      "path": "/assets/spatail-library/physics/velocity_arrow.glb",
+      "scaleMeters": [
+        0.04,
+        0.04,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "arrow",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "acceleration_arrow",
+      "name": "Acceleration Arrow",
+      "category": "physics",
+      "semanticTags": [
+        "acceleration",
+        "arrow",
+        "vector"
+      ],
+      "path": "/assets/spatail-library/physics/acceleration_arrow.glb",
+      "scaleMeters": [
+        0.04,
+        0.04,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "arrow",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "gravity_arrow",
+      "name": "Gravity Arrow",
+      "category": "physics",
+      "semanticTags": [
+        "gravity",
+        "arrow",
+        "down"
+      ],
+      "path": "/assets/spatail-library/physics/gravity_arrow.glb",
+      "scaleMeters": [
+        0.04,
+        0.04,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "arrow",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "magnetic_bar",
+      "name": "Bar Magnet",
+      "category": "physics",
+      "semanticTags": [
+        "magnet",
+        "bar",
+        "magnetic"
+      ],
+      "path": "/assets/spatail-library/physics/magnetic_bar.glb",
+      "scaleMeters": [
+        0.04,
+        0.04,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "magnet_horseshoe",
+      "name": "Horseshoe Magnet",
+      "category": "physics",
+      "semanticTags": [
+        "magnet",
+        "horseshoe",
+        "magnetic"
+      ],
+      "path": "/assets/spatail-library/physics/magnet_horseshoe.glb",
+      "scaleMeters": [
+        0.12,
+        0.04,
+        0.12
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "electric_field_source",
+      "name": "Electric Field Source",
+      "category": "physics",
+      "semanticTags": [
+        "electric",
+        "charge",
+        "field"
+      ],
+      "path": "/assets/spatail-library/physics/electric_field_source.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "light_ray",
+      "name": "Light Ray",
+      "category": "physics",
+      "semanticTags": [
+        "light",
+        "ray",
+        "beam"
+      ],
+      "path": "/assets/spatail-library/physics/light_ray.glb",
+      "scaleMeters": [
+        0.01,
+        0.01,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "prism",
+      "name": "Prism",
+      "category": "physics",
+      "semanticTags": [
+        "prism",
+        "light",
+        "refraction"
+      ],
+      "path": "/assets/spatail-library/physics/prism.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "lens_convex",
+      "name": "Convex Lens",
+      "category": "physics",
+      "semanticTags": [
+        "lens",
+        "convex",
+        "optics"
+      ],
+      "path": "/assets/spatail-library/physics/lens_convex.glb",
+      "scaleMeters": [
+        0.1,
+        0.02,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "lens_concave",
+      "name": "Concave Lens",
+      "category": "physics",
+      "semanticTags": [
+        "lens",
+        "concave",
+        "optics"
+      ],
+      "path": "/assets/spatail-library/physics/lens_concave.glb",
+      "scaleMeters": [
+        0.1,
+        0.02,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "mirror",
+      "name": "Mirror",
+      "category": "physics",
+      "semanticTags": [
+        "mirror",
+        "reflect",
+        "optics"
+      ],
+      "path": "/assets/spatail-library/physics/mirror.glb",
+      "scaleMeters": [
+        0.2,
+        0.3,
+        0.01
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "wave_surface",
+      "name": "Wave Surface",
+      "category": "physics",
+      "semanticTags": [
+        "wave",
+        "surface",
+        "ripple"
+      ],
+      "path": "/assets/spatail-library/physics/wave_surface.glb",
+      "scaleMeters": [
+        0.4,
+        0.05,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "sine_wave_ribbon",
+      "name": "Sine Wave Ribbon",
+      "category": "physics",
+      "semanticTags": [
+        "sine",
+        "wave",
+        "ribbon"
+      ],
+      "path": "/assets/spatail-library/physics/sine_wave_ribbon.glb",
+      "scaleMeters": [
+        0.4,
+        0.1,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "sound_wave_rings",
+      "name": "Sound Wave Rings",
+      "category": "physics",
+      "semanticTags": [
+        "sound",
+        "wave",
+        "rings"
+      ],
+      "path": "/assets/spatail-library/physics/sound_wave_rings.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "water_wave_ripple",
+      "name": "Water Ripple",
+      "category": "physics",
+      "semanticTags": [
+        "water",
+        "ripple",
+        "wave"
+      ],
+      "path": "/assets/spatail-library/physics/water_wave_ripple.glb",
+      "scaleMeters": [
+        0.3,
+        0.02,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "thermometer",
+      "name": "Thermometer",
+      "category": "physics",
+      "semanticTags": [
+        "thermometer",
+        "temperature",
+        "heat"
+      ],
+      "path": "/assets/spatail-library/physics/thermometer.glb",
+      "scaleMeters": [
+        0.02,
+        0.2,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "beaker",
+      "name": "Beaker",
+      "category": "physics",
+      "semanticTags": [
+        "beaker",
+        "lab",
+        "chemistry"
+      ],
+      "path": "/assets/spatail-library/physics/beaker.glb",
+      "scaleMeters": [
+        0.08,
+        0.12,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "flask",
+      "name": "Flask",
+      "category": "physics",
+      "semanticTags": [
+        "flask",
+        "lab",
+        "chemistry"
+      ],
+      "path": "/assets/spatail-library/physics/flask.glb",
+      "scaleMeters": [
+        0.1,
+        0.14,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "test_tube",
+      "name": "Test Tube",
+      "category": "physics",
+      "semanticTags": [
+        "test",
+        "tube",
+        "lab"
+      ],
+      "path": "/assets/spatail-library/physics/test_tube.glb",
+      "scaleMeters": [
+        0.02,
+        0.15,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "burner",
+      "name": "Bunsen Burner",
+      "category": "physics",
+      "semanticTags": [
+        "burner",
+        "flame",
+        "lab"
+      ],
+      "path": "/assets/spatail-library/physics/burner.glb",
+      "scaleMeters": [
+        0.05,
+        0.12,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "balance_scale",
+      "name": "Balance Scale",
+      "category": "physics",
+      "semanticTags": [
+        "balance",
+        "scale",
+        "weigh"
+      ],
+      "path": "/assets/spatail-library/physics/balance_scale.glb",
+      "scaleMeters": [
+        0.3,
+        0.25,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pulley_system",
+      "name": "Pulley System",
+      "category": "physics",
+      "semanticTags": [
+        "pulley",
+        "system",
+        "lift"
+      ],
+      "path": "/assets/spatail-library/physics/pulley_system.glb",
+      "scaleMeters": [
+        0.2,
+        0.3,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "lever",
+      "name": "Lever",
+      "category": "physics",
+      "semanticTags": [
+        "lever",
+        "simple",
+        "machine"
+      ],
+      "path": "/assets/spatail-library/physics/lever.glb",
+      "scaleMeters": [
+        0.4,
+        0.02,
+        0.04
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "fulcrum",
+      "name": "Fulcrum",
+      "category": "physics",
+      "semanticTags": [
+        "fulcrum",
+        "pivot",
+        "lever"
+      ],
+      "path": "/assets/spatail-library/physics/fulcrum.glb",
+      "scaleMeters": [
+        0.06,
+        0.06,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "inclined_plane",
+      "name": "Inclined Plane",
+      "category": "physics",
+      "semanticTags": [
+        "incline",
+        "plane",
+        "ramp"
+      ],
+      "path": "/assets/spatail-library/physics/inclined_plane.glb",
+      "scaleMeters": [
+        0.4,
+        0.15,
+        0.25
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

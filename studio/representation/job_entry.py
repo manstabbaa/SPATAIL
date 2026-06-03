@@ -28,6 +28,17 @@ def _write(path: Path, obj) -> None:
     path.write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _load_library():
+    """Best-effort: attach the starter Asset Library (tiers 1-4) if it's been built.
+    Returns None — the factory falls back to generate — if it's absent."""
+    try:
+        from library.asset_library import AssetLibrary
+        lib = AssetLibrary()
+        return lib if lib.count else None
+    except Exception:
+        return None
+
+
 def run_job(prompt: str, exp_id: str, out_dir, *,
             on_stage=lambda s: None, dry_run: bool = True,
             blender_exe: str | None = None) -> dict:
@@ -40,9 +51,9 @@ def run_job(prompt: str, exp_id: str, out_dir, *,
     plan, manifest = eng.run(prompt)
 
     on_stage("factory")
-    factory = BlenderAssetFactory(blender_exe=blender_exe)
+    factory = BlenderAssetFactory(blender_exe=blender_exe, library=_load_library())
     pkg = factory.produce(manifest, subject=plan.subject, dry_run=dry_run,
-                          placement=asdict(plan.placement))
+                          placement=asdict(plan.placement), domain=plan.domain)
 
     on_stage("staging")
     contract = RuntimeSceneBuilder().build(plan, pkg, scene_id=exp_id, prompt=prompt)

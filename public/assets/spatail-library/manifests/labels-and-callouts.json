@@ -1,0 +1,326 @@
+{
+  "category": "labels-and-callouts",
+  "count": 10,
+  "assets": [
+    {
+      "assetId": "callout_line",
+      "name": "Callout Line",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "callout",
+        "line",
+        "leader"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/callout_line.glb",
+      "scaleMeters": [
+        0.005,
+        0.005,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "label_tag",
+      "name": "Label Tag",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "label",
+        "tag",
+        "name"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/label_tag.glb",
+      "scaleMeters": [
+        0.14,
+        0.05,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "hotspot_dot",
+      "name": "Hotspot Dot",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "hotspot",
+        "dot",
+        "marker"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/hotspot_dot.glb",
+      "scaleMeters": [
+        0.02,
+        0.02,
+        0.02
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "object_label_pin",
+      "name": "Object Label Pin",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "label",
+        "pin",
+        "object"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/object_label_pin.glb",
+      "scaleMeters": [
+        0.14,
+        0.05,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "part_label_pin",
+      "name": "Part Label Pin",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "label",
+        "pin",
+        "part"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/part_label_pin.glb",
+      "scaleMeters": [
+        0.14,
+        0.05,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "phase_label_pin",
+      "name": "Phase Label Pin",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "label",
+        "pin",
+        "phase"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/phase_label_pin.glb",
+      "scaleMeters": [
+        0.14,
+        0.05,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "leader_line",
+      "name": "Leader Line",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "leader",
+        "line",
+        "callout"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/leader_line.glb",
+      "scaleMeters": [
+        0.004,
+        0.004,
+        0.25
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "number_badge",
+      "name": "Number Badge",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "number",
+        "badge",
+        "step"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/number_badge.glb",
+      "scaleMeters": [
+        0.04,
+        0.04,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "dimension_label",
+      "name": "Dimension Label",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "dimension",
+        "measure",
+        "label"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/dimension_label.glb",
+      "scaleMeters": [
+        0.14,
+        0.05,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "annotation_arrow",
+      "name": "Annotation Arrow",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "arrow",
+        "annotation",
+        "point"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/annotation_arrow.glb",
+      "scaleMeters": [
+        0.06,
+        0.03,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating"
+      ],
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "arrow",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

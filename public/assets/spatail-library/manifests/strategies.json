@@ -1,0 +1,145 @@
+{
+  "count": 20,
+  "strategies": [
+    {
+      "id": "real_scale_preview",
+      "name": "Real-Scale Preview",
+      "engineStrategy": "real_scale_placement",
+      "isNewToEngine": false,
+      "rationale": "Place the subject at true scale in the room."
+    },
+    {
+      "id": "tabletop_miniature",
+      "name": "Tabletop Miniature",
+      "engineStrategy": "real_scale_placement",
+      "isNewToEngine": true,
+      "rationale": "Shrink a large subject onto the table so it's graspable."
+    },
+    {
+      "id": "exploded_view",
+      "name": "Exploded View",
+      "engineStrategy": "exploded_view",
+      "isNewToEngine": false,
+      "rationale": "Separate parts along assembly axes to reveal structure."
+    },
+    {
+      "id": "cutaway_view",
+      "name": "Cutaway View",
+      "engineStrategy": "cutaway_view",
+      "isNewToEngine": false,
+      "rationale": "Slice the shell away to expose interior anatomy in situ."
+    },
+    {
+      "id": "xray_view",
+      "name": "X-Ray View",
+      "engineStrategy": "cutaway_view",
+      "isNewToEngine": true,
+      "rationale": "Make the shell transparent to see internals without removing them."
+    },
+    {
+      "id": "assembly_sequence",
+      "name": "Assembly Sequence",
+      "engineStrategy": "assembly_sequence",
+      "isNewToEngine": false,
+      "rationale": "Build the subject up step by step in space."
+    },
+    {
+      "id": "disassembly_sequence",
+      "name": "Disassembly Sequence",
+      "engineStrategy": "assembly_sequence",
+      "isNewToEngine": true,
+      "rationale": "Take the subject apart step by step (reverse assembly)."
+    },
+    {
+      "id": "animated_process",
+      "name": "Animated Process",
+      "engineStrategy": "animated_simulation",
+      "isNewToEngine": false,
+      "rationale": "Show the process in motion as a seamless loop."
+    },
+    {
+      "id": "timeline_story",
+      "name": "Timeline Story",
+      "engineStrategy": "timeline",
+      "isNewToEngine": false,
+      "rationale": "Lay events along a spatial line the user walks."
+    },
+    {
+      "id": "side_by_side_comparison",
+      "name": "Side-by-Side Comparison",
+      "engineStrategy": "comparison_layout",
+      "isNewToEngine": false,
+      "rationale": "Place options on an equal-distance arc to choose between them."
+    },
+    {
+      "id": "layered_breakdown",
+      "name": "Layered Breakdown",
+      "engineStrategy": "layered_breakdown",
+      "isNewToEngine": false,
+      "rationale": "Peel the subject into stacked semantic layers."
+    },
+    {
+      "id": "flow_visualization",
+      "name": "Flow Visualization",
+      "engineStrategy": "flow_visualization",
+      "isNewToEngine": false,
+      "rationale": "Visualise movement/quantity flowing through a system."
+    },
+    {
+      "id": "cause_effect_visualization",
+      "name": "Cause & Effect",
+      "engineStrategy": "cause_and_effect",
+      "isNewToEngine": false,
+      "rationale": "Stage a trigger and its consequence so the link is seen."
+    },
+    {
+      "id": "guided_tour",
+      "name": "Guided Tour",
+      "engineStrategy": "guided_narrative",
+      "isNewToEngine": false,
+      "rationale": "Walk the user through staged beats with attention cues."
+    },
+    {
+      "id": "interactive_sandbox",
+      "name": "Interactive Sandbox",
+      "engineStrategy": "interactive_sandbox",
+      "isNewToEngine": false,
+      "rationale": "Give direct controls to manipulate the subject."
+    },
+    {
+      "id": "scale_compression",
+      "name": "Scale Compression",
+      "engineStrategy": "real_scale_placement",
+      "isNewToEngine": true,
+      "rationale": "Compress an enormous subject (solar system) to comprehensible size."
+    },
+    {
+      "id": "scale_expansion",
+      "name": "Scale Expansion",
+      "engineStrategy": "real_scale_placement",
+      "isNewToEngine": true,
+      "rationale": "Expand a tiny subject (a cell, an atom) to room scale."
+    },
+    {
+      "id": "before_after_comparison",
+      "name": "Before / After",
+      "engineStrategy": "comparison_layout",
+      "isNewToEngine": true,
+      "rationale": "Show two states of the same subject side by side."
+    },
+    {
+      "id": "system_map",
+      "name": "System Map",
+      "engineStrategy": "flow_visualization",
+      "isNewToEngine": true,
+      "rationale": "Lay a system out as nodes and links you can trace."
+    },
+    {
+      "id": "part_to_whole_explanation",
+      "name": "Part-to-Whole",
+      "engineStrategy": "layered_breakdown",
+      "isNewToEngine": true,
+      "rationale": "Move between a part and the whole it belongs to."
+    }
+  ]
+}

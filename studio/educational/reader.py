@@ -204,14 +204,190 @@ CONCEPTS = [
         ],
         "interactions": ["step_through_explanation", "tap_to_highlight", "isolate_important_parts", "reset_view"],
     },
+    {
+        "id": "human_heart",
+        "page": 10,
+        "title": "The Human Heart",
+        "selectionTargets": ["the human heart", "heart"],
+        "keywords": ["heart", "cardiac", "blood", "pump", "ventricle", "atrium"],
+        "learningGoal": "Explain how the heart pumps blood through the body.",
+        "recommendedRepresentation": "animated_process",
+        "alsoUses": ["cutaway_view"],
+        "body": (
+            "The heart is a muscular pump that pushes blood through the body. Its chambers fill "
+            "and contract in a steady rhythm, sending oxygen-rich blood out to the tissues and "
+            "returning oxygen-poor blood to the lungs.\n\n"
+            "A spatial explanation should show the beating cycle and the direction of blood flow, "
+            "not just a static organ."
+        ),
+        "experienceBeats": [
+            "Show the heart at rest", "Highlight the four chambers", "Animate one heartbeat",
+            "Show blood flowing in and out", "Label the path to the lungs and body",
+        ],
+        "interactions": ["scrub_timeline", "tap_to_highlight", "isolate_important_parts", "reset_view"],
+    },
+    {
+        "id": "dna",
+        "page": 11,
+        "title": "DNA",
+        "selectionTargets": ["DNA", "the double helix"],
+        "keywords": ["dna", "double helix", "gene", "base pair", "genetic", "chromosome"],
+        "learningGoal": "Show how DNA stores genetic information in a double helix.",
+        "recommendedRepresentation": "layered_breakdown",
+        "alsoUses": ["animated_process"],
+        "body": (
+            "DNA is a long molecule shaped like a twisted ladder — the double helix. Its rungs are "
+            "pairs of chemical bases whose order spells out the instructions a cell uses to build "
+            "proteins.\n\n"
+            "A spatial model can unwind the helix to reveal the base pairs, then show how the "
+            "sequence carries information."
+        ),
+        "experienceBeats": [
+            "Show the twisted double helix", "Slow the twist to a ladder", "Highlight one base pair",
+            "Reveal the sequence as information", "Re-coil the helix",
+        ],
+        "interactions": ["tap_to_highlight", "step_through_explanation", "isolate_important_parts", "reset_view"],
+    },
+    {
+        "id": "atom",
+        "page": 12,
+        "title": "The Atom",
+        "selectionTargets": ["the atom", "atom"],
+        "keywords": ["atom", "nucleus", "electron", "proton", "neutron", "element"],
+        "learningGoal": "Explain that atoms have a dense nucleus surrounded by electrons.",
+        "recommendedRepresentation": "animated_process",
+        "alsoUses": ["scale_expansion"],
+        "body": (
+            "An atom is the smallest unit of an element. It has a tiny, dense nucleus of protons "
+            "and neutrons, surrounded by far lighter electrons that occupy regions around it.\n\n"
+            "Because atoms are invisibly small, scaling one up to room size lets a learner see the "
+            "nucleus and the electron regions in proportion."
+        ),
+        "experienceBeats": [
+            "Place the nucleus at the center", "Add electrons in shells around it",
+            "Animate electrons moving", "Compare the tiny nucleus to the whole atom",
+            "Label protons, neutrons, and electrons",
+        ],
+        "interactions": ["tap_to_highlight", "step_through_explanation", "isolate_important_parts", "reset_view"],
+    },
+    {
+        "id": "lever",
+        "page": 13,
+        "title": "The Lever",
+        "selectionTargets": ["the lever", "lever", "simple machine"],
+        "keywords": ["lever", "fulcrum", "force", "simple machine", "load", "effort"],
+        "learningGoal": "Show how a lever multiplies force around a fulcrum.",
+        "recommendedRepresentation": "cause_effect_visualization",
+        "alsoUses": ["interactive_sandbox"],
+        "body": (
+            "A lever is a stiff bar that pivots on a fulcrum. Pushing down on one end lifts a load "
+            "on the other, and moving the fulcrum changes how much force is needed.\n\n"
+            "A spatial scene should let the learner move the fulcrum and feel how effort and load "
+            "trade off."
+        ),
+        "experienceBeats": [
+            "Place a bar on a fulcrum", "Add a load on one end", "Push the other end to lift it",
+            "Move the fulcrum and compare effort", "Show the force arrows",
+        ],
+        "interactions": ["step_through_explanation", "tap_to_highlight", "isolate_important_parts", "reset_view"],
+    },
+    {
+        "id": "gears",
+        "page": 14,
+        "title": "Gears",
+        "selectionTargets": ["gears", "gear train", "how gears work"],
+        "keywords": ["gear", "cog", "gear train", "ratio", "torque", "mesh"],
+        "learningGoal": "Explain how meshing gears change speed and turning force.",
+        "recommendedRepresentation": "animated_process",
+        "alsoUses": ["exploded_view"],
+        "body": (
+            "Gears are toothed wheels that mesh so one turns another. A small gear driving a large "
+            "gear turns slower but with more force; the sizes set the gear ratio.\n\n"
+            "A spatial scene should animate the meshing teeth and show how speed and force trade off "
+            "between gears."
+        ),
+        "experienceBeats": [
+            "Show two meshing gears", "Animate them turning together", "Highlight the meshing teeth",
+            "Compare a small and a large gear", "Show the speed-versus-force trade",
+        ],
+        "interactions": ["tap_to_highlight", "step_through_explanation", "isolate_important_parts", "reset_view"],
+    },
+    {
+        "id": "pendulum",
+        "page": 15,
+        "title": "The Pendulum",
+        "selectionTargets": ["the pendulum", "pendulum"],
+        "keywords": ["pendulum", "swing", "oscillation", "period", "gravity"],
+        "learningGoal": "Show why a pendulum swings back and forth at a steady period.",
+        "recommendedRepresentation": "animated_process",
+        "alsoUses": ["cause_effect_visualization"],
+        "body": (
+            "A pendulum is a weight hung so it can swing freely. Gravity pulls it back toward the "
+            "center, so it swings past and returns, keeping a steady rhythm set mostly by its "
+            "length.\n\n"
+            "A spatial scene should animate the swing and show the restoring pull at each point."
+        ),
+        "experienceBeats": [
+            "Hang the weight at rest", "Lift it to one side", "Release and animate the swing",
+            "Show the restoring force", "Compare a short and a long pendulum",
+        ],
+        "interactions": ["step_through_explanation", "tap_to_highlight", "isolate_important_parts", "reset_view"],
+    },
+    {
+        "id": "moon_phases",
+        "page": 16,
+        "title": "Moon Phases",
+        "selectionTargets": ["moon phases", "phases of the moon"],
+        "keywords": ["moon", "phase", "lunar", "orbit", "sunlight", "earth"],
+        "learningGoal": "Explain why the Moon shows different phases from Earth.",
+        "recommendedRepresentation": "animated_process",
+        "alsoUses": ["scale_compression"],
+        "body": (
+            "The Moon does not make its own light; we see the half lit by the Sun. As the Moon "
+            "orbits Earth, we view that lit half from changing angles, so it appears to grow and "
+            "shrink through its phases.\n\n"
+            "A spatial scene should place the Sun, Earth, and Moon and animate the orbit to show "
+            "why the lit fraction changes."
+        ),
+        "experienceBeats": [
+            "Place Earth with the Moon in orbit", "Light the Moon from the Sun's side",
+            "Animate the Moon around Earth", "Show the phase seen from Earth at each step",
+            "Label new, quarter, and full moon",
+        ],
+        "interactions": ["scrub_timeline", "tap_to_highlight", "isolate_important_parts", "reset_view"],
+    },
+    {
+        "id": "skyscraper",
+        "page": 17,
+        "title": "Skyscrapers",
+        "selectionTargets": ["skyscraper", "how skyscrapers stand"],
+        "keywords": ["skyscraper", "building", "steel", "frame", "column", "beam", "load"],
+        "learningGoal": "Explain how a steel frame lets a tall building stand and carry loads.",
+        "recommendedRepresentation": "assembly_sequence",
+        "alsoUses": ["part_to_whole_explanation"],
+        "body": (
+            "A skyscraper stands on a steel (or concrete) frame of columns and beams that carries "
+            "its weight down to deep foundations. The frame also resists wind, which pushes harder "
+            "the higher you go.\n\n"
+            "A spatial scene should build the frame floor by floor and show how loads travel down "
+            "the columns."
+        ),
+        "experienceBeats": [
+            "Lay the foundation", "Raise the steel columns", "Add floor beams and slabs",
+            "Stack floors upward", "Show loads traveling down to the ground",
+        ],
+        "interactions": ["step_through_explanation", "tap_to_highlight", "isolate_important_parts", "reset_view"],
+    },
 ]
 
 BOOK = {
-    "id": "spatail_demo_reader",
-    "title": "SPATAIL Educational Wrapper Demo Reader",
+    "id": "spatail_general_science_reader",
+    "title": "SPATAIL General Science & Technology Reader",
     "subtitle": "Read → Select → Show in SPATAIL → interactive XR explanation",
-    "academicBasis": "OpenStax — Concepts of Biology / University Physics / Astronomy "
-                     "(openstax.org, CC BY). Science summaries are original paraphrases.",
+    "academicBasis": "General-science basis: CK-12 FlexBooks (life / physical / earth-space "
+                     "science, CC BY-NC) and OpenStax (Biology, University Physics, Astronomy, "
+                     "Chemistry; openstax.org, CC BY). Summaries here are original paraphrases "
+                     "written for the demo, not redistributed verbatim.",
     "sourceType": "book_page",
 }
 

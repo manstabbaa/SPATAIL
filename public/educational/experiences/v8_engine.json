@@ -177,7 +177,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T17:48:40.366630+00:00",
+    "createdAt": "2026-06-03T20:25:31.695925+00:00",
     "sceneId": "edu_v8_engine",
     "title": "V8 Engine",
     "sourceBrief": {
@@ -208,7 +208,7 @@
       "scaleMode": "dynamic"
     },
     "studio": {
-      "glb": "",
+      "glb": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
       "frame": "y_up_m",
       "room": {
         "w": 6.0,
@@ -407,8 +407,8 @@
       {
         "id": "v8_engine",
         "role": "primary_object",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
         "footprint": {
           "w": 0.5,
           "h": 0.5,
@@ -425,8 +425,8 @@
       {
         "id": "v8_engine_part_a",
         "role": "part",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
         "footprint": {
           "w": 0.5,
           "h": 0.5,
@@ -443,8 +443,8 @@
       {
         "id": "v8_engine_part_b",
         "role": "part",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
         "footprint": {
           "w": 0.5,
           "h": 0.5,
@@ -461,8 +461,8 @@
       {
         "id": "v8_engine_core",
         "role": "part",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
         "footprint": {
           "w": 0.5,
           "h": 0.5,
@@ -502,8 +502,12 @@
     "assets": [
       {
         "assetId": "v8_engine",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+          "cutaway": "/assets/spatail-library/mechanical/engine_block_simplified_cutaway.glb",
+          "transparent": "/assets/spatail-library/mechanical/engine_block_simplified_transparent.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -543,15 +547,20 @@
             0.5
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "engine_block_simplified",
         "fallbackPrimitive": "cube"
       },
       {
         "assetId": "v8_engine_part_a",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+          "cutaway": "/assets/spatail-library/mechanical/engine_block_simplified_cutaway.glb",
+          "highlightable": "/assets/spatail-library/mechanical/engine_block_simplified_highlightable.glb",
+          "transparent": "/assets/spatail-library/mechanical/engine_block_simplified_transparent.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -591,15 +600,20 @@
             0.5
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "engine_block_simplified",
         "fallbackPrimitive": "cube"
       },
       {
         "assetId": "v8_engine_part_b",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+          "cutaway": "/assets/spatail-library/mechanical/engine_block_simplified_cutaway.glb",
+          "highlightable": "/assets/spatail-library/mechanical/engine_block_simplified_highlightable.glb",
+          "transparent": "/assets/spatail-library/mechanical/engine_block_simplified_transparent.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -639,15 +653,20 @@
             0.5
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "engine_block_simplified",
         "fallbackPrimitive": "cube"
       },
       {
         "assetId": "v8_engine_core",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+          "cutaway": "/assets/spatail-library/mechanical/engine_block_simplified_cutaway.glb",
+          "highlightable": "/assets/spatail-library/mechanical/engine_block_simplified_highlightable.glb",
+          "transparent": "/assets/spatail-library/mechanical/engine_block_simplified_transparent.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -687,8 +706,8 @@
             0.5
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "engine_block_simplified",
         "fallbackPrimitive": "cube"
       }

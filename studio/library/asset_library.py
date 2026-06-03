@@ -104,8 +104,9 @@ class AssetLibrary:
         self.by_category.clear()
         if not self.manifests.exists():
             return
+        _SKIP = ("library.json", "behaviors.json", "schema.json", "generated.json")
         for mf in sorted(self.manifests.glob("*.json")):
-            if mf.name in ("library.json", "behaviors.json", "schema.json"):
+            if mf.name in _SKIP:
                 continue
             if mf.name == "strategies.json":
                 try:
@@ -123,6 +124,18 @@ class AssetLibrary:
                     continue
                 self.assets[aid] = a
                 self.by_category.setdefault(a.get("category", "?"), []).append(aid)
+        # generated.json overlay LAST → baked assets OVERRIDE their catalog metadata
+        # (assetState flips to "generated"/"cached" with real glb/usdz paths).
+        gen = self.manifests / "generated.json"
+        if gen.exists():
+            try:
+                for a in json.loads(gen.read_text(encoding="utf-8")).get("assets", []):
+                    aid = a.get("assetId")
+                    if aid:
+                        self.assets[aid] = a
+                        self.by_category.setdefault(a.get("category", "generated"), []).append(aid)
+            except (ValueError, OSError):
+                pass
 
     @property
     def count(self) -> int:
@@ -206,18 +219,23 @@ class AssetLibrary:
     def register_generated(self, asset_id: str, glb_path: str, *,
                            category: str = "generated", name: str = "",
                            semantic_tags=(), scale_meters=None, pivot: str = "center_bottom",
-                           representation_uses=()) -> dict:
-        """Persist a freshly generated asset to manifests/generated.json and index it,
-        so the next resolve() returns it as a `library` (real GLB) hit."""
+                           representation_uses=(), usdz_path: str = "", bbox_m=None,
+                           fallback_primitive: str = "cube",
+                           placement_types=("table", "floor"), asset_state: str = "generated") -> dict:
+        """Persist a freshly generated/baked asset to manifests/generated.json and index
+        it, so the next resolve() returns it as a `library` (real GLB) hit. usdz_path lets
+        the iOS runtime load the cached USDZ."""
         meta = {
             "assetId": asset_id, "name": name or asset_id.replace("_", " ").title(),
             "category": category, "semanticTags": list(semantic_tags) or _tokens(asset_id),
-            "path": glb_path, "scaleMeters": list(scale_meters or [0.3, 0.3, 0.3]),
-            "pivot": pivot, "placementTypes": ["table", "floor"],
+            "path": glb_path, "usdzPath": usdz_path,
+            "scaleMeters": list(scale_meters or [0.3, 0.3, 0.3]),
+            "pivot": pivot, "placementTypes": list(placement_types),
             "representationUses": list(representation_uses), "supportsHighlight": True,
             "supportsTransparency": True, "supportsAnimation": True,
-            "fallbackPrimitive": "cube", "qualityLevel": "generated",
-            "license": "internal_generated", "assetState": "generated",
+            "fallbackPrimitive": fallback_primitive, "qualityLevel": "generated",
+            "license": "internal_generated", "assetState": asset_state,
+            "boundingBoxMeters": bbox_m or {},
         }
         gen_path = self.manifests / "generated.json"
         try:

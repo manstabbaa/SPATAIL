@@ -182,7 +182,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T17:48:40.382342+00:00",
+    "createdAt": "2026-06-03T20:25:31.711966+00:00",
     "sceneId": "edu_bridge_construction",
     "title": "Bridge Construction",
     "sourceBrief": {
@@ -213,7 +213,7 @@
       "scaleMode": "dynamic"
     },
     "studio": {
-      "glb": "",
+      "glb": "/assets/spatail-library/architecture/truss_segment.glb",
       "frame": "y_up_m",
       "room": {
         "w": 6.0,
@@ -412,8 +412,8 @@
       {
         "id": "bridge_construction",
         "role": "primary_object",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/architecture/truss_segment.glb",
         "footprint": {
           "w": 0.6,
           "h": 0.1,
@@ -430,8 +430,8 @@
       {
         "id": "bridge_construction_base",
         "role": "part",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/architecture/foundation_block.glb",
         "footprint": {
           "w": 0.5,
           "h": 0.5,
@@ -448,8 +448,8 @@
       {
         "id": "bridge_construction_mid",
         "role": "part",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/architecture/bridge_deck.glb",
         "footprint": {
           "w": 1.5,
           "h": 0.4,
@@ -466,8 +466,8 @@
       {
         "id": "bridge_construction_top",
         "role": "part",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/architecture/bridge_deck.glb",
         "footprint": {
           "w": 1.5,
           "h": 0.4,
@@ -507,8 +507,11 @@
     "assets": [
       {
         "assetId": "bridge_construction",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/architecture/truss_segment.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/architecture/truss_segment.glb",
+          "staged": "/assets/spatail-library/architecture/truss_segment_staged.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -548,15 +551,19 @@
             0.1
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "truss_segment",
         "fallbackPrimitive": "cube"
       },
       {
         "assetId": "bridge_construction_base",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/architecture/foundation_block.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/architecture/foundation_block.glb",
+          "highlightable": "/assets/spatail-library/architecture/foundation_block_highlightable.glb",
+          "staged": "/assets/spatail-library/architecture/foundation_block_staged.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -596,15 +603,19 @@
             0.5
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "foundation_block",
         "fallbackPrimitive": "cube"
       },
       {
         "assetId": "bridge_construction_mid",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/architecture/bridge_deck.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/architecture/bridge_deck.glb",
+          "highlightable": "/assets/spatail-library/architecture/bridge_deck_highlightable.glb",
+          "staged": "/assets/spatail-library/architecture/bridge_deck_staged.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -644,15 +655,19 @@
             0.4
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "bridge_deck",
         "fallbackPrimitive": "cube"
       },
       {
         "assetId": "bridge_construction_top",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/architecture/bridge_deck.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/architecture/bridge_deck.glb",
+          "highlightable": "/assets/spatail-library/architecture/bridge_deck_highlightable.glb",
+          "staged": "/assets/spatail-library/architecture/bridge_deck_staged.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -692,8 +707,8 @@
             0.4
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "bridge_deck",
         "fallbackPrimitive": "cube"
       }

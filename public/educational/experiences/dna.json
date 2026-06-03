@@ -1,0 +1,847 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "DNA",
+  "surroundingContext": "DNA is a long molecule shaped like a twisted ladder — the double helix. Its rungs are pairs of chemical bases whose order spells out the instructions a cell uses to build proteins.\n\nA spatial model can unwind the helix to reveal the base pairs, then show how the sequence carries information.",
+  "learningGoal": "Show how DNA stores genetic information in a double helix.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "layered_breakdown",
+  "conceptId": "dna",
+  "spatailPrompt": "Create an educational spatial explanation of \"DNA\". Learning goal: Show how DNA stores genetic information in a double helix. Prefer a layered breakdown with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"DNA is a long molecule shaped like a twisted ladder — the double helix. Its rungs are pairs of chemical bases whose order spells out the instructions a cell uses to build proteins.\n\nA spatial model can unwind the helix to reveal the base pairs, then show how the sequence carries information.\".",
+  "experienceBeats": [
+    "Show the twisted double helix",
+    "Slow the twist to a ladder",
+    "Highlight one base pair",
+    "Reveal the sequence as information",
+    "Re-coil the helix"
+  ],
+  "interactions": [
+    "tap_to_highlight",
+    "step_through_explanation",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_dna",
+    "domain": "biological",
+    "intent": "explain",
+    "strategy": "layered_breakdown",
+    "subject": "DNA",
+    "placement": {
+      "anchor": "table",
+      "layout": "cluster",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.95,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "biological + explain -> layered_breakdown. Peel the subject into stacked semantic layers the user reveals one at a time — best for nested structure.",
+    "experienceBeats": [
+      {
+        "id": "show_the_twisted_double_helix",
+        "title": "Show the twisted double helix",
+        "narration": "Show the twisted double helix",
+        "focus": "dna",
+        "reveal": "auto"
+      },
+      {
+        "id": "slow_the_twist_to_a_ladder",
+        "title": "Slow the twist to a ladder",
+        "narration": "Slow the twist to a ladder",
+        "focus": "dna",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "highlight_one_base_pair",
+        "title": "Highlight one base pair",
+        "narration": "Highlight one base pair",
+        "focus": "dna",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "reveal_the_sequence_as_information",
+        "title": "Reveal the sequence as information",
+        "narration": "Reveal the sequence as information",
+        "focus": "dna",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "re_coil_the_helix",
+        "title": "Re-coil the helix",
+        "narration": "Re-coil the helix",
+        "focus": "dna",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "dna",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "dna_part_a",
+        "type": "part",
+        "priority": 1
+      },
+      {
+        "id": "dna_part_b",
+        "type": "part",
+        "priority": 1
+      },
+      {
+        "id": "dna_core",
+        "type": "part",
+        "priority": 2
+      }
+    ],
+    "requiredAnimations": [],
+    "interactions": [
+      {
+        "id": "reveal",
+        "type": "tap_reveal",
+        "label": "Tap to reveal more",
+        "params": {}
+      },
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        }
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_dna",
+    "subject": "DNA",
+    "strategy": "layered_breakdown",
+    "assetRequests": [
+      {
+        "assetId": "dna",
+        "description": "complete DNA, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "complete",
+          "layered"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "dna_part_a",
+        "description": "the dna part a component of the DNA",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "highlightable",
+          "layered"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "dna_part_b",
+        "description": "the dna part b component of the DNA",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "highlightable",
+          "layered"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "dna_core",
+        "description": "the dna core component of the DNA",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "highlightable",
+          "layered"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T20:25:31.721071+00:00",
+    "sceneId": "edu_dna",
+    "title": "Dna",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"DNA\". Learning goal: Show how DNA stores genetic information in a double helix. Prefer a layered breakdown with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"DNA is a long molecule shaped like a twisted ladder — the double helix. Its rungs are pairs of chemical bases whose order spells out the instructions a cell uses to build proteins.\n\nA spatial model can unwind the helix to reveal the base pairs, then show how the sequence carries information.\".",
+      "subject": "DNA",
+      "domain": "biological",
+      "intent": "explain",
+      "strategy": "layered_breakdown"
+    },
+    "domain": {
+      "name": "biological",
+      "confidence": "high",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "biological",
+      "intent": "explain",
+      "strategy": "layered_breakdown",
+      "subject": "DNA",
+      "reasoning": "biological + explain -> layered_breakdown. Peel the subject into stacked semantic layers the user reveals one at a time — best for nested structure.",
+      "domainConfidence": 0.95,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "table",
+      "layout": "cluster",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "/assets/spatail-library/biology/nucleus.glb",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": null,
+        "fps": 30,
+        "loop": true,
+        "count": 0
+      },
+      "bbox": {
+        "min": [
+          -0.05,
+          0.0,
+          -0.05
+        ],
+        "max": [
+          0.05,
+          0.1,
+          0.05
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 0.74,
+      "baseline_z_m": 1.2927
+    },
+    "staging": {
+      "distance_m": 0.74,
+      "spread_deg": 30.0,
+      "reasoning": "4 exhibit(s) on a cluster at 0.74 m, dropped 12.0 deg along the natural gaze; anchor=table."
+    },
+    "beats": [
+      {
+        "id": "show_the_twisted_double_helix",
+        "title": "Show the twisted double helix",
+        "narration": "Show the twisted double helix",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "slow_the_twist_to_a_ladder",
+        "title": "Slow the twist to a ladder",
+        "narration": "Slow the twist to a ladder",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "highlight_one_base_pair",
+        "title": "Highlight one base pair",
+        "narration": "Highlight one base pair",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "reveal_the_sequence_as_information",
+        "title": "Reveal the sequence as information",
+        "narration": "Reveal the sequence as information",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "re_coil_the_helix",
+        "title": "Re-coil the helix",
+        "narration": "Re-coil the helix",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "show_the_twisted_double_helix",
+        "title": "Show the twisted double helix",
+        "description": "Show the twisted double helix",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "slow_the_twist_to_a_ladder",
+        "title": "Slow the twist to a ladder",
+        "description": "Slow the twist to a ladder",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "highlight_one_base_pair",
+        "title": "Highlight one base pair",
+        "description": "Highlight one base pair",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "reveal_the_sequence_as_information",
+        "title": "Reveal the sequence as information",
+        "description": "Reveal the sequence as information",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "re_coil_the_helix",
+        "title": "Re-coil the helix",
+        "description": "Re-coil the helix",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "reveal",
+        "type": "tap_reveal",
+        "label": "Tap to reveal more",
+        "params": {},
+        "trigger": "on_tap"
+      },
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        },
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "dna",
+        "role": "primary_object",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/biology/nucleus.glb",
+        "footprint": {
+          "w": 0.1,
+          "h": 0.1,
+          "d": 0.1
+        },
+        "position_yup": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true
+      },
+      {
+        "id": "dna_part_a",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/biology/nucleus.glb",
+        "footprint": {
+          "w": 0.1,
+          "h": 0.1,
+          "d": 0.1
+        },
+        "position_yup": [
+          -0.0645,
+          1.2927,
+          -0.7372
+        ],
+        "yaw_rad": 0.0873,
+        "inComfortCone": true
+      },
+      {
+        "id": "dna_part_b",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/biology/nucleus.glb",
+        "footprint": {
+          "w": 0.1,
+          "h": 0.1,
+          "d": 0.1
+        },
+        "position_yup": [
+          0.0645,
+          1.2927,
+          -0.7372
+        ],
+        "yaw_rad": -0.0873,
+        "inComfortCone": true
+      },
+      {
+        "id": "dna_core",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/biology/nucleus.glb",
+        "footprint": {
+          "w": 0.1,
+          "h": 0.1,
+          "d": 0.1
+        },
+        "position_yup": [
+          0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "DNA",
+      "surroundingContext": "DNA is a long molecule shaped like a twisted ladder — the double helix. Its rungs are pairs of chemical bases whose order spells out the instructions a cell uses to build proteins.\n\nA spatial model can unwind the helix to reveal the base pairs, then show how the sequence carries information.",
+      "learningGoal": "Show how DNA stores genetic information in a double helix.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "layered_breakdown",
+      "conceptId": "dna",
+      "spatailPrompt": "Create an educational spatial explanation of \"DNA\". Learning goal: Show how DNA stores genetic information in a double helix. Prefer a layered breakdown with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"DNA is a long molecule shaped like a twisted ladder — the double helix. Its rungs are pairs of chemical bases whose order spells out the instructions a cell uses to build proteins.\n\nA spatial model can unwind the helix to reveal the base pairs, then show how the sequence carries information.\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_dna",
+    "assets": [
+      {
+        "assetId": "dna",
+        "path": "/assets/spatail-library/biology/nucleus.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/biology/nucleus.glb",
+          "layered": "/assets/spatail-library/biology/nucleus_layered.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.05,
+              -0.05,
+              0.0
+            ],
+            "max": [
+              0.05,
+              0.05,
+              0.1
+            ],
+            "size": [
+              0.1,
+              0.1,
+              0.1
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.05
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.1,
+            0.1,
+            0.1
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "nucleus",
+        "fallbackPrimitive": "sphere"
+      },
+      {
+        "assetId": "dna_part_a",
+        "path": "/assets/spatail-library/biology/nucleus.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/biology/nucleus.glb",
+          "highlightable": "/assets/spatail-library/biology/nucleus_highlightable.glb",
+          "layered": "/assets/spatail-library/biology/nucleus_layered.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.05,
+              -0.05,
+              0.0
+            ],
+            "max": [
+              0.05,
+              0.05,
+              0.1
+            ],
+            "size": [
+              0.1,
+              0.1,
+              0.1
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.05
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.1,
+            0.1,
+            0.1
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "nucleus",
+        "fallbackPrimitive": "sphere"
+      },
+      {
+        "assetId": "dna_part_b",
+        "path": "/assets/spatail-library/biology/nucleus.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/biology/nucleus.glb",
+          "highlightable": "/assets/spatail-library/biology/nucleus_highlightable.glb",
+          "layered": "/assets/spatail-library/biology/nucleus_layered.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.05,
+              -0.05,
+              0.0
+            ],
+            "max": [
+              0.05,
+              0.05,
+              0.1
+            ],
+            "size": [
+              0.1,
+              0.1,
+              0.1
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.05
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.1,
+            0.1,
+            0.1
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "nucleus",
+        "fallbackPrimitive": "sphere"
+      },
+      {
+        "assetId": "dna_core",
+        "path": "/assets/spatail-library/biology/nucleus.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/biology/nucleus.glb",
+          "highlightable": "/assets/spatail-library/biology/nucleus_highlightable.glb",
+          "layered": "/assets/spatail-library/biology/nucleus_layered.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.05,
+              -0.05,
+              0.0
+            ],
+            "max": [
+              0.05,
+              0.05,
+              0.1
+            ],
+            "size": [
+              0.1,
+              0.1,
+              0.1
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.05
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.1,
+            0.1,
+            0.1
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "nucleus",
+        "fallbackPrimitive": "sphere"
+      }
+    ],
+    "animations": []
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "dna"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream dna",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "dna"
+          ],
+          "unlocks": [
+            "swap_placeholder:dna"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream dna_part_a",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "dna_part_a"
+          ],
+          "unlocks": [
+            "swap_placeholder:dna_part_a"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "stream dna_part_b",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "dna_part_b"
+          ],
+          "unlocks": [
+            "swap_placeholder:dna_part_b"
+          ]
+        },
+        {
+          "phase": 4,
+          "label": "stream dna_core",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "dna_core"
+          ],
+          "unlocks": [
+            "swap_placeholder:dna_core"
+          ]
+        },
+        {
+          "phase": 5,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "interaction:reveal",
+            "interaction:play_pause"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "table",
+      "title": "Dna",
+      "firstBeat": "Show the twisted double helix",
+      "placeholders": [
+        {
+          "assetId": "dna",
+          "primitive": "box",
+          "position_yup": [
+            -0.1915,
+            1.2927,
+            -0.7148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "dna"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "reveal": {
+        "enabledAfterPhase": 5,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "dna",
+          "dna_part_a",
+          "dna_part_b",
+          "dna_core"
+        ]
+      },
+      "play_pause": {
+        "enabledAfterPhase": 5,
+        "type": "play_baked",
+        "targetAssets": [
+          "dna",
+          "dna_part_a",
+          "dna_part_b",
+          "dna_core"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "reveal",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "play_pause",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

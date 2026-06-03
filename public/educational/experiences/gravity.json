@@ -138,7 +138,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T17:48:40.362757+00:00",
+    "createdAt": "2026-06-03T20:25:31.690841+00:00",
     "sceneId": "edu_gravity",
     "title": "Gravity",
     "sourceBrief": {
@@ -169,7 +169,7 @@
       "scaleMode": "dynamic"
     },
     "studio": {
-      "glb": "",
+      "glb": "/assets/spatail-library/physics/apple.glb",
       "frame": "y_up_m",
       "room": {
         "w": 6.0,
@@ -368,8 +368,8 @@
       {
         "id": "gravity",
         "role": "primary_object",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/physics/apple.glb",
         "footprint": {
           "w": 0.08,
           "h": 0.08,
@@ -386,8 +386,8 @@
       {
         "id": "gravity_context",
         "role": "environment",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/physics/apple.glb",
         "footprint": {
           "w": 0.08,
           "h": 0.08,
@@ -427,8 +427,10 @@
     "assets": [
       {
         "assetId": "gravity",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/physics/apple.glb",
+        "variants": {
+          "default": "/assets/spatail-library/physics/apple.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -468,15 +470,17 @@
             0.08
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "apple",
         "fallbackPrimitive": "sphere"
       },
       {
         "assetId": "gravity_context",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/physics/apple.glb",
+        "variants": {
+          "default": "/assets/spatail-library/physics/apple.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -516,8 +520,8 @@
             0.08
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "apple",
         "fallbackPrimitive": "sphere"
       }

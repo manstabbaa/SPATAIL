@@ -179,7 +179,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T17:48:40.371675+00:00",
+    "createdAt": "2026-06-03T20:25:31.701375+00:00",
     "sceneId": "edu_solar_system",
     "title": "Solar System",
     "sourceBrief": {
@@ -210,7 +210,7 @@
       "scaleMode": "dynamic"
     },
     "studio": {
-      "glb": "",
+      "glb": "/assets/spatail-library/astronomy/sun.glb",
       "frame": "y_up_m",
       "room": {
         "w": 6.0,
@@ -418,8 +418,8 @@
       {
         "id": "solar_system",
         "role": "primary_object",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/astronomy/sun.glb",
         "footprint": {
           "w": 0.4,
           "h": 0.4,
@@ -436,8 +436,8 @@
       {
         "id": "solar_system_orbiter_a",
         "role": "part",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/astronomy/sun.glb",
         "footprint": {
           "w": 0.4,
           "h": 0.4,
@@ -454,8 +454,8 @@
       {
         "id": "solar_system_orbiter_b",
         "role": "part",
-        "status": "placeholder",
-        "processedPath": "",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/astronomy/sun.glb",
         "footprint": {
           "w": 0.4,
           "h": 0.4,
@@ -495,8 +495,10 @@
     "assets": [
       {
         "assetId": "solar_system",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/astronomy/sun.glb",
+        "variants": {
+          "default": "/assets/spatail-library/astronomy/sun.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -536,15 +538,18 @@
             0.4
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "sun",
         "fallbackPrimitive": "sphere"
       },
       {
         "assetId": "solar_system_orbiter_a",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/astronomy/sun.glb",
+        "variants": {
+          "default": "/assets/spatail-library/astronomy/sun.glb",
+          "highlightable": "/assets/spatail-library/astronomy/sun_highlightable.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -584,15 +589,18 @@
             0.4
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "sun",
         "fallbackPrimitive": "sphere"
       },
       {
         "assetId": "solar_system_orbiter_b",
-        "path": "",
-        "variants": {},
+        "path": "/assets/spatail-library/astronomy/sun.glb",
+        "variants": {
+          "default": "/assets/spatail-library/astronomy/sun.glb",
+          "highlightable": "/assets/spatail-library/astronomy/sun_highlightable.glb"
+        },
         "metadata": {
           "boundingBoxMeters": {
             "min": [
@@ -632,8 +640,8 @@
             0.4
           ]
         },
-        "status": "primitive",
-        "source": "primitive",
+        "status": "library",
+        "source": "library",
         "libraryAssetId": "sun",
         "fallbackPrimitive": "sphere"
       }

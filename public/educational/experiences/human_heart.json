@@ -1,0 +1,662 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "the human heart",
+  "surroundingContext": "The heart is a muscular pump that pushes blood through the body. Its chambers fill and contract in a steady rhythm, sending oxygen-rich blood out to the tissues and returning oxygen-poor blood to the lungs.\n\nA spatial explanation should show the beating cycle and the direction of blood flow, not just a static organ.",
+  "learningGoal": "Explain how the heart pumps blood through the body.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "animated_process",
+  "conceptId": "human_heart",
+  "spatailPrompt": "Create an educational spatial explanation of \"the human heart\". Learning goal: Explain how the heart pumps blood through the body. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"The heart is a muscular pump that pushes blood through the body. Its chambers fill and contract in a steady rhythm, sending oxygen-rich blood out to the tissues and returning oxygen-poor blood to the lungs.\n\nA spatial explanation should show the beating cycle and the direction of blood flow, not just a static organ.\".",
+  "experienceBeats": [
+    "Show the heart at rest",
+    "Highlight the four chambers",
+    "Animate one heartbeat",
+    "Show blood flowing in and out",
+    "Label the path to the lungs and body"
+  ],
+  "interactions": [
+    "scrub_timeline",
+    "tap_to_highlight",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_human_heart",
+    "domain": "biological",
+    "intent": "explain",
+    "strategy": "animated_simulation",
+    "subject": "Human Heart",
+    "placement": {
+      "anchor": "table",
+      "layout": "cluster",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.95,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> animated_simulation. Show the process in motion as a seamless loop — best when the concept is a behaviour over time, not a static object.",
+    "experienceBeats": [
+      {
+        "id": "show_the_heart_at_rest",
+        "title": "Show the heart at rest",
+        "narration": "Show the heart at rest",
+        "focus": "human_heart",
+        "reveal": "auto"
+      },
+      {
+        "id": "highlight_the_four_chambers",
+        "title": "Highlight the four chambers",
+        "narration": "Highlight the four chambers",
+        "focus": "human_heart",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_one_heartbeat",
+        "title": "Animate one heartbeat",
+        "narration": "Animate one heartbeat",
+        "focus": "human_heart",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_blood_flowing_in_and_out",
+        "title": "Show blood flowing in and out",
+        "narration": "Show blood flowing in and out",
+        "focus": "human_heart",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "label_the_path_to_the_lungs_and_body",
+        "title": "Label the path to the lungs and body",
+        "narration": "Label the path to the lungs and body",
+        "focus": "human_heart",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "human_heart",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "human_heart_mover",
+        "type": "part",
+        "priority": 1
+      }
+    ],
+    "requiredAnimations": [
+      {
+        "id": "human_heart_sim",
+        "targetAsset": "human_heart",
+        "motion": "spin",
+        "note": "seamless looping process"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        }
+      },
+      {
+        "id": "highlight_phase",
+        "type": "tap_reveal",
+        "label": "Tap to highlight this phase",
+        "params": {}
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_human_heart",
+    "subject": "Human Heart",
+    "strategy": "animated_simulation",
+    "assetRequests": [
+      {
+        "assetId": "human_heart",
+        "description": "complete Human Heart, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "default"
+        ],
+        "requiredAnimations": [
+          "spin"
+        ]
+      },
+      {
+        "assetId": "human_heart_mover",
+        "description": "the human heart mover component of the Human Heart",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "default",
+          "highlightable"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T20:25:31.711966+00:00",
+    "sceneId": "edu_human_heart",
+    "title": "Human Heart",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"the human heart\". Learning goal: Explain how the heart pumps blood through the body. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"The heart is a muscular pump that pushes blood through the body. Its chambers fill and contract in a steady rhythm, sending oxygen-rich blood out to the tissues and returning oxygen-poor blood to the lungs.\n\nA spatial explanation should show the beating cycle and the direction of blood flow, not just a static organ.\".",
+      "subject": "Human Heart",
+      "domain": "biological",
+      "intent": "explain",
+      "strategy": "animated_simulation"
+    },
+    "domain": {
+      "name": "biological",
+      "confidence": "high",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "biological",
+      "intent": "explain",
+      "strategy": "animated_simulation",
+      "subject": "Human Heart",
+      "reasoning": "caller override -> animated_simulation. Show the process in motion as a seamless loop — best when the concept is a behaviour over time, not a static object.",
+      "domainConfidence": 0.95,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "table",
+      "layout": "cluster",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "/assets/spatail-library/biology/heart_simplified.glb",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": "human_heart_spin",
+        "fps": 30,
+        "loop": true,
+        "count": 1
+      },
+      "bbox": {
+        "min": [
+          -0.06,
+          0.0,
+          -0.07
+        ],
+        "max": [
+          0.06,
+          0.1,
+          0.07
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 0.74,
+      "baseline_z_m": 1.2927
+    },
+    "staging": {
+      "distance_m": 0.74,
+      "spread_deg": 30.0,
+      "reasoning": "2 exhibit(s) on a cluster at 0.74 m, dropped 12.0 deg along the natural gaze; anchor=table."
+    },
+    "beats": [
+      {
+        "id": "show_the_heart_at_rest",
+        "title": "Show the heart at rest",
+        "narration": "Show the heart at rest",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "highlight_the_four_chambers",
+        "title": "Highlight the four chambers",
+        "narration": "Highlight the four chambers",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_one_heartbeat",
+        "title": "Animate one heartbeat",
+        "narration": "Animate one heartbeat",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_blood_flowing_in_and_out",
+        "title": "Show blood flowing in and out",
+        "narration": "Show blood flowing in and out",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "label_the_path_to_the_lungs_and_body",
+        "title": "Label the path to the lungs and body",
+        "narration": "Label the path to the lungs and body",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "show_the_heart_at_rest",
+        "title": "Show the heart at rest",
+        "description": "Show the heart at rest",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "highlight_the_four_chambers",
+        "title": "Highlight the four chambers",
+        "description": "Highlight the four chambers",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "animate_one_heartbeat",
+        "title": "Animate one heartbeat",
+        "description": "Animate one heartbeat",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "show_blood_flowing_in_and_out",
+        "title": "Show blood flowing in and out",
+        "description": "Show blood flowing in and out",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "label_the_path_to_the_lungs_and_body",
+        "title": "Label the path to the lungs and body",
+        "description": "Label the path to the lungs and body",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        },
+        "trigger": "on_tap"
+      },
+      {
+        "id": "highlight_phase",
+        "type": "tap_reveal",
+        "label": "Tap to highlight this phase",
+        "params": {},
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "human_heart",
+        "role": "primary_object",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/biology/heart_simplified.glb",
+        "footprint": {
+          "w": 0.12,
+          "h": 0.1,
+          "d": 0.14
+        },
+        "position_yup": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true
+      },
+      {
+        "id": "human_heart_mover",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/biology/heart_simplified.glb",
+        "footprint": {
+          "w": 0.12,
+          "h": 0.1,
+          "d": 0.14
+        },
+        "position_yup": [
+          0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "the human heart",
+      "surroundingContext": "The heart is a muscular pump that pushes blood through the body. Its chambers fill and contract in a steady rhythm, sending oxygen-rich blood out to the tissues and returning oxygen-poor blood to the lungs.\n\nA spatial explanation should show the beating cycle and the direction of blood flow, not just a static organ.",
+      "learningGoal": "Explain how the heart pumps blood through the body.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "animated_process",
+      "conceptId": "human_heart",
+      "spatailPrompt": "Create an educational spatial explanation of \"the human heart\". Learning goal: Explain how the heart pumps blood through the body. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"The heart is a muscular pump that pushes blood through the body. Its chambers fill and contract in a steady rhythm, sending oxygen-rich blood out to the tissues and returning oxygen-poor blood to the lungs.\n\nA spatial explanation should show the beating cycle and the direction of blood flow, not just a static organ.\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_human_heart",
+    "assets": [
+      {
+        "assetId": "human_heart",
+        "path": "/assets/spatail-library/biology/heart_simplified.glb",
+        "variants": {
+          "default": "/assets/spatail-library/biology/heart_simplified.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.06,
+              -0.07,
+              0.0
+            ],
+            "max": [
+              0.06,
+              0.07,
+              0.1
+            ],
+            "size": [
+              0.12,
+              0.14,
+              0.1
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.05
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.12,
+            0.14,
+            0.1
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "heart_simplified",
+        "fallbackPrimitive": "sphere"
+      },
+      {
+        "assetId": "human_heart_mover",
+        "path": "/assets/spatail-library/biology/heart_simplified.glb",
+        "variants": {
+          "default": "/assets/spatail-library/biology/heart_simplified.glb",
+          "highlightable": "/assets/spatail-library/biology/heart_simplified_highlightable.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.06,
+              -0.07,
+              0.0
+            ],
+            "max": [
+              0.06,
+              0.07,
+              0.1
+            ],
+            "size": [
+              0.12,
+              0.14,
+              0.1
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.05
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.12,
+            0.14,
+            0.1
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "heart_simplified",
+        "fallbackPrimitive": "sphere"
+      }
+    ],
+    "animations": [
+      {
+        "animationId": "human_heart_spin",
+        "targetAssets": [
+          "human_heart"
+        ],
+        "type": "looping",
+        "path": ""
+      }
+    ]
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "human_heart"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream human_heart",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "human_heart"
+          ],
+          "unlocks": [
+            "swap_placeholder:human_heart"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream human_heart_mover",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "human_heart_mover"
+          ],
+          "unlocks": [
+            "swap_placeholder:human_heart_mover"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "animation:human_heart_spin",
+            "interaction:play_pause",
+            "interaction:highlight_phase"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "table",
+      "title": "Human Heart",
+      "firstBeat": "Show the heart at rest",
+      "placeholders": [
+        {
+          "assetId": "human_heart",
+          "primitive": "box",
+          "position_yup": [
+            -0.1915,
+            1.2927,
+            -0.7148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "human heart"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "play_pause": {
+        "enabledAfterPhase": 3,
+        "type": "play_baked",
+        "targetAssets": [
+          "human_heart",
+          "human_heart_mover"
+        ]
+      },
+      "highlight_phase": {
+        "enabledAfterPhase": 3,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "human_heart",
+          "human_heart_mover"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "play_pause",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "highlight_phase",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

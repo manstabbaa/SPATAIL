@@ -1,0 +1,259 @@
+{
+  "book": {
+    "id": "spatail_demo_reader",
+    "title": "SPATAIL Educational Wrapper Demo Reader",
+    "subtitle": "Read → Select → Show in SPATAIL → interactive XR explanation",
+    "academicBasis": "OpenStax — Concepts of Biology / University Physics / Astronomy (openstax.org, CC BY). Science summaries are original paraphrases.",
+    "sourceType": "book_page"
+  },
+  "concepts": [
+    {
+      "id": "photosynthesis",
+      "page": 3,
+      "title": "Photosynthesis",
+      "selectionTargets": [
+        "photosynthesis"
+      ],
+      "keywords": [
+        "photosynthesis",
+        "chloroplast",
+        "leaf",
+        "glucose",
+        "light energy"
+      ],
+      "learningGoal": "Explain how plants transform light energy into chemical energy.",
+      "recommendedRepresentation": "animated_process",
+      "alsoUses": [
+        "flow_visualization"
+      ],
+      "body": "Photosynthesis is the process plants use to convert light energy into stored chemical energy. In a simplified explanation, sunlight reaches the leaf, water enters through the roots, and carbon dioxide enters through small openings in the leaf. Inside chloroplasts, the plant uses these inputs to form glucose and release oxygen.\n\nA good spatial explanation should not only show a plant. It should show the flow of matter and energy: inputs moving toward the leaf and outputs leaving it. This makes the invisible chemical process easier to understand in space.",
+      "experienceBeats": [
+        "Show the leaf as the main object",
+        "Reveal sunlight, water, and carbon dioxide as inputs",
+        "Animate the chloroplast as the conversion point",
+        "Show glucose and oxygen leaving as outputs",
+        "Tap each input or output for a short explanation"
+      ],
+      "interactions": [
+        "tap_to_highlight",
+        "step_through_explanation",
+        "isolate_important_parts",
+        "reset_view"
+      ]
+    },
+    {
+      "id": "cell_division",
+      "page": 4,
+      "title": "Cell Division",
+      "selectionTargets": [
+        "cell division"
+      ],
+      "keywords": [
+        "cell division",
+        "mitosis",
+        "nucleus",
+        "dna",
+        "daughter cell"
+      ],
+      "learningGoal": "Explain how one parent cell becomes two daughter cells.",
+      "recommendedRepresentation": "timeline",
+      "alsoUses": [
+        "animated_process"
+      ],
+      "body": "Cell division is the process by which one parent cell divides into two daughter cells. Before division is complete, the cell must copy its genetic material so each new cell receives the information it needs. The cell then separates its contents and forms two cells.\n\nThe best spatial representation is a timeline that the learner can scrub. Each stage should be visible as a beat: parent cell, DNA copying, separation, and two daughter cells. This is stronger than a static cell model because division is a process, not just an object.",
+      "experienceBeats": [
+        "Show one parent cell",
+        "Highlight the nucleus and DNA",
+        "Animate DNA copying",
+        "Show the cell membrane pinching inward",
+        "End with two daughter cells and labels"
+      ],
+      "interactions": [
+        "scrub_timeline",
+        "step_through_explanation",
+        "tap_to_highlight",
+        "reset_view"
+      ]
+    },
+    {
+      "id": "gravity",
+      "page": 5,
+      "title": "Gravity",
+      "selectionTargets": [
+        "gravity pulls objects toward Earth",
+        "gravity"
+      ],
+      "keywords": [
+        "gravity",
+        "force",
+        "falling",
+        "apple",
+        "earth",
+        "mass"
+      ],
+      "learningGoal": "Show why unsupported objects accelerate downward near Earth.",
+      "recommendedRepresentation": "cause_effect_visualization",
+      "alsoUses": [
+        "animated_process"
+      ],
+      "body": "Gravity pulls objects toward Earth because Earth has mass and attracts nearby objects. When an object like an apple is unsupported, gravity causes it to accelerate downward. The apple does not move because it wants to go down; it moves because a force acts on it.\n\nA spatial scene should make the invisible force visible. The apple, Earth, ground, and a force arrow are enough for the first version. Later, SPATAIL can add a path trail, a velocity arrow, and a comparison mode showing different planets.",
+      "experienceBeats": [
+        "Place an apple above the ground",
+        "Draw a force arrow toward Earth",
+        "Animate the apple falling",
+        "Compare weak and strong gravity arrows",
+        "Reset and replay the fall"
+      ],
+      "interactions": [
+        "step_through_explanation",
+        "tap_to_highlight",
+        "isolate_important_parts",
+        "reset_view"
+      ]
+    },
+    {
+      "id": "v8_engine",
+      "page": 6,
+      "title": "V8 Engine",
+      "selectionTargets": [
+        "V8 engine",
+        "how a V8 engine works"
+      ],
+      "keywords": [
+        "v8",
+        "engine",
+        "piston",
+        "crankshaft",
+        "cylinder",
+        "combustion"
+      ],
+      "learningGoal": "Explain how pistons, connecting rods, and crankshaft motion work together.",
+      "recommendedRepresentation": "cutaway_view",
+      "alsoUses": [
+        "exploded_view",
+        "animated_simulation"
+      ],
+      "body": "A V8 engine has eight cylinders arranged in two banks, often forming a V shape. Inside the cylinders, pistons move up and down. Connecting rods transfer this motion to the crankshaft, which rotates and sends mechanical power to the drivetrain.\n\nThe educational goal is not to create a perfect engine model. The goal is to show hidden internal relationships. A cutaway or exploded view helps the learner understand parts that are normally hidden by the engine block.",
+      "experienceBeats": [
+        "Show the complete engine shape first",
+        "Fade the outer shell into a cutaway",
+        "Highlight pistons in the cylinder banks",
+        "Animate reciprocating piston motion",
+        "Show crankshaft rotation and firing sequence"
+      ],
+      "interactions": [
+        "tap_to_highlight",
+        "step_through_explanation",
+        "isolate_important_parts",
+        "reset_view"
+      ]
+    },
+    {
+      "id": "solar_system",
+      "page": 7,
+      "title": "Solar System",
+      "selectionTargets": [
+        "solar system"
+      ],
+      "keywords": [
+        "solar system",
+        "sun",
+        "planet",
+        "orbit",
+        "mercury",
+        "jupiter"
+      ],
+      "learningGoal": "Compare the Sun and planets while preserving conceptual relationships.",
+      "recommendedRepresentation": "scale_compression",
+      "alsoUses": [
+        "animated_process"
+      ],
+      "body": "The solar system contains the Sun, planets, moons, asteroids, comets, and other objects held together by gravity. The planets orbit the Sun at very different distances. A perfectly accurate scale model would be too large for most rooms.\n\nFor XR, the best first representation is a compressed scale comparison. It should communicate order, relative size, and orbital relationships without pretending that the distances are fully accurate.",
+      "experienceBeats": [
+        "Place the Sun as the anchor object",
+        "Arrange planets outward in order",
+        "Use compressed spacing so the scene fits the room",
+        "Show orbit rings or trails",
+        "Tap planets for size and distance facts"
+      ],
+      "interactions": [
+        "tap_to_highlight",
+        "step_through_explanation",
+        "isolate_important_parts",
+        "reset_view"
+      ]
+    },
+    {
+      "id": "roman_colosseum",
+      "page": 8,
+      "title": "Roman Colosseum",
+      "selectionTargets": [
+        "Roman Colosseum"
+      ],
+      "keywords": [
+        "colosseum",
+        "amphitheater",
+        "rome",
+        "arches",
+        "seating",
+        "arena"
+      ],
+      "learningGoal": "Explain the structure as a layered architectural and historical space.",
+      "recommendedRepresentation": "guided_tour",
+      "alsoUses": [
+        "cutaway_view"
+      ],
+      "body": "The Roman Colosseum was a large amphitheater in ancient Rome. Its layered seating, repeated arches, internal passages, and arena floor made it a complex public structure. Understanding it spatially requires more than viewing the outside.\n\nA good SPATAIL scene should combine a miniature overview with a cutaway. The learner can first understand the full shape, then inspect layers and movement paths inside the structure.",
+      "experienceBeats": [
+        "Show a tabletop miniature of the Colosseum",
+        "Slice a section open to reveal seating layers",
+        "Highlight arches and circulation paths",
+        "Animate crowds moving through entrances",
+        "Allow a life-size section expansion for scale"
+      ],
+      "interactions": [
+        "tap_to_highlight",
+        "step_through_explanation",
+        "isolate_important_parts",
+        "reset_view"
+      ]
+    },
+    {
+      "id": "bridge_construction",
+      "page": 9,
+      "title": "Bridge Construction",
+      "selectionTargets": [
+        "bridge construction",
+        "how a bridge is assembled"
+      ],
+      "keywords": [
+        "bridge",
+        "construction",
+        "foundation",
+        "tower",
+        "cable",
+        "deck",
+        "truss"
+      ],
+      "learningGoal": "Explain how a bridge is assembled from foundations to deck and cables.",
+      "recommendedRepresentation": "assembly_sequence",
+      "alsoUses": [
+        "part_to_whole_explanation"
+      ],
+      "body": "Bridge construction is a sequence of structural steps. Builders must create stable foundations, raise supports, connect load-bearing members, and add the deck. Different bridge types use different strategies, but all must transfer loads safely to the ground.\n\nThe best SPATAIL representation is an assembly sequence. Instead of showing a completed bridge only, the app should build the bridge in stages and show how forces travel through the structure.",
+      "experienceBeats": [
+        "Start with foundations and piers",
+        "Add towers or supports",
+        "Connect cables or trusses",
+        "Place deck sections step by step",
+        "Highlight load paths through the structure"
+      ],
+      "interactions": [
+        "step_through_explanation",
+        "tap_to_highlight",
+        "isolate_important_parts",
+        "reset_view"
+      ]
+    }
+  ]
+}

@@ -161,6 +161,24 @@ final class GenerativeClient {
     func generateRepresentation(prompt: String,
                                 onStage: @escaping (String) -> Void) async throws -> RepresentationBundle {
         let create = try await submit(prompt: prompt, mode: "representation")
+        return try await awaitBundle(create, onStage: onStage)
+    }
+
+    /// Educational Wrapper: a selected concept (+ its surrounding context) becomes the
+    /// SAME runtime bundle, built by the representation pipeline server-side, so the
+    /// existing RepresentationRuntime renders it. No new scene logic on the client.
+    func generateEducational(selectedText: String, surroundingContext: String,
+                             onStage: @escaping (String) -> Void) async throws -> RepresentationBundle {
+        let create = try await submit(prompt: selectedText, mode: "educational",
+                                      extra: ["selectedText": selectedText,
+                                              "surroundingContext": surroundingContext])
+        return try await awaitBundle(create, onStage: onStage)
+    }
+
+    /// Poll a runtime-shaped job (representation or educational) to completion and
+    /// download its three artifacts concurrently into a RepresentationBundle.
+    private func awaitBundle(_ create: CreateJobResponse,
+                             onStage: @escaping (String) -> Void) async throws -> RepresentationBundle {
         onStage("planning…")
         let deadline = Date().addingTimeInterval(120)
         var state = try await poll(id: create.id)
@@ -173,7 +191,7 @@ final class GenerativeClient {
         }
         guard let rURL = state.runtime_url, let pURL = state.progressive_url,
               let dURL = state.delivery_url else {
-            throw GenError.server("Job done but no representation produced.")
+            throw GenError.server("Job done but no experience produced.")
         }
         onStage("downloading…")
         async let contract: RuntimeSceneContract = fetchJSON(rURL)
@@ -191,12 +209,14 @@ final class GenerativeClient {
         return try JSONDecoder().decode(T.self, from: data)
     }
 
-    private func submit(prompt: String, mode: String? = nil) async throws -> CreateJobResponse {
+    private func submit(prompt: String, mode: String? = nil,
+                        extra: [String: Any] = [:]) async throws -> CreateJobResponse {
         var req = URLRequest(url: try base().appendingPathComponent("jobs"))
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         var payload: [String: Any] = ["prompt": prompt, "client": "ios"]
         if let mode { payload["mode"] = mode }
+        for (k, v) in extra { payload[k] = v }
         req.httpBody = try JSONSerialization.data(withJSONObject: payload)
         let (data, resp) = try await URLSession.shared.data(for: req)
         try check(resp)

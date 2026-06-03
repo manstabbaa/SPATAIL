@@ -7,7 +7,7 @@ import SwiftUI
 //  3. Analyze   — SPATAIL ANALYSIS proposes scale variants for YOUR room.
 //  4. Place     — tap a variant; the exhibit anchors + plays.
 
-enum Stage { case scanning, choosing, prompting, generating, analyzing, placed, experiencing, representing }
+enum Stage { case scanning, choosing, prompting, generating, analyzing, placed, experiencing, representing, reading }
 
 // How a prompt is realised: a full multi-station Lesson (Director), a single
 // generated Object, or a Representation (the brain → progressive runtime contract).
@@ -90,6 +90,34 @@ final class SessionModel: ObservableObject {
 
     func saveServer() { GenerativeClient.baseURL = serverURL }
 
+    // --- Educational Wrapper ---------------------------------------------
+    func startReading() { genError = nil; representation = nil; stage = .reading }
+
+    /// A selected concept from the reader → the SPATAIL pipeline (educational mode)
+    /// → presented via the existing RepresentationRuntime. No new scene logic.
+    func explainSelection(_ sel: CapturedSelection) {
+        saveServer()
+        let text = sel.selectedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        genError = nil; genStage = "submitting…"
+        generatedURL = nil; experience = nil; representation = nil
+        stage = .generating
+        Task {
+            do {
+                let bundle = try await gen.generateEducational(
+                    selectedText: text, surroundingContext: sel.surroundingContext
+                ) { [weak self] s in
+                    Task { @MainActor in self?.genStage = s }
+                }
+                representation = bundle; beatIndex = 0; selected = nil; chosen = nil
+                representationEpoch += 1; stage = .representing
+            } catch {
+                genError = error.localizedDescription
+                stage = .reading
+            }
+        }
+    }
+
     func generate() {
         saveServer()
         let p = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -162,9 +190,13 @@ struct ContentView: View {
     @StateObject private var model = SessionModel()
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            ARContainerView(model: model).ignoresSafeArea()
-            panel
+        if model.stage == .reading {
+            ReadingView(model: model)
+        } else {
+            ZStack(alignment: .bottom) {
+                ARContainerView(model: model).ignoresSafeArea()
+                panel
+            }
         }
     }
 
@@ -173,6 +205,8 @@ struct ContentView: View {
             switch model.stage {
             case .scanning:
                 card { Text(model.statusText).font(.callout) }
+            case .reading:
+                EmptyView()   // full-screen ReadingView is shown by `body`
             case .choosing:
                 card {
                     Text("What do you want to see?").font(.headline)
@@ -186,6 +220,15 @@ struct ContentView: View {
                             Spacer(); Image(systemName: "chevron.right")
                         }
                     }.buttonStyle(.borderedProminent)
+                    Button {
+                        model.startReading()
+                    } label: {
+                        HStack {
+                            Image(systemName: "book")
+                            Text("Read & explain (Educational)").bold()
+                            Spacer(); Image(systemName: "chevron.right")
+                        }
+                    }.buttonStyle(.bordered)
                     if !model.catalog.isEmpty {
                         Text("or pick a built-in demo")
                             .font(.caption2).foregroundStyle(.secondary)

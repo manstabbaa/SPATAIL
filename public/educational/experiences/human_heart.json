@@ -148,7 +148,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T20:25:31.711966+00:00",
+    "createdAt": "2026-06-03T20:30:00.344434+00:00",
     "sceneId": "edu_human_heart",
     "title": "Human Heart",
     "sourceBrief": {
@@ -391,7 +391,9 @@
           -0.7148
         ],
         "yaw_rad": 0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/biology/heart_simplified.usdz",
+        "fallbackPrimitive": "sphere"
       },
       {
         "id": "human_heart_mover",
@@ -409,7 +411,9 @@
           -0.7148
         ],
         "yaw_rad": -0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/biology/heart_simplified.usdz",
+        "fallbackPrimitive": "sphere"
       }
     ],
     "xrDesignCitations": {
@@ -483,7 +487,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "heart_simplified",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": "/assets/spatail-library/biology/heart_simplified.usdz"
       },
       {
         "assetId": "human_heart_mover",
@@ -534,7 +539,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "heart_simplified",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": "/assets/spatail-library/biology/heart_simplified.usdz"
       }
     ],
     "animations": [

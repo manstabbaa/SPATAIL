@@ -173,7 +173,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T20:25:31.721071+00:00",
+    "createdAt": "2026-06-03T20:30:00.349939+00:00",
     "sceneId": "edu_dna",
     "title": "Dna",
     "sourceBrief": {
@@ -416,7 +416,9 @@
           -0.7148
         ],
         "yaw_rad": 0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/biology/nucleus.usdz",
+        "fallbackPrimitive": "sphere"
       },
       {
         "id": "dna_part_a",
@@ -434,7 +436,9 @@
           -0.7372
         ],
         "yaw_rad": 0.0873,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/biology/nucleus.usdz",
+        "fallbackPrimitive": "sphere"
       },
       {
         "id": "dna_part_b",
@@ -452,7 +456,9 @@
           -0.7372
         ],
         "yaw_rad": -0.0873,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/biology/nucleus.usdz",
+        "fallbackPrimitive": "sphere"
       },
       {
         "id": "dna_core",
@@ -470,7 +476,9 @@
           -0.7148
         ],
         "yaw_rad": -0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/biology/nucleus.usdz",
+        "fallbackPrimitive": "sphere"
       }
     ],
     "xrDesignCitations": {
@@ -545,7 +553,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "nucleus",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": "/assets/spatail-library/biology/nucleus.usdz"
       },
       {
         "assetId": "dna_part_a",
@@ -597,7 +606,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "nucleus",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": "/assets/spatail-library/biology/nucleus.usdz"
       },
       {
         "assetId": "dna_part_b",
@@ -649,7 +659,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "nucleus",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": "/assets/spatail-library/biology/nucleus.usdz"
       },
       {
         "assetId": "dna_core",
@@ -701,7 +712,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "nucleus",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": "/assets/spatail-library/biology/nucleus.usdz"
       }
     ],
     "animations": []

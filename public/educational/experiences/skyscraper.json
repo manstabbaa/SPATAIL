@@ -182,7 +182,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T20:25:31.742345+00:00",
+    "createdAt": "2026-06-03T20:30:00.371034+00:00",
     "sceneId": "edu_skyscraper",
     "title": "Skyscrapers",
     "sourceBrief": {
@@ -425,7 +425,9 @@
           -0.7148
         ],
         "yaw_rad": 0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/truss_segment.usdz",
+        "fallbackPrimitive": "cube"
       },
       {
         "id": "skyscrapers_base",
@@ -443,7 +445,9 @@
           -0.7372
         ],
         "yaw_rad": 0.0873,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/foundation_block.usdz",
+        "fallbackPrimitive": "cube"
       },
       {
         "id": "skyscrapers_mid",
@@ -461,7 +465,9 @@
           -0.7372
         ],
         "yaw_rad": -0.0873,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "cube"
       },
       {
         "id": "skyscrapers_top",
@@ -479,7 +485,9 @@
           -0.7148
         ],
         "yaw_rad": -0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "cube"
       }
     ],
     "xrDesignCitations": {
@@ -554,7 +562,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "truss_segment",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/truss_segment.usdz"
       },
       {
         "assetId": "skyscrapers_base",
@@ -606,7 +615,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "foundation_block",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/foundation_block.usdz"
       },
       {
         "assetId": "skyscrapers_mid",
@@ -654,7 +664,8 @@
         "status": "placeholder",
         "source": "placeholder",
         "libraryAssetId": "generic_object_placeholder",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": ""
       },
       {
         "assetId": "skyscrapers_top",
@@ -702,7 +713,8 @@
         "status": "placeholder",
         "source": "placeholder",
         "libraryAssetId": "generic_object_placeholder",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": ""
       }
     ],
     "animations": [

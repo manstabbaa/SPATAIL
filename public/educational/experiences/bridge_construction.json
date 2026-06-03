@@ -182,7 +182,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T20:25:31.711966+00:00",
+    "createdAt": "2026-06-03T20:30:00.340922+00:00",
     "sceneId": "edu_bridge_construction",
     "title": "Bridge Construction",
     "sourceBrief": {
@@ -425,7 +425,9 @@
           -2.4148
         ],
         "yaw_rad": 0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/truss_segment.usdz",
+        "fallbackPrimitive": "cube"
       },
       {
         "id": "bridge_construction_base",
@@ -443,7 +445,9 @@
           -2.4905
         ],
         "yaw_rad": 0.0873,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/foundation_block.usdz",
+        "fallbackPrimitive": "cube"
       },
       {
         "id": "bridge_construction_mid",
@@ -461,7 +465,9 @@
           -2.4905
         ],
         "yaw_rad": -0.0873,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/bridge_deck.usdz",
+        "fallbackPrimitive": "cube"
       },
       {
         "id": "bridge_construction_top",
@@ -479,7 +485,9 @@
           -2.4148
         ],
         "yaw_rad": -0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/bridge_deck.usdz",
+        "fallbackPrimitive": "cube"
       }
     ],
     "xrDesignCitations": {
@@ -554,7 +562,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "truss_segment",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/truss_segment.usdz"
       },
       {
         "assetId": "bridge_construction_base",
@@ -606,7 +615,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "foundation_block",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/foundation_block.usdz"
       },
       {
         "assetId": "bridge_construction_mid",
@@ -658,7 +668,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "bridge_deck",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/bridge_deck.usdz"
       },
       {
         "assetId": "bridge_construction_top",
@@ -710,7 +721,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "bridge_deck",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/bridge_deck.usdz"
       }
     ],
     "animations": [

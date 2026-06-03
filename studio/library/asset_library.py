@@ -83,6 +83,7 @@ class Resolution:
     source: str                 # library | primitive | placeholder | generate
     libraryAssetId: str = ""
     glbPath: str = ""           # web path if a real GLB exists
+    usdzPath: str = ""          # web path to the cached USDZ (for the iOS runtime)
     fallbackPrimitive: str = "cube"
     scaleMeters: list = field(default_factory=lambda: [0.1, 0.1, 0.1])
     pivot: str = "center"
@@ -194,7 +195,7 @@ class AssetLibrary:
             a = m.asset
             if a.get("assetState") in ("generated", "cached"):
                 return Resolution(source="library", libraryAssetId=a["assetId"],
-                                  glbPath=a.get("path", ""),
+                                  glbPath=a.get("path", ""), usdzPath=a.get("usdzPath", ""),
                                   fallbackPrimitive=a.get("fallbackPrimitive", "cube"),
                                   scaleMeters=a.get("scaleMeters", [0.1, 0.1, 0.1]),
                                   pivot=a.get("pivot", "center"),

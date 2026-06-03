@@ -177,7 +177,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T20:25:31.695925+00:00",
+    "createdAt": "2026-06-03T20:30:00.327382+00:00",
     "sceneId": "edu_v8_engine",
     "title": "V8 Engine",
     "sourceBrief": {
@@ -420,7 +420,9 @@
           -0.7148
         ],
         "yaw_rad": 0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/mechanical/engine_block_simplified.usdz",
+        "fallbackPrimitive": "cube"
       },
       {
         "id": "v8_engine_part_a",
@@ -438,7 +440,9 @@
           -0.7372
         ],
         "yaw_rad": 0.0873,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/mechanical/engine_block_simplified.usdz",
+        "fallbackPrimitive": "cube"
       },
       {
         "id": "v8_engine_part_b",
@@ -456,7 +460,9 @@
           -0.7372
         ],
         "yaw_rad": -0.0873,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/mechanical/engine_block_simplified.usdz",
+        "fallbackPrimitive": "cube"
       },
       {
         "id": "v8_engine_core",
@@ -474,7 +480,9 @@
           -0.7148
         ],
         "yaw_rad": -0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/mechanical/engine_block_simplified.usdz",
+        "fallbackPrimitive": "cube"
       }
     ],
     "xrDesignCitations": {
@@ -550,7 +558,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "engine_block_simplified",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/mechanical/engine_block_simplified.usdz"
       },
       {
         "assetId": "v8_engine_part_a",
@@ -603,7 +612,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "engine_block_simplified",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/mechanical/engine_block_simplified.usdz"
       },
       {
         "assetId": "v8_engine_part_b",
@@ -656,7 +666,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "engine_block_simplified",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/mechanical/engine_block_simplified.usdz"
       },
       {
         "assetId": "v8_engine_core",
@@ -709,7 +720,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "engine_block_simplified",
-        "fallbackPrimitive": "cube"
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/mechanical/engine_block_simplified.usdz"
       }
     ],
     "animations": []

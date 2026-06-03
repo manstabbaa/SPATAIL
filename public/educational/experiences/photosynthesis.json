@@ -148,7 +148,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T20:25:31.685230+00:00",
+    "createdAt": "2026-06-03T20:30:00.314343+00:00",
     "sceneId": "edu_photosynthesis",
     "title": "Photosynthesis",
     "sourceBrief": {
@@ -391,7 +391,9 @@
           -0.7148
         ],
         "yaw_rad": 0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "sphere"
       },
       {
         "id": "photosynthesis_mover",
@@ -409,7 +411,9 @@
           -0.7148
         ],
         "yaw_rad": -0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "sphere"
       }
     ],
     "xrDesignCitations": {
@@ -481,7 +485,8 @@
         "status": "placeholder",
         "source": "placeholder",
         "libraryAssetId": "biological_placeholder",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": ""
       },
       {
         "assetId": "photosynthesis_mover",
@@ -529,7 +534,8 @@
         "status": "placeholder",
         "source": "placeholder",
         "libraryAssetId": "biological_placeholder",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": ""
       }
     ],
     "animations": [

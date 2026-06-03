@@ -344,6 +344,20 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(body)
             return None
 
+        # Serve the starter asset library (cached GLB/USDZ) at the SAME path the
+        # manifests reference, so the iOS app and web viewer fetch real cached assets.
+        if path.startswith("/assets/spatail-library/"):
+            base = (ROOT / "public" / "assets" / "spatail-library").resolve()
+            fp = (base / unquote(path)[len("/assets/spatail-library/"):]).resolve()
+            if not str(fp).startswith(str(base)) or not fp.is_file():
+                return self._send(404, obj={"error": "asset not found", "path": path})
+            ext = fp.suffix.lower()
+            ctype = ("model/vnd.usdz+zip" if ext == ".usdz"
+                     else "model/gltf-binary" if ext == ".glb"
+                     else "application/json" if ext == ".json"
+                     else "application/octet-stream")
+            return self._send(200, raw=fp.read_bytes(), ctype=ctype)
+
         return self._send(404, obj={"error": "not found"})
 
 

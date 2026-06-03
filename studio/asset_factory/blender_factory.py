@@ -108,11 +108,12 @@ class BlenderAssetFactory:
                 "center": [0.0, 0.0, round(sz / 2, 4)]}
         path = res.glbPath if res.source == "library" else ""
         return self._assemble(req, path, bbox, res.source, placement, source=res.source,
-                              library_id=res.libraryAssetId, fallback=res.fallbackPrimitive)
+                              library_id=res.libraryAssetId, fallback=res.fallbackPrimitive,
+                              usdz=res.usdzPath if res.source == "library" else "")
 
     def _assemble(self, req, glb_path: str, bbox_m: dict, status: str,
                   placement: dict | None, *, source: str = "generate",
-                  library_id: str = "", fallback: str = "") -> DeliveredAsset:
+                  library_id: str = "", fallback: str = "", usdz: str = "") -> DeliveredAsset:
         bbox_m = bbox_m or {}
         size = bbox_m.get("size", [0.0, 0.0, 0.0])
         center = bbox_m.get("center", [0.0, 0.0, 0.0])
@@ -130,7 +131,8 @@ class BlenderAssetFactory:
         return DeliveredAsset(assetId=req.assetId, path=glb_path,
                               variants=self._variant_paths(req, glb_path) if glb_path else {},
                               metadata=meta, status=status, source=source,
-                              libraryAssetId=library_id, fallbackPrimitive=fallback)
+                              libraryAssetId=library_id, fallbackPrimitive=fallback,
+                              usdzPath=usdz)
 
     def _variant_paths(self, req, base_glb: str) -> dict:
         out = {}

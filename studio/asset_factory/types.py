@@ -28,6 +28,7 @@ class DeliveredAsset:
     source: str = "generate"                # which resolution tier produced it
     libraryAssetId: str = ""                # the starter-library catalog asset that resolved it
     fallbackPrimitive: str = ""             # runtime proxy shape when path is empty
+    usdzPath: str = ""                      # cached USDZ web path (for the iOS runtime)
 
 
 @dataclass

@@ -179,7 +179,7 @@
   },
   "runtimeContract": {
     "schemaVersion": "0.4.0-studio-runtime",
-    "createdAt": "2026-06-03T20:25:31.701375+00:00",
+    "createdAt": "2026-06-03T20:30:00.331884+00:00",
     "sceneId": "edu_solar_system",
     "title": "Solar System",
     "sourceBrief": {
@@ -431,7 +431,9 @@
           -2.4148
         ],
         "yaw_rad": 0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/astronomy/sun.usdz",
+        "fallbackPrimitive": "sphere"
       },
       {
         "id": "solar_system_orbiter_a",
@@ -449,7 +451,9 @@
           -2.5
         ],
         "yaw_rad": -0.0,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/astronomy/sun.usdz",
+        "fallbackPrimitive": "sphere"
       },
       {
         "id": "solar_system_orbiter_b",
@@ -467,7 +471,9 @@
           -2.4148
         ],
         "yaw_rad": -0.2618,
-        "inComfortCone": true
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/astronomy/sun.usdz",
+        "fallbackPrimitive": "sphere"
       }
     ],
     "xrDesignCitations": {
@@ -541,7 +547,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "sun",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": "/assets/spatail-library/astronomy/sun.usdz"
       },
       {
         "assetId": "solar_system_orbiter_a",
@@ -592,7 +599,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "sun",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": "/assets/spatail-library/astronomy/sun.usdz"
       },
       {
         "assetId": "solar_system_orbiter_b",
@@ -643,7 +651,8 @@
         "status": "library",
         "source": "library",
         "libraryAssetId": "sun",
-        "fallbackPrimitive": "sphere"
+        "fallbackPrimitive": "sphere",
+        "usdzPath": "/assets/spatail-library/astronomy/sun.usdz"
       }
     ],
     "animations": [

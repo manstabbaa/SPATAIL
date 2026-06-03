@@ -79,6 +79,8 @@ class RuntimeSceneBuilder:
                 "in_comfort_cone": xr.in_comfort_cone(pb),
                 "status": "processed" if asset.status in ("built", "cached", "library") else "placeholder",
                 "processedPath": asset.path,
+                "usdzUrl": getattr(asset, "usdzPath", ""),
+                "fallbackPrimitive": getattr(asset, "fallbackPrimitive", ""),
             })
         placed_by_id = {p["assetId"]: p for p in placed}
 
@@ -125,6 +127,7 @@ class RuntimeSceneBuilder:
             "processedPath": p["processedPath"], "footprint": p["footprint_m"],
             "position_yup": p["position_yup"], "yaw_rad": p["yaw_rad"],
             "inComfortCone": p["in_comfort_cone"],
+            "usdzUrl": p.get("usdzUrl", ""), "fallbackPrimitive": p.get("fallbackPrimitive", ""),
         } for p in placed]
 
         # --- studio block (primary asset summary) ----------------------------

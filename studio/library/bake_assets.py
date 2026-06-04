@@ -324,4 +324,5 @@ def main():
     print(f"[bake] done: {len(baked)} baked, {len(failed)} failed")
 
 
-main()
+if __name__ == "__main__":   # Blender runs this with __name__=='__main__'; guard so
+    main()                    # other modules can import the helpers without running it

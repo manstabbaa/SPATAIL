@@ -70,6 +70,13 @@ assets_processed/
 docs/screenshots/_tmp/
 # built web viewer artifacts
 dist/
+# Meshy image-to-3D — heavy binaries (12-22MB USDZ each); kept on the PC disk and
+# served over Tailscale, regenerable via studio/meshy/pipeline.py. Code IS tracked.
+/studio/out/meshy/
+/public/assets/spatail-library/meshy/
+# external API keys live OUTSIDE the repo (~/.spatail/secrets.env) — never commit
+*.env
+secrets.env
 
 # Claude / agent local state
 .claude/projects/

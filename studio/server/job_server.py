@@ -238,6 +238,8 @@ class Handler(BaseHTTPRequestHandler):
     # -- routes ---------------------------------------------------------------
     def do_POST(self):
         path = urlsplit(self.path).path
+        if path == "/modular":
+            return self._modular()
         if path != "/jobs":
             return self._send(404, obj={"error": "not found"})
         try:
@@ -271,6 +273,46 @@ class Handler(BaseHTTPRequestHandler):
         print(f"[job] {job_id} queued: {prompt!r}", flush=True)
         return self._send(200, obj={"id": job_id, "status": "queued"})
 
+    def _modular(self):
+        """Synchronous: text or photo -> the modular SPATAIL experience contract
+        (agent-composed mechanics). Body: {kind:"text"|"image", text|image(base64),
+        note, use_llm}. Returns the v0.5 modular contract directly."""
+        try:
+            length = int(self.headers.get("Content-Length", 0) or 0)
+            data = json.loads(self.rfile.read(length) or b"{}")
+        except (ValueError, json.JSONDecodeError):
+            return self._send(400, obj={"error": "invalid JSON body"})
+        kind = (data.get("kind") or "text").lower()
+        use_llm = bool(data.get("use_llm", True))
+        try:
+            import sys as _sys
+            _d = str(ROOT / "studio" / "director")
+            if _d not in _sys.path:
+                _sys.path.insert(0, _d)
+            import experience as _ex
+            if kind == "image":
+                import base64 as _b64
+                img = data.get("image") or ""
+                if "," in img:
+                    img = img.split(",", 1)[1]            # strip data: URI prefix
+                raw = _b64.b64decode(img)
+                contract = _ex.build_from_image(raw, mime=data.get("mime") or "image/jpeg",
+                                                note=data.get("note", ""), use_llm=use_llm)
+            else:
+                text = (data.get("text") or data.get("selectedText") or data.get("prompt") or "").strip()
+                if not text:
+                    return self._send(400, obj={"error": "missing 'text'"})
+                contract = _ex.build_modular_experience(
+                    text, kind="text", summary=data.get("surroundingContext") or text, use_llm=use_llm)
+            print(f"[modular] {kind} -> {contract.get('title')!r} "
+                  f"({contract.get('composer')}, {len(contract.get('beats', []))} beats, "
+                  f"{len(contract.get('mechanicsUsed', []))} mechanics)", flush=True)
+            return self._send(200, obj=contract)
+        except Exception as e:  # noqa: BLE001
+            import traceback
+            traceback.print_exc()
+            return self._send(500, obj={"error": "modular build failed", "detail": str(e)[:300]})
+
     def do_HEAD(self):
         self.do_GET()
 
@@ -288,6 +330,13 @@ class Handler(BaseHTTPRequestHandler):
                 "blender": (bridge or {}).get("blender"),
                 "jobs": njobs, "artifacts_dir": str(ARTIFACTS),
             })
+
+        if path.startswith("/mechanics/"):
+            base = (ROOT / "public" / "mechanics").resolve()
+            fp = (base / unquote(path)[len("/mechanics/"):]).resolve()
+            if not str(fp).startswith(str(base)) or not fp.is_file():
+                return self._send(404, obj={"error": "not found", "path": path})
+            return self._send(200, raw=fp.read_bytes(), ctype="application/json")
 
         if path.startswith("/jobs/"):
             job_id = unquote(path[len("/jobs/"):]).strip("/")

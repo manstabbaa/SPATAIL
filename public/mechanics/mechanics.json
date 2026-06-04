@@ -1,0 +1,1617 @@
+{
+  "schemaVersion": "0.5.0-spatail-mechanics",
+  "count": 41,
+  "categories": {
+    "motion": [
+      "spin",
+      "orbit",
+      "oscillate",
+      "reciprocate",
+      "bob",
+      "grow_shrink",
+      "flow",
+      "wave",
+      "play_clip"
+    ],
+    "reveal": [
+      "assemble",
+      "explode",
+      "cutaway",
+      "fade_in",
+      "build_up",
+      "dissolve"
+    ],
+    "focus": [
+      "isolate",
+      "ghost_others",
+      "highlight",
+      "zoom_to",
+      "pulse"
+    ],
+    "compare": [
+      "side_by_side",
+      "scale_compare",
+      "before_after",
+      "morph"
+    ],
+    "annotate": [
+      "label",
+      "callout",
+      "dimension_line",
+      "arrow_point",
+      "trace_path"
+    ],
+    "interact": [
+      "tap_step",
+      "grab_physics",
+      "rotate_handle",
+      "slider_param",
+      "scrub_timeline",
+      "quiz",
+      "toggle_states"
+    ],
+    "camera": [
+      "focus_camera",
+      "orbit_camera",
+      "frame_all"
+    ],
+    "narrate": [
+      "speak",
+      "caption"
+    ]
+  },
+  "capabilities": [
+    "animation",
+    "named_parts",
+    "none",
+    "path",
+    "physics",
+    "transparency",
+    "two_or_more"
+  ],
+  "triggers": [
+    "auto",
+    "on_tap",
+    "on_focus",
+    "on_step",
+    "on_grab",
+    "on_slider",
+    "timeline"
+  ],
+  "mechanics": [
+    {
+      "id": "spin",
+      "category": "motion",
+      "summary": "Rotate continuously about an axis (wheels, planets, drums).",
+      "runtime": "transform.spin",
+      "needs": [],
+      "params": {
+        "axis": {
+          "default": "y",
+          "type": "axis",
+          "range": [
+            "x",
+            "y",
+            "z"
+          ],
+          "doc": ""
+        },
+        "rpm": {
+          "default": 12.0,
+          "type": "float",
+          "range": [
+            0.5,
+            120
+          ],
+          "doc": ""
+        },
+        "direction": {
+          "default": 1,
+          "type": "int",
+          "range": [
+            -1,
+            1
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "orbit",
+      "category": "motion",
+      "summary": "Move one asset around another on a circular path.",
+      "runtime": "transform.orbit",
+      "needs": [],
+      "params": {
+        "center": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "radius_m": {
+          "default": 0.3,
+          "type": "float",
+          "range": [
+            0.02,
+            3
+          ],
+          "doc": ""
+        },
+        "period_s": {
+          "default": 6.0,
+          "type": "float",
+          "range": [
+            0.5,
+            60
+          ],
+          "doc": ""
+        },
+        "axis": {
+          "default": "y",
+          "type": "axis",
+          "range": [
+            "x",
+            "y",
+            "z"
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "oscillate",
+      "category": "motion",
+      "summary": "Swing back and forth about a pivot (pendulum, swing, metronome).",
+      "runtime": "transform.oscillate",
+      "needs": [],
+      "params": {
+        "axis": {
+          "default": "x",
+          "type": "axis",
+          "range": [
+            "x",
+            "y",
+            "z"
+          ],
+          "doc": ""
+        },
+        "amplitude_deg": {
+          "default": 25.0,
+          "type": "float",
+          "range": [
+            1,
+            90
+          ],
+          "doc": ""
+        },
+        "period_s": {
+          "default": 2.0,
+          "type": "float",
+          "range": [
+            0.2,
+            20
+          ],
+          "doc": ""
+        },
+        "pivot": {
+          "default": "top",
+          "type": "enum",
+          "range": [
+            "top",
+            "center",
+            "bottom"
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "reciprocate",
+      "category": "motion",
+      "summary": "Linear back-and-forth (piston, plunger, needle).",
+      "runtime": "transform.reciprocate",
+      "needs": [],
+      "params": {
+        "axis": {
+          "default": "z",
+          "type": "axis",
+          "range": [
+            "x",
+            "y",
+            "z"
+          ],
+          "doc": ""
+        },
+        "distance_m": {
+          "default": 0.1,
+          "type": "float",
+          "range": [
+            0.005,
+            1
+          ],
+          "doc": ""
+        },
+        "period_s": {
+          "default": 1.0,
+          "type": "float",
+          "range": [
+            0.1,
+            10
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "bob",
+      "category": "motion",
+      "summary": "Gentle float up/down to feel alive (idle hover).",
+      "runtime": "transform.bob",
+      "needs": [],
+      "params": {
+        "amplitude_m": {
+          "default": 0.02,
+          "type": "float",
+          "range": [
+            0.002,
+            0.2
+          ],
+          "doc": ""
+        },
+        "period_s": {
+          "default": 3.0,
+          "type": "float",
+          "range": [
+            0.5,
+            10
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "grow_shrink",
+      "category": "motion",
+      "summary": "Scale between two sizes (growth, breathing, inflation).",
+      "runtime": "transform.scale",
+      "needs": [],
+      "params": {
+        "from": {
+          "default": 1.0,
+          "type": "float",
+          "range": [
+            0.05,
+            5
+          ],
+          "doc": ""
+        },
+        "to": {
+          "default": 1.4,
+          "type": "float",
+          "range": [
+            0.05,
+            5
+          ],
+          "doc": ""
+        },
+        "period_s": {
+          "default": 2.5,
+          "type": "float",
+          "range": [
+            0.2,
+            30
+          ],
+          "doc": ""
+        },
+        "loop": {
+          "default": true,
+          "type": "bool",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "flow",
+      "category": "motion",
+      "summary": "Stream markers/particles along a path (current, blood, traffic).",
+      "runtime": "fx.flow",
+      "needs": [
+        "path"
+      ],
+      "params": {
+        "speed": {
+          "default": 0.3,
+          "type": "float",
+          "range": [
+            0.02,
+            3
+          ],
+          "doc": ""
+        },
+        "count": {
+          "default": 20,
+          "type": "int",
+          "range": [
+            3,
+            200
+          ],
+          "doc": ""
+        },
+        "color": {
+          "default": "#54b0ff",
+          "type": "color",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "wave",
+      "category": "motion",
+      "summary": "Propagate a wave along an axis (sound, ripple, oscillation).",
+      "runtime": "fx.wave",
+      "needs": [],
+      "params": {
+        "axis": {
+          "default": "x",
+          "type": "axis",
+          "range": [
+            "x",
+            "y",
+            "z"
+          ],
+          "doc": ""
+        },
+        "amplitude_m": {
+          "default": 0.05,
+          "type": "float",
+          "range": [
+            0.005,
+            0.5
+          ],
+          "doc": ""
+        },
+        "wavelength_m": {
+          "default": 0.3,
+          "type": "float",
+          "range": [
+            0.05,
+            2
+          ],
+          "doc": ""
+        },
+        "speed": {
+          "default": 0.4,
+          "type": "float",
+          "range": [
+            0.05,
+            3
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "play_clip",
+      "category": "motion",
+      "summary": "Play the asset's baked animation clip.",
+      "runtime": "anim.play",
+      "needs": [
+        "animation"
+      ],
+      "params": {
+        "clip": {
+          "default": "",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        },
+        "loop": {
+          "default": true,
+          "type": "bool",
+          "range": null,
+          "doc": ""
+        },
+        "speed": {
+          "default": 1.0,
+          "type": "float",
+          "range": [
+            0.1,
+            4
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "assemble",
+      "category": "reveal",
+      "summary": "Parts fly in and snap together to build the whole.",
+      "runtime": "parts.assemble",
+      "needs": [
+        "named_parts"
+      ],
+      "params": {
+        "duration_s": {
+          "default": 2.0,
+          "type": "float",
+          "range": [
+            0.3,
+            10
+          ],
+          "doc": ""
+        },
+        "stagger_s": {
+          "default": 0.15,
+          "type": "float",
+          "range": [
+            0,
+            1
+          ],
+          "doc": ""
+        },
+        "from_m": {
+          "default": 0.4,
+          "type": "float",
+          "range": [
+            0.05,
+            2
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "on_step",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "explode",
+      "category": "reveal",
+      "summary": "Separate parts outward to show how it's built.",
+      "runtime": "parts.explode",
+      "needs": [
+        "named_parts"
+      ],
+      "params": {
+        "distance_m": {
+          "default": 0.25,
+          "type": "float",
+          "range": [
+            0.02,
+            1.5
+          ],
+          "doc": ""
+        },
+        "axis": {
+          "default": "radial",
+          "type": "enum",
+          "range": [
+            "radial",
+            "x",
+            "y",
+            "z"
+          ],
+          "doc": ""
+        },
+        "stagger_s": {
+          "default": 0.08,
+          "type": "float",
+          "range": [
+            0,
+            1
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "on_tap",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "cutaway",
+      "category": "reveal",
+      "summary": "Slice the object with a plane to expose the interior.",
+      "runtime": "geo.cutaway",
+      "needs": [
+        "transparency"
+      ],
+      "params": {
+        "plane": {
+          "default": "x",
+          "type": "axis",
+          "range": [
+            "x",
+            "y",
+            "z"
+          ],
+          "doc": ""
+        },
+        "offset_m": {
+          "default": 0.0,
+          "type": "float",
+          "range": [
+            -0.5,
+            0.5
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "on_tap",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "fade_in",
+      "category": "reveal",
+      "summary": "Fade assets in (optionally staggered) as they're introduced.",
+      "runtime": "material.fade",
+      "needs": [],
+      "params": {
+        "duration_s": {
+          "default": 0.6,
+          "type": "float",
+          "range": [
+            0.1,
+            3
+          ],
+          "doc": ""
+        },
+        "stagger_s": {
+          "default": 0.1,
+          "type": "float",
+          "range": [
+            0,
+            1
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "build_up",
+      "category": "reveal",
+      "summary": "Reveal parts one at a time in a meaningful order.",
+      "runtime": "parts.sequence",
+      "needs": [
+        "named_parts"
+      ],
+      "params": {
+        "per_part_s": {
+          "default": 0.5,
+          "type": "float",
+          "range": [
+            0.1,
+            3
+          ],
+          "doc": ""
+        },
+        "order": {
+          "default": "bottom_up",
+          "type": "enum",
+          "range": [
+            "bottom_up",
+            "top_down",
+            "back_to_front",
+            "given"
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_step"
+      ],
+      "default_trigger": "on_step",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "dissolve",
+      "category": "reveal",
+      "summary": "Dissolve a layer/asset away to reveal what's beneath.",
+      "runtime": "material.dissolve",
+      "needs": [
+        "transparency"
+      ],
+      "params": {
+        "duration_s": {
+          "default": 1.0,
+          "type": "float",
+          "range": [
+            0.2,
+            5
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "on_tap",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "isolate",
+      "category": "focus",
+      "summary": "Hide everything except the focused asset/part.",
+      "runtime": "focus.isolate",
+      "needs": [],
+      "params": {
+        "target": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "on_tap",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "ghost_others",
+      "category": "focus",
+      "summary": "Make non-focused assets semi-transparent.",
+      "runtime": "focus.ghost",
+      "needs": [
+        "transparency"
+      ],
+      "params": {
+        "opacity": {
+          "default": 0.18,
+          "type": "float",
+          "range": [
+            0.0,
+            0.6
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_focus",
+        "on_step",
+        "auto"
+      ],
+      "default_trigger": "on_focus",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "highlight",
+      "category": "focus",
+      "summary": "Tint/emit a target to draw the eye.",
+      "runtime": "focus.highlight",
+      "needs": [],
+      "params": {
+        "target": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "color": {
+          "default": "#ffd23f",
+          "type": "color",
+          "range": null,
+          "doc": ""
+        },
+        "pulse": {
+          "default": true,
+          "type": "bool",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "on_focus",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "zoom_to",
+      "category": "focus",
+      "summary": "Scale a target up in place for close inspection.",
+      "runtime": "focus.zoom",
+      "needs": [],
+      "params": {
+        "target": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "scale": {
+          "default": 1.8,
+          "type": "float",
+          "range": [
+            1.05,
+            5
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_tap",
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "on_tap",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "pulse",
+      "category": "focus",
+      "summary": "Rhythmically pulse a target's scale to mark it as live/important.",
+      "runtime": "focus.pulse",
+      "needs": [],
+      "params": {
+        "target": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "period_s": {
+          "default": 1.2,
+          "type": "float",
+          "range": [
+            0.3,
+            5
+          ],
+          "doc": ""
+        },
+        "amount": {
+          "default": 0.08,
+          "type": "float",
+          "range": [
+            0.01,
+            0.4
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_focus"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "side_by_side",
+      "category": "compare",
+      "summary": "Lay items in a row at matched scale to compare.",
+      "runtime": "compare.row",
+      "needs": [
+        "two_or_more"
+      ],
+      "params": {
+        "gap_m": {
+          "default": 0.12,
+          "type": "float",
+          "range": [
+            0.01,
+            1
+          ],
+          "doc": ""
+        },
+        "match_scale": {
+          "default": true,
+          "type": "bool",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "scale_compare",
+      "category": "compare",
+      "summary": "Show items at TRUE relative size against a referent.",
+      "runtime": "compare.scale",
+      "needs": [
+        "two_or_more"
+      ],
+      "params": {
+        "referent": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "before_after",
+      "category": "compare",
+      "summary": "Swap/cross-fade between two states of the same thing.",
+      "runtime": "compare.beforeafter",
+      "needs": [],
+      "params": {
+        "a": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "b": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "transition": {
+          "default": "crossfade",
+          "type": "enum",
+          "range": [
+            "crossfade",
+            "wipe",
+            "swap"
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_tap",
+        "on_step"
+      ],
+      "default_trigger": "on_tap",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "morph",
+      "category": "compare",
+      "summary": "Smoothly morph one asset/state into another.",
+      "runtime": "compare.morph",
+      "needs": [],
+      "params": {
+        "from": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "to": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "duration_s": {
+          "default": 1.5,
+          "type": "float",
+          "range": [
+            0.2,
+            8
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_tap",
+        "on_step"
+      ],
+      "default_trigger": "on_tap",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "label",
+      "category": "annotate",
+      "summary": "Floating label pinned to a target.",
+      "runtime": "ui.label",
+      "needs": [],
+      "params": {
+        "target": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "text": {
+          "default": "",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        },
+        "anchor": {
+          "default": "top",
+          "type": "enum",
+          "range": [
+            "top",
+            "front",
+            "left",
+            "right"
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_focus"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "callout",
+      "category": "annotate",
+      "summary": "Label with a leader line to a precise point.",
+      "runtime": "ui.callout",
+      "needs": [],
+      "params": {
+        "target": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "text": {
+          "default": "",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_focus"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "dimension_line",
+      "category": "annotate",
+      "summary": "Draw a measured dimension between two points.",
+      "runtime": "ui.dimension",
+      "needs": [],
+      "params": {
+        "from": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "to": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "value": {
+          "default": "",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "arrow_point",
+      "category": "annotate",
+      "summary": "Arrow pointing at a feature, optional caption.",
+      "runtime": "ui.arrow",
+      "needs": [],
+      "params": {
+        "at": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "text": {
+          "default": "",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_focus"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "trace_path",
+      "category": "annotate",
+      "summary": "Draw a trajectory/flow path through space.",
+      "runtime": "ui.trace",
+      "needs": [
+        "path"
+      ],
+      "params": {
+        "color": {
+          "default": "#54b0ff",
+          "type": "color",
+          "range": null,
+          "doc": ""
+        },
+        "animated": {
+          "default": true,
+          "type": "bool",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "tap_step",
+      "category": "interact",
+      "summary": "Tap anywhere to advance to the next beat.",
+      "runtime": "ix.tapstep",
+      "needs": [],
+      "params": {},
+      "triggers": [
+        "on_tap"
+      ],
+      "default_trigger": "on_tap",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "grab_physics",
+      "category": "interact",
+      "summary": "Pick up and release with real gravity/collision.",
+      "runtime": "ix.grab",
+      "needs": [
+        "physics"
+      ],
+      "params": {
+        "mass_kg": {
+          "default": 1.0,
+          "type": "float",
+          "range": [
+            0.05,
+            50
+          ],
+          "doc": ""
+        },
+        "gravity": {
+          "default": true,
+          "type": "bool",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_grab"
+      ],
+      "default_trigger": "on_grab",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "rotate_handle",
+      "category": "interact",
+      "summary": "Let the user spin the object with a drag.",
+      "runtime": "ix.rotate",
+      "needs": [],
+      "params": {
+        "axis": {
+          "default": "y",
+          "type": "axis",
+          "range": [
+            "x",
+            "y",
+            "z",
+            "free"
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_grab"
+      ],
+      "default_trigger": "on_grab",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "slider_param",
+      "category": "interact",
+      "summary": "A slider drives a named animation/param live.",
+      "runtime": "ix.slider",
+      "needs": [],
+      "params": {
+        "param": {
+          "default": "angle",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        },
+        "min": {
+          "default": 0.0,
+          "type": "float",
+          "range": null,
+          "doc": ""
+        },
+        "max": {
+          "default": 90.0,
+          "type": "float",
+          "range": null,
+          "doc": ""
+        },
+        "bind": {
+          "default": "oscillate.amplitude_deg",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_slider"
+      ],
+      "default_trigger": "on_slider",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "scrub_timeline",
+      "category": "interact",
+      "summary": "Scrub a baked clip forward/back by dragging.",
+      "runtime": "ix.scrub",
+      "needs": [
+        "animation"
+      ],
+      "params": {
+        "clip": {
+          "default": "",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_slider"
+      ],
+      "default_trigger": "on_slider",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "quiz",
+      "category": "interact",
+      "summary": "A multiple-choice check tied to the content.",
+      "runtime": "ix.quiz",
+      "needs": [],
+      "params": {
+        "question": {
+          "default": "",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        },
+        "options": {
+          "default": [],
+          "type": "string",
+          "range": null,
+          "doc": ""
+        },
+        "answer": {
+          "default": 0,
+          "type": "int",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_focus",
+        "on_step"
+      ],
+      "default_trigger": "on_step",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "toggle_states",
+      "category": "interact",
+      "summary": "Tap to cycle an asset through discrete states.",
+      "runtime": "ix.toggle",
+      "needs": [],
+      "params": {
+        "states": {
+          "default": [],
+          "type": "string",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "on_tap"
+      ],
+      "default_trigger": "on_tap",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "focus_camera",
+      "category": "camera",
+      "summary": "Frame the camera on a target (UX hint, not forced).",
+      "runtime": "cam.focus",
+      "needs": [],
+      "params": {
+        "target": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_step",
+        "on_focus"
+      ],
+      "default_trigger": "on_step",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "orbit_camera",
+      "category": "camera",
+      "summary": "Slowly orbit the view around a target.",
+      "runtime": "cam.orbit",
+      "needs": [],
+      "params": {
+        "target": {
+          "default": "",
+          "type": "assetRef",
+          "range": null,
+          "doc": ""
+        },
+        "period_s": {
+          "default": 12.0,
+          "type": "float",
+          "range": [
+            3,
+            60
+          ],
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "frame_all",
+      "category": "camera",
+      "summary": "Pull back to frame the whole scene.",
+      "runtime": "cam.frameall",
+      "needs": [],
+      "params": {},
+      "triggers": [
+        "auto",
+        "on_step"
+      ],
+      "default_trigger": "on_step",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "speak",
+      "category": "narrate",
+      "summary": "Narrate the beat (TTS), optional per platform.",
+      "runtime": "tts.speak",
+      "needs": [],
+      "params": {
+        "text": {
+          "default": "",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    },
+    {
+      "id": "caption",
+      "category": "narrate",
+      "summary": "Show the beat text as a caption panel.",
+      "runtime": "ui.caption",
+      "needs": [],
+      "params": {
+        "text": {
+          "default": "",
+          "type": "string",
+          "range": null,
+          "doc": ""
+        }
+      },
+      "triggers": [
+        "auto",
+        "on_step"
+      ],
+      "default_trigger": "auto",
+      "platforms": [
+        "ios",
+        "visionos",
+        "web"
+      ]
+    }
+  ]
+}

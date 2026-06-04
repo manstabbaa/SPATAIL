@@ -1,0 +1,118 @@
+"""experience.py — assemble the modular SPATAIL experience contract.
+
+Ties the existing brain to the new agent director:
+  understanding  <- RepresentationEngine (domain/intent/subject)         [reuse]
+  assets         <- AssetLibrary.resolve per requested asset             [reuse]
+  beats          <- director.compose (agent picks mechanics freely)      [new]
+  stage          <- plan.placement (xr_design comfort)                   [reuse]
+
+Emits schemaVersion 0.5.0-spatail-modular — platform-agnostic. No rigid presentation
+template: the beats are whatever the director designed from the mechanics catalog.
+Works for pasted text or an image-derived brief (kind="text"|"image").
+"""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+_STUDIO = Path(__file__).resolve().parents[1]
+for p in (_STUDIO, _STUDIO / "server", _STUDIO / "mechanics", _STUDIO / "director"):
+    sp = str(p)
+    if sp not in sys.path:
+        sys.path.insert(0, sp)
+
+import composer  # noqa: E402
+from representation.engine import RepresentationEngine  # noqa: E402
+
+SCHEMA = "0.5.0-spatail-modular"
+_ROLE = {"hero": "primary_object", "primary": "primary_object", "part": "part",
+         "comparison_item": "comparison_object", "comparison": "comparison_object",
+         "environment": "environment", "label_target": "label"}
+
+
+def _load_library():
+    try:
+        from library.asset_library import AssetLibrary
+        lib = AssetLibrary()
+        return lib if lib.count else None
+    except Exception:
+        return None
+
+
+def _resolve_assets(plan, manifest, lib) -> list[dict]:
+    assets, seen = [], set()
+    reqs = manifest.assetRequests or []
+    for req in reqs:
+        if req.assetId in seen:
+            continue
+        seen.add(req.assetId)
+        meta, res = {}, None
+        if lib is not None:
+            res = lib.resolve(asset_id=req.assetId, subject=plan.subject, domain=plan.domain,
+                              semantic_role=req.semanticRole, strategy=plan.strategy)
+            meta = lib.assets.get(res.libraryAssetId, {}) if res.libraryAssetId else {}
+        a = {
+            "id": req.assetId,
+            "name": meta.get("name", req.assetId.replace("_", " ").title()),
+            "role": _ROLE.get(req.semanticRole, "part"),
+            "description": req.description,
+            "glbUrl": getattr(res, "glbPath", "") if res else "",
+            "usdzUrl": getattr(res, "usdzPath", "") if res else "",
+            "fallbackPrimitive": getattr(res, "fallbackPrimitive", "cube") if res else "cube",
+            "scaleMeters": getattr(res, "scaleMeters", [0.2, 0.2, 0.2]) if res else [0.2, 0.2, 0.2],
+            "supportsAnimation": bool(meta.get("supportsAnimation", False)),
+            "supportsHighlight": bool(meta.get("supportsHighlight", False)),
+            "supportsTransparency": bool(meta.get("supportsTransparency", False)),
+            "source": getattr(res, "source", "generate") if res else "generate",
+            "status": ("processed" if (res and res.source in ("library", "cached", "generated"))
+                       else "placeholder"),
+            "animation": None,        # filled by the mass asset+animation gen stage
+        }
+        assets.append(a)
+    return assets
+
+
+def build_modular_experience(input_text: str, *, kind: str = "text", subject_hint: str | None = None,
+                             summary: str | None = None, experience_id: str | None = None,
+                             use_llm: bool = True, library=None) -> dict:
+    eng = RepresentationEngine()
+    plan, manifest = eng.run(subject_hint or input_text, experience_id=experience_id)
+    lib = library if library is not None else _load_library()
+    assets = _resolve_assets(plan, manifest, lib)
+
+    understanding = {
+        "domain": plan.domain, "intent": plan.intent, "subject": plan.subject,
+        "summary": (summary or input_text or plan.subject).strip()[:600],
+        "reasoning": plan.reasoning,
+    }
+    design = composer.compose(understanding, assets, use_llm=use_llm)
+
+    phase0 = [a["id"] for a in assets if a["status"] != "placeholder"][:3]
+    return {
+        "schemaVersion": SCHEMA,
+        "experienceId": plan.experienceId,
+        "title": (plan.subject or "Experience").strip().title(),
+        "source": {"kind": kind, "input": (input_text or "")[:600], "subjectHint": subject_hint or ""},
+        "understanding": understanding,
+        "stage": {"anchor": plan.placement.anchor, "layout": plan.placement.layout,
+                  "facing": plan.placement.facing, "scaleMode": plan.placement.scale_mode},
+        "assets": assets,
+        "mechanicsManifest": "/mechanics/mechanics.json",
+        "composer": design["composer"],
+        "mechanicsUsed": design["mechanicsUsed"],
+        "capabilities": design["capabilities"],
+        "beats": design["beats"],
+        "progressive": {"firstInteractiveMsBudget": 800, "phase0Assets": phase0,
+                        "needsGeneration": [a["id"] for a in assets if a["status"] == "placeholder"]},
+    }
+
+
+def build_from_image(image_bytes: bytes, *, mime: str = "image/jpeg", note: str = "",
+                     use_llm: bool = True, library=None) -> dict:
+    """Phone photo -> Gemini vision brief -> the same modular experience."""
+    import vision
+    b = vision.brief_from_image(image_bytes, mime=mime, note=note)
+    c = build_modular_experience(b["prompt"], kind="image", subject_hint=b["subject"],
+                                 summary=b["summary"], use_llm=use_llm, library=library)
+    c["source"]["vision"] = b
+    return c

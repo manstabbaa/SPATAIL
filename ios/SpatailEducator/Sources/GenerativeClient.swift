@@ -209,6 +209,29 @@ final class GenerativeClient {
         return try JSONDecoder().decode(T.self, from: data)
     }
 
+    // MARK: - modular experience (v0.5) — synchronous POST /modular
+    /// Pasted text -> the agent-composed modular experience contract (mechanics + beats).
+    func generateModular(text: String) async throws -> ModularExperience {
+        try await postModular(["kind": "text", "text": text, "use_llm": true])
+    }
+
+    /// Phone photo (JPEG bytes) -> Gemini vision brief -> the same modular experience.
+    func generateModular(imageJPEG: Data, note: String = "") async throws -> ModularExperience {
+        try await postModular(["kind": "image", "image": imageJPEG.base64EncodedString(),
+                               "mime": "image/jpeg", "note": note, "use_llm": true])
+    }
+
+    private func postModular(_ payload: [String: Any]) async throws -> ModularExperience {
+        var req = URLRequest(url: try base().appendingPathComponent("modular"))
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.timeoutInterval = 120          // synchronous server-side build (engine + agent)
+        req.httpBody = try JSONSerialization.data(withJSONObject: payload)
+        let (data, resp) = try await URLSession.shared.data(for: req)
+        try check(resp)
+        return try JSONDecoder().decode(ModularExperience.self, from: data)
+    }
+
     private func submit(prompt: String, mode: String? = nil,
                         extra: [String: Any] = [:]) async throws -> CreateJobResponse {
         var req = URLRequest(url: try base().appendingPathComponent("jobs"))

@@ -28,6 +28,7 @@ targets:
         CFBundleDisplayName: SPATAIL Educator
         UILaunchScreen: {}
         NSCameraUsageDescription: "SPATAIL uses the camera to scan your space and place 3D demos in augmented reality."
+        NSPhotoLibraryUsageDescription: "SPATAIL can use a photo of what you want explained to build a 3D lesson."
         # The generative AR loop talks cleartext HTTP to the PC job server over
         # Tailscale (e.g. http://mansourspc.<tailnet>.ts.net:8787 or http://100.x.y.z:8787).
         # iOS App Transport Security blocks cleartext HTTP by default, so allow it.

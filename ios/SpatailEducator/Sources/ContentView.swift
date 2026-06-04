@@ -189,6 +189,8 @@ final class SessionModel: ObservableObject {
 struct ContentView: View {
     @StateObject private var model = SessionModel()
 
+    @State private var showModular = false
+
     var body: some View {
         if model.stage == .reading {
             ReadingView(model: model)
@@ -197,6 +199,7 @@ struct ContentView: View {
                 ARContainerView(model: model).ignoresSafeArea()
                 panel
             }
+            .fullScreenCover(isPresented: $showModular) { ModularEntryView() }
         }
     }
 
@@ -229,6 +232,13 @@ struct ContentView: View {
                             Spacer(); Image(systemName: "chevron.right")
                         }
                     }.buttonStyle(.bordered)
+                    Button { showModular = true } label: {
+                        HStack {
+                            Image(systemName: "wand.and.stars")
+                            Text("Explain anything — modular (text or photo)").bold()
+                            Spacer(); Image(systemName: "chevron.right")
+                        }
+                    }.buttonStyle(.borderedProminent)
                     if !model.catalog.isEmpty {
                         Text("or pick a built-in demo")
                             .font(.caption2).foregroundStyle(.secondary)

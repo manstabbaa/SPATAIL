@@ -297,13 +297,30 @@ class Handler(BaseHTTPRequestHandler):
                     img = img.split(",", 1)[1]            # strip data: URI prefix
                 raw = _b64.b64decode(img)
                 contract = _ex.build_from_image(raw, mime=data.get("mime") or "image/jpeg",
-                                                note=data.get("note", ""), use_llm=use_llm)
+                                                note=data.get("note", ""),
+                                                question=(data.get("question") or data.get("text") or ""),
+                                                use_llm=use_llm)
             else:
                 text = (data.get("text") or data.get("selectedText") or data.get("prompt") or "").strip()
                 if not text:
                     return self._send(400, obj={"error": "missing 'text'"})
                 contract = _ex.build_modular_experience(
                     text, kind="text", summary=data.get("surroundingContext") or text, use_llm=use_llm)
+            # Real-model generation: if Gemini authored a mechanism brief, enqueue a
+            # live-Blender build (reuses the proven object generator) and hand the phone
+            # a job id to poll — it streams the animated USDZ in over the placeholder.
+            gen = contract.get("generation") or {}
+            if gen.get("brief"):
+                gid = "gen_" + uuid.uuid4().hex[:8]
+                with _LOCK:
+                    _JOBS[gid] = {"id": gid, "status": "queued", "stage": "queued",
+                                  "message": None, "prompt": gen["brief"], "mode": "object",
+                                  "client": "modular", "created": time.time(),
+                                  "usdz": None, "metadata": None}
+                _QUEUE.put(gid)
+                contract["generationJobId"] = gid
+                print(f"[modular] queued Blender mechanism {gid} for {gen.get('subject')!r}: "
+                      f"{gen['brief'][:90]!r}", flush=True)
             print(f"[modular] {kind} -> {contract.get('title')!r} "
                   f"({contract.get('composer')}, {len(contract.get('beats', []))} beats, "
                   f"{len(contract.get('mechanicsUsed', []))} mechanics)", flush=True)

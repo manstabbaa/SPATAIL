@@ -108,11 +108,25 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
 
 
 def build_from_image(image_bytes: bytes, *, mime: str = "image/jpeg", note: str = "",
-                     use_llm: bool = True, library=None) -> dict:
-    """Phone photo -> Gemini vision brief -> the same modular experience."""
+                     question: str = "", use_llm: bool = True, library=None) -> dict:
+    """Phone photo + question -> Gemini mechanism brief -> the modular experience.
+
+    Adds a `generation` block (the Blender mechanism brief Gemini authored + the
+    target primary asset) so the server can build the real animated USDZ on the PC
+    and the phone can stream it in over the placeholder.
+    """
     import vision
-    b = vision.brief_from_image(image_bytes, mime=mime, note=note)
+    b = vision.brief_from_image(image_bytes, mime=mime, note=note, question=question)
     c = build_modular_experience(b["prompt"], kind="image", subject_hint=b["subject"],
                                  summary=b["summary"], use_llm=use_llm, library=library)
     c["source"]["vision"] = b
+    primary = next((a["id"] for a in c["assets"] if a.get("role") == "primary_object"),
+                   (c["assets"][0]["id"] if c["assets"] else "hero"))
+    c["generation"] = {
+        "brief": b.get("mechanism_brief", ""),
+        "subject": b.get("subject", ""),
+        "answer": b.get("answer", ""),
+        "question": b.get("question", question or ""),
+        "assetId": primary,
+    }
     return c

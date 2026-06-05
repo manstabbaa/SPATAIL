@@ -30,18 +30,30 @@ def _key() -> str:
     raise RuntimeError("GEMINI_API_KEY not set")
 
 
-PROMPT = """You are SPATAIL's vision front-end. The user photographed something they want
-explained in an interactive 3D/AR lesson. Identify the MAIN subject and return STRICT JSON:
+PROMPT = """You are SPATAIL's vision front-end. The user photographed something and asked:
+"{question}". Identify the MAIN subject and explain HOW IT WORKS so we can show it as an
+interactive, ANIMATED 3D/AR mechanism overlaid on the real object. Return STRICT JSON:
 {"subject": "<short noun phrase, the thing to explain>",
- "summary": "<2-3 sentence plain explanation a learner would want>",
+ "summary": "<2-3 sentence plain-language answer to the user's question>",
+ "answer": "<one concise sentence directly answering the question>",
  "prompt": "<an imperative request like 'Explain how a <subject> works'>",
+ "mechanism_brief": "<instructions to a 3D artist to FIRST recreate the recognizable real object
+   faithfully — it must clearly read as the actual object in the photo (correct overall shape,
+   proportions, distinct named PARTS, and colors/materials) — and THEN animate it to answer the
+   question. Describe the parts, how they connect, and the MOTION or transform that explains how it
+   works as a smooth ~4-second seamless loop (parts moving, opening, highlighting, or exploding to
+   reveal internals). Physically faithful, tabletop-scaled (<= 0.5 m). Model a real recognizable
+   object with detail — NEVER abstract boxes or primitives.>",
  "confidence": <0..1>}
 Pick the single most teachable subject. If text is visible and central, you may read it.
-User note (may be empty): {note}"""
+If the question is empty, treat it as "How does this work?". User note (may be empty): {note}"""
 
 
-def brief_from_image(image_bytes: bytes, *, mime: str = "image/jpeg", note: str = "") -> dict:
-    parts = [{"text": PROMPT.replace("{note}", note or "")},
+def brief_from_image(image_bytes: bytes, *, mime: str = "image/jpeg", note: str = "",
+                     question: str = "") -> dict:
+    q = (question or "").strip() or "How does this work?"
+    prompt = PROMPT.replace("{question}", q).replace("{note}", note or "")
+    parts = [{"text": prompt},
              {"inlineData": {"mimeType": mime, "data": base64.b64encode(image_bytes).decode()}}]
     body = {"contents": [{"parts": parts}],
             "generationConfig": {"responseMimeType": "application/json", "temperature": 0.3}}
@@ -55,10 +67,15 @@ def brief_from_image(image_bytes: bytes, *, mime: str = "image/jpeg", note: str 
     obj.setdefault("subject", "the subject")
     obj.setdefault("summary", "")
     obj.setdefault("prompt", f"Explain {obj['subject']}")
+    obj.setdefault("answer", obj.get("summary", ""))
+    obj.setdefault("mechanism_brief",
+                   f"Build and animate a clear, physically faithful 3D model of {obj['subject']} "
+                   f"that demonstrates how it works, as a smooth 4-second seamless loop, tabletop-scaled.")
+    obj["question"] = q
     return obj
 
 
-def brief_from_path(path: str, note: str = "") -> dict:
+def brief_from_path(path: str, note: str = "", question: str = "") -> dict:
     p = Path(path)
     mime = "image/png" if p.suffix.lower() == ".png" else "image/jpeg"
-    return brief_from_image(p.read_bytes(), mime=mime, note=note)
+    return brief_from_image(p.read_bytes(), mime=mime, note=note, question=question)

@@ -18,6 +18,9 @@ struct ModularExperience: Decodable {
     var capabilities: [String] = []
     var beats: [Beat] = []
     var progressive = Progressive()
+    /// Set by the server when a live-Blender build was queued for the primary
+    /// object; the client polls this job and streams the real model in over the box.
+    var generationJobId: String? = nil
 
     struct Understanding: Decodable {
         var domain = "", intent = "", subject = "", summary = "", reasoning = ""

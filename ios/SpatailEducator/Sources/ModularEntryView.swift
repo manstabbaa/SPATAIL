@@ -13,13 +13,14 @@ struct ModularEntryView: View {
     @State private var status = "Type what to explain, or tap the camera."
     @State private var busy = false
     @State private var experience: ModularExperience?
+    @State private var streamModel: StreamPayload? = nil
     @State private var showCamera = false
     @Environment(\.dismiss) private var dismiss
     private let client = GenerativeClient()
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            ModularARView(experience: experience, onStatus: { status = $0 })
+            ModularARView(experience: experience, streamModel: streamModel, onStatus: { status = $0 })
                 .ignoresSafeArea()
 
             VStack(spacing: 8) {
@@ -71,16 +72,40 @@ struct ModularEntryView: View {
         busy = true; status = "looking at your photo…"
         do {
             let data = image.jpegData(compressionQuality: 0.7) ?? Data()
-            experience = try await client.generateModular(imageJPEG: data)
-            status = "ready — tap to step"
-        } catch { status = "error: \(error.localizedDescription)" }
-        busy = false
+            let q = text.trimmingCharacters(in: .whitespaces)
+            let exp = try await client.generateModular(imageJPEG: data, question: q)
+            experience = exp
+            busy = false
+            if let jid = exp.generationJobId, !jid.isEmpty {
+                status = "Blender is building a real model… (a few minutes)"
+                Task { await streamGenerated(jid, exp) }
+            } else {
+                status = "ready — tap to step"
+            }
+        } catch { status = "error: \(error.localizedDescription)"; busy = false }
+    }
+
+    /// Poll the queued Blender build and stream the real model in over the placeholder.
+    private func streamGenerated(_ jobId: String, _ exp: ModularExperience) async {
+        do {
+            let url = try await client.awaitGeneratedModel(jobId: jobId) { s in
+                status = "building: \(s)"
+            }
+            let target = exp.assets.first(where: { $0.role == "primary_object" })?.id
+                      ?? exp.assets.first?.id ?? ""
+            streamModel = StreamPayload(assetId: target, url: url)
+            status = "real model ready — tap to step"
+        } catch { status = "model build failed: \(error.localizedDescription)" }
     }
 }
+
+/// A Blender-generated model (local USDZ) to stream into a specific asset's holder.
+struct StreamPayload: Equatable { let assetId: String; let url: URL }
 
 /// SwiftUI host for an ARView running a ModularRuntime; re-presents when the experience changes.
 struct ModularARView: UIViewRepresentable {
     let experience: ModularExperience?
+    var streamModel: StreamPayload? = nil
     let onStatus: (String) -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator() }
@@ -95,14 +120,20 @@ struct ModularARView: UIViewRepresentable {
     }
 
     func updateUIView(_ v: ARView, context: Context) {
-        guard let e = experience, context.coordinator.presentedId != e.experienceId else { return }
-        context.coordinator.presentedId = e.experienceId
-        context.coordinator.runtime?.present(e)
+        if let e = experience, context.coordinator.presentedId != e.experienceId {
+            context.coordinator.presentedId = e.experienceId
+            context.coordinator.runtime?.present(e)
+        }
+        if let sm = streamModel, context.coordinator.streamedPath != sm.url.path {
+            context.coordinator.streamedPath = sm.url.path
+            context.coordinator.runtime?.streamLocalModel(sm.url, into: sm.assetId)
+        }
     }
 
     @MainActor final class Coordinator {
         var runtime: ModularRuntime?
         var presentedId: String?
+        var streamedPath: String?
     }
 }
 
@@ -131,6 +162,16 @@ struct CameraPicker: UIViewControllerRepresentable {
             parent.dismiss()
         }
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) { parent.dismiss() }
+    }
+}
+#else
+// visionOS / non-iOS: the modular entry (camera + ARView host) is iPhone-only.
+// Provide a placeholder so shared ContentView's `.fullScreenCover { ModularEntryView() }`
+// resolves on every target (mirrors ARContainerView's #else stub).
+struct ModularEntryView: View {
+    var body: some View {
+        Color.black.overlay(Text("Modular mode — available on iPhone")
+            .foregroundStyle(.white))
     }
 }
 #endif

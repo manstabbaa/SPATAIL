@@ -77,10 +77,34 @@ final class GenerativeClient {
         return u
     }
 
-    // Resolve a possibly-relative artifact URL against the base.
+    // Resolve an artifact URL against the base the client actually reaches.
+    //
+    // The server may hand back an ABSOLUTE url built from its own internal host
+    // (e.g. http://localhost:8787/... or http://127.0.0.1:8787/...). Over
+    // Tailscale the phone can't reach the server's localhost, so we must NOT use
+    // such URLs verbatim — that's "unable to reach server" right after a job
+    // finishes. Since one server serves both the API and the artifacts, we keep
+    // only the path (+query) and re-host it onto `base()` — the address that
+    // polling already succeeded against.
     private func resolve(_ path: String) throws -> URL {
-        if let abs = URL(string: path), abs.scheme != nil { return abs }
-        return try base().appendingPathComponent(path.hasPrefix("/") ? String(path.dropFirst()) : path)
+        let b = try base()
+        // Extract just path (+query), whether `path` is absolute or relative.
+        var pathOnly = path
+        var query: String? = nil
+        if let abs = URLComponents(string: path), abs.scheme != nil {
+            pathOnly = abs.path
+            query = abs.query
+        } else if let qi = path.firstIndex(of: "?") {
+            pathOnly = String(path[..<qi])
+            query = String(path[path.index(after: qi)...])
+        }
+        guard var comps = URLComponents(url: b, resolvingAgainstBaseURL: false) else {
+            throw GenError.badURL
+        }
+        comps.path = pathOnly.hasPrefix("/") ? pathOnly : "/" + pathOnly
+        comps.query = query
+        guard let out = comps.url else { throw GenError.badURL }
+        return out
     }
 
     /// Submit a prompt, poll to completion, download the USDZ, return its local file URL.
@@ -215,10 +239,28 @@ final class GenerativeClient {
         try await postModular(["kind": "text", "text": text, "use_llm": true])
     }
 
-    /// Phone photo (JPEG bytes) -> Gemini vision brief -> the same modular experience.
-    func generateModular(imageJPEG: Data, note: String = "") async throws -> ModularExperience {
+    /// Phone photo (JPEG bytes) + the user's question -> Gemini mechanism brief ->
+    /// the same modular experience (with a generationJobId for the Blender build).
+    func generateModular(imageJPEG: Data, note: String = "", question: String = "") async throws -> ModularExperience {
         try await postModular(["kind": "image", "image": imageJPEG.base64EncodedString(),
-                               "mime": "image/jpeg", "note": note, "use_llm": true])
+                               "mime": "image/jpeg", "note": note, "question": question, "use_llm": true])
+    }
+
+    /// Poll a queued Blender generation job (mode:object) to completion, then download
+    /// its USDZ to a local file. Long cap — Blender authoring runs minutes, not seconds.
+    func awaitGeneratedModel(jobId: String,
+                             onStage: @escaping (String) -> Void) async throws -> URL {
+        let deadline = Date().addingTimeInterval(600)        // 10 min
+        var state = try await poll(id: jobId)
+        while state.status != .done {
+            if Date() > deadline { throw GenError.timeout }
+            if state.status == .error { throw GenError.server(state.message ?? "Generation failed.") }
+            try await Task.sleep(nanoseconds: 2_500_000_000)
+            state = try await poll(id: jobId)
+            onStage(state.stage ?? state.status.rawValue)
+        }
+        guard let usdz = state.usdz_url else { throw GenError.server("Job done but no model produced.") }
+        return try await download(path: usdz, id: jobId)
     }
 
     private func postModular(_ payload: [String: Any]) async throws -> ModularExperience {

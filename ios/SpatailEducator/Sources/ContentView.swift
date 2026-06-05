@@ -190,6 +190,7 @@ struct ContentView: View {
     @StateObject private var model = SessionModel()
 
     @State private var showModular = false
+    @State private var showLive = false
 
     var body: some View {
         if model.stage == .reading {
@@ -200,6 +201,7 @@ struct ContentView: View {
                 panel
             }
             .fullScreenCover(isPresented: $showModular) { ModularEntryView() }
+            .fullScreenCover(isPresented: $showLive) { LiveExplainerView() }
         }
     }
 
@@ -239,21 +241,16 @@ struct ContentView: View {
                             Spacer(); Image(systemName: "chevron.right")
                         }
                     }.buttonStyle(.borderedProminent)
-                    if !model.catalog.isEmpty {
-                        Text("or pick a built-in demo")
-                            .font(.caption2).foregroundStyle(.secondary)
-                    }
-                    ForEach(model.catalog) { e in
-                        Button { model.pick(e) } label: {
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text(e.title).font(.subheadline).bold()
-                                    Text(e.subtitle).font(.caption).foregroundStyle(.secondary)
-                                }
-                                Spacer(); Image(systemName: "chevron.right")
-                            }
-                        }.buttonStyle(.bordered)
-                    }
+                    Button { showLive = true } label: {
+                        HStack {
+                            Image(systemName: "viewfinder")
+                            Text("Live Explainer — point at a real object").bold()
+                            Spacer(); Image(systemName: "chevron.right")
+                        }
+                    }.buttonStyle(.borderedProminent).tint(.teal)
+                    // Built-in demos temporarily hidden from the app (Catalog.swift,
+                    // Resources/*.usdz, and model.catalog are all kept — restore this
+                    // ForEach over model.catalog to bring them back).
                 }
             case .prompting:
                 card {

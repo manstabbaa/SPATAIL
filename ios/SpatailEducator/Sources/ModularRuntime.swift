@@ -49,18 +49,44 @@ final class ModularRuntime: NSObject {
     }
 
     // MARK: - present
+    /// Present onto a freshly detected horizontal plane (the original tabletop flow).
     func present(_ e: ModularExperience) {
         clear()
         guard let view else { return }
-        exp = e
         let a = AnchorEntity(plane: .horizontal, minimumBounds: [0.15, 0.15])
-        anchor = a; view.scene.addAnchor(a)
+        view.scene.addAnchor(a)
+        present(e, on: a, centered: false)
+    }
+
+    /// Present OVERLAID on a caller-owned anchor (e.g. a world ARAnchor pinned to a
+    /// real object by Live Explainer). `centered` lays the assets out tightly on the
+    /// anchor origin (over the object) instead of the user-facing comfort arc.
+    func present(_ e: ModularExperience, into host: AnchorEntity, centered: Bool = true) {
+        clear()
+        guard view != nil else { return }
+        // The caller already added `host` to the scene; we attach our content to it.
+        present(e, on: host, centered: centered)
+    }
+
+    /// Shared builder — lays out assets on `a` and wires beats + the per-frame tick.
+    private func present(_ e: ModularExperience, on a: AnchorEntity, centered: Bool) {
+        guard let view else { return }
+        exp = e
+        anchor = a
 
         let widths = e.assets.map { Float(max($0.scaleMeters.first ?? 0.2, 0.05)) }
-        let dist: Float = (e.stage.anchor == "floor") ? 1.2 : 0.74
-        let poses = StationLayout.poses(count: e.assets.count, footprintWidths: widths,
+        let poses: [StationPose]
+        if centered {
+            // Overlay-on-object: the primary asset sits AT the anchor origin (on the
+            // real object); any extra parts ring tightly around it so the whole thing
+            // reads as one explanation pinned to the object, not a comfort-arc layout.
+            poses = Self.centeredPoses(count: e.assets.count, footprintWidths: widths)
+        } else {
+            let dist: Double = (e.stage.anchor == "floor") ? 1.2 : 0.74
+            poses = StationLayout.poses(count: e.assets.count, footprintWidths: widths,
                                         comfortRadiusM: dist, spacingMinM: 0.12,
                                         layout: e.stage.layout)
+        }
         for (i, asset) in e.assets.enumerated() {
             let holder = Entity()
             holder.position = poses[i].position
@@ -296,6 +322,21 @@ final class ModularRuntime: NSObject {
         synth.speak(u)
     }
 
+    /// Object-overlay poses: asset 0 at the anchor origin (on the real object),
+    /// remaining assets in a small ring just behind/above so callouts read clearly.
+    private static func centeredPoses(count: Int, footprintWidths: [Float]) -> [StationPose] {
+        guard count > 0 else { return [] }
+        let ring = max(footprintWidths.max() ?? 0.15, 0.1) * 1.2   // ring radius ~ object size
+        var out: [StationPose] = [StationPose(index: 0, position: SIMD3(0, 0, 0), yawRadians: 0)]
+        for i in 1..<max(count, 1) {
+            let ang = (2 * Float.pi) * Float(i - 1) / Float(max(count - 1, 1))
+            out.append(StationPose(index: i,
+                                   position: SIMD3(ring * cos(ang), 0, ring * sin(ang)),
+                                   yawRadians: 0))
+        }
+        return out
+    }
+
     private func makeBox(_ asset: ModularExperience.Asset) -> ModelEntity {
         let dims = asset.scaleMeters.count == 3 ? asset.scaleMeters : [0.18, 0.18, 0.18]
         let longest = max(dims.max() ?? 0.18, 0.02)
@@ -335,6 +376,43 @@ final class ModularRuntime: NSObject {
             holder.addChild(entity)
             nodes[assetId] = entity
         } catch { /* keep the box */ }
+    }
+
+    /// Replace the placeholder box for `assetId` with a Blender-generated USDZ from a
+    /// LOCAL file, fit to tabletop, seat on the surface, and play its BAKED animation.
+    /// The Blender animation is the representation, so primitive mechanics stop and the
+    /// remaining placeholder boxes hide — the forced-Blender path, never cubes as final.
+    func streamLocalModel(_ fileURL: URL, into assetId: String) {
+        Task { @MainActor in
+            guard let holder = self.holders[assetId] ?? self.holders.values.first else { return }
+            do {
+                let entity: Entity
+                if #available(iOS 18.0, *) { entity = try await Entity(contentsOf: fileURL) }
+                else { entity = try Entity.load(contentsOf: fileURL) }
+                let bounds = entity.visualBounds(relativeTo: nil)
+                let longest = max(bounds.extents.x, max(bounds.extents.y, bounds.extents.z), 0.001)
+                entity.scale = SIMD3(repeating: 0.3 / longest)         // longest dim -> ~30 cm
+                let b2 = entity.visualBounds(relativeTo: nil)
+                entity.position.y = b2.extents.y / 2                   // seat on the surface
+                // the baked Blender animation is the representation — stop primitive mechanics
+                self.animators.removeAll()
+                if let base = self.baseXform[ObjectIdentifier(holder)] { holder.transform = base }
+                // swap the placeholder box for the real model
+                self.nodes[assetId]?.removeFromParent()
+                holder.addChild(entity)
+                self.nodes[assetId] = entity
+                // hide remaining placeholder boxes — the Blender model is the scene
+                for (id, h) in self.holders where id != assetId {
+                    let placeholder = (self.exp?.assets.first(where: { $0.id == id })?.usdzUrl.isEmpty) ?? true
+                    if placeholder { h.isEnabled = false }
+                }
+                // play the baked Blender animation (loop)
+                for anim in entity.availableAnimations {
+                    entity.playAnimation(anim.repeat(), transitionDuration: 0.3, startsPaused: false)
+                }
+                self.onStatus("real model ready — tap to step")
+            } catch { self.onStatus("model load failed") }
+        }
     }
 
     private func installTap() {

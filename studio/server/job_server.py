@@ -429,8 +429,22 @@ class Handler(BaseHTTPRequestHandler):
                 text = (data.get("text") or data.get("selectedText") or data.get("prompt") or "").strip()
                 if not text:
                     return self._send(400, obj={"error": "missing 'text'"})
-                contract = _ex.build_modular_experience(
-                    text, kind="text", summary=data.get("surroundingContext") or text, use_llm=use_llm)
+                # Iterative project editing: when `prior` (the current scene's
+                # subject/summary) is sent, EVOLVE that scene rather than starting
+                # over from just the new instruction.
+                prior = data.get("prior") or {}
+                if prior:
+                    psub = (prior.get("subject") or "").strip()
+                    psum = (prior.get("summary") or "").strip()
+                    subject_hint = f"{psub} — {text}" if psub else text
+                    summary = (f"Existing experience: {psum}. Now change it: {text}"
+                               if psum else (data.get("surroundingContext") or text))
+                    contract = _ex.build_modular_experience(
+                        text, kind="text", subject_hint=subject_hint,
+                        summary=summary, use_llm=use_llm)
+                else:
+                    contract = _ex.build_modular_experience(
+                        text, kind="text", summary=data.get("surroundingContext") or text, use_llm=use_llm)
             # Real-model generation: if Gemini authored a mechanism brief, enqueue a
             # live-Blender build (reuses the proven object generator) and hand the phone
             # a job id to poll — it streams the animated USDZ in over the placeholder.

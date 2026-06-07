@@ -284,6 +284,34 @@ final class GenerativeClient {
         return try JSONDecoder().decode(ModularExperience.self, from: data)
     }
 
+    // MARK: - project (iterative) editing
+    /// Decoded experience + the RAW server JSON (persisted verbatim into the project
+    /// bundle, so we don't need the whole contract to be Encodable).
+    struct ModularResult { let experience: ModularExperience; let raw: Data }
+
+    /// First prompt OR an edit. `prior` carries the current scene's subject+summary
+    /// so the server EVOLVES the existing experience instead of starting from zero.
+    func generateProject(text: String,
+                         prior: (subject: String, summary: String)? = nil) async throws -> ModularResult {
+        var payload: [String: Any] = ["kind": "text", "text": text, "use_llm": true]
+        if let p = prior { payload["prior"] = ["subject": p.subject, "summary": p.summary] }
+        return try await postModularRaw(payload)
+    }
+
+    private func postModularRaw(_ payload: [String: Any]) async throws -> ModularResult {
+        var req = URLRequest(url: try base().appendingPathComponent("modular"))
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.timeoutInterval = 120
+        var payload = payload
+        payload["session"] = Self.sessionId
+        req.httpBody = try JSONSerialization.data(withJSONObject: payload)
+        let (data, resp) = try await URLSession.shared.data(for: req)
+        try check(resp)
+        let exp = try JSONDecoder().decode(ModularExperience.self, from: data)
+        return ModularResult(experience: exp, raw: data)
+    }
+
     private func submit(prompt: String, mode: String? = nil,
                         extra: [String: Any] = [:]) async throws -> CreateJobResponse {
         var req = URLRequest(url: try base().appendingPathComponent("jobs"))

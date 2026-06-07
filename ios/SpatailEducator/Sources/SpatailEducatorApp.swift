@@ -12,7 +12,10 @@ import SwiftUI
 struct SpatailEducatorApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // Single entry: prompt → project → keep prompting to evolve the scene.
+            // (The legacy ContentView menu is retained in the codebase but no longer
+            // the root.)
+            HomeView()
         }
     }
 }

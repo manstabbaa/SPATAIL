@@ -1,10 +1,10 @@
 import SwiftUI
 #if os(iOS)
 
-// A project = a living XR scene + a persistent chat. The FIRST prompt creates the
-// scene; every prompt after EVOLVES it (regenerate-from-prior, then re-present).
-// v1 re-presents the whole scene on each edit; incremental edit-ops are the next
-// step. Generated models stream in over placeholders and are cached for reopen.
+// The single CANVAS: a live camera/AR feed + a persistent prompt bar. The FIRST
+// prompt lazily creates a project and builds the scene; every prompt after EVOLVES
+// it (regenerate-from-prior, approach B; explicit edit-ops are the next step).
+// One ARView for the whole app (Home hosts this directly — no second AR session).
 
 @MainActor
 final class ProjectSession: ObservableObject {
@@ -13,22 +13,26 @@ final class ProjectSession: ObservableObject {
     @Published var streamModel: StreamPayload?
     @Published var status = ""
     @Published var busy = false
+    @Published private(set) var title = ""
 
-    private var meta: ProjectMeta
+    private var meta: ProjectMeta?
     private let store: ProjectStore
     private let client = GenerativeClient()
 
-    init(meta: ProjectMeta, store: ProjectStore) { self.meta = meta; self.store = store }
+    init(store: ProjectStore, meta: ProjectMeta? = nil) {
+        self.store = store; self.meta = meta; self.title = meta?.title ?? ""
+    }
 
     func load() {
-        conversation = store.loadConversation(meta.id)
-        if let data = store.loadContract(meta.id),
+        guard let m = meta else { return }
+        conversation = store.loadConversation(m.id)
+        if let data = store.loadContract(m.id),
            let exp = try? JSONDecoder().decode(ModularExperience.self, from: data) {
             experience = exp
+            if title.isEmpty { title = exp.title }
         }
     }
 
-    /// Context so the server evolves the CURRENT scene rather than starting over.
     private var priorContext: (subject: String, summary: String)? {
         guard let e = experience else { return nil }
         let subj = e.understanding.subject.isEmpty ? e.title : e.understanding.subject
@@ -39,46 +43,49 @@ final class ProjectSession: ObservableObject {
     func send(_ prompt: String) {
         let p = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !p.isEmpty, !busy else { return }
+        if meta == nil { meta = store.create(title: "", firstPrompt: p) }   // lazy create
+        guard let pid = meta?.id else { return }
         let isFirst = experience == nil
         conversation.append(ConversationTurn(role: "user", text: p))
-        store.saveConversation(conversation, for: meta.id)
+        store.saveConversation(conversation, for: pid)
         busy = true; status = isFirst ? "creating…" : "evolving the scene…"
         let prior = priorContext
         Task {
             do {
                 let result = try await client.generateProject(text: p, prior: prior)
                 experience = result.experience
-                store.saveContract(result.raw, for: meta.id)
-                meta.updatedAt = Date()
-                if meta.title.isEmpty || isFirst { meta.title = result.experience.title }
-                store.saveMeta(meta)
+                store.saveContract(result.raw, for: pid)
+                if var m = meta {
+                    m.updatedAt = Date()
+                    if m.title.isEmpty || isFirst { m.title = result.experience.title }
+                    meta = m; title = m.title; store.saveMeta(m)
+                }
                 conversation.append(ConversationTurn(role: "assistant",
                     text: "Updated — \(result.experience.title) · \(result.experience.mechanicsUsed.count) mechanics"))
-                store.saveConversation(conversation, for: meta.id)
+                store.saveConversation(conversation, for: pid)
                 busy = false; status = "ready — tap to step, or keep prompting"
                 if let jid = result.experience.generationJobId, !jid.isEmpty {
                     status = "building a real model…"
-                    await streamGenerated(jid, result.experience)
+                    await streamGenerated(jid, result.experience, pid)
                 }
             } catch {
                 busy = false; status = "error: \(error.localizedDescription)"
                 conversation.append(ConversationTurn(role: "assistant",
                     text: "Couldn't do that: \(error.localizedDescription)"))
-                store.saveConversation(conversation, for: meta.id)
+                store.saveConversation(conversation, for: pid)
             }
         }
     }
 
-    private func streamGenerated(_ jobId: String, _ exp: ModularExperience) async {
+    private func streamGenerated(_ jobId: String, _ exp: ModularExperience, _ pid: String) async {
         do {
             let url = try await client.awaitGeneratedModel(jobId: jobId) { [weak self] s in
                 Task { @MainActor in self?.status = "building: \(s)" }
             }
             let target = exp.assets.first(where: { $0.role == "primary_object" })?.id
                        ?? exp.assets.first?.id ?? ""
-            if let cached = store.cacheAsset(url, assetId: target, projectId: meta.id) {
-                meta.cachedAssets[target] = cached.lastPathComponent
-                store.saveMeta(meta)
+            if let cached = store.cacheAsset(url, assetId: target, projectId: pid) {
+                if var m = meta { m.cachedAssets[target] = cached.lastPathComponent; meta = m; store.saveMeta(m) }
                 streamModel = StreamPayload(assetId: target, url: cached)
             } else {
                 streamModel = StreamPayload(assetId: target, url: url)
@@ -87,10 +94,10 @@ final class ProjectSession: ObservableObject {
         } catch { status = "model build failed: \(error.localizedDescription)" }
     }
 
-    /// After the AR view presents the saved contract, re-apply cached generated models.
     func restreamCached() {
-        for (assetId, file) in meta.cachedAssets {
-            let u = store.assetsDir(meta.id).appendingPathComponent(file)
+        guard let m = meta else { return }
+        for (assetId, file) in m.cachedAssets {
+            let u = store.assetsDir(m.id).appendingPathComponent(file)
             if FileManager.default.fileExists(atPath: u.path) {
                 streamModel = StreamPayload(assetId: assetId, url: u)
             }
@@ -98,16 +105,19 @@ final class ProjectSession: ObservableObject {
     }
 }
 
-struct ProjectView: View {
-    let meta: ProjectMeta
+struct CanvasView: View {
     @ObservedObject var store: ProjectStore
+    let meta: ProjectMeta?
     var initialPrompt: String?
+    let onOpenProjects: () -> Void
     @StateObject private var session: ProjectSession
     @State private var input = ""
 
-    init(meta: ProjectMeta, store: ProjectStore, initialPrompt: String? = nil) {
-        self.meta = meta; self.store = store; self.initialPrompt = initialPrompt
-        _session = StateObject(wrappedValue: ProjectSession(meta: meta, store: store))
+    init(store: ProjectStore, meta: ProjectMeta?, initialPrompt: String? = nil,
+         onOpenProjects: @escaping () -> Void) {
+        self.store = store; self.meta = meta; self.initialPrompt = initialPrompt
+        self.onOpenProjects = onOpenProjects
+        _session = StateObject(wrappedValue: ProjectSession(store: store, meta: meta))
     }
 
     var body: some View {
@@ -117,8 +127,19 @@ struct ProjectView: View {
                 .ignoresSafeArea()
             chat
         }
-        .navigationTitle(meta.title.isEmpty ? "Experience" : meta.title)
-        .navigationBarTitleDisplayMode(.inline)
+        .overlay(alignment: .topLeading) {
+            Button(action: onOpenProjects) {
+                Image(systemName: "square.stack.3d.up.fill").font(.title2)
+                    .padding(10).background(.ultraThinMaterial, in: Circle())
+            }.padding()
+        }
+        .overlay(alignment: .top) {
+            if !session.title.isEmpty {
+                Text(session.title).font(.headline).foregroundStyle(.white)
+                    .padding(.horizontal, 12).padding(.vertical, 6)
+                    .background(.ultraThinMaterial, in: Capsule()).padding(.top, 6)
+            }
+        }
         .onAppear {
             session.load()
             if let p = initialPrompt, session.conversation.isEmpty {
@@ -135,8 +156,7 @@ struct ProjectView: View {
                 HStack(spacing: 6) {
                     if session.busy { ProgressView().tint(.white) }
                     Text(session.status).font(.caption).foregroundStyle(.white)
-                }
-                .padding(8).background(.ultraThinMaterial, in: Capsule())
+                }.padding(8).background(.ultraThinMaterial, in: Capsule())
             }
             if !session.conversation.isEmpty {
                 ScrollView {
@@ -151,7 +171,9 @@ struct ProjectView: View {
                 }.frame(maxHeight: 110)
             }
             HStack(spacing: 10) {
-                TextField("Prompt to change the scene…", text: $input, axis: .vertical)
+                TextField(session.experience == nil ? "Describe an experience to build here…"
+                                                    : "Prompt to change the scene…",
+                          text: $input, axis: .vertical)
                     .textFieldStyle(.roundedBorder).lineLimit(1...3)
                     .submitLabel(.send).onSubmit(sendInput)
                 Button(action: sendInput) {
@@ -163,18 +185,6 @@ struct ProjectView: View {
         .padding()
     }
 
-    private func sendInput() {
-        let p = input; input = ""; session.send(p)
-    }
-}
-
-#else
-struct ProjectView: View {
-    let meta: ProjectMeta
-    var store: ProjectStore
-    var initialPrompt: String? = nil
-    var body: some View {
-        Color.black.overlay(Text("Projects — available on iPhone").foregroundStyle(.white))
-    }
+    private func sendInput() { let p = input; input = ""; session.send(p) }
 }
 #endif

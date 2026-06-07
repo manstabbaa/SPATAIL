@@ -24,6 +24,8 @@ struct JobState: Decodable {
     let message: String?
     let usdz_url: String?
     let metadata_url: String?
+    // queued jobs waiting for a Blender lane: how many are ahead (per-phone scheduler).
+    var queuePosition: Int? = nil
     // experience jobs (mode == "experience"):
     var experience_url: String? = nil
     var usdz_base: String? = nil
@@ -69,6 +71,12 @@ final class GenerativeClient {
         get { UserDefaults.standard.string(forKey: baseURLKey) ?? "" }
         set { UserDefaults.standard.set(newValue, forKey: baseURLKey) }
     }
+
+    // A stable id for THIS running app instance. Sent with every job so the PC
+    // binds this phone to its own Blender session/lane — builds from different
+    // phones run concurrently in their own headless Blender instead of queuing
+    // behind each other on one shared instance. Fresh per launch ("per running app").
+    static let sessionId: String = UUID().uuidString
 
     private func base() throws -> URL {
         let s = Self.baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -268,6 +276,8 @@ final class GenerativeClient {
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.timeoutInterval = 120          // synchronous server-side build (engine + agent)
+        var payload = payload
+        payload["session"] = Self.sessionId   // bind this phone to its own Blender lane
         req.httpBody = try JSONSerialization.data(withJSONObject: payload)
         let (data, resp) = try await URLSession.shared.data(for: req)
         try check(resp)
@@ -279,7 +289,8 @@ final class GenerativeClient {
         var req = URLRequest(url: try base().appendingPathComponent("jobs"))
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        var payload: [String: Any] = ["prompt": prompt, "client": "ios"]
+        var payload: [String: Any] = ["prompt": prompt, "client": "ios",
+                                      "session": Self.sessionId]
         if let mode { payload["mode"] = mode }
         for (k, v) in extra { payload[k] = v }
         req.httpBody = try JSONSerialization.data(withJSONObject: payload)

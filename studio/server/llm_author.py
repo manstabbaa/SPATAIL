@@ -157,6 +157,14 @@ built around the origin and resting on the ground (nothing below z=0 at rest). D
 NOT change scene frame_start/frame_end/fps.
 7. End by assigning a short summary dict to a variable named `result`, e.g.
        result = {"objects": [o.name for o in bpy.data.objects], "summary": "..."}
+8. STYLE — aim for a soft, matte "clay" look in a gentle pastel palette (e.g. soft \
+blush, muted blue, sage green, warm sand, clay terracotta, dusty lilac, cream, slate) \
+where it does not hurt recognizability (a banana stays yellow, the sky stays blue). \
+Prefer clean solid forms over tiny sharp detail. SPATAIL applies a final matte+bevel \
+pass automatically, so you do NOT need to add bevels or tune roughness yourself.
+9. SOCKETS (optional) — you MAY add Empties named "socket_<purpose>" (e.g. \
+socket_label, socket_grab), parented to gen_root, to mark attachment points for UI \
+or handles. They are invisible and never animated.
 
 OUTPUT: return ONLY the raw Python script — no prose, no markdown fences."""
 
@@ -171,7 +179,7 @@ def _author_prompt(prompt, frames, fps):
 def _repair_prompt(prompt, frames, fps, code, error):
     return (_author_prompt(prompt, frames, fps) +
             "\n\n---\nYour previous script raised this error in Blender:\n\n" +
-            error[:2500] + "\n\nPREVIOUS SCRIPT:\n" + code[:6000] +
+            (error or "")[:2500] + "\n\nPREVIOUS SCRIPT:\n" + (code or "")[:6000] +
             "\n\nReturn a corrected, complete Python script (only code). Keep every "
             "HARD RULE (parent to gen_root, assign `result`, no scene clearing).")
 
@@ -196,9 +204,14 @@ def author_scene(prompt, frames, fps, run_code, on_stage=lambda s: None,
     code = None
     last_err = None
     for attempt in range(1, max_attempts + 1):
-        on_stage("modeling" if attempt == 1 else f"repairing (try {attempt})")
-        text = _author_prompt(prompt, frames, fps) if attempt == 1 \
-            else _repair_prompt(prompt, frames, fps, code, last_err)
+        # Repair ONLY when a prior attempt actually produced a script. A prior
+        # attempt that TIMED OUT leaves code=None; building a repair prompt from
+        # that would do code[:6000] on None -> "'NoneType' object is not
+        # subscriptable". In that case retry with a fresh author prompt instead.
+        repairing = bool(code)
+        on_stage("modeling" if not repairing else f"repairing (try {attempt})")
+        text = _repair_prompt(prompt, frames, fps, code, last_err) if repairing \
+            else _author_prompt(prompt, frames, fps)
         try:
             raw = _run_cli(text, timeout=gen_timeout)
         except subprocess.TimeoutExpired:

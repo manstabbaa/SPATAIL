@@ -21,6 +21,44 @@ struct ModularExperience: Decodable {
     /// Set by the server when a live-Blender build was queued for the primary
     /// object; the client polls this job and streams the real model in over the box.
     var generationJobId: String? = nil
+    /// v0.6 Scene Contract (content/placement/brand/logic). Optional + additive: the
+    /// runtime uses logic.triggers for the game-manager layer when present; absent on
+    /// older server builds, in which case the runtime falls back to beats + taps.
+    var sceneContract: SceneContract? = nil
+
+    struct SceneContract: Decodable {
+        var placement = ScenePlacement()
+        var logic = Logic()
+        struct ScenePlacement: Decodable {
+            var anchorPreference = "table"
+            var layout = "arc"
+            var scaleMode = "dynamic"
+            var primary: String? = nil
+        }
+        struct Logic: Decodable {
+            var triggers: [Trigger] = []
+            var objectives: [Objective] = []
+        }
+        struct Trigger: Decodable {
+            var when = When()
+            var doActions: [Action] = []
+            enum CodingKeys: String, CodingKey { case when; case doActions = "do" }
+        }
+        struct When: Decodable {
+            var event = ""                 // onTap | onApproach | onGaze | onGrab | onQuizCorrect
+            var target = "scene"
+            var params: [String: AnyParam] = [:]
+        }
+        struct Action: Decodable {
+            var action = ""                // advanceTrack | mechanic | playClipIfAny | playSound | ...
+            var mechanic: String? = nil
+            var target: String? = nil
+            var params: [String: AnyParam] = [:]
+        }
+        struct Objective: Decodable {
+            var id = "", goal = "", summary = ""
+        }
+    }
 
     struct Understanding: Decodable {
         var domain = "", intent = "", subject = "", summary = "", reasoning = ""

@@ -31,6 +31,7 @@ import sys
 import threading
 import time
 import uuid
+from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from queue import Queue
@@ -40,6 +41,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import blender_bridge  # noqa: E402
 import generator  # noqa: E402
 import director  # noqa: E402
+import headless_build  # noqa: E402  (per-phone isolated Blender executor)
 
 # Representation Engine — opt-in mode="representation". Purely additive: the
 # existing "experience"/"object" modes are untouched. Imported defensively so a
@@ -119,7 +121,23 @@ def _blender_watchdog(poll_seconds: float = 15.0) -> None:
 
 _JOBS: dict[str, dict] = {}
 _LOCK = threading.Lock()
-_QUEUE: "Queue[str]" = Queue()
+_QUEUE: "Queue[str]" = Queue()                 # intake; the dispatcher drains this
+
+# ── per-session concurrency ("a Blender session per running app") ───────────────
+# Each phone sends a stable `session` id. Object builds for DIFFERENT phones run in
+# their OWN headless Blender concurrently (isolated); one phone is capped so it
+# can't hog the box. Shared-bridge modes (experience/representation/educational)
+# all use the single LIVE Blender, so they share one lane and serialise.
+GLOBAL_CAP = max(1, int(os.environ.get("SPATAIL_BLENDER_CONCURRENCY", "3")))
+SESSION_CAP = max(1, int(os.environ.get("SPATAIL_SESSION_CONCURRENCY", "1")))
+ISOLATED = os.environ.get("SPATAIL_ISOLATED_BUILDS", "1").lower() not in (
+    "0", "false", "no", "off")
+SHARED_SESSION = "__shared_blender__"          # lane for everything on the live spine
+
+_PENDING: "deque[str]" = deque()               # job_ids awaiting dispatch (FIFO)
+_INFLIGHT: dict[str, int] = {}                 # session -> builds currently running
+_GLOBAL_INFLIGHT = 0
+_SCHED = threading.Condition()                 # guards _PENDING/_INFLIGHT/_GLOBAL_INFLIGHT
 
 
 def _update(job_id: str, **kw) -> None:
@@ -134,87 +152,190 @@ def _snapshot(job_id: str) -> dict | None:
         return dict(job) if job else None
 
 
-def _worker() -> None:
-    """Serialise generation jobs FIFO; one Blender build at a time."""
-    while True:
-        job_id = _QUEUE.get()
-        try:
-            job = _snapshot(job_id)
-            if not job:
-                continue
-            _update(job_id, status="running", stage="planning", message=None)
-            if job.get("mode") == "representation":
-                # Representation Engine: prompt -> Experience Plan + Asset Request
-                # Manifest + Runtime Scene Contract + Progressive Load Plan.
-                if job_entry is None:
-                    raise RuntimeError("representation mode unavailable on this server")
-                res = job_entry.run_job(
+def _uses_isolated(job: dict) -> bool:
+    """An object/back-compat build runs in its OWN headless Blender when isolated
+    mode is on and the executor is actually available; everything else (and the
+    fallback) uses the shared live spine."""
+    return (ISOLATED and headless_build.available()
+            and job.get("mode") in (None, "object"))
+
+
+def _session_for(job_id: str) -> str:
+    """The concurrency lane for a job: the phone's session for isolated per-phone
+    object builds; the single shared lane for everything on the live Blender."""
+    job = _snapshot(job_id)
+    if not job:
+        return SHARED_SESSION
+    if _uses_isolated(job):
+        # per-phone affinity; anon builds get their own lane so they don't serialise
+        return f"sess:{job.get('session')}" if job.get("session") else f"job:{job_id}"
+    return SHARED_SESSION
+
+
+def _run_job(job_id: str) -> None:
+    """Run ONE job to done/error on a per-build worker thread (spawned by the
+    scheduler). The concurrency lane it holds is freed by _run_and_release.
+
+    Object / back-compat builds run in their OWN headless Blender when isolated
+    mode is on (true per-phone concurrency); every other mode drives the shared
+    live spine and therefore shares a single serialised lane."""
+    try:
+        job = _snapshot(job_id)
+        if not job:
+            return
+        _update(job_id, status="running", stage="planning", message=None)
+        if job.get("mode") == "representation":
+            # Representation Engine: prompt -> Experience Plan + Asset Request
+            # Manifest + Runtime Scene Contract + Progressive Load Plan.
+            if job_entry is None:
+                raise RuntimeError("representation mode unavailable on this server")
+            res = job_entry.run_job(
+                job["prompt"], job_id, ARTIFACTS,
+                on_stage=lambda s, _id=job_id: _update(_id, stage=s),
+            )
+            _update(
+                job_id, status="done", stage="ready", message=None,
+                representation=res["experience_name"], runtime=res["runtime_name"],
+                delivery=res["delivery_name"], progressive=res["progressive_name"],
+                plan_artifact=res["plan_name"], title=res.get("title"),
+                stations=res.get("stations"), finished=time.time(),
+            )
+            print(f"[job] {job_id} done -> representation {res.get('title')!r} "
+                  f"({res.get('strategy')}, {res.get('stations')} assets)", flush=True)
+        elif job.get("mode") == "educational":
+            # Educational Wrapper: a selected concept -> EducationalExperiencePlan,
+            # reusing the representation pipeline (same runtime contract artifacts).
+            if job_entry is None:
+                raise RuntimeError("educational mode unavailable on this server")
+            res = job_entry.run_educational_job(
+                job.get("selectedText") or job["prompt"], job_id, ARTIFACTS,
+                surrounding_context=job.get("surroundingContext") or "",
+                learning_goal=job.get("learningGoal"),
+                on_stage=lambda s, _id=job_id: _update(_id, stage=s),
+            )
+            _update(
+                job_id, status="done", stage="ready", message=None,
+                representation=res["experience_name"], runtime=res["runtime_name"],
+                delivery=res["delivery_name"], progressive=res["progressive_name"],
+                plan_artifact=res["plan_name"], educational=res["educational_name"],
+                title=res.get("title"), stations=res.get("stations"),
+                concept=res.get("conceptId"), finished=time.time(),
+            )
+            print(f"[job] {job_id} done -> educational {res.get('conceptId')!r} "
+                  f"({res.get('strategy')})", flush=True)
+        elif job.get("mode") == "experience":
+            # Director: prompt -> multi-station Experience Spec + N USDZs
+            res = director.generate_experience(
+                job["prompt"], job_id, ARTIFACTS,
+                on_stage=lambda s, _id=job_id: _update(_id, stage=s),
+            )
+            _update(
+                job_id, status="done", stage="ready", message=None,
+                experience=res["experience_name"], stations=res["stations"],
+                title=res["title"], finished=time.time(),
+            )
+            print(f"[job] {job_id} done -> {res['experience_name']} "
+                  f"({res['stations']} stations)", flush=True)
+        else:
+            # single object — isolated per-phone headless Blender when enabled,
+            # else the shared live spine (back-compat). Same generator either way.
+            if _uses_isolated(job):
+                res = headless_build.build(
                     job["prompt"], job_id, ARTIFACTS,
-                    on_stage=lambda s, _id=job_id: _update(_id, stage=s),
-                )
-                _update(
-                    job_id, status="done", stage="ready", message=None,
-                    representation=res["experience_name"], runtime=res["runtime_name"],
-                    delivery=res["delivery_name"], progressive=res["progressive_name"],
-                    plan_artifact=res["plan_name"], title=res.get("title"),
-                    stations=res.get("stations"), finished=time.time(),
-                )
-                print(f"[job] {job_id} done -> representation {res.get('title')!r} "
-                      f"({res.get('strategy')}, {res.get('stations')} assets)", flush=True)
-            elif job.get("mode") == "educational":
-                # Educational Wrapper: a selected concept -> EducationalExperiencePlan,
-                # reusing the representation pipeline (same runtime contract artifacts).
-                if job_entry is None:
-                    raise RuntimeError("educational mode unavailable on this server")
-                res = job_entry.run_educational_job(
-                    job.get("selectedText") or job["prompt"], job_id, ARTIFACTS,
-                    surrounding_context=job.get("surroundingContext") or "",
-                    learning_goal=job.get("learningGoal"),
-                    on_stage=lambda s, _id=job_id: _update(_id, stage=s),
-                )
-                _update(
-                    job_id, status="done", stage="ready", message=None,
-                    representation=res["experience_name"], runtime=res["runtime_name"],
-                    delivery=res["delivery_name"], progressive=res["progressive_name"],
-                    plan_artifact=res["plan_name"], educational=res["educational_name"],
-                    title=res.get("title"), stations=res.get("stations"),
-                    concept=res.get("conceptId"), finished=time.time(),
-                )
-                print(f"[job] {job_id} done -> educational {res.get('conceptId')!r} "
-                      f"({res.get('strategy')})", flush=True)
-            elif job.get("mode") == "experience":
-                # Director: prompt -> multi-station Experience Spec + N USDZs
-                res = director.generate_experience(
-                    job["prompt"], job_id, ARTIFACTS,
-                    on_stage=lambda s, _id=job_id: _update(_id, stage=s),
-                )
-                _update(
-                    job_id, status="done", stage="ready", message=None,
-                    experience=res["experience_name"], stations=res["stations"],
-                    title=res["title"], finished=time.time(),
-                )
-                print(f"[job] {job_id} done -> {res['experience_name']} "
-                      f"({res['stations']} stations)", flush=True)
+                    on_stage=lambda s, _id=job_id: _update(_id, stage=s))
+                lane = "isolated"
             else:
-                # single-object generator (back-compat)
                 res = generator.generate(
                     job["prompt"], job_id, ARTIFACTS,
-                    on_stage=lambda s, _id=job_id: _update(_id, stage=s),
-                )
-                _update(
-                    job_id, status="done", stage="ready", message=None,
-                    usdz=res["usdz_name"], metadata=res["metadata_name"],
-                    bbox_yup=res.get("bbox_yup"), max_dim=res.get("max_dim"),
-                    spec=res.get("spec"), finished=time.time(),
-                )
-                print(f"[job] {job_id} done -> {res['usdz_name']} "
-                      f"(max_dim {res.get('max_dim')} m)", flush=True)
-        except Exception as exc:  # noqa: BLE001
-            _update(job_id, status="error", stage=None, message=str(exc),
-                    finished=time.time())
-            print(f"[job] {job_id} ERROR: {exc}", flush=True)
-        finally:
-            _QUEUE.task_done()
+                    on_stage=lambda s, _id=job_id: _update(_id, stage=s))
+                lane = "shared"
+            _update(
+                job_id, status="done", stage="ready", message=None,
+                usdz=res["usdz_name"], metadata=res.get("metadata_name"),
+                bbox_yup=res.get("bbox_yup"), max_dim=res.get("max_dim"),
+                spec=res.get("spec"), finished=time.time(),
+            )
+            print(f"[job] {job_id} done -> {res['usdz_name']} "
+                  f"({lane}, max_dim {res.get('max_dim')} m)", flush=True)
+    except Exception as exc:  # noqa: BLE001
+        _update(job_id, status="error", stage=None, message=str(exc),
+                finished=time.time())
+        print(f"[job] {job_id} ERROR: {exc}", flush=True)
+
+
+# ── scheduler: intake -> pending -> dispatch under (global, per-session) caps ───
+def _intake() -> None:
+    """Move queued job ids into the scheduler's pending deque and wake dispatch."""
+    while True:
+        job_id = _QUEUE.get()
+        with _SCHED:
+            _PENDING.append(job_id)
+            _SCHED.notify_all()
+
+
+def _collect_dispatchable() -> list[str]:
+    """Pending jobs that may start NOW without breaching the global cap or any
+    per-session cap, in FIFO order. Must be called holding _SCHED."""
+    room = GLOBAL_CAP - _GLOBAL_INFLIGHT
+    if room <= 0:
+        return []
+    picks: list[str] = []
+    proj = dict(_INFLIGHT)
+    for jid in _PENDING:
+        if len(picks) >= room:
+            break
+        s = _session_for(jid)
+        if proj.get(s, 0) < SESSION_CAP:
+            picks.append(jid)
+            proj[s] = proj.get(s, 0) + 1
+    return picks
+
+
+def _ahead_of(job_id: str) -> int:
+    """How many pending jobs sit before this one — for queue-position reporting so
+    the phone shows 'queued (N ahead)' instead of a silent countdown."""
+    with _SCHED:
+        for i, jid in enumerate(_PENDING):
+            if jid == job_id:
+                return i
+    return 0
+
+
+def _dispatch_loop() -> None:
+    """Start dispatchable jobs on their own worker threads as lanes free up."""
+    global _GLOBAL_INFLIGHT
+    while True:
+        with _SCHED:
+            picks = _collect_dispatchable()
+            while not picks:
+                _SCHED.wait()
+                picks = _collect_dispatchable()
+            for jid in picks:
+                try:
+                    _PENDING.remove(jid)
+                except ValueError:
+                    continue
+                s = _session_for(jid)
+                _INFLIGHT[s] = _INFLIGHT.get(s, 0) + 1
+                _GLOBAL_INFLIGHT += 1
+                threading.Thread(target=_run_and_release, args=(jid, s),
+                                 daemon=True, name=f"build-{jid}").start()
+
+
+def _run_and_release(job_id: str, sess: str) -> None:
+    """Run a job, then free its global + per-session lane and wake the dispatcher."""
+    global _GLOBAL_INFLIGHT
+    try:
+        _run_job(job_id)
+    finally:
+        with _SCHED:
+            n = _INFLIGHT.get(sess, 1) - 1
+            if n <= 0:
+                _INFLIGHT.pop(sess, None)
+            else:
+                _INFLIGHT[sess] = n
+            _GLOBAL_INFLIGHT -= 1
+            _SCHED.notify_all()
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -263,6 +384,9 @@ class Handler(BaseHTTPRequestHandler):
                 "id": job_id, "status": "queued", "stage": "queued",
                 "message": None, "prompt": prompt, "mode": mode,
                 "client": data.get("client"), "created": time.time(),
+                # per-phone concurrency lane (stable id the app sends each launch);
+                # falls back to the client's address so distinct phones still split.
+                "session": data.get("session") or self.client_address[0],
                 "usdz": None, "metadata": None,
                 # educational wrapper inputs (mode == "educational"):
                 "selectedText": data.get("selectedText"),
@@ -270,7 +394,8 @@ class Handler(BaseHTTPRequestHandler):
                 "learningGoal": data.get("learningGoal"),
             }
         _QUEUE.put(job_id)
-        print(f"[job] {job_id} queued: {prompt!r}", flush=True)
+        print(f"[job] {job_id} queued (session {_JOBS[job_id]['session']!r}): {prompt!r}",
+              flush=True)
         return self._send(200, obj={"id": job_id, "status": "queued"})
 
     def _modular(self):
@@ -312,15 +437,23 @@ class Handler(BaseHTTPRequestHandler):
             gen = contract.get("generation") or {}
             if gen.get("brief"):
                 gid = "gen_" + uuid.uuid4().hex[:8]
+                session = data.get("session") or self.client_address[0]
                 with _LOCK:
                     _JOBS[gid] = {"id": gid, "status": "queued", "stage": "queued",
                                   "message": None, "prompt": gen["brief"], "mode": "object",
                                   "client": "modular", "created": time.time(),
-                                  "usdz": None, "metadata": None}
+                                  "session": session, "usdz": None, "metadata": None}
                 _QUEUE.put(gid)
                 contract["generationJobId"] = gid
                 print(f"[modular] queued Blender mechanism {gid} for {gen.get('subject')!r}: "
                       f"{gen['brief'][:90]!r}", flush=True)
+            # Attach the v0.6 Scene Contract (content/placement/brand/logic) additively
+            # so newer phones get the game-manager trigger graph; old builds ignore it.
+            try:
+                import scene_contract as _sc
+                contract["sceneContract"] = _sc.to_scene_contract(contract)
+            except Exception as _sce:  # noqa: BLE001
+                print(f"[modular] sceneContract skip: {_sce}", flush=True)
             print(f"[modular] {kind} -> {contract.get('title')!r} "
                   f"({contract.get('composer')}, {len(contract.get('beats', []))} beats, "
                   f"{len(contract.get('mechanicsUsed', []))} mechanics)", flush=True)
@@ -364,6 +497,12 @@ class Handler(BaseHTTPRequestHandler):
                 "id": job["id"], "status": job["status"],
                 "stage": job.get("stage"), "message": job.get("message"),
             }
+            # While still waiting for a lane, tell the phone its place in line so it
+            # shows real progress ("queued (2 ahead)") instead of a blind countdown.
+            if job["status"] == "queued":
+                ahead = _ahead_of(job_id)
+                out["queuePosition"] = ahead
+                out["stage"] = f"queued ({ahead} ahead)" if ahead else "queued"
             if job["status"] == "done":
                 if job.get("representation"):
                     # Representation / Educational job: plan + manifest + runtime + progressive
@@ -455,7 +594,10 @@ def main() -> None:
         threading.Thread(target=_blender_watchdog, daemon=True,
                          name="blender-watchdog").start()
 
-    threading.Thread(target=_worker, daemon=True, name="gen-worker").start()
+    # Scheduler: intake drains the queue into pending; dispatch starts builds on
+    # their own threads under the (global, per-session) caps — per-phone concurrency.
+    threading.Thread(target=_intake, daemon=True, name="gen-intake").start()
+    threading.Thread(target=_dispatch_loop, daemon=True, name="gen-dispatch").start()
 
     httpd = ThreadingHTTPServer((args.host, args.port), Handler)
     httpd.daemon_threads = True
@@ -475,6 +617,12 @@ def main() -> None:
     print(f"  keep-awake      : {'off' if args.no_keep_awake else 'on'}", flush=True)
     print(f"  blender watchdog: {'off' if args.no_watchdog else 'on (relaunch if bridge drops)'}",
           flush=True)
+    iso = ISOLATED and headless_build.available()
+    print(f"  build isolation : {'per-phone headless Blender' if iso else 'shared live spine'}"
+          f"  (global cap {GLOBAL_CAP}, per-session {SESSION_CAP})", flush=True)
+    if ISOLATED and not headless_build.available():
+        print(f"  NOTE: isolation requested but Blender exe/driver missing — using shared spine",
+              flush=True)
     print("=" * 64, flush=True)
     try:
         httpd.serve_forever()

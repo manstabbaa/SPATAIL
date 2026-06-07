@@ -26,8 +26,10 @@ import pathlib
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "blender"))
 import blender_bridge as bridge  # noqa: E402
 import llm_author  # noqa: E402
+import spatail_style  # noqa: E402  (deterministic Tarka clay pass + manifest introspection)
 
 FPS = 30
 FRAMES = 120                 # 4.0 s seamless loop (matches studio CYCLE)
@@ -146,10 +148,20 @@ else:
        "TARGET": MAX_DIM_TARGET, "USDZ": "{USDZ}"}
 
 
-def generate(prompt: str, job_id: str, out_dir, on_stage=lambda s: None) -> dict:
+def generate(prompt: str, job_id: str, out_dir, on_stage=lambda s: None,
+             *, run_code=None) -> dict:
     """Prepare -> author (LLM) -> export. Returns artifact names + bbox.
-    Raises on failure (no primitive fallback)."""
-    if bridge.ping() is None:
+    Raises on failure (no primitive fallback).
+
+    `run_code(code, *, timeout, strict_json)` is the Blender executor. It defaults
+    to the shared LIVE socket bridge (the always-on spine). The per-phone headless
+    path injects an IN-PROCESS executor instead (exec inside a dedicated
+    ``blender --background`` per build), so builds are isolated and concurrent —
+    same PREPARE/author/EXPORT, just a different place to run the bpy code."""
+    rc = run_code or bridge.run_code
+    # Only probe the shared socket when we're actually using it; the headless
+    # injected executor runs in-process and has no socket to ping.
+    if run_code is None and bridge.ping() is None:
         raise bridge.BridgeError(
             "Blender MCP bridge not reachable on localhost:9876 - open Blender and "
             "make sure the 'MCP' add-on server is running.")
@@ -165,18 +177,34 @@ def generate(prompt: str, job_id: str, out_dir, on_stage=lambda s: None) -> dict
 
     # 1. PREPARE — guaranteed clean scene every prompt
     on_stage("clearing scene")
-    bridge.run_code(_PREPARE, timeout=60.0)
+    rc(_PREPARE, timeout=60.0)
 
     # 2. AUTHOR — Claude writes + (self-)repairs the Blender script, run live
     authored = llm_author.author_scene(
-        prompt, FRAMES, FPS, bridge.run_code, on_stage=on_stage)
+        prompt, FRAMES, FPS, rc, on_stage=on_stage)
+
+    # 2b. STYLE — deterministic SPATAIL clay pass (matte materials + rounded bevels).
+    # Best-effort: a styling hiccup must never fail an otherwise-good build.
+    style = None
+    try:
+        on_stage("styling")
+        style = rc(spatail_style.STYLE_CODE, timeout=60.0)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[generator] clay style pass skipped: {exc}", flush=True)
 
     # 3. EXPORT — measure, scale to tabletop, write USDZ
     on_stage("exporting")
     export_code = _EXPORT.replace("{USDZ}", usdz_for_blender)
-    res = bridge.run_code(export_code, timeout=180.0)
+    res = rc(export_code, timeout=180.0)
     if not res.get("exported"):
         raise bridge.BridgeError(f"USDZ export failed: {res.get('error')}")
+
+    # 3b. MANIFEST — introspect the asset package (parts/sockets/clips/materials).
+    manifest = None
+    try:
+        manifest = rc(spatail_style.INTROSPECT_CODE, timeout=30.0)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[generator] manifest introspect skipped: {exc}", flush=True)
 
     # metadata (reuses the studio metadata shape)
     meta = {
@@ -194,14 +222,36 @@ def generate(prompt: str, job_id: str, out_dir, on_stage=lambda s: None) -> dict
         "bbox_yup_m": res["bbox_yup"],
         "max_dim_m": res["max_dim"],
         "blender_summary": authored.get("blender_result"),
+        "style": style,                       # SPATAIL clay pass result (or None)
     }
     meta_path = out_dir / f"{job_id}_metadata.json"
     meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+
+    # Asset-package manifest — parts/sockets/clips/materials the runtime (Phase 3)
+    # and placement (Phase 2) consume. Foundation for "Blender motion, not procedural".
+    manifest_name = None
+    if manifest:
+        man = {
+            "schema": "spatail-asset-manifest/1",
+            "assetId": job_id,
+            "usdz": f"{job_id}.usdz",
+            "bbox_yup_m": res["bbox_yup"],
+            "max_dim_m": res["max_dim"],
+            "parts": manifest.get("parts", []),
+            "sockets": manifest.get("sockets", []),
+            "clips": manifest.get("clips", []),
+            "materials": manifest.get("materials", []),
+            "style": (style or {}).get("style"),
+        }
+        manifest_path = out_dir / f"{job_id}_manifest.json"
+        manifest_path.write_text(json.dumps(man, indent=2), encoding="utf-8")
+        manifest_name = manifest_path.name
     on_stage("ready")
 
     return {
         "usdz_name": usdz_path.name,
         "metadata_name": meta_path.name,
+        "manifest_name": manifest_name,
         "bbox_yup": res["bbox_yup"],
         "max_dim": res["max_dim"],
         "authoring": meta["authoring"],

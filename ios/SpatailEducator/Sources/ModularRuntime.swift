@@ -6,6 +6,7 @@ import UIKit
 import Combine
 import simd
 import AVFoundation
+import AudioToolbox
 
 // ModularRuntime — the GENERIC interpreter for the SPATAIL v0.5 modular contract.
 // The agent composed `beats`, each applying `mechanics` to assets; this runtime
@@ -34,6 +35,16 @@ final class ModularRuntime: NSObject {
     private var startTime: TimeInterval = 0
     private let synth = AVSpeechSynthesizer()
     private let onStatus: (String) -> Void
+
+    // ── game-manager layer (v0.6 sceneContract.logic.triggers) ──────────────────
+    // When the server supplies triggers, taps/proximity/gaze drive event->action
+    // rules (the open-world interactivity). Empty => unchanged tap-to-step behavior.
+    private var triggers: [ModularExperience.SceneContract.Trigger] = []
+    private var firedOnce: Set<String> = []          // proximity/gaze edge-trigger guard
+    private var gazeStart: [String: TimeInterval] = [:]
+    /// Set by the AR host from the on-device RoomModel (placement solver input).
+    /// Available to the solver; current layout still uses StationLayout (see present).
+    var roomModel: RoomModel?
 
     struct Animator {
         weak var target: Entity?
@@ -73,6 +84,8 @@ final class ModularRuntime: NSObject {
         guard let view else { return }
         exp = e
         anchor = a
+        self.triggers = e.sceneContract?.logic.triggers ?? []
+        self.firedOnce.removeAll(); self.gazeStart.removeAll()
 
         let widths = e.assets.map { Float(max($0.scaleMeters.first ?? 0.2, 0.05)) }
         let poses: [StationPose]
@@ -94,6 +107,9 @@ final class ModularRuntime: NSObject {
             a.addChild(holder)
             holders[asset.id] = holder
             baseXform[ObjectIdentifier(holder)] = holder.transform
+            // soft contact shadow so the asset reads as grounded, not floating
+            holder.addChild(makeContactShadow(
+                radius: Float(max(asset.scaleMeters.first ?? 0.2, 0.06)) * 0.75))
             let box = makeBox(asset)
             holder.addChild(box)
             nodes[asset.id] = box
@@ -234,6 +250,7 @@ final class ModularRuntime: NSObject {
             default: break
             }
         }
+        checkSpatialTriggers(now)
     }
 
     private func addAnimator(_ e: Entity, _ kind: String, _ p: [String: AnyParam], center: SIMD3<Float>? = nil) {
@@ -417,10 +434,112 @@ final class ModularRuntime: NSObject {
 
     private func installTap() {
         guard let view else { return }
-        let g = UITapGestureRecognizer(target: self, action: #selector(onTap))
+        let g = UITapGestureRecognizer(target: self, action: #selector(onTap(_:)))
         view.addGestureRecognizer(g)
     }
-    @objc private func onTap() { next() }
+
+    // Route taps through the trigger graph (game manager). Tapping an asset fires its
+    // onTap rules; tapping empty space fires scene rules. If nothing matches, fall
+    // back to advancing the guided track (the original behaviour) so older server
+    // responses (no sceneContract) work unchanged.
+    @objc private func onTap(_ g: UITapGestureRecognizer) {
+        guard let view else { return }
+        let p = g.location(in: view)
+        let tappedId = view.entity(at: p).flatMap { holderId(for: $0) }
+        if fireTriggers(event: "onTap", target: tappedId ?? "scene") { return }
+        next()
+    }
+
+    // ── game-manager dispatch ───────────────────────────────────────────────────
+    private func holderId(for e: Entity) -> String? {
+        var cur: Entity? = e
+        while let c = cur {
+            if let hit = holders.first(where: { $0.value === c })?.key { return hit }
+            cur = c.parent
+        }
+        return nil
+    }
+
+    @discardableResult
+    private func fireTriggers(event: String, target: String) -> Bool {
+        let matches = triggers.filter { $0.when.event == event && $0.when.target == target }
+        guard !matches.isEmpty else { return false }
+        for t in matches { executeActions(t.doActions, defaultTarget: target) }
+        return true
+    }
+
+    private func executeActions(_ actions: [ModularExperience.SceneContract.Action], defaultTarget: String) {
+        for a in actions {
+            let tgt = a.target ?? defaultTarget
+            switch a.action {
+            case "advanceTrack":      next()
+            case "playSound":         playCue(a.params.s("cue", "tap"))
+            case "playClipIfAny":     playClipOn(tgt)
+            case "mechanic":
+                if let mid = a.mechanic {
+                    applyMechanic(ModularExperience.MechanicUse(
+                        mechanic: mid, target: tgt, params: a.params, trigger: "on_tap"))
+                }
+            case "advanceObjective":  onStatus("✓ objective progressed")
+            case "cycleState":        break       // reserved for the asset state machine
+            default:                  break
+            }
+        }
+    }
+
+    private func playClipOn(_ id: String) {
+        guard let m = nodes[id] else { return }
+        if let clip = m.availableAnimations.first {
+            m.playAnimation(clip.repeat(), transitionDuration: 0.2, startsPaused: false)
+        }
+    }
+
+    private func playCue(_ cue: String) {
+        let sound: SystemSoundID = cue == "correct" ? 1054 : (cue == "pickup" ? 1104 : 1103)
+        AudioServicesPlaySystemSound(sound)
+    }
+
+    // Per-frame proximity + gaze-dwell detection -> fires onApproach / onGaze rules.
+    private func checkSpatialTriggers(_ now: TimeInterval) {
+        guard let view, !triggers.isEmpty else { return }
+        let cam = view.cameraTransform.translation
+        let f = -view.cameraTransform.matrix.columns.2
+        let camFwd = simd_normalize(SIMD3(f.x, 0, f.z))
+        for (id, h) in holders {
+            let to = h.position(relativeTo: nil) - cam
+            let dist = simd_length(to)
+            for t in triggers where t.when.event == "onApproach" && t.when.target == id {
+                let r = t.when.params.f("radius_m", 0.7)
+                let key = "near:" + id
+                if dist <= r && !firedOnce.contains(key) {
+                    firedOnce.insert(key); executeActions(t.doActions, defaultTarget: id)
+                } else if dist > r * 1.3 { firedOnce.remove(key) }
+            }
+            for t in triggers where t.when.event == "onGaze" && t.when.target == id {
+                let flat = simd_length(SIMD3(to.x, 0, to.z)) > 1e-4
+                    ? simd_normalize(SIMD3(to.x, 0, to.z)) : camFwd
+                let aligned = simd_dot(flat, camFwd) > 0.96      // ~16° cone
+                let dwell = t.when.params.d("dwell_s", 1.0)
+                let key = "gaze:" + id
+                if aligned {
+                    let start = gazeStart[id] ?? now; gazeStart[id] = start
+                    if now - start >= dwell && !firedOnce.contains(key) {
+                        firedOnce.insert(key); executeActions(t.doActions, defaultTarget: id)
+                    }
+                } else { gazeStart[id] = nil; firedOnce.remove(key) }
+            }
+        }
+    }
+
+    // A soft, flat contact shadow so assets read as grounded on the surface.
+    private func makeContactShadow(radius: Float) -> ModelEntity {
+        let r = max(radius, 0.04)
+        let mesh = MeshResource.generatePlane(width: r * 2, depth: r * 2, cornerRadius: r)
+        let e = ModelEntity(mesh: mesh, materials: [UnlitMaterial(color: .black)])
+        e.position.y = 0.002
+        if #available(iOS 18.0, *) { e.components.set(OpacityComponent(opacity: 0.22)) }
+        return e
+    }
 
     private func installRotate(_ h: Entity) {
         if let me = nodes.values.first(where: { $0.parent == h }) as? ModelEntity {

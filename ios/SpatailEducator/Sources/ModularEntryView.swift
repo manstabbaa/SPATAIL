@@ -113,8 +113,11 @@ struct ModularARView: UIViewRepresentable {
     func makeUIView(context: Context) -> ARView {
         let v = ARView(frame: .zero)
         let cfg = ARWorldTrackingConfiguration()
-        cfg.planeDetection = [.horizontal]
+        // horizontal + vertical so the RoomModelBuilder can classify floor/table/wall
+        cfg.planeDetection = [.horizontal, .vertical]
+        cfg.environmentTexturing = .automatic
         v.session.run(cfg)
+        v.session.delegate = context.coordinator         // feeds the RoomModel
         context.coordinator.runtime = ModularRuntime(view: v, onStatus: onStatus)
         return v
     }
@@ -130,10 +133,37 @@ struct ModularARView: UIViewRepresentable {
         }
     }
 
-    @MainActor final class Coordinator {
+    @MainActor final class Coordinator: NSObject, ARSessionDelegate {
         var runtime: ModularRuntime?
         var presentedId: String?
         var streamedPath: String?
+        private let roomBuilder = RoomModelBuilder()
+        private var lastRoomPush: TimeInterval = 0
+
+        // ARKit callbacks arrive off the main actor; hop to MainActor for state.
+        nonisolated func session(_ s: ARSession, didAdd anchors: [ARAnchor]) {
+            let planes = anchors.compactMap { $0 as? ARPlaneAnchor }
+            if planes.isEmpty { return }
+            Task { @MainActor in self.roomBuilder.update(planes: planes) }
+        }
+        nonisolated func session(_ s: ARSession, didUpdate anchors: [ARAnchor]) {
+            let planes = anchors.compactMap { $0 as? ARPlaneAnchor }
+            if planes.isEmpty { return }
+            Task { @MainActor in self.roomBuilder.update(planes: planes) }
+        }
+        nonisolated func session(_ s: ARSession, didUpdate frame: ARFrame) {
+            let cam = frame.camera.transform
+            let light = frame.lightEstimate
+            Task { @MainActor in
+                self.roomBuilder.update(cameraTransform: cam)
+                self.roomBuilder.update(light: light)
+                let now = CACurrentMediaTime()
+                if now - self.lastRoomPush > 1.0 {            // refresh RoomModel ~1 Hz
+                    self.lastRoomPush = now
+                    self.runtime?.roomModel = self.roomBuilder.build()
+                }
+            }
+        }
     }
 }
 

@@ -40,7 +40,7 @@ def _load_library():
 
 
 def _resolve_assets(plan, manifest, lib) -> list[dict]:
-    assets, seen = [], set()
+    assets, seen, seen_models = [], set(), set()
     reqs = manifest.assetRequests or []
     for req in reqs:
         if req.assetId in seen:
@@ -68,6 +68,15 @@ def _resolve_assets(plan, manifest, lib) -> list[dict]:
                        else "placeholder"),
             "animation": None,        # filled by the mass asset+animation gen stage
         }
+        # Drop assets that resolve to the SAME model as one already kept — the library
+        # returns the whole object for unknown "parts", which would otherwise render as
+        # N identical copies (e.g. "a v8 engine" -> 4 engine blocks). Real distinct
+        # models (different usdz/glb) and to-be-generated placeholders (no model) stay.
+        model_key = a["usdzUrl"] or a["glbUrl"]
+        if model_key and model_key in seen_models:
+            continue
+        if model_key:
+            seen_models.add(model_key)
         assets.append(a)
     return assets
 

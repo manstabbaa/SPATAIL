@@ -43,8 +43,11 @@ final class ModularRuntime: NSObject {
     private var firedOnce: Set<String> = []          // proximity/gaze edge-trigger guard
     private var gazeStart: [String: TimeInterval] = [:]
     /// Set by the AR host from the on-device RoomModel (placement solver input).
-    /// Available to the solver; current layout still uses StationLayout (see present).
     var roomModel: RoomModel?
+    /// World transform where the scene is placed. Taken LIVE on first present (so it
+    /// uses the current camera, not a stale scan pose) and reused across edits so the
+    /// scene stays put in the room instead of jumping each time it's regenerated.
+    private var placedTransform: simd_float4x4?
 
     struct Animator {
         weak var target: Entity?
@@ -60,13 +63,41 @@ final class ModularRuntime: NSObject {
     }
 
     // MARK: - present
-    /// Present onto a freshly detected horizontal plane (the original tabletop flow).
+    /// Present with LIVE, world-anchored placement: drop the scene where the user is
+    /// looking, on a real horizontal surface, world-locked so it stays put as the
+    /// camera moves. The room scan and the build finish at different moments, so the
+    /// pose is taken live at present time. Reused across edits so it doesn't jump.
     func present(_ e: ModularExperience) {
         clear()
         guard let view else { return }
-        let a = AnchorEntity(plane: .horizontal, minimumBounds: [0.15, 0.15])
+        let t = placedTransform ?? Self.placementTransform(in: view)
+        placedTransform = t
+        let a = AnchorEntity(world: t)
         view.scene.addAnchor(a)
-        present(e, on: a, centered: false)
+        present(e, on: a, centered: true)        // sit tightly AT the placed surface point
+    }
+
+    /// Raycast from screen-centre to a real horizontal surface and face the user.
+    /// Falls back to a point ~0.8 m ahead of (and below) the camera if nothing's hit
+    /// yet — still a fixed world transform, so it stays anchored.
+    private static func placementTransform(in view: ARView) -> simd_float4x4 {
+        let cam = view.cameraTransform
+        var origin: SIMD3<Float>
+        let pt = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
+        if let hit = view.raycast(from: pt, allowing: .estimatedPlane, alignment: .horizontal).first {
+            let c = hit.worldTransform.columns.3
+            origin = SIMD3(c.x, c.y, c.z)
+        } else {
+            let f = -SIMD3(cam.matrix.columns.2.x, 0, cam.matrix.columns.2.z)
+            let fwd = simd_length(f) > 1e-4 ? simd_normalize(f) : SIMD3(0, 0, -1)
+            origin = cam.translation + fwd * 0.8
+            origin.y = cam.translation.y - 0.6
+        }
+        let toCam = cam.translation - origin
+        let yaw = atan2(toCam.x, toCam.z)            // face the user
+        return Transform(scale: .one,
+                         rotation: simd_quatf(angle: yaw, axis: SIMD3(0, 1, 0)),
+                         translation: origin).matrix
     }
 
     /// Present OVERLAID on a caller-owned anchor (e.g. a world ARAnchor pinned to a

@@ -20,7 +20,7 @@ import catalog as mech  # noqa: E402
 
 _ROT = ("planet", "orbit", "solar", "moon", "gear", "wheel", "spin", "rotat", "turbine", "drum", "fan")
 _OSC = ("pendulum", "swing", "wave", "oscill", "vibrat", "metronome", "spring")
-_RECIP = ("piston", "engine", "pump", "plunger", "cylinder")
+_RECIP = ("piston", "plunger", "cylinder")   # whole "engine"/"pump" shouldn't reciprocate as one body
 
 
 def caps_for(assets: list[dict]) -> set:

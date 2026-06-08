@@ -445,6 +445,15 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     contract = _ex.build_modular_experience(
                         text, kind="text", summary=data.get("surroundingContext") or text, use_llm=use_llm)
+                # Route text through per-part Blender generation: build the primary object
+                # as named component parts (the author models + bakes their motion); the
+                # phone streams it in over the placeholder and the manifest binds the parts.
+                assets_ = contract.get("assets") or []
+                primary = next((a["id"] for a in assets_ if a.get("role") == "primary_object"),
+                               assets_[0]["id"] if assets_ else "hero")
+                subj = (contract.get("understanding") or {}).get("subject") or text
+                contract.setdefault("generation",
+                                    {"brief": subj, "subject": subj, "assetId": primary})
             # Real-model generation: if Gemini authored a mechanism brief, enqueue a
             # live-Blender build (reuses the proven object generator) and hand the phone
             # a job id to poll — it streams the animated USDZ in over the placeholder.
@@ -539,6 +548,10 @@ class Handler(BaseHTTPRequestHandler):
                     out["usdz_url"] = f"/artifacts/{job['usdz']}"
                     if job.get("metadata"):
                         out["metadata_url"] = f"/artifacts/{job['metadata']}"
+                    # component manifest (parts/roles/motion) if the build emitted one —
+                    # lets the runtime bind named parts (explode/tap a part, motion).
+                    if (ARTIFACTS / f"{job['id']}_manifest.json").exists():
+                        out["manifest_url"] = f"/artifacts/{job['id']}_manifest.json"
             return self._send(200, obj=out)
 
         if path.startswith("/artifacts/"):

@@ -1,13 +1,14 @@
-"""director.py — the agent that DESIGNS a SPATAIL experience by composing mechanics.
+"""composer.py — the SPATAIL sequencer (replaces the old mechanics catalog).
 
-Given understanding (domain/intent/subject/summary) + the available assets and their
-capabilities, it freely composes mechanics (studio/mechanics/catalog.py) into ordered
-beats. Two composers, same output shape:
-  - llm.compose (Gemini)        : an agent picks/params/sequences mechanics with freedom
-  - deterministic_compose       : always-on offline fallback (rules by intent/domain)
-Everything validates against the catalog, so whatever is chosen the runtime can run it.
+Motion is BAKED into each asset as named clips (the Blender->SPATAIL contract,
+asset_manifest.py). This module no longer composes procedural mechanics; it DESIGNS
+the experience as:
+  - sequence : ordered steps, each PLAYS a clip + shows narration/panels
+  - triggers : interaction layered on top (onTap/onApproach/onGaze -> play/advance/label)
+SPATAIL (the runtime game-manager) plays and sequences these clips.
 
-A beat = {id, title, narration, focus(assetId), mechanics:[{mechanic,target,params,trigger}]}.
+Two paths, same output shape: llm.compose (Gemini) for freedom, deterministic for
+the always-on offline guarantee.
 """
 from __future__ import annotations
 
@@ -15,210 +16,132 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "mechanics"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))     # studio/ for asset_manifest
-import catalog as mech  # noqa: E402
-import asset_manifest as am  # noqa: E402  (the Blender<->composer component contract)
-
-_ROT = ("planet", "orbit", "solar", "moon", "gear", "wheel", "spin", "rotat", "turbine", "drum", "fan")
-_OSC = ("pendulum", "swing", "wave", "oscill", "vibrat", "metronome", "spring")
-_RECIP = ("piston", "plunger", "cylinder")   # whole "engine"/"pump" shouldn't reciprocate as one body
+import asset_manifest as am  # noqa: E402
 
 
-def caps_for(assets: list[dict]) -> set:
-    """Capability tokens present across the assets/scene (gates which mechanics apply)."""
-    caps = {"none"}
-    if len(assets) >= 2:
-        caps.add("two_or_more")
+def _clip_names(asset: dict) -> list[str]:
+    return [c.get("name") for c in (asset.get("clips") or []) if c.get("name")]
+
+
+def _hero_clips(assets: list[dict]) -> list[dict]:
+    return (assets[0].get("clips") if assets else None) or am.default_clips(120)
+
+
+def deterministic_sequence(understanding: dict, assets: list[dict]) -> list[dict]:
+    """A solid, varied sequence from rules — the offline guarantee."""
+    subject = (understanding.get("subject") or "this").strip()
+    summary = understanding.get("summary", "") or f"Let's look at {subject}."
+    if not assets:
+        return [{"id": "intro", "title": subject.title(), "narration": summary,
+                 "focus": "scene", "clip": "demo", "loop": True,
+                 "panels": [{"kind": "title", "title": subject.title(), "body": summary}],
+                 "advance": "tap"}]
+    hero = assets[0]
+    clips = _hero_clips(assets)
+    primary = am.primary_clip(clips)
+    steps = [{
+        "id": "intro", "title": subject.title(), "narration": summary,
+        "focus": hero["id"], "clip": primary, "loop": True,
+        "panels": [{"kind": "title", "title": subject.title(), "body": summary}],
+        "advance": "tap",
+    }]
+    # a step per ADDITIONAL baked clip (play that segment)
+    for c in clips:
+        if c["name"] == primary:
+            continue
+        steps.append({
+            "id": f"clip_{c['name']}", "title": c["name"].replace("_", " ").title(),
+            "narration": f"{subject.title()} — {c['name'].replace('_', ' ')}.",
+            "focus": hero["id"], "clip": c["name"], "loop": bool(c.get("loop", True)),
+            "panels": [], "advance": "tap",
+        })
+    # a step per additional asset
+    for a in assets[1:]:
+        a_clip = (_clip_names(a) or [primary])[0]
+        steps.append({
+            "id": f"asset_{a['id']}", "title": a.get("name", a["id"]),
+            "narration": a.get("description") or f"Here's {a.get('name', a['id'])}.",
+            "focus": a["id"], "clip": a_clip, "loop": True, "panels": [], "advance": "tap",
+        })
+    steps.append({
+        "id": "recap", "title": "Recap", "narration": f"That's {subject}.",
+        "focus": hero["id"], "clip": primary, "loop": True,
+        "panels": [{"kind": "quiz", "title": "Check", "question": f"What did we explore?",
+                    "options": [subject.title(), "Something else"], "answer": 0}],
+        "advance": "tap",
+    })
+    return steps
+
+
+def _triggers(understanding: dict, assets: list[dict]) -> list[dict]:
+    if not assets:
+        return []
+    hero = assets[0]["id"]
+    out = [
+        {"when": {"event": "onTap", "target": "scene"}, "do": [{"action": "advance"}]},
+        {"when": {"event": "onApproach", "target": hero, "params": {"radius_m": 0.7}},
+         "do": [{"action": "playClip"}]},
+        {"when": {"event": "onGaze", "target": hero, "params": {"dwell_s": 1.0}},
+         "do": [{"action": "label", "target": hero}]},
+    ]
     for a in assets:
-        if a.get("supportsAnimation"):
-            caps.add("animation")
-        if a.get("supportsTransparency"):
-            caps.add("transparency")
-        if a.get("supportsHighlight"):
-            caps.add("named_parts")
-        if a.get("physics") or a.get("supportsPhysics"):
-            caps.add("physics")
-        if a.get("path"):
-            caps.add("path")
-    return caps
+        for p in (a.get("parts") or [])[:12]:
+            nm = p.get("name")
+            if nm:
+                out.append({"when": {"event": "onTap", "target": nm},
+                            "do": [{"action": "label", "target": nm}]})
+    return out
 
 
-def _m(mid: str, target: str = "scene", params: dict | None = None, trigger: str | None = None) -> dict:
-    return {"mechanic": mid, "target": target,
-            "params": mech.validate_params(mid, params or {}),
-            "trigger": trigger or mech.BY_ID[mid].default_trigger}
-
-
-def validate_beats(beats: list[dict], assets: list[dict], caps: set) -> list[dict]:
-    """Keep only catalog-valid, capability-satisfied mechanics with real targets."""
+def _validate_sequence(seq: list[dict], assets: list[dict]) -> list[dict]:
+    """Keep steps sane: real focus asset, a clip name that exists on the focus asset
+    (else its primary), bounded panels."""
     ids = {a["id"] for a in assets} | {"scene"}
-    # component part names are valid targets too (so a mechanic can drive one part)
-    ids |= {p["name"] for a in assets for p in (a.get("parts") or []) if p.get("name")}
     hero = assets[0]["id"] if assets else "scene"
+    by_id = {a["id"]: a for a in assets}
     clean = []
-    for i, b in enumerate(beats):
-        mlist = []
-        for mc in b.get("mechanics", []):
-            mid = mc.get("mechanic")
-            if mid not in mech.BY_ID or not mech.usable(mid, caps):
-                continue
-            tgt = mc.get("target", "scene")
-            tgt = tgt if tgt in ids else ("scene" if tgt == "scene" else hero)
-            trig = mc.get("trigger") or mech.BY_ID[mid].default_trigger
-            if trig not in mech.BY_ID[mid].triggers:
-                trig = mech.BY_ID[mid].default_trigger
-            mlist.append({"mechanic": mid, "target": tgt,
-                          "params": mech.validate_params(mid, mc.get("params")), "trigger": trig})
-        focus = b.get("focus")
+    for i, s in enumerate(seq or []):
+        focus = s.get("focus") if s.get("focus") in ids else hero
+        asset = by_id.get(focus)
+        names = _clip_names(asset) if asset else []
+        clip = s.get("clip")
+        if clip not in names:
+            clip = am.primary_clip(asset.get("clips")) if asset and asset.get("clips") else "demo"
         clean.append({
-            "id": b.get("id") or f"beat_{i}",
-            "title": b.get("title", "") or f"Step {i + 1}",
-            "narration": b.get("narration", ""),
-            "focus": focus if focus in ids else hero,
-            "mechanics": mlist,
+            "id": s.get("id") or f"step_{i}",
+            "title": str(s.get("title", "") or "")[:120],
+            "narration": str(s.get("narration", "") or "")[:400],
+            "focus": focus, "clip": clip, "loop": bool(s.get("loop", True)),
+            "panels": (s.get("panels") or [])[:4],
+            "advance": s.get("advance", "tap") if s.get("advance") in ("tap", "auto") else "tap",
         })
     return clean
 
 
-def _hero_motion(subject: str, caps: set, hero: str) -> dict | None:
-    s = (subject or "").lower()
-    if any(k in s for k in _OSC):
-        return _m("oscillate", hero)
-    if any(k in s for k in _RECIP):
-        return _m("reciprocate", hero)
-    if any(k in s for k in _ROT):
-        return _m("spin", hero, {"rpm": 8})
-    if "animation" in caps:
-        return _m("play_clip", hero)
-    return _m("spin", hero, {"rpm": 5})
-
-
-def deterministic_compose(understanding: dict, assets: list[dict], caps: set) -> list[dict]:
-    """A solid, varied experience from rules — the offline guarantee."""
-    if not assets:
-        return [{"id": "intro", "title": understanding.get("subject", "Experience"),
-                 "narration": understanding.get("summary", ""),
-                 "mechanics": [_m("caption", "scene", {"text": understanding.get("summary", "")})]}]
-    hero = assets[0]["id"]
-    subject = understanding.get("subject", "")
-    intent = (understanding.get("intent") or "explain").lower()
-    domain = (understanding.get("domain") or "").lower()
-    is_edu = domain in ("educational", "scientific", "biological", "mechanical", "architectural") or True
-    beats = []
-
-    # 1) intro — bring it in, name it, narrate
-    beats.append({"id": "intro", "title": subject.title() or "Overview",
-                  "narration": understanding.get("summary", f"Let's look at {subject}."),
-                  "focus": hero, "mechanics": [
-                      _m("fade_in", "scene", {"stagger_s": 0.12}),
-                      _m("caption", "scene", {"text": understanding.get("summary", "")}),
-                      _m("focus_camera", hero),
-                      _m("speak", "scene", {"text": understanding.get("summary", "")})]})
-
-    # 2) hero beat — isolate, animate, label
-    hero_beat = {"id": "hero", "title": subject.title() or "The main idea",
-                 "narration": f"This is {subject}.", "focus": hero, "mechanics": [
-                     _m("highlight", hero, {"pulse": True}),
-                     _m("label", hero, {"text": (assets[0].get("name") or subject)}),
-                     _m("tap_step")]}
-    hm = _hero_motion(subject, caps, hero)
-    if hm:
-        hero_beat["mechanics"].insert(0, hm)
-    if "named_parts" in caps and intent in ("assemble", "explore", "explain", "process"):
-        hero_beat["mechanics"].insert(1, _m("explode", hero, trigger="on_tap"))
-    beats.append(hero_beat)
-
-    # 3) comparison / parts beats per other asset
-    others = assets[1:]
-    if others and intent in ("compare", "comparison"):
-        beats.append({"id": "compare", "title": "Compared", "narration": "Side by side.",
-                      "focus": hero, "mechanics": [
-                          _m("scale_compare" if "two_or_more" in caps else "side_by_side", "scene"),
-                          *[_m("label", a["id"], {"text": a.get("name", a["id"])}) for a in assets]]})
-    else:
-        for a in others:
-            beats.append({"id": f"x_{a['id']}", "title": a.get("name", a["id"]),
-                          "narration": a.get("note", f"Here's {a.get('name', a['id'])}."),
-                          "focus": a["id"], "mechanics": [
-                              _m("focus_camera", a["id"]),
-                              _m("ghost_others", a["id"]) if "transparency" in caps else _m("highlight", a["id"]),
-                              _m("label", a["id"], {"text": a.get("name", a["id"])}),
-                              _m("tap_step")]})
-
-    # 4) recap — frame all, optional quiz
-    recap = {"id": "recap", "title": "Recap", "narration": f"That's {subject}.",
-             "focus": hero, "mechanics": [_m("frame_all"),
-             _m("caption", "scene", {"text": f"{subject.title()} — review."})]}
-    if is_edu:
-        recap["mechanics"].append(_m("quiz", "scene", {
-            "question": f"What did we just explore?", "options": [subject, "Something else"], "answer": 0}))
-    beats.append(recap)
-    return beats
-
-
-def _component_mechanics(hero_asset: dict) -> list[dict]:
-    """Per-component motion from the Blender->composer manifest contract: each moving
-    part -> its mechanic (piston->reciprocate, crank->spin) targeted BY PART NAME with
-    the role's axis. Empty when the asset has no parts manifest (whole-body fallback)."""
-    out = []
-    for p in am.moving_parts(hero_asset.get("parts")):
-        mo = p["motion"]
-        params = {"axis": mo.get("axis", "y")}
-        if "rpm" in mo:
-            params["rpm"] = mo["rpm"]
-        if "period_s" in mo:
-            params["period_s"] = mo["period_s"]
-        out.append(_m(mo["mechanic"], p["name"], params))
-    return out
-
-
-def _ensure_components(beats: list[dict], assets: list[dict]) -> list[dict]:
-    """If the hero asset has moving COMPONENTS, drive them per-part (and drop any
-    whole-hero motion). Runs after either composer so the app's LLM path gets
-    component-accurate motion too."""
-    if not assets:
-        return beats
-    hero = assets[0]
-    comp = _component_mechanics(hero)
-    if not comp:
-        return beats
-    part_names = {p.get("name") for p in (hero.get("parts") or [])}
-    if any(mc.get("target") in part_names for b in beats for mc in b.get("mechanics", [])):
-        return beats                                    # already component-driven
-    target_beat = next((b for b in beats if b.get("focus") == hero["id"]),
-                       beats[0] if beats else None)
-    if target_beat is None:
-        return beats
-    motion = {"spin", "oscillate", "reciprocate", "bob", "wave", "grow_shrink",
-              "play_clip", "pulse"}
-    kept = [mc for mc in target_beat.get("mechanics", [])
-            if not (mc.get("mechanic") in motion and mc.get("target") == hero["id"])]
-    target_beat["mechanics"] = comp + kept              # components first, no whole-body motion
-    return beats
-
-
 def compose(understanding: dict, assets: list[dict], *, use_llm: bool = True) -> dict:
-    """Design the experience. Tries the LLM agent, validates, falls back to rules."""
-    caps = caps_for(assets)
+    """Design the experience as a clip SEQUENCE + triggers. Tries Gemini, falls back
+    to the deterministic sequencer."""
     composer = "deterministic"
-    beats = None
+    sequence = None
     if use_llm:
         try:
             import llm
-            raw = llm.compose(understanding, assets, caps)
-            beats = validate_beats(raw, assets, caps)
-            if beats and any(b["mechanics"] for b in beats):
+            raw = llm.compose(understanding, assets, _hero_clips(assets))
+            sequence = _validate_sequence(raw, assets)
+            if sequence and any(s.get("clip") for s in sequence):
                 composer = "gemini"
             else:
-                beats = None
+                sequence = None
         except Exception as e:  # noqa: BLE001
-            print(f"[director] LLM composer unavailable, using rules: {e!r}"[:200])
-            beats = None
-    if not beats:
-        beats = validate_beats(deterministic_compose(understanding, assets, caps), assets, caps)
-    # component-accurate motion from the asset manifest contract (both paths)
-    beats = _ensure_components(beats, assets)
-    mechanics_used = sorted({mc["mechanic"] for b in beats for mc in b["mechanics"]})
-    return {"composer": composer, "beats": beats, "mechanicsUsed": mechanics_used,
-            "capabilities": sorted(caps)}
+            print(f"[director] LLM sequencer unavailable, using rules: {e!r}"[:200])
+            sequence = None
+    if not sequence:
+        sequence = _validate_sequence(deterministic_sequence(understanding, assets), assets)
+    triggers = _triggers(understanding, assets)
+    objectives = [{"id": "understand", "goal": understanding.get("subject", ""),
+                   "summary": understanding.get("summary", "")}]
+    clips = _hero_clips(assets)
+    return {"composer": composer, "sequence": sequence, "triggers": triggers,
+            "clips": clips, "objectives": objectives,
+            "clipsUsed": sorted({s["clip"] for s in sequence if s.get("clip")})}

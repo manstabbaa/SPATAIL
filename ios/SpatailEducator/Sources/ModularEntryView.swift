@@ -30,7 +30,7 @@ struct ModularEntryView: View {
                     .padding(8).background(.ultraThinMaterial, in: Capsule())
 
                 if let e = experience {
-                    Text("\(e.title) · \(e.composer) · \(e.mechanicsUsed.count) mechanics — tap to step")
+                    Text("\(e.title) · \(e.composer) · \(e.sequence.count) steps — tap to step")
                         .font(.caption2).foregroundStyle(.white.opacity(0.8))
                 }
 

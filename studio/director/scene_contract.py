@@ -65,28 +65,21 @@ def _content_for(modular: dict) -> list:
 
 
 def _logic_for(modular: dict) -> dict:
-    """Game-manager program: guided track + trigger graph + objectives. Derived by
-    director/logic.py from the composed beats/mechanics (the interactive layer)."""
+    """Game-manager program: the clip SEQUENCE + interaction triggers + objectives,
+    produced by the composer (sequencer). SPATAIL plays/sequences the clips."""
     u = modular.get("understanding", {}) or {}
-    beats = modular.get("beats", []) or []
-    assets = modular.get("assets", []) or []
-    try:
-        import sys
-        from pathlib import Path
-        _d = str(Path(__file__).resolve().parent)
-        if _d not in sys.path:
-            sys.path.insert(0, _d)
-        import logic
-        return logic.build_logic(u, beats, assets)
-    except Exception:  # noqa: BLE001 — never fail contract assembly over the logic layer
-        return {"guidedTrack": beats, "triggers": [],
-                "objectives": [{"id": "understand", "goal": u.get("subject", ""),
-                                "summary": u.get("summary", "")}],
-                "worldState": {}}
+    return {
+        "sequence": modular.get("sequence", []),
+        "triggers": modular.get("triggers", []),
+        "objectives": modular.get("objectives",
+                                  [{"id": "understand", "goal": u.get("subject", ""),
+                                    "summary": u.get("summary", "")}]),
+        "worldState": {"stepIndex": 0},
+    }
 
 
 def to_scene_contract(modular: dict, *, brand: dict | None = None) -> dict:
-    """Project a v0.5 modular experience into a v0.6 Scene Contract. Pure + additive."""
+    """Project the modular experience into a v0.6 Scene Contract. Pure + additive."""
     return {
         "schemaVersion": SCHEMA,
         "experienceId": modular.get("experienceId"),
@@ -100,8 +93,6 @@ def to_scene_contract(modular: dict, *, brand: dict | None = None) -> dict:
         "brand": brand or {"status": "pending",
                            "note": "SPATAIL brand system supplied separately"},
         "logic": _logic_for(modular),
-        "mechanicsManifest": modular.get("mechanicsManifest", "/mechanics/mechanics.json"),
-        "capabilities": modular.get("capabilities", []),
         "progressive": modular.get("progressive", {}),
         # carry the Blender-build hook through unchanged
         "generation": modular.get("generation"),

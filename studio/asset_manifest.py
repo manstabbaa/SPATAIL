@@ -1,24 +1,24 @@
-"""asset_manifest.py — the CONTRACT between Blender (asset producer) and the
-composer (experience designer). Both import this, so they agree on an asset's
-COMPONENTS, their PLACEMENT, and the MOTION each implies.
+"""asset_manifest.py — the CONTRACT between Blender (asset producer) and SPATAIL
+(the game manager / player).
 
-Blender builds named parts and emits an AssetManifest ({assetId}_manifest.json):
-each part carries its name, a semantic ROLE (inferred from the name), and its
-PLACEMENT (pivot, size, bbox) in the asset's rendered Y-up frame. The composer
-reads the manifest and maps each component to the right mechanic — piston ->
-reciprocate along its axis, crankshaft -> spin about its axis — targeting the part
-by name; the runtime then animates that named sub-entity.
+Blender BAKES the asset's motion as named CLIPS — frame-range segments on the
+asset's single exported timeline — and lists them here, alongside the named PARTS
+(for labels / tap-a-part). SPATAIL does NOT compute motion: it PLAYS and SEQUENCES
+these clips, with interaction layered on top.
 
-One schema, one role vocabulary, one role->motion map. Pure stdlib so it imports
-anywhere (inside Blender, the server, the composer).
+This replaces the old procedural "mechanics catalog": all movement lives in the
+asset as baked animation; the runtime is a clip player + sequencer + trigger graph.
+
+Pure stdlib so it imports anywhere (inside Blender, the server, the composer).
 """
 from __future__ import annotations
 
 import re
 
-SCHEMA = "spatail-asset-manifest/1"
+SCHEMA = "spatail-asset-manifest/2"
 
-# Semantic component roles, inferred from a part's name (longest/most-specific wins).
+# Part name -> semantic role. Used for LABELS and TAP-A-PART targeting only; motion
+# is now baked into clips, not derived from the role.
 ROLE_KEYWORDS = {
     "crank":    ["crankshaft", "crank"],
     "camshaft": ["camshaft"],
@@ -29,77 +29,77 @@ ROLE_KEYWORDS = {
     "wheel":    ["wheel", "tire", "tyre"],
     "fan":      ["fan", "blade", "propeller", "prop", "rotor", "impeller", "turbine"],
     "shaft":    ["driveshaft", "axle", "spindle", "shaft"],
-    "pendulum": ["pendulum", "bob"],
-    "spring":   ["spring", "coil"],
     "belt":     ["belt", "chain", "timing"],
-    "rotor_disc": ["disc", "disk", "flywheel"],
     "body":     ["body", "block", "case", "casing", "housing", "frame", "base",
                  "engine", "mount", "cover", "manifold"],
 }
 
-# Role -> the motion mechanic + axis it should get. Axes are in the asset's RENDERED
-# Y-up frame (USDZ export turns Blender +Z-up into +Y-up), so "up" == y.
-ROLE_MOTION: dict[str, dict] = {
-    "piston":   {"mechanic": "reciprocate", "axis": "y", "period_s": 0.5},
-    "valve":    {"mechanic": "reciprocate", "axis": "y", "period_s": 0.5},
-    "rod":      {"mechanic": "reciprocate", "axis": "y", "period_s": 0.5},
-    "spring":   {"mechanic": "reciprocate", "axis": "y", "period_s": 1.0},
-    "crank":    {"mechanic": "spin", "axis": "x", "rpm": 40},
-    "camshaft": {"mechanic": "spin", "axis": "x", "rpm": 20},
-    "shaft":    {"mechanic": "spin", "axis": "x", "rpm": 30},
-    "gear":     {"mechanic": "spin", "axis": "z", "rpm": 25},
-    "wheel":    {"mechanic": "spin", "axis": "x", "rpm": 20},
-    "fan":      {"mechanic": "spin", "axis": "z", "rpm": 80},
-    "rotor_disc": {"mechanic": "spin", "axis": "y", "rpm": 30},
-    "belt":     {"mechanic": "flow", "axis": "y"},
-    "pendulum": {"mechanic": "oscillate", "axis": "x"},
-    # body/block/housing and unknown "part" -> no intrinsic motion (the static frame)
-}
-
 
 def infer_role(name: str) -> str:
-    """Map a part name to a semantic role. Strips trailing instance suffixes
-    (piston_1, gear.003) before matching."""
-    n = re.sub(r"[._]\d+$", "", (name or "").strip().lower())
-    n = n.replace("-", "_")
+    n = re.sub(r"[._]\d+$", "", (name or "").strip().lower()).replace("-", "_")
     for role, kws in ROLE_KEYWORDS.items():
         if any(k in n for k in kws):
             return role
     return "part"
 
 
-def motion_for(role: str) -> dict | None:
-    return ROLE_MOTION.get(role)
-
-
 def enrich_parts(raw_parts: list[dict]) -> list[dict]:
-    """Attach role + motion to Blender's per-part geometry facts (name/pivot/size).
-    This is the contract instance the composer consumes."""
+    """Attach a semantic role to Blender's per-part geometry facts (name/pivot/size).
+    For labels and tap-a-part; no motion (that lives in clips)."""
     out = []
     for p in raw_parts or []:
-        role = infer_role(p.get("name", ""))
         out.append({
             "name": p.get("name"),
-            "role": role,
+            "role": infer_role(p.get("name", "")),
             "pivot_m": p.get("pivot_m", [0.0, 0.0, 0.0]),
             "size_m": p.get("size_m"),
-            "motion": motion_for(role),          # {mechanic, axis, ...} or None
         })
     return out
 
 
-def moving_parts(parts: list[dict] | None) -> list[dict]:
-    """Parts that imply intrinsic motion (the composer animates these per-component)."""
-    return [p for p in (parts or []) if p.get("motion")]
+# ── clips: the new vocabulary (named baked segments of the asset's timeline) ─────
+
+def default_clips(frame_end: int, fps: int = 30) -> list[dict]:
+    """When the author didn't declare segments, the whole baked timeline is one
+    looping clip named 'demo'."""
+    return [{"name": "demo", "role": "demo", "start": 1, "end": int(max(frame_end, 1)),
+             "fps": int(fps), "loop": True}]
+
+
+def normalize_clips(raw, frame_end: int, fps: int = 30) -> list[dict]:
+    """Validate the clips the author baked (reported via result['clips']); fall back
+    to a single 'demo' clip spanning the whole timeline."""
+    out = []
+    for c in raw or []:
+        try:
+            name = str(c.get("name") or "clip").strip() or "clip"
+            s = int(c.get("start", 1))
+            e = int(c.get("end", frame_end))
+            if e <= s:
+                continue
+            out.append({"name": name, "role": str(c.get("role") or name),
+                        "start": s, "end": e, "fps": int(c.get("fps", fps)),
+                        "loop": bool(c.get("loop", True))})
+        except Exception:
+            continue
+    return out or default_clips(frame_end, fps)
+
+
+def primary_clip(clips: list[dict]) -> str:
+    """The clip the runtime plays by default (idle/demo/running)."""
+    if not clips:
+        return "demo"
+    for pref in ("running", "demo", "idle"):
+        for c in clips:
+            if c.get("name") == pref:
+                return pref
+    return clips[0]["name"]
 
 
 if __name__ == "__main__":
     import json
-    demo = [{"name": "engine_block", "pivot_m": [0, 0.1, 0], "size_m": [0.4, 0.3, 0.4]},
-            {"name": "piston_1", "pivot_m": [-0.1, 0.2, 0], "size_m": [0.05, 0.1, 0.05]},
-            {"name": "piston_2", "pivot_m": [0.1, 0.2, 0], "size_m": [0.05, 0.1, 0.05]},
-            {"name": "crankshaft", "pivot_m": [0, 0.05, 0], "size_m": [0.3, 0.05, 0.05]},
-            {"name": "fan_blade", "pivot_m": [0, 0.1, 0.2], "size_m": [0.2, 0.2, 0.02]}]
-    enriched = enrich_parts(demo)
-    print(json.dumps(enriched, indent=2))
-    print("moving:", [(p["name"], p["motion"]["mechanic"]) for p in moving_parts(enriched)])
+    print(json.dumps(normalize_clips(
+        [{"name": "running", "start": 1, "end": 120},
+         {"name": "explode", "start": 121, "end": 180, "loop": False}], 180), indent=2))
+    print("parts:", json.dumps(enrich_parts(
+        [{"name": "piston_1"}, {"name": "engine_block"}]), indent=2))

@@ -233,16 +233,20 @@ def generate(prompt: str, job_id: str, out_dir, on_stage=lambda s: None,
     # and placement (Phase 2) consume. Foundation for "Blender motion, not procedural".
     manifest_name = None
     if manifest:
+        # clips = the named baked segments the author reported (result['clips']),
+        # else the whole timeline as one looping 'demo' clip. SPATAIL plays these.
+        clips = asset_manifest.normalize_clips(
+            (authored.get("blender_result") or {}).get("clips"), FRAMES, FPS)
         man = {
             "schema": asset_manifest.SCHEMA,
             "assetId": job_id,
             "usdz": f"{job_id}.usdz",
             "bbox_yup_m": res["bbox_yup"],
             "max_dim_m": res["max_dim"],
-            # parts carry role + motion (the contract the composer maps to mechanics)
+            # parts (for labels / tap-a-part) + the baked CLIPS SPATAIL plays/sequences
             "parts": asset_manifest.enrich_parts(manifest.get("parts", [])),
+            "clips": clips,
             "sockets": manifest.get("sockets", []),
-            "clips": manifest.get("clips", []),
             "materials": manifest.get("materials", []),
             "style": (style or {}).get("style"),
         }

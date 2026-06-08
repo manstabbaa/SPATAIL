@@ -158,8 +158,13 @@ so never post-process fcurves.)
 6. Keep it TABLETOP-sized: whole scene within ~0.9 m in its largest dimension, \
 built around the origin and resting on the ground (nothing below z=0 at rest). Do \
 NOT change scene frame_start/frame_end/fps.
-7. End by assigning a short summary dict to a variable named `result`, e.g.
-       result = {"objects": [o.name for o in bpy.data.objects], "summary": "..."}
+7. End by assigning a summary dict to a variable named `result`, INCLUDING the baked \
+animation CLIPS (named frame-range segments) so SPATAIL can play/sequence them:
+       result = {"objects": [o.name for o in bpy.data.objects], "summary": "...",
+                 "clips": [{"name": "running", "start": 1, "end": %(FRAMES)d, "loop": True}]}
+   Bake the motion the subject REQUIRES (the named parts from rule 4 are what move). You \
+MAY split the timeline into several named segments (e.g. 1-60 "running", 61-90 "explode") \
+and list each in clips; otherwise report one looping clip spanning 1..%(FRAMES)d.
 8. STYLE — aim for a soft, matte "clay" look in a gentle pastel palette (e.g. soft \
 blush, muted blue, sage green, warm sand, clay terracotta, dusty lilac, cream, slate) \
 where it does not hurt recognizability (a banana stays yellow, the sky stays blue). \

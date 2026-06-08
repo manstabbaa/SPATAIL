@@ -24,7 +24,7 @@ for p in (_STUDIO, _STUDIO / "server", _STUDIO / "mechanics", _STUDIO / "directo
 import composer  # noqa: E402
 from representation.engine import RepresentationEngine  # noqa: E402
 
-SCHEMA = "0.5.0-spatail-modular"
+SCHEMA = "0.6.0-spatail-modular"
 _ROLE = {"hero": "primary_object", "primary": "primary_object", "part": "part",
          "comparison_item": "comparison_object", "comparison": "comparison_object",
          "environment": "environment", "label_target": "label"}
@@ -39,18 +39,18 @@ def _load_library():
         return None
 
 
-def _load_manifest_parts(asset_id: str) -> list:
-    """Read {asset_id}_manifest.json (the Blender->composer contract) from the gen
-    artifacts dir if a build produced one; returns its enriched parts or []."""
+def _load_manifest(asset_id: str) -> dict:
+    """Read {asset_id}_manifest.json (the Blender->SPATAIL contract: parts + clips)
+    from the gen artifacts dir if a build produced one."""
     try:
         import json
         root = Path(__file__).resolve().parents[2]          # SPATAIL_MAX
         mf = root / "studio" / "out" / "gen" / f"{asset_id}_manifest.json"
         if mf.exists():
-            return (json.loads(mf.read_text(encoding="utf-8")) or {}).get("parts") or []
+            return json.loads(mf.read_text(encoding="utf-8")) or {}
     except Exception:
         pass
-    return []
+    return {}
 
 
 def _resolve_assets(plan, manifest, lib) -> list[dict]:
@@ -82,11 +82,14 @@ def _resolve_assets(plan, manifest, lib) -> list[dict]:
                        else "placeholder"),
             "animation": None,        # filled by the mass asset+animation gen stage
         }
-        # attach the Blender->composer component contract (manifest parts) if a build
-        # produced one for this asset, so the composer can drive each component.
-        mparts = _load_manifest_parts(a["id"])
-        if mparts:
-            a["parts"] = mparts
+        # attach the Blender->SPATAIL contract (manifest parts + baked clips) if a
+        # build produced one, so the sequencer can play the asset's clips and the
+        # runtime can label / tap its parts.
+        man = _load_manifest(a["id"])
+        if man.get("parts"):
+            a["parts"] = man["parts"]
+        if man.get("clips"):
+            a["clips"] = man["clips"]
         # Drop assets that resolve to the SAME model as one already kept — the library
         # returns the whole object for unknown "parts", which would otherwise render as
         # N identical copies (e.g. "a v8 engine" -> 4 engine blocks). Real distinct
@@ -125,11 +128,14 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
         "stage": {"anchor": plan.placement.anchor, "layout": plan.placement.layout,
                   "facing": plan.placement.facing, "scaleMode": plan.placement.scale_mode},
         "assets": assets,
-        "mechanicsManifest": "/mechanics/mechanics.json",
         "composer": design["composer"],
-        "mechanicsUsed": design["mechanicsUsed"],
-        "capabilities": design["capabilities"],
-        "beats": design["beats"],
+        # the experience = a SEQUENCE of steps that play baked clips, + triggers
+        # (interaction). Motion lives in the asset's clips; SPATAIL plays/sequences.
+        "sequence": design["sequence"],
+        "triggers": design["triggers"],
+        "clips": design["clips"],
+        "clipsUsed": design["clipsUsed"],
+        "objectives": design["objectives"],
         "progressive": {"firstInteractiveMsBudget": 800, "phase0Assets": phase0,
                         "needsGeneration": [a["id"] for a in assets if a["status"] == "placeholder"]},
     }

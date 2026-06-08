@@ -61,7 +61,7 @@ final class ProjectSession: ObservableObject {
                     meta = m; title = m.title; store.saveMeta(m)
                 }
                 conversation.append(ConversationTurn(role: "assistant",
-                    text: "Updated — \(result.experience.title) · \(result.experience.mechanicsUsed.count) mechanics"))
+                    text: "Updated — \(result.experience.title) · \(result.experience.sequence.count) steps"))
                 store.saveConversation(conversation, for: pid)
                 busy = false; status = "ready — tap to step, or keep prompting"
                 if let jid = result.experience.generationJobId, !jid.isEmpty {

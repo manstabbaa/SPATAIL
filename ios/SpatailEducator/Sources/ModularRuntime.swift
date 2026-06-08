@@ -187,7 +187,7 @@ final class ModularRuntime: NSObject {
     // MARK: - mechanic dispatch
     private func applyMechanic(_ mc: ModularExperience.MechanicUse) {
         let p = mc.params
-        let tgt = holders[mc.target]
+        let tgt = resolveTarget(mc.target)
         switch mc.mechanic {
         // continuous motion -> animators
         case "spin", "oscillate", "bob", "pulse", "grow_shrink", "reciprocate", "wave":
@@ -487,6 +487,17 @@ final class ModularRuntime: NSObject {
         while let c = cur {
             if let hit = holders.first(where: { $0.value === c })?.key { return hit }
             cur = c.parent
+        }
+        return nil
+    }
+
+    /// Resolve a mechanic target to an entity: a whole-asset holder, or a named
+    /// sub-PART inside a loaded model (so component mechanics — piston, crank — animate
+    /// that specific part). USDZ export preserves the Blender object names.
+    private func resolveTarget(_ id: String) -> Entity? {
+        if let h = holders[id] { return h }
+        for (_, n) in nodes {
+            if let e = n.findEntity(named: id) { return e }
         }
         return nil
     }

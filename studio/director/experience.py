@@ -39,6 +39,20 @@ def _load_library():
         return None
 
 
+def _load_manifest_parts(asset_id: str) -> list:
+    """Read {asset_id}_manifest.json (the Blender->composer contract) from the gen
+    artifacts dir if a build produced one; returns its enriched parts or []."""
+    try:
+        import json
+        root = Path(__file__).resolve().parents[2]          # SPATAIL_MAX
+        mf = root / "studio" / "out" / "gen" / f"{asset_id}_manifest.json"
+        if mf.exists():
+            return (json.loads(mf.read_text(encoding="utf-8")) or {}).get("parts") or []
+    except Exception:
+        pass
+    return []
+
+
 def _resolve_assets(plan, manifest, lib) -> list[dict]:
     assets, seen, seen_models = [], set(), set()
     reqs = manifest.assetRequests or []
@@ -68,6 +82,11 @@ def _resolve_assets(plan, manifest, lib) -> list[dict]:
                        else "placeholder"),
             "animation": None,        # filled by the mass asset+animation gen stage
         }
+        # attach the Blender->composer component contract (manifest parts) if a build
+        # produced one for this asset, so the composer can drive each component.
+        mparts = _load_manifest_parts(a["id"])
+        if mparts:
+            a["parts"] = mparts
         # Drop assets that resolve to the SAME model as one already kept — the library
         # returns the whole object for unknown "parts", which would otherwise render as
         # N identical copies (e.g. "a v8 engine" -> 4 engine blocks). Real distinct

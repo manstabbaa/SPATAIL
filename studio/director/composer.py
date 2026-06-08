@@ -16,7 +16,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "mechanics"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))     # studio/ for asset_manifest
 import catalog as mech  # noqa: E402
+import asset_manifest as am  # noqa: E402  (the Blender<->composer component contract)
 
 _ROT = ("planet", "orbit", "solar", "moon", "gear", "wheel", "spin", "rotat", "turbine", "drum", "fan")
 _OSC = ("pendulum", "swing", "wave", "oscill", "vibrat", "metronome", "spring")
@@ -51,6 +53,8 @@ def _m(mid: str, target: str = "scene", params: dict | None = None, trigger: str
 def validate_beats(beats: list[dict], assets: list[dict], caps: set) -> list[dict]:
     """Keep only catalog-valid, capability-satisfied mechanics with real targets."""
     ids = {a["id"] for a in assets} | {"scene"}
+    # component part names are valid targets too (so a mechanic can drive one part)
+    ids |= {p["name"] for a in assets for p in (a.get("parts") or []) if p.get("name")}
     hero = assets[0]["id"] if assets else "scene"
     clean = []
     for i, b in enumerate(beats):
@@ -153,6 +157,47 @@ def deterministic_compose(understanding: dict, assets: list[dict], caps: set) ->
     return beats
 
 
+def _component_mechanics(hero_asset: dict) -> list[dict]:
+    """Per-component motion from the Blender->composer manifest contract: each moving
+    part -> its mechanic (piston->reciprocate, crank->spin) targeted BY PART NAME with
+    the role's axis. Empty when the asset has no parts manifest (whole-body fallback)."""
+    out = []
+    for p in am.moving_parts(hero_asset.get("parts")):
+        mo = p["motion"]
+        params = {"axis": mo.get("axis", "y")}
+        if "rpm" in mo:
+            params["rpm"] = mo["rpm"]
+        if "period_s" in mo:
+            params["period_s"] = mo["period_s"]
+        out.append(_m(mo["mechanic"], p["name"], params))
+    return out
+
+
+def _ensure_components(beats: list[dict], assets: list[dict]) -> list[dict]:
+    """If the hero asset has moving COMPONENTS, drive them per-part (and drop any
+    whole-hero motion). Runs after either composer so the app's LLM path gets
+    component-accurate motion too."""
+    if not assets:
+        return beats
+    hero = assets[0]
+    comp = _component_mechanics(hero)
+    if not comp:
+        return beats
+    part_names = {p.get("name") for p in (hero.get("parts") or [])}
+    if any(mc.get("target") in part_names for b in beats for mc in b.get("mechanics", [])):
+        return beats                                    # already component-driven
+    target_beat = next((b for b in beats if b.get("focus") == hero["id"]),
+                       beats[0] if beats else None)
+    if target_beat is None:
+        return beats
+    motion = {"spin", "oscillate", "reciprocate", "bob", "wave", "grow_shrink",
+              "play_clip", "pulse"}
+    kept = [mc for mc in target_beat.get("mechanics", [])
+            if not (mc.get("mechanic") in motion and mc.get("target") == hero["id"])]
+    target_beat["mechanics"] = comp + kept              # components first, no whole-body motion
+    return beats
+
+
 def compose(understanding: dict, assets: list[dict], *, use_llm: bool = True) -> dict:
     """Design the experience. Tries the LLM agent, validates, falls back to rules."""
     caps = caps_for(assets)
@@ -172,6 +217,8 @@ def compose(understanding: dict, assets: list[dict], *, use_llm: bool = True) ->
             beats = None
     if not beats:
         beats = validate_beats(deterministic_compose(understanding, assets, caps), assets, caps)
+    # component-accurate motion from the asset manifest contract (both paths)
+    beats = _ensure_components(beats, assets)
     mechanics_used = sorted({mc["mechanic"] for b in beats for mc in b["mechanics"]})
     return {"composer": composer, "beats": beats, "mechanicsUsed": mechanics_used,
             "capabilities": sorted(caps)}

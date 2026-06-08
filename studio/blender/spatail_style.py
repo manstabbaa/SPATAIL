@@ -137,7 +137,15 @@ seen = set()
 if root:
     for o in root.children_recursive:
         if o.type == 'MESH':
-            parts.append(o.name)
+            loc = o.matrix_world.translation
+            dim = o.dimensions
+            # geometry facts per part, in the asset's RENDERED Y-up frame
+            # (USDZ export turns Blender +Z-up into +Y-up: [x, z, -y]).
+            parts.append({
+                "name": o.name,
+                "pivot_m": [round(loc.x, 4), round(loc.z, 4), round(-loc.y, 4)],
+                "size_m": [round(dim.x, 4), round(dim.z, 4), round(dim.y, 4)],
+            })
             for slot in o.material_slots:
                 m = slot.material
                 if m and m.name not in seen:

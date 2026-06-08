@@ -27,9 +27,11 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "blender"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))   # studio/ for asset_manifest
 import blender_bridge as bridge  # noqa: E402
 import llm_author  # noqa: E402
 import spatail_style  # noqa: E402  (deterministic Tarka clay pass + manifest introspection)
+import asset_manifest  # noqa: E402  (Blender<->composer component contract)
 
 FPS = 30
 FRAMES = 120                 # 4.0 s seamless loop (matches studio CYCLE)
@@ -232,12 +234,13 @@ def generate(prompt: str, job_id: str, out_dir, on_stage=lambda s: None,
     manifest_name = None
     if manifest:
         man = {
-            "schema": "spatail-asset-manifest/1",
+            "schema": asset_manifest.SCHEMA,
             "assetId": job_id,
             "usdz": f"{job_id}.usdz",
             "bbox_yup_m": res["bbox_yup"],
             "max_dim_m": res["max_dim"],
-            "parts": manifest.get("parts", []),
+            # parts carry role + motion (the contract the composer maps to mechanics)
+            "parts": asset_manifest.enrich_parts(manifest.get("parts", [])),
             "sockets": manifest.get("sockets", []),
             "clips": manifest.get("clips", []),
             "materials": manifest.get("materials", []),

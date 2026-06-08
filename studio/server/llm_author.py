@@ -143,7 +143,10 @@ HARD RULES — the script MUST:
 (sphere, cube, cylinder, cone, torus...), with correct proportions and sensible \
 colours: one Principled BSDF material per part — set inputs "Base Color", \
 "Roughness", "Metallic", and also set mat.diffuse_color to the same rgba. Compose \
-multiple parts when it reads better (a tree = trunk + foliage; an apple = body + stem + leaf).
+multiple parts when it reads better (a tree = trunk + foliage; an apple = body + stem + leaf). \
+NAME each mesh object semantically for the real component it is (e.g. piston_1, \
+crankshaft, camshaft, gear_a, fan_blade, valve_intake, wheel_fl) — the system reads \
+these names to animate each component individually (pistons reciprocate, the crank spins).
 5. ANIMATE the described action as a SEAMLESS LOOP over frames 1..%(FRAMES)d at \
 %(FPS)d fps — the last-frame pose must flow into frame 1 with no visible jump. Bake \
 with obj.keyframe_insert(...). Set interpolation at INSERT time:

@@ -32,6 +32,10 @@ final class ModularRuntime: NSObject {
     private let synth = AVSpeechSynthesizer()
     private let onStatus: (String) -> Void
 
+    /// Live RoomModel pushed from ARKit (~1 Hz) by ModularEntryView's coordinator.
+    /// Input for PlacementSolver; held here for placement once wired.
+    var roomModel: RoomModel?
+
     init(view: ARView, onStatus: @escaping (String) -> Void = { _ in }) {
         self.view = view; self.onStatus = onStatus; super.init()
     }
@@ -252,8 +256,11 @@ final class ModularRuntime: NSObject {
         guard !baseStr.isEmpty, let base = URL(string: baseStr),
               let url = URL(string: urlString, relativeTo: base) else { return }
         do {
+            print("SPATAIL: loadModel \(assetId) ← \(url.absoluteString)")
             let (tmp, resp) = try await URLSession.shared.download(from: url)
-            if let http = resp as? HTTPURLResponse, !(200..<300).contains(http.statusCode) { return }
+            if let http = resp as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+                print("SPATAIL: loadModel \(assetId) HTTP \(http.statusCode) — keeping box"); return
+            }
             let dst = FileManager.default.temporaryDirectory.appendingPathComponent("mod_\(assetId).usdz")
             try? FileManager.default.removeItem(at: dst); try FileManager.default.moveItem(at: tmp, to: dst)
             let entity: Entity
@@ -262,8 +269,11 @@ final class ModularRuntime: NSObject {
             fit(entity, to: max(min(footprintW, 0.3), 0.05))
             nodes[assetId]?.isEnabled = false
             holder.addChild(entity); nodes[assetId] = entity
-            for anim in entity.availableAnimations { entity.playAnimation(anim.repeat(), transitionDuration: 0.2) }
-        } catch { /* keep the box */ }
+            let clips = entity.availableAnimations
+            print("SPATAIL: loadModel \(assetId) — \(clips.count) animation clip(s)")
+            if clips.isEmpty { print("SPATAIL: WARNING no animations on \(assetId); model is static.") }
+            for anim in clips { entity.playAnimation(anim.repeat(), transitionDuration: 0.2) }
+        } catch { print("SPATAIL: loadModel \(assetId) FAILED: \(error) — keeping box") }
     }
 
     /// Stream a Blender-generated USDZ into an asset's holder and play its baked clips.
@@ -280,9 +290,15 @@ final class ModularRuntime: NSObject {
                     let placeholder = (self.exp?.assets.first(where: { $0.id == id })?.usdzUrl.isEmpty) ?? true
                     if placeholder { h.isEnabled = false }
                 }
-                for anim in entity.availableAnimations { entity.playAnimation(anim.repeat(), transitionDuration: 0.3) }
+                let clips = entity.availableAnimations
+                print("SPATAIL: streamLocalModel \(assetId) ← \(fileURL.lastPathComponent) — \(clips.count) animation clip(s)")
+                if clips.isEmpty { print("SPATAIL: WARNING no animations on \(assetId); model is static.") }
+                for anim in clips { entity.playAnimation(anim.repeat(), transitionDuration: 0.3) }
                 self.onStatus("real model ready")
-            } catch { self.onStatus("model load failed") }
+            } catch {
+                print("SPATAIL: streamLocalModel \(assetId) FAILED: \(error)")
+                self.onStatus("model load failed")
+            }
         }
     }
 

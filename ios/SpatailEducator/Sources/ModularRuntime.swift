@@ -36,6 +36,10 @@ final class ModularRuntime: NSObject {
     /// Input for PlacementSolver; held here for placement once wired.
     var roomModel: RoomModel?
 
+    /// TRACKED stream (anchoring.mode == "object"): iOS 27 object tracking session
+    /// layer. The entry view's coordinator forwards ARObjectAnchor events into it.
+    let objectAnchoring = ObjectAnchoringController()
+
     init(view: ARView, onStatus: @escaping (String) -> Void = { _ in }) {
         self.view = view; self.onStatus = onStatus; super.init()
     }
@@ -44,7 +48,36 @@ final class ModularRuntime: NSObject {
     func present(_ e: ModularExperience) {
         clear()
         guard let view else { return }
-        let t = placedTransform ?? Self.placementTransform(in: view)
+        // The stream split (design system anchoring): object-TRACKED overlay when the
+        // brain asked for it and the device can; otherwise the world-PLACED stream.
+        if e.anchoring.mode == "object" {
+            onStatus("tracked mode: looking for your object…")
+            objectAnchoring.onStatus = { [weak self] s in self?.onStatus(s) }
+            objectAnchoring.onMountReady = { [weak self] mount in
+                guard let self else { return }
+                self.present(e, on: mount)                  // experience root ON the object
+            }
+            objectAnchoring.onTrackingChanged = { [weak self] tracked in
+                guard let self, let a = self.anchor else { return }
+                // §3.4: pause when tracking is lost — ghost the content, keep state.
+                self.setOpacity(a, tracked ? 1.0 : 0.15)
+            }
+            objectAnchoring.onFallback = { [weak self] reason in
+                guard let self, let view = self.view else { return }
+                self.onStatus(reason)
+                self.presentWorldPlaced(e, in: view)        // anchoring.fallback == "world"
+            }
+            objectAnchoring.begin(anchoring: e.anchoring, view: view)
+            return
+        }
+        presentWorldPlaced(e, in: view)
+    }
+
+    /// PLACED stream: anchor in the world per the Placement Design System policy.
+    private func presentWorldPlaced(_ e: ModularExperience, in view: ARView) {
+        objectAnchoring.stop()
+        let t = placedTransform ?? Self.placementTransform(in: view,
+                                                           anchorType: e.placement.anchorType)
         placedTransform = t
         let a = AnchorEntity(world: t)
         view.scene.addAnchor(a)
@@ -82,8 +115,17 @@ final class ModularRuntime: NSObject {
         installTap()
         stepIndex = 0
         applyStep(0)
-        print("SPATAIL v0.6: '\(e.title)' — \(e.assets.count) assets, \(e.sequence.count) steps, "
-              + "\(e.clips.count) clips, composer=\(e.composer)")
+        // §5 scale rule: ALWAYS communicate a changed scale ("Scaled to about 1:8 …",
+        // "Enlarged for inspection …"). The note rides under the primary asset.
+        if !e.placement.scaleNote.isEmpty,
+           let primary = holders[e.assets.first(where: { $0.role == "primary_object" })?.id
+                                 ?? e.assets.first?.id ?? ""] {
+            addLabel(e.placement.scaleNote, near: primary)
+        }
+        print("SPATAIL v0.7: '\(e.title)' — \(e.assets.count) assets, \(e.sequence.count) steps, "
+              + "\(e.clips.count) clips, composer=\(e.composer), "
+              + "preset=\(e.placement.preset.isEmpty ? "n/a" : e.placement.preset), "
+              + "anchoring=\(e.anchoring.mode)")
     }
 
     // MARK: - sequence (the game manager plays steps that play clips)
@@ -209,17 +251,23 @@ final class ModularRuntime: NSObject {
         exp?.assets.first(where: { $0.id == id })?.name ?? id.replacingOccurrences(of: "_", with: " ")
     }
 
-    // MARK: - placement (live + world-anchored)
-    private static func placementTransform(in view: ARView) -> simd_float4x4 {
+    // MARK: - placement (live + world-anchored; honours the design-system anchor type)
+    private static func placementTransform(in view: ARView,
+                                           anchorType: String = "table") -> simd_float4x4 {
         let cam = view.cameraTransform
         var origin: SIMD3<Float>
         let pt = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
-        if let hit = view.raycast(from: pt, allowing: .estimatedPlane, alignment: .horizontal).first {
+        // Wall-board experiences raycast vertical surfaces; everything else horizontal.
+        // (Table-vs-floor refinement belongs to the PlacementSolver/RoomModel wiring.)
+        let alignment: ARRaycastQuery.TargetAlignment = (anchorType == "wall") ? .vertical : .horizontal
+        if let hit = view.raycast(from: pt, allowing: .estimatedPlane, alignment: alignment).first {
             let c = hit.worldTransform.columns.3; origin = SIMD3(c.x, c.y, c.z)
         } else {
             let f = -SIMD3(cam.matrix.columns.2.x, 0, cam.matrix.columns.2.z)
             let fwd = simd_length(f) > 1e-4 ? simd_normalize(f) : SIMD3(0, 0, -1)
-            origin = cam.translation + fwd * 0.8; origin.y = cam.translation.y - 0.6
+            origin = cam.translation + fwd * 0.8
+            // §7 comfort: walls hang at eye level; surface content drops to ~table height.
+            origin.y = cam.translation.y - (anchorType == "wall" ? 0.0 : 0.6)
         }
         let toCam = cam.translation - origin
         return Transform(scale: .one, rotation: simd_quatf(angle: atan2(toCam.x, toCam.z), axis: SIMD3(0, 1, 0)),
@@ -266,7 +314,11 @@ final class ModularRuntime: NSObject {
             let entity: Entity
             if #available(iOS 18.0, *) { entity = try await Entity(contentsOf: dst) } else { entity = try Entity.load(contentsOf: dst) }
             guard let holder = holders[assetId] else { return }
-            fit(entity, to: max(min(footprintW, 0.3), 0.05))
+            // §5: true-scale experiences keep real-world dimensions (capped for safety);
+            // fit-to-surface/miniature use the tabletop budget.
+            let trueScale = (exp?.placement.scaleMode == "true_scale")
+            fit(entity, to: trueScale ? max(min(footprintW, 1.2), 0.05)
+                                      : max(min(footprintW, 0.3), 0.05))
             nodes[assetId]?.isEnabled = false
             holder.addChild(entity); nodes[assetId] = entity
             let clips = entity.availableAnimations
@@ -346,6 +398,7 @@ final class ModularRuntime: NSObject {
     private func playCue(_ cue: String) { AudioServicesPlaySystemSound(cue == "correct" ? 1054 : (cue == "pickup" ? 1104 : 1103)) }
 
     func clear() {
+        objectAnchoring.stop()
         updateSub = nil; labels.removeAll(); caption = nil
         if let anchor, let view { view.scene.removeAnchor(anchor) }
         anchor = nil; holders.removeAll(); nodes.removeAll(); exp = nil; stepIndex = 0

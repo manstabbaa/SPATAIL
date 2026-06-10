@@ -15,6 +15,9 @@ struct ModularEntryView: View {
     @State private var experience: ModularExperience?
     @State private var streamModel: StreamPayload? = nil
     @State private var showCamera = false
+    // The two streams of a spatial experience: overlay the REAL object in front of
+    // you (object tracking) vs place the experience in your space (tabletop).
+    @State private var trackObject = false
     @Environment(\.dismiss) private var dismiss
     private let client = GenerativeClient()
 
@@ -47,6 +50,15 @@ struct ModularEntryView: View {
                     }.disabled(busy)
                 }
                 .padding(10).background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+
+                // Stream choice: tracked overlay vs placed-in-space.
+                Toggle(isOn: $trackObject) {
+                    Label("Overlay the real object (object tracking)", systemImage: "viewfinder")
+                        .font(.caption).foregroundStyle(.white)
+                }
+                .toggleStyle(.switch).tint(.teal)
+                .padding(.horizontal, 12).padding(.vertical, 6)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
             }
             .padding()
         }
@@ -59,12 +71,34 @@ struct ModularEntryView: View {
         }
     }
 
+    /// Tracked stream: find a served .referenceobject whose subjects match the prompt.
+    private func matchTrackable(_ prompt: String) async -> GenerativeClient.Trackable? {
+        guard trackObject else { return nil }
+        let words = Set(prompt.lowercased().split(separator: " ").map(String.init))
+        let all = (try? await client.fetchTrackables()) ?? []
+        return all.first { t in
+            t.subjects.contains { subj in
+                let sw = Set(subj.lowercased().split(separator: " ").map(String.init))
+                return !sw.isDisjoint(with: words)
+            }
+        }
+    }
+
     private func go(text: String) async {
         let t = text.trimmingCharacters(in: .whitespaces)
         guard !t.isEmpty else { return }
         busy = true; status = "thinking…"
-        do { experience = try await client.generateModular(text: t); status = "ready — tap to step" }
-        catch { status = "error: \(error.localizedDescription)" }
+        do {
+            let trackable = await matchTrackable(t)
+            if trackObject && trackable == nil {
+                status = "no trained tracker matches yet — overlay will pin near the object"
+            }
+            experience = try await client.generateModular(
+                text: t, tracked: trackObject,
+                trackedObjectId: trackable?.id ?? "",
+                referenceObjectUrl: trackable?.url ?? "")
+            status = "ready — tap to step"
+        } catch { status = "error: \(error.localizedDescription)" }
         busy = false
     }
 
@@ -73,7 +107,11 @@ struct ModularEntryView: View {
         do {
             let data = image.jpegData(compressionQuality: 0.7) ?? Data()
             let q = text.trimmingCharacters(in: .whitespaces)
-            let exp = try await client.generateModular(imageJPEG: data, question: q)
+            let trackable = await matchTrackable(q.isEmpty ? "object" : q)
+            let exp = try await client.generateModular(
+                imageJPEG: data, question: q, tracked: trackObject,
+                trackedObjectId: trackable?.id ?? "",
+                referenceObjectUrl: trackable?.url ?? "")
             experience = exp
             busy = false
             if let jid = exp.generationJobId, !jid.isEmpty {
@@ -141,15 +179,30 @@ struct ModularARView: UIViewRepresentable {
         private var lastRoomPush: TimeInterval = 0
 
         // ARKit callbacks arrive off the main actor; hop to MainActor for state.
+        // Planes feed the RoomModel; ARObjectAnchors (the TRACKED stream, iOS 27
+        // object tracking) forward to the runtime's ObjectAnchoringController.
         nonisolated func session(_ s: ARSession, didAdd anchors: [ARAnchor]) {
             let planes = anchors.compactMap { $0 as? ARPlaneAnchor }
-            if planes.isEmpty { return }
-            Task { @MainActor in self.roomBuilder.update(planes: planes) }
+            let objects = anchors.compactMap { $0 as? ARObjectAnchor }
+            if planes.isEmpty && objects.isEmpty { return }
+            Task { @MainActor in
+                if !planes.isEmpty { self.roomBuilder.update(planes: planes) }
+                if !objects.isEmpty { self.runtime?.objectAnchoring.objectAnchorsAdded(objects) }
+            }
         }
         nonisolated func session(_ s: ARSession, didUpdate anchors: [ARAnchor]) {
             let planes = anchors.compactMap { $0 as? ARPlaneAnchor }
-            if planes.isEmpty { return }
-            Task { @MainActor in self.roomBuilder.update(planes: planes) }
+            let objects = anchors.compactMap { $0 as? ARObjectAnchor }
+            if planes.isEmpty && objects.isEmpty { return }
+            Task { @MainActor in
+                if !planes.isEmpty { self.roomBuilder.update(planes: planes) }
+                if !objects.isEmpty { self.runtime?.objectAnchoring.objectAnchorsUpdated(objects) }
+            }
+        }
+        nonisolated func session(_ s: ARSession, didRemove anchors: [ARAnchor]) {
+            let objects = anchors.compactMap { $0 as? ARObjectAnchor }
+            if objects.isEmpty { return }
+            Task { @MainActor in self.runtime?.objectAnchoring.objectAnchorsRemoved(objects) }
         }
         nonisolated func session(_ s: ARSession, didUpdate frame: ARFrame) {
             let cam = frame.camera.transform

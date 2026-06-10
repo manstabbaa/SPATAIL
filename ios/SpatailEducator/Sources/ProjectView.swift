@@ -14,6 +14,9 @@ final class ProjectSession: ObservableObject {
     @Published var status = ""
     @Published var busy = false
     @Published private(set) var title = ""
+    /// The stream choice: overlay the REAL object in front of you (object
+    /// tracking) instead of placing the experience in free space.
+    @Published var trackObject = false
 
     private var meta: ProjectMeta?
     private let store: ProjectStore
@@ -50,9 +53,23 @@ final class ProjectSession: ObservableObject {
         store.saveConversation(conversation, for: pid)
         busy = true; status = isFirst ? "creating…" : "evolving the scene…"
         let prior = priorContext
+        let tracked = trackObject
         Task {
             do {
-                let result = try await client.generateProject(text: p, prior: prior)
+                // Tracked stream: pick a served .referenceobject whose subjects
+                // match the prompt (if the library has one trained for it).
+                var trackableId = "", trackableUrl = ""
+                if tracked {
+                    let words = Set(p.lowercased().split(separator: " ").map(String.init))
+                    if let match = ((try? await client.fetchTrackables()) ?? []).first(where: { t in
+                        t.subjects.contains { subj in
+                            !Set(subj.lowercased().split(separator: " ").map(String.init)).isDisjoint(with: words)
+                        }
+                    }) { trackableId = match.id; trackableUrl = match.url }
+                }
+                let result = try await client.generateProject(
+                    text: p, prior: prior, tracked: tracked,
+                    trackedObjectId: trackableId, referenceObjectUrl: trackableUrl)
                 experience = result.experience
                 store.saveContract(result.raw, for: pid)
                 if var m = meta {
@@ -171,7 +188,16 @@ struct CanvasView: View {
                 }.frame(maxHeight: 110)
             }
             HStack(spacing: 10) {
-                TextField(session.experience == nil ? "Describe an experience to build here…"
+                // Stream choice: viewfinder ON = overlay the real object (tracked);
+                // OFF = place the experience in your space (design-system placement).
+                Button { session.trackObject.toggle() } label: {
+                    Image(systemName: session.trackObject ? "viewfinder.circle.fill" : "viewfinder.circle")
+                        .font(.title2)
+                        .foregroundStyle(session.trackObject ? .teal : .white.opacity(0.7))
+                }
+                TextField(session.experience == nil ? (session.trackObject
+                                                       ? "What's the object in front of you?"
+                                                       : "Describe an experience to build here…")
                                                     : "Prompt to change the scene…",
                           text: $input, axis: .vertical)
                     .textFieldStyle(.roundedBorder).lineLimit(1...3)

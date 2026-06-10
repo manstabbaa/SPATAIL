@@ -241,17 +241,63 @@ final class GenerativeClient {
         return try JSONDecoder().decode(T.self, from: data)
     }
 
-    // MARK: - modular experience (v0.5) — synchronous POST /modular
-    /// Pasted text -> the agent-composed modular experience contract (mechanics + beats).
-    func generateModular(text: String) async throws -> ModularExperience {
-        try await postModular(["kind": "text", "text": text, "use_llm": true])
+    // MARK: - modular experience — synchronous POST /modular
+    /// Pasted text -> the modular experience contract. `tracked` selects the
+    /// object-TRACKED stream: the server answers with anchoring.mode == "object"
+    /// (+ the .referenceobject to download) and the design system tailors the
+    /// experience to overlay the real object instead of placing it in space.
+    func generateModular(text: String, tracked: Bool = false,
+                         trackedObjectId: String = "",
+                         referenceObjectUrl: String = "") async throws -> ModularExperience {
+        try await postModular(trackedPayload(["kind": "text", "text": text, "use_llm": true],
+                                             tracked, trackedObjectId, referenceObjectUrl))
     }
 
     /// Phone photo (JPEG bytes) + the user's question -> Gemini mechanism brief ->
     /// the same modular experience (with a generationJobId for the Blender build).
-    func generateModular(imageJPEG: Data, note: String = "", question: String = "") async throws -> ModularExperience {
-        try await postModular(["kind": "image", "image": imageJPEG.base64EncodedString(),
-                               "mime": "image/jpeg", "note": note, "question": question, "use_llm": true])
+    func generateModular(imageJPEG: Data, note: String = "", question: String = "",
+                         tracked: Bool = false, trackedObjectId: String = "",
+                         referenceObjectUrl: String = "") async throws -> ModularExperience {
+        try await postModular(trackedPayload(
+            ["kind": "image", "image": imageJPEG.base64EncodedString(),
+             "mime": "image/jpeg", "note": note, "question": question, "use_llm": true],
+            tracked, trackedObjectId, referenceObjectUrl))
+    }
+
+    private func trackedPayload(_ base: [String: Any], _ tracked: Bool,
+                                _ objectId: String, _ refUrl: String) -> [String: Any] {
+        guard tracked else { return base }
+        var p = base
+        p["tracked"] = true
+        p["trackedObjectId"] = objectId
+        p["referenceObjectUrl"] = refUrl
+        return p
+    }
+
+    // MARK: - trackables (the reference-object library for the TRACKED stream)
+    /// One Mac-trained .referenceobject the server delivers post-compile.
+    struct Trackable: Decodable, Identifiable {
+        let id: String
+        var name = ""
+        var url = ""                 // server-relative: /trackables/<file>
+        var tracking = "detection"   // "detection" (stationary) | "tracking" (handheld)
+        var subjects: [String] = []
+        enum K: String, CodingKey { case id, name, url, tracking, subjects }
+        init(from d: Decoder) throws {
+            let c = try d.container(keyedBy: K.self)
+            id = (try? c.decode(String.self, forKey: .id)) ?? UUID().uuidString
+            name = (try? c.decode(String.self, forKey: .name)) ?? ""
+            url = (try? c.decode(String.self, forKey: .url)) ?? ""
+            tracking = (try? c.decode(String.self, forKey: .tracking)) ?? "detection"
+            subjects = (try? c.decode([String].self, forKey: .subjects)) ?? []
+        }
+    }
+    private struct TrackablesIndex: Decodable { var trackables: [Trackable] = [] }
+
+    /// GET /trackables — which real-world objects this server can track right now.
+    func fetchTrackables() async throws -> [Trackable] {
+        let idx: TrackablesIndex = try await fetchJSON("/trackables")
+        return idx.trackables
     }
 
     /// Poll a queued Blender generation job (mode:object) to completion, then download
@@ -291,10 +337,14 @@ final class GenerativeClient {
 
     /// First prompt OR an edit. `prior` carries the current scene's subject+summary
     /// so the server EVOLVES the existing experience instead of starting from zero.
+    /// `tracked` selects the object-TRACKED stream (overlay the real object).
     func generateProject(text: String,
-                         prior: (subject: String, summary: String)? = nil) async throws -> ModularResult {
+                         prior: (subject: String, summary: String)? = nil,
+                         tracked: Bool = false, trackedObjectId: String = "",
+                         referenceObjectUrl: String = "") async throws -> ModularResult {
         var payload: [String: Any] = ["kind": "text", "text": text, "use_llm": true]
         if let p = prior { payload["prior"] = ["subject": p.subject, "summary": p.summary] }
+        payload = trackedPayload(payload, tracked, trackedObjectId, referenceObjectUrl)
         return try await postModularRaw(payload)
     }
 

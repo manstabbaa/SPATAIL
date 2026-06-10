@@ -21,10 +21,12 @@ struct ModularExperience: Decodable {
     var triggers: [Trigger] = []
     var clips: [Clip] = []
     var generationJobId: String? = nil
+    var anchoring = Anchoring()            // the stream split: object (tracked) | world
+    var placement = PlacementPolicy()      // Placement Design System §12 contract
 
     enum K: String, CodingKey {
         case schemaVersion, experienceId, title, understanding, stage, assets,
-             composer, sequence, triggers, clips, generationJobId
+             composer, sequence, triggers, clips, generationJobId, anchoring, placement
     }
     init(from d: Decoder) throws {
         let c = try d.container(keyedBy: K.self)
@@ -39,6 +41,87 @@ struct ModularExperience: Decodable {
         triggers = (try? c.decode([Trigger].self, forKey: .triggers)) ?? []
         clips = (try? c.decode([Clip].self, forKey: .clips)) ?? []
         generationJobId = try? c.decode(String.self, forKey: .generationJobId)
+        anchoring = (try? c.decode(Anchoring.self, forKey: .anchoring)) ?? Anchoring()
+        placement = (try? c.decode(PlacementPolicy.self, forKey: .placement)) ?? PlacementPolicy()
+    }
+
+    /// The TRACKED/PLACED stream split (server: design_system.decide_anchoring).
+    /// mode "object": mount the experience on an ARObjectAnchor resolved from a
+    /// .referenceobject (iOS 27 object tracking); degrade to "world" per fallback.
+    struct Anchoring: Decodable {
+        var mode = "world"                  // "object" | "world"
+        var objectId = ""
+        var referenceObjectUrl = ""         // server-relative; downloaded at runtime
+        var tracking = "detection"          // "detection" (stationary) | "tracking" (handheld)
+        var pauseOnTrackingLoss = true
+        var fallback = "world"
+        init() {}
+        init(from d: Decoder) throws {
+            let c = try d.container(keyedBy: K.self)
+            mode = (try? c.decode(String.self, forKey: .mode)) ?? "world"
+            objectId = (try? c.decode(String.self, forKey: .objectId)) ?? ""
+            referenceObjectUrl = (try? c.decode(String.self, forKey: .referenceObjectUrl)) ?? ""
+            tracking = (try? c.decode(String.self, forKey: .tracking)) ?? "detection"
+            pauseOnTrackingLoss = (try? c.decode(Bool.self, forKey: .pauseOnTrackingLoss)) ?? true
+            fallback = (try? c.decode(String.self, forKey: .fallback)) ?? "world"
+        }
+        enum K: String, CodingKey {
+            case mode, objectId, referenceObjectUrl, tracking, pauseOnTrackingLoss, fallback
+        }
+    }
+
+    /// Placement Design System policy (docs/spatail-placement-design-system.md §12).
+    /// POLICY only — anchor preference + fallback, scale mode + user-facing scale
+    /// note, comfort, UI rules. The runtime/solver resolves geometry against the room.
+    struct PlacementPolicy: Decodable {
+        var preset = ""                     // e.g. "mechanical_exploded_view"
+        var mode = ""                       // real_scale|miniature|exploded|object_overlay|wall_board|room_simulation
+        var anchorType = "table"
+        var anchorFallback = "floor"
+        var scaleMode = "fit_to_surface"    // true_scale|fit_to_surface|miniature|enlarged_detail|adaptive
+        var maxSurfaceCoverage = 0.65
+        var showScaleReference = false
+        var scaleNote = ""                  // §5: ALWAYS communicate changed scale
+        var faceUser = true
+        var preferredDistance = ""
+        var labelBehavior = "on_select"
+        var panelPosition = "beside_object"
+        var semanticActions: [String] = []
+        init() {}
+        init(from d: Decoder) throws {
+            let c = try d.container(keyedBy: K.self)
+            preset = (try? c.decode(String.self, forKey: .preset)) ?? ""
+            mode = (try? c.decode(String.self, forKey: .mode)) ?? ""
+            if let a = try? c.decode([String: String].self, forKey: .anchor) {
+                anchorType = a["type"] ?? "table"
+                anchorFallback = a["fallback"] ?? "floor"
+            }
+            if let s = try? c.nestedContainer(keyedBy: ScaleK.self, forKey: .scale) {
+                scaleMode = (try? s.decode(String.self, forKey: .mode)) ?? "fit_to_surface"
+                maxSurfaceCoverage = (try? s.decode(Double.self, forKey: .maxSurfaceCoverage)) ?? 0.65
+                showScaleReference = (try? s.decode(Bool.self, forKey: .showScaleReference)) ?? false
+                scaleNote = (try? s.decode(String.self, forKey: .scaleNote)) ?? ""
+            }
+            if let p = try? c.nestedContainer(keyedBy: PosK.self, forKey: .position) {
+                faceUser = (try? p.decode(Bool.self, forKey: .faceUser)) ?? true
+            }
+            if let u = try? c.nestedContainer(keyedBy: UiK.self, forKey: .ui) {
+                labelBehavior = (try? u.decode(String.self, forKey: .labelBehavior)) ?? "on_select"
+                panelPosition = (try? u.decode(String.self, forKey: .panelPosition)) ?? "beside_object"
+            }
+            if let m = try? c.nestedContainer(keyedBy: ComfK.self, forKey: .comfort) {
+                preferredDistance = (try? m.decode(String.self, forKey: .preferredDistance)) ?? ""
+            }
+            if let i = try? c.nestedContainer(keyedBy: InterK.self, forKey: .interaction) {
+                semanticActions = (try? i.decode([String].self, forKey: .semanticActions)) ?? []
+            }
+        }
+        enum K: String, CodingKey { case preset, mode, anchor, scale, position, ui, comfort, interaction }
+        enum ScaleK: String, CodingKey { case mode, maxSurfaceCoverage, showScaleReference, scaleNote }
+        enum PosK: String, CodingKey { case faceUser }
+        enum UiK: String, CodingKey { case labelBehavior, panelPosition }
+        enum ComfK: String, CodingKey { case preferredDistance }
+        enum InterK: String, CodingKey { case semanticActions }
     }
 
     struct Understanding: Decodable {

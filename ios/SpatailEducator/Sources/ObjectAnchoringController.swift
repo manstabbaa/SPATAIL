@@ -38,9 +38,15 @@ final class ObjectAnchoringController {
     var onFallback: ((String) -> Void)?
     var onStatus: ((String) -> Void)?
 
-    /// Object tracking with ML .referenceobject files needs iOS 27.
+    /// Object tracking with ML .referenceobject files needs iOS 27 — both at runtime
+    /// AND at build time (trackingObjects / ARObjectAnchor.isTracked are not in the
+    /// iOS 26 SDK). SPATAIL_IOS27_TRACKING is set in project.yml once the Xcode 27
+    /// beta is the build toolchain; without it every tracked request degrades to the
+    /// placed stream via onFallback.
     static var isSupported: Bool {
+        #if SPATAIL_IOS27_TRACKING
         if #available(iOS 27.0, *) { return true }
+        #endif
         return false
     }
 
@@ -83,11 +89,15 @@ final class ObjectAnchoringController {
             let cfg = ARWorldTrackingConfiguration()
             cfg.planeDetection = [.horizontal, .vertical]
             cfg.environmentTexturing = .automatic
+            #if SPATAIL_IOS27_TRACKING
             if anchoring.tracking == "tracking" {
                 cfg.trackingObjects = [refObj]      // handheld: per-frame pose (iOS 27)
             } else {
                 cfg.detectionObjects = [refObj]     // stationary: low power
             }
+            #else
+            cfg.detectionObjects = [refObj]         // pre-iOS-27 SDK: detection only
+            #endif
             view.session.run(cfg)
             phase = .searching
             onStatus?("point your camera at the object…")
@@ -141,6 +151,9 @@ final class ObjectAnchoringController {
     }
 
     func objectAnchorsUpdated(_ anchors: [ARObjectAnchor]) {
+        // ARObjectAnchor.isTracked is iOS 27 SDK API — without it there is no
+        // visibility signal, so the §3.4 pause/resume behavior is compiled out.
+        #if SPATAIL_IOS27_TRACKING
         guard let id = anchorIdentifier,
               let anchor = anchors.first(where: { $0.identifier == id }) else { return }
         let tracked = anchor.isTracked
@@ -154,6 +167,7 @@ final class ObjectAnchoringController {
             onStatus?("locked onto the object")
             onTrackingChanged?(true)
         }
+        #endif
     }
 
     func objectAnchorsRemoved(_ anchors: [ARObjectAnchor]) {

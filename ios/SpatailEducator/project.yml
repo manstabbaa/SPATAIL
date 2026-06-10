@@ -13,6 +13,11 @@ settings:
     SWIFT_VERSION: "5.9"
     GENERATE_INFOPLIST_FILE: YES
     TARGETED_DEVICE_FAMILY: "1,2,7"   # iPhone, iPad, Vision
+    # Tracked stream (iOS 27 object tracking): trackingObjects and
+    # ARObjectAnchor.isTracked only exist in the iOS 27 SDK. Once the Xcode 27
+    # beta is the build toolchain, uncomment the next line (then `xcodegen
+    # generate`); until then tracked requests degrade to the placed stream.
+    # SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SPATAIL_IOS27_TRACKING"
 
 targets:
   SpatailEducator:

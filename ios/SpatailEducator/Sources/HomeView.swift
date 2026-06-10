@@ -10,11 +10,21 @@ struct HomeView: View {
     @State private var activeMeta: ProjectMeta?      // nil = a fresh scratch canvas
     @State private var scratchNonce = 0
     @State private var showProjects = false
+    @State private var showFactory = false
     @State private var serverURL = GenerativeClient.baseURL
 
     var body: some View {
         content
             .sheet(isPresented: $showProjects) { projectsSheet }
+            .fullScreenCover(isPresented: $showFactory) { factoryCover }
+    }
+
+    @ViewBuilder private var factoryCover: some View {
+        #if os(iOS)
+        FactoryBrowseView()
+        #else
+        Color.black.overlay(Text("Asset Factory — available on iPhone").foregroundStyle(.white))
+        #endif
     }
 
     @ViewBuilder private var content: some View {
@@ -38,6 +48,13 @@ struct HomeView: View {
                 }
                 Section {
                     Button { newScratch() } label: { Label("New experience", systemImage: "plus") }
+                    Button {
+                        showProjects = false
+                        // present the cover after the sheet finishes dismissing
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { showFactory = true }
+                    } label: {
+                        Label("Asset Factory — test normalized assets", systemImage: "shippingbox")
+                    }
                 }
                 if store.projects.isEmpty {
                     Section { Text("No projects yet — type a prompt to create one.")

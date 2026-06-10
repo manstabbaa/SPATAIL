@@ -383,6 +383,15 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(400, obj={"error": "invalid JSON body"})
         kind = (data.get("kind") or "text").lower()
         use_llm = bool(data.get("use_llm", True))
+        # The stream split (tracked vs placed): the phone sets tracked=true when the
+        # experience should overlay a REAL object (iOS 27 object tracking). It may
+        # name the object and/or a served .referenceobject the runtime can download.
+        tracked = bool(data.get("tracked", False))
+        tracked_kw = {
+            "tracked": tracked,
+            "tracked_object_id": (data.get("trackedObjectId") or "").strip() or None,
+            "reference_object_url": (data.get("referenceObjectUrl") or "").strip() or None,
+        }
         try:
             import sys as _sys
             _d = str(ROOT / "studio" / "director")
@@ -398,7 +407,7 @@ class Handler(BaseHTTPRequestHandler):
                 contract = _ex.build_from_image(raw, mime=data.get("mime") or "image/jpeg",
                                                 note=data.get("note", ""),
                                                 question=(data.get("question") or data.get("text") or ""),
-                                                use_llm=use_llm)
+                                                use_llm=use_llm, **tracked_kw)
             else:
                 text = (data.get("text") or data.get("selectedText") or data.get("prompt") or "").strip()
                 if not text:
@@ -415,10 +424,11 @@ class Handler(BaseHTTPRequestHandler):
                                if psum else (data.get("surroundingContext") or text))
                     contract = _ex.build_modular_experience(
                         text, kind="text", subject_hint=subject_hint,
-                        summary=summary, use_llm=use_llm)
+                        summary=summary, use_llm=use_llm, **tracked_kw)
                 else:
                     contract = _ex.build_modular_experience(
-                        text, kind="text", summary=data.get("surroundingContext") or text, use_llm=use_llm)
+                        text, kind="text", summary=data.get("surroundingContext") or text,
+                        use_llm=use_llm, **tracked_kw)
                 # Route text through per-part Blender generation: build the primary object
                 # as named component parts (the author models + bakes their motion); the
                 # phone streams it in over the placeholder and the manifest binds the parts.
@@ -565,6 +575,21 @@ class Handler(BaseHTTPRequestHandler):
                      else "application/octet-stream")
             return self._send(200, raw=fp.read_bytes(), ctype=ctype)
 
+        # ── Trackables: the reference-object library for the TRACKED stream.
+        # .referenceobject files are trained on the Mac (Create ML / `xcrun createml
+        # objecttracker`), dropped into public/assets/spatail-trackables/, and
+        # downloaded by the phone at runtime (ARReferenceObject(archiveURL:) loads
+        # any local file URL — post-compile delivery, no app rebuild). ──
+        if path == "/trackables":
+            return self._send(200, obj=_trackables_index())
+
+        if path.startswith("/trackables/"):
+            base = (ROOT / "public" / "assets" / "spatail-trackables").resolve()
+            fp = (base / unquote(path)[len("/trackables/"):]).resolve()
+            if not str(fp).startswith(str(base)) or not fp.is_file():
+                return self._send(404, obj={"error": "trackable not found", "path": path})
+            return self._send(200, raw=fp.read_bytes(), ctype="application/octet-stream")
+
         # Serve the starter asset library (cached GLB/USDZ) at the SAME path the
         # manifests reference, so the iOS app and web viewer fetch real cached assets.
         if path.startswith("/assets/spatail-library/"):
@@ -580,6 +605,38 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, raw=fp.read_bytes(), ctype=ctype)
 
         return self._send(404, obj={"error": "not found"})
+
+
+def _trackables_index() -> dict:
+    """List the reference-object library (TRACKED stream anchors).
+
+    Each entry: {id, name, url, tracking, subjects}. `tracking` declares the
+    runtime lane — "detection" (stationary, low power) vs "tracking" (handheld,
+    per-frame high rate). An optional sidecar <id>.json refines name/tracking/
+    subjects; without one, sane defaults apply. Drop new .referenceobject files
+    in public/assets/spatail-trackables/ — no server restart needed (scanned per
+    request; the dir is tiny)."""
+    root = (ROOT / "public" / "assets" / "spatail-trackables").resolve()
+    items = []
+    if root.is_dir():
+        for ro in sorted(root.glob("*.referenceobject")):
+            rid = ro.stem
+            meta = {}
+            side = root / f"{rid}.json"
+            if side.is_file():
+                try:
+                    meta = json.loads(side.read_text(encoding="utf-8")) or {}
+                except (ValueError, OSError):
+                    meta = {}
+            items.append({
+                "id": rid,
+                "name": meta.get("name", rid.replace("_", " ").title()),
+                "url": f"/trackables/{ro.name}",
+                "bytes": ro.stat().st_size,
+                "tracking": meta.get("tracking", "detection"),
+                "subjects": meta.get("subjects", [rid.replace("_", " ")]),
+            })
+    return {"trackables": items, "count": len(items)}
 
 
 def _factory_index() -> dict:

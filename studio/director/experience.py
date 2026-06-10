@@ -23,8 +23,9 @@ for p in (_STUDIO, _STUDIO / "server", _STUDIO / "mechanics", _STUDIO / "directo
 
 import composer  # noqa: E402
 from representation.engine import RepresentationEngine  # noqa: E402
+from spatail.design_system import decide_placement  # noqa: E402  (Placement Design System)
 
-SCHEMA = "0.6.0-spatail-modular"
+SCHEMA = "0.7.0-spatail-modular"
 _ROLE = {"hero": "primary_object", "primary": "primary_object", "part": "part",
          "comparison_item": "comparison_object", "comparison": "comparison_object",
          "environment": "environment", "label_target": "label"}
@@ -105,7 +106,9 @@ def _resolve_assets(plan, manifest, lib) -> list[dict]:
 
 def build_modular_experience(input_text: str, *, kind: str = "text", subject_hint: str | None = None,
                              summary: str | None = None, experience_id: str | None = None,
-                             use_llm: bool = True, library=None) -> dict:
+                             use_llm: bool = True, library=None,
+                             tracked: bool = False, reference_object_url: str | None = None,
+                             tracked_object_id: str | None = None) -> dict:
     eng = RepresentationEngine()
     plan, manifest = eng.run(subject_hint or input_text, experience_id=experience_id)
     lib = library if library is not None else _load_library()
@@ -118,6 +121,13 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
     }
     design = composer.compose(understanding, assets, use_llm=use_llm)
 
+    # Placement Design System (docs/spatail-placement-design-system.md): the §12
+    # placement contract — POLICY the on-device solver resolves against the room.
+    # Also carries the stream split: anchoring.mode = "object" (tracked) | "world".
+    placement = decide_placement(understanding, assets, tracked=tracked,
+                                 reference_object_url=reference_object_url,
+                                 tracked_object_id=tracked_object_id)
+
     phase0 = [a["id"] for a in assets if a["status"] != "placeholder"][:3]
     return {
         "schemaVersion": SCHEMA,
@@ -127,6 +137,8 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
         "understanding": understanding,
         "stage": {"anchor": plan.placement.anchor, "layout": plan.placement.layout,
                   "facing": plan.placement.facing, "scaleMode": plan.placement.scale_mode},
+        "placement": placement,
+        "anchoring": placement["anchoring"],
         "assets": assets,
         "composer": design["composer"],
         # the experience = a SEQUENCE of steps that play baked clips, + triggers
@@ -142,7 +154,9 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
 
 
 def build_from_image(image_bytes: bytes, *, mime: str = "image/jpeg", note: str = "",
-                     question: str = "", use_llm: bool = True, library=None) -> dict:
+                     question: str = "", use_llm: bool = True, library=None,
+                     tracked: bool = False, reference_object_url: str | None = None,
+                     tracked_object_id: str | None = None) -> dict:
     """Phone photo + question -> Gemini mechanism brief -> the modular experience.
 
     Adds a `generation` block (the Blender mechanism brief Gemini authored + the
@@ -152,7 +166,9 @@ def build_from_image(image_bytes: bytes, *, mime: str = "image/jpeg", note: str 
     import vision
     b = vision.brief_from_image(image_bytes, mime=mime, note=note, question=question)
     c = build_modular_experience(b["prompt"], kind="image", subject_hint=b["subject"],
-                                 summary=b["summary"], use_llm=use_llm, library=library)
+                                 summary=b["summary"], use_llm=use_llm, library=library,
+                                 tracked=tracked, reference_object_url=reference_object_url,
+                                 tracked_object_id=tracked_object_id)
     c["source"]["vision"] = b
     primary = next((a["id"] for a in c["assets"] if a.get("role") == "primary_object"),
                    (c["assets"][0]["id"] if c["assets"] else "hero"))

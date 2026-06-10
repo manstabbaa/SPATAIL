@@ -24,13 +24,15 @@ def _placement_for(modular: dict) -> dict:
     """Spatial requirements the on-device solver resolves against the RoomModel."""
     stage = modular.get("stage", {}) or {}
     assets = modular.get("assets", []) or []
+    design = modular.get("placement", {}) or {}     # Placement Design System §12 contract
     primary = next((a["id"] for a in assets if a.get("role") == "primary_object"),
                    assets[0]["id"] if assets else None)
+    anchor_pref = (design.get("anchor") or {}).get("type") or stage.get("anchor", "table")
     return {
-        "anchorPreference": stage.get("anchor", "table"),   # table|floor|wall|free
+        "anchorPreference": anchor_pref,                    # table|floor|wall|object|room|free
         "layout": stage.get("layout", "arc"),
         "facing": stage.get("facing", "user"),
-        "scaleMode": stage.get("scaleMode", "dynamic"),     # dynamic|tabletop|real
+        "scaleMode": (design.get("scale") or {}).get("mode") or stage.get("scaleMode", "dynamic"),
         "primary": primary,
         # per-asset footprint requirement (true metres) the solver packs into space
         "footprints": {a["id"]: a.get("scaleMeters", [0.2, 0.2, 0.2]) for a in assets},
@@ -38,6 +40,11 @@ def _placement_for(modular: dict) -> dict:
         "relationships": [],
         # zones the design system can target (level-design vocabulary)
         "zones": ["hero", "secondary", "peripheral"],
+        # the full Placement Design System policy (anchor+fallback, scale mode+notes,
+        # position/orientation rules, semantic interactions, UI rules, comfort, §10
+        # fallbacks) — docs/spatail-placement-design-system.md. The device solver
+        # treats THIS as the requirement set; the keys above remain for older runtimes.
+        "designSystem": design,
     }
 
 
@@ -88,6 +95,9 @@ def to_scene_contract(modular: dict, *, brand: dict | None = None) -> dict:
         "understanding": modular.get("understanding", {}),
         "content": _content_for(modular),
         "placement": _placement_for(modular),
+        # the stream split: anchoring.mode = "object" (ARObjectAnchor on a
+        # .referenceobject, tracked overlay) | "world" (solver-resolved world anchor).
+        "anchoring": modular.get("anchoring", {"mode": "world", "fallback": "world"}),
         # Pillar 3 is owned by the SPATAIL brand system; until it's supplied the
         # runtime falls back to platform defaults for all spatial UI.
         "brand": brand or {"status": "pending",

@@ -67,6 +67,11 @@ Package.resolved
 # tracked when useful. Strip clearly-volatile caches.
 # 4.7GB of segmented meshes — regenerable from skills
 assets_processed/
+# ─── AI Asset Factory runtime output (regenerable; config/ + code stay tracked) ─
+asset_factory/cache/
+asset_factory/logs/
+asset_factory/reports/
+asset_factory/previews/
 docs/screenshots/_tmp/
 # built web viewer artifacts
 dist/

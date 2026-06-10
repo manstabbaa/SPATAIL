@@ -576,6 +576,24 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(body)
             return None
 
+        # ── Asset Factory: list + serve normalized ingested assets for the iOS
+        # factory browser (a different subsystem from the generative library) ──
+        if path == "/factory/index":
+            return self._send(200, obj=_factory_index())
+
+        if path.startswith("/factory/file/"):
+            base = (ROOT / "assets_processed").resolve()
+            fp = (base / unquote(path)[len("/factory/file/"):]).resolve()
+            if not str(fp).startswith(str(base)) or not fp.is_file():
+                return self._send(404, obj={"error": "factory file not found", "path": path})
+            ext = fp.suffix.lower()
+            ctype = ("model/vnd.usdz+zip" if ext == ".usdz"
+                     else "model/gltf-binary" if ext == ".glb"
+                     else "image/png" if ext == ".png"
+                     else "application/json" if ext == ".json"
+                     else "application/octet-stream")
+            return self._send(200, raw=fp.read_bytes(), ctype=ctype)
+
         # Serve the starter asset library (cached GLB/USDZ) at the SAME path the
         # manifests reference, so the iOS app and web viewer fetch real cached assets.
         if path.startswith("/assets/spatail-library/"):
@@ -591,6 +609,45 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, raw=fp.read_bytes(), ctype=ctype)
 
         return self._send(404, obj={"error": "not found"})
+
+
+def _factory_index() -> dict:
+    """List successfully-processed AI Asset Factory assets for the iOS browser.
+
+    Reads the factory's own assets_processed/<id>/asset_manifest.json files
+    directly (stdlib only) — it deliberately does NOT import the top-level
+    asset_factory package, which would shadow studio/asset_factory on sys.path.
+    """
+    root = (ROOT / "assets_processed").resolve()
+    assets = []
+    if root.is_dir():
+        for man in sorted(root.glob("*/asset_manifest.json")):
+            try:
+                m = json.loads(man.read_text(encoding="utf-8"))
+            except (ValueError, OSError):
+                continue
+            if m.get("status") != "success":
+                continue
+            aid = m.get("asset_id") or man.parent.name
+            d = man.parent
+            exported = m.get("exported_files", {}) or {}
+            has_usdz = bool(exported.get("usdz")) and (d / f"{aid}.normalized.usdz").is_file()
+            has_prev = (d / "preview.png").is_file()
+            assets.append({
+                "id": aid,
+                "title": aid.replace("_", " ").title(),
+                "bounds_mode": m.get("bounds_mode"),
+                "origin_mode": m.get("origin_mode"),
+                "target_bounds_m": m.get("target_bounds_m", {}),
+                "final_bounds_m": m.get("final_bounds_m", {}),
+                "triangle_count": m.get("triangle_count", 0),
+                "unit_system": m.get("unit_system", "meters"),
+                "glb_url": f"/factory/file/{aid}/{aid}.normalized.glb",
+                "usdz_url": f"/factory/file/{aid}/{aid}.normalized.usdz" if has_usdz else "",
+                "preview_url": f"/factory/file/{aid}/preview.png" if has_prev else "",
+                "has_usdz": has_usdz,
+            })
+    return {"assets": assets, "count": len(assets)}
 
 
 def _lan_ip() -> str:

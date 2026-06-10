@@ -1,0 +1,9 @@
+{
+  "max_workers": "auto",
+  "asset_timeout_seconds": 600,
+  "preview_engine": "workbench",
+  "preview_resolution": 768,
+  "use_gpu_for_preview": true,
+  "copy_assets_to_local_scratch": true,
+  "scratch_dir": "asset_factory/cache/scratch"
+}

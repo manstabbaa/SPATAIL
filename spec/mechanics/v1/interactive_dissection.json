@@ -1,8 +1,0 @@
-{
-  "kind": "interactive_dissection",
-  "status": "placeholder",
-  "placeholderFor": "annotated_callouts",
-  "version": 1,
-  "description": "User taps and the AI explains the tapped part with a panel + isolation animation.",
-  "expectedSourceShape": { "target": "elementId" }
-}

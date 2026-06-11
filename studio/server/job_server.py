@@ -53,6 +53,18 @@ except Exception as _rep_exc:  # noqa: BLE001
     job_entry = None
     print(f"[spine] representation mode unavailable: {_rep_exc}", flush=True)
 
+# The asset artist (Meshy) — the DEFAULT path for object generation since the
+# tracked/placed pivot: Gemini multi-view → Meshy image-to-3D → normalize +
+# decimate → USDZ. Imported defensively; the procedural Blender author remains
+# the fallback whenever this is unavailable or a build fails.
+try:
+    sys.path.insert(0, os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "meshy"))
+    import asset_service as meshy_assets  # noqa: E402
+except Exception as _meshy_exc:  # noqa: BLE001
+    meshy_assets = None
+    print(f"[spine] meshy asset path unavailable: {_meshy_exc}", flush=True)
+
 ROOT = Path(__file__).resolve().parents[2]            # C:\SPATAIL_MAX
 ARTIFACTS = ROOT / "studio" / "out" / "gen"
 ARTIFACTS.mkdir(parents=True, exist_ok=True)
@@ -216,14 +228,32 @@ def _run_job(job_id: str) -> None:
             print(f"[job] {job_id} done -> {res['experience_name']} "
                   f"({res['stations']} stations)", flush=True)
         else:
-            # single object — isolated per-phone headless Blender when enabled,
-            # else the shared live spine (back-compat). Same generator either way.
-            if _uses_isolated(job):
+            # single object. DEFAULT path = the asset artist (Meshy): photoreal
+            # mesh from multi-view images, normalized + decimated for AR. The
+            # procedural Blender author is the FALLBACK (Meshy unavailable, no
+            # keys, API failure, …) — same result shape either way.
+            res, lane = None, ""
+            asset_req = job.get("asset") or {}
+            if meshy_assets is not None and meshy_assets.available():
+                try:
+                    res = meshy_assets.produce(
+                        asset_req.get("subject") or job["prompt"],
+                        job["prompt"], job_id, ARTIFACTS,
+                        asset_id=asset_req.get("assetId"),
+                        scale_meters=asset_req.get("scaleMeters"),
+                        category=asset_req.get("category") or "general",
+                        on_stage=lambda s, _id=job_id: _update(_id, stage=s))
+                    lane = "meshy"
+                except Exception as exc:  # noqa: BLE001
+                    print(f"[job] {job_id} meshy path failed ({exc}) — "
+                          f"procedural fallback", flush=True)
+                    res = None
+            if res is None and _uses_isolated(job):
                 res = headless_build.build(
                     job["prompt"], job_id, ARTIFACTS,
                     on_stage=lambda s, _id=job_id: _update(_id, stage=s))
                 lane = "isolated"
-            else:
+            elif res is None:
                 res = generator.generate(
                     job["prompt"], job_id, ARTIFACTS,
                     on_stage=lambda s, _id=job_id: _update(_id, stage=s))
@@ -429,30 +459,44 @@ class Handler(BaseHTTPRequestHandler):
                     contract = _ex.build_modular_experience(
                         text, kind="text", summary=data.get("surroundingContext") or text,
                         use_llm=use_llm, **tracked_kw)
-                # Route text through per-part Blender generation: build the primary object
-                # as named component parts (the author models + bakes their motion); the
-                # phone streams it in over the placeholder and the manifest binds the parts.
+                # Generation gate: only queue an asset build when the primary asset
+                # did NOT resolve to a real model. A library hit (incl. every asset
+                # the Meshy artist already produced) renders immediately — no job,
+                # no credits. This is what makes the library COMPOUND.
                 assets_ = contract.get("assets") or []
-                primary = next((a["id"] for a in assets_ if a.get("role") == "primary_object"),
-                               assets_[0]["id"] if assets_ else "hero")
+                primary_a = next((a for a in assets_ if a.get("role") == "primary_object"),
+                                 assets_[0] if assets_ else None)
+                primary = primary_a["id"] if primary_a else "hero"
+                primary_missing = not (primary_a and (primary_a.get("usdzUrl")
+                                                      or primary_a.get("glbUrl")))
                 subj = (contract.get("understanding") or {}).get("subject") or text
-                contract.setdefault("generation",
-                                    {"brief": subj, "subject": subj, "assetId": primary})
-            # Real-model generation: if Gemini authored a mechanism brief, enqueue a
-            # live-Blender build (reuses the proven object generator) and hand the phone
-            # a job id to poll — it streams the animated USDZ in over the placeholder.
+                if primary_missing:
+                    contract.setdefault("generation",
+                                        {"brief": subj, "subject": subj, "assetId": primary})
+            # Real-model generation: enqueue an ASSET build the phone polls and streams
+            # in over the placeholder. The worker runs the Meshy artist first
+            # (procedural Blender fallback). `asset` carries what the artist needs.
             gen = contract.get("generation") or {}
             if gen.get("brief"):
                 gid = "gen_" + uuid.uuid4().hex[:8]
                 session = data.get("session") or self.client_address[0]
+                assets_ = contract.get("assets") or []
+                gen_asset = next((a for a in assets_ if a["id"] == gen.get("assetId")),
+                                 assets_[0] if assets_ else {})
                 with _LOCK:
                     _JOBS[gid] = {"id": gid, "status": "queued", "stage": "queued",
                                   "message": None, "prompt": gen["brief"], "mode": "object",
                                   "client": "modular", "created": time.time(),
-                                  "session": session, "usdz": None, "metadata": None}
+                                  "session": session, "usdz": None, "metadata": None,
+                                  "asset": {
+                                      "assetId": gen.get("assetId"),
+                                      "subject": gen.get("subject") or "",
+                                      "scaleMeters": gen_asset.get("scaleMeters"),
+                                      "category": (contract.get("understanding") or {}).get("domain"),
+                                  }}
                 _QUEUE.put(gid)
                 contract["generationJobId"] = gid
-                print(f"[modular] queued Blender mechanism {gid} for {gen.get('subject')!r}: "
+                print(f"[modular] queued asset build {gid} for {gen.get('subject')!r}: "
                       f"{gen['brief'][:90]!r}", flush=True)
             # Attach the v0.6 Scene Contract (content/placement/brand/logic) additively
             # so newer phones get the game-manager trigger graph; old builds ignore it.

@@ -35,7 +35,9 @@ final class ProjectSession: ObservableObject {
         if let data = store.loadContract(m.id),
            let exp = try? JSONDecoder().decode(ModularExperience.self, from: data) {
             experience = exp
-            experienceEpoch += 1
+            // no epoch bump here: load() re-fires from onAppear (e.g. returning from
+            // the Asset Factory cover) and must not tear down the live scene; a fresh
+            // coordinator (presentedEpoch -1) presents a loaded project at any epoch
             if title.isEmpty { title = exp.title }
         }
     }

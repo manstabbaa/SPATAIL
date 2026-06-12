@@ -152,6 +152,8 @@ struct ModularARView: UIViewRepresentable {
     let experience: ModularExperience?
     var epoch: Int = 0
     var streamModel: StreamPayload? = nil
+    /// Bumped to re-place the presented experience against the live room (§7 recentering).
+    var repositionEpoch: Int = 0
     let onStatus: (String) -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator() }
@@ -165,6 +167,7 @@ struct ModularARView: UIViewRepresentable {
         v.session.run(cfg)
         v.session.delegate = context.coordinator         // feeds the RoomModel
         context.coordinator.runtime = ModularRuntime(view: v, onStatus: onStatus)
+        context.coordinator.repositionedEpoch = repositionEpoch   // no fire on first update
         return v
     }
 
@@ -177,11 +180,16 @@ struct ModularARView: UIViewRepresentable {
             context.coordinator.streamedPath = sm.url.path
             context.coordinator.runtime?.streamLocalModel(sm.url, into: sm.assetId)
         }
+        if context.coordinator.repositionedEpoch != repositionEpoch {
+            context.coordinator.repositionedEpoch = repositionEpoch
+            context.coordinator.runtime?.reposition()
+        }
     }
 
     @MainActor final class Coordinator: NSObject, ARSessionDelegate {
         var runtime: ModularRuntime?
         var presentedEpoch = -1
+        var repositionedEpoch = 0
         var streamedPath: String?
         private let roomBuilder = RoomModelBuilder()
         private var lastRoomPush: TimeInterval = 0

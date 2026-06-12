@@ -170,6 +170,45 @@ final class ModularRuntime: NSObject {
         clear(); guard view != nil else { return }; present(e, on: host)
     }
 
+    /// §7 comfort: re-place the current experience against the freshest RoomModel
+    /// ("recentering when placement feels awkward"). Keeps the built scene — loaded
+    /// models, clips, step state all survive; only the anchor and layout move.
+    func reposition() {
+        guard let e = exp, let view, anchor != nil, e.anchoring.mode != "object" else { return }
+        if let solved = solvedPlacement(e) {
+            placedTransform = solved.root
+            relocateAnchor(to: solved.root)
+            for (id, h) in holders {
+                if let l = solved.locals[id] { h.position = l }
+                h.scale = SIMD3(repeating: max(solved.scale, 0.05))
+            }
+            onStatus("repositioned onto the \(solved.anchor) (design system)")
+            return
+        }
+        let t = Self.placementTransform(in: view, anchorType: e.placement.anchorType)
+        placedTransform = t
+        relocateAnchor(to: t)
+        let widths = e.assets.map { Float(max($0.scaleMeters.first ?? 0.2, 0.05)) }
+        let poses = Self.ringPoses(count: e.assets.count, footprintWidths: widths)
+        for (i, a) in e.assets.enumerated() {
+            holders[a.id]?.position = poses[i]
+            holders[a.id]?.scale = .one
+        }
+        onStatus("repositioned (raycast)")
+    }
+
+    /// Move the whole scene to a new world transform by re-parenting the holders
+    /// onto a fresh world anchor (AnchorEntity(world:) transforms are immutable).
+    private func relocateAnchor(to t: simd_float4x4) {
+        guard let view else { return }
+        let a = AnchorEntity(world: t)
+        view.scene.addAnchor(a)
+        for (_, h) in holders { a.addChild(h) }       // keeps local transforms
+        if let caption { a.addChild(caption) }
+        if let old = anchor { view.scene.removeAnchor(old) }
+        anchor = a
+    }
+
     private func present(_ e: ModularExperience, on a: AnchorEntity,
                          layout: [String: SIMD3<Float>]? = nil, layoutScale: Float = 1.0) {
         guard let view else { return }

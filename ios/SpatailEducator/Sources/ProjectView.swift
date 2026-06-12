@@ -13,6 +13,8 @@ final class ProjectSession: ObservableObject {
     /// Bumped on every new contract — experienceId is a stable subject slug, so the
     /// AR host re-presents on epoch, not id (same-subject re-prompts must re-place).
     @Published var experienceEpoch = 0
+    /// Bumped by the reposition button — re-place the scene against the live room.
+    @Published var repositionEpoch = 0
     @Published var streamModel: StreamPayload?
     @Published var status = ""
     @Published var busy = false
@@ -148,6 +150,7 @@ struct CanvasView: View {
         ZStack(alignment: .bottom) {
             ModularARView(experience: session.experience, epoch: session.experienceEpoch,
                           streamModel: session.streamModel,
+                          repositionEpoch: session.repositionEpoch,
                           onStatus: { session.status = $0 })
                 .ignoresSafeArea()
             chat
@@ -163,6 +166,17 @@ struct CanvasView: View {
                 Text(session.title).font(.headline).foregroundStyle(.white)
                     .padding(.horizontal, 12).padding(.vertical, 6)
                     .background(.ultraThinMaterial, in: Capsule()).padding(.top, 6)
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            // §7 comfort: recentering when placement feels awkward — rescan the live
+            // room and re-place the scene (solver against the current RoomModel).
+            if session.experience != nil {
+                Button { session.repositionEpoch += 1 } label: {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                        .font(.title2)
+                        .padding(10).background(.ultraThinMaterial, in: Circle())
+                }.padding()
             }
         }
         .onAppear {

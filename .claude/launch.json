@@ -2,16 +2,16 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "spatail-server",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["studio/server/job_server.py", "--port", "8788", "--no-watchdog", "--no-keep-awake"],
+      "port": 8788
+    },
+    {
       "name": "studio-viewer",
       "runtimeExecutable": "python",
       "runtimeArgs": ["studio/viewer/server.py"],
       "port": 5180
-    },
-    {
-      "name": "spatial-viewer",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["viewer/server.js"],
-      "port": 5173
     },
     {
       "name": "engineexplainer",

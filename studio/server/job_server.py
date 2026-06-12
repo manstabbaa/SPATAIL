@@ -520,7 +520,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlsplit(self.path).path
 
-        if path in ("/", "/health"):
+        if path == "/health":
             bridge = blender_bridge.ping()
             with _LOCK:
                 njobs = len(_JOBS)
@@ -531,6 +531,7 @@ class Handler(BaseHTTPRequestHandler):
                 "blender": (bridge or {}).get("blender"),
                 "jobs": njobs, "artifacts_dir": str(ARTIFACTS),
             })
+        # "/" serves the web viewer (flat asset+explanation preview) further down.
 
         if path.startswith("/mechanics/"):
             base = (ROOT / "public" / "mechanics").resolve()
@@ -573,6 +574,9 @@ class Handler(BaseHTTPRequestHandler):
                     out["usdz_url"] = f"/artifacts/{job['usdz']}"
                     if job.get("metadata"):
                         out["metadata_url"] = f"/artifacts/{job['metadata']}"
+                    # GLB twin (the Meshy artist writes one) — the web viewer's format
+                    if (ARTIFACTS / f"{job['id']}.glb").exists():
+                        out["glb_url"] = f"/artifacts/{job['id']}.glb"
                     # component manifest (parts/roles/motion) if the build emitted one —
                     # lets the runtime bind named parts (explode/tap a part, motion).
                     if (ARTIFACTS / f"{job['id']}_manifest.json").exists():
@@ -619,6 +623,19 @@ class Handler(BaseHTTPRequestHandler):
                      else "application/octet-stream")
             return self._send(200, raw=fp.read_bytes(), ctype=ctype)
 
+        # ── Web viewer: a FLAT preview of the content pipeline (model + the
+        # explanation contract) for fast feedback — the product stays MR on the
+        # phone. One static page + a library index; everything else reuses the
+        # exact same /modular, /jobs and /assets endpoints the phone uses. ──
+        if path in ("/", "/web", "/web/"):
+            page = ROOT / "public" / "webviewer" / "index.html"
+            if not page.is_file():
+                return self._send(404, obj={"error": "webviewer not installed"})
+            return self._send(200, raw=page.read_bytes(), ctype="text/html; charset=utf-8")
+
+        if path == "/web/assets":
+            return self._send(200, obj=_webviewer_assets())
+
         # ── Trackables: the reference-object library for the TRACKED stream.
         # .referenceobject files are trained on the Mac (Create ML / `xcrun createml
         # objecttracker`), dropped into public/assets/spatail-trackables/, and
@@ -649,6 +666,30 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, raw=fp.read_bytes(), ctype=ctype)
 
         return self._send(404, obj={"error": "not found"})
+
+
+def _webviewer_assets() -> dict:
+    """The Meshy library for the web viewer: one entry per slug, preferring the
+    animated cut, then the decimated one, then full-res. GLB for <model-viewer>."""
+    root = (ROOT / "public" / "assets" / "spatail-library" / "meshy").resolve()
+    base = "/assets/spatail-library/meshy"
+    out: dict[str, dict] = {}
+    if root.is_dir():
+        for glb in sorted(root.glob("*.glb")):
+            stem = glb.stem
+            slug = stem[:-5] if stem.endswith("_anim") else (
+                stem[:-3] if stem.endswith("_ar") else stem)
+            rank = 2 if stem.endswith("_anim") else (1 if stem.endswith("_ar") else 0)
+            cur = out.get(slug)
+            if cur is None or rank > cur["_rank"]:
+                usdz = glb.with_suffix(".usdz")
+                out[slug] = {"_rank": rank, "id": slug,
+                             "name": slug.replace("_", " ").title(),
+                             "glb": f"{base}/{glb.name}",
+                             "usdz": f"{base}/{usdz.name}" if usdz.exists() else "",
+                             "animated": stem.endswith("_anim")}
+    assets = [{k: v for k, v in a.items() if k != "_rank"} for a in out.values()]
+    return {"assets": sorted(assets, key=lambda a: a["id"]), "count": len(assets)}
 
 
 def _trackables_index() -> dict:

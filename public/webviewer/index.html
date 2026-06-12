@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPATAIL — Asset Viewer</title>
+<script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+  :root { --bg:#0b0d10; --panel:#14181d; --line:#232a31; --text:#e8edf2;
+          --dim:#8b97a3; --teal:#2dd4bf; --amber:#fbbf24; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font:14px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif; }
+  header { padding:14px 20px; border-bottom:1px solid var(--line);
+           display:flex; align-items:baseline; gap:12px; }
+  header h1 { font-size:16px; margin:0; letter-spacing:.4px; }
+  header span { color:var(--dim); font-size:12px; }
+  .bar { display:flex; gap:8px; padding:14px 20px; }
+  .bar input { flex:1; background:var(--panel); border:1px solid var(--line);
+               border-radius:10px; color:var(--text); padding:10px 14px; font-size:14px; }
+  .bar button { background:var(--teal); color:#06251f; border:0; border-radius:10px;
+                padding:10px 18px; font-weight:600; cursor:pointer; }
+  .bar button:disabled { opacity:.45; cursor:wait; }
+  #status { padding:0 20px 8px; color:var(--amber); font-size:12px; min-height:18px; }
+  main { display:grid; grid-template-columns: 1.25fr 1fr; gap:14px; padding:0 20px 14px; }
+  @media (max-width: 900px) { main { grid-template-columns:1fr; } }
+  .stage { background:var(--panel); border:1px solid var(--line); border-radius:14px;
+           min-height:440px; position:relative; overflow:hidden; }
+  model-viewer { width:100%; height:520px; background:
+        radial-gradient(ellipse at 50% 110%, #1d242b 0%, #0b0d10 70%); }
+  .stage .empty { position:absolute; inset:0; display:flex; align-items:center;
+                  justify-content:center; color:var(--dim); }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:14px;
+           padding:16px 18px; overflow:auto; max-height:520px; }
+  .panel h2 { margin:0 0 4px; font-size:17px; }
+  .panel .sum { color:var(--dim); margin:0 0 12px; }
+  .card { border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:10px 0; }
+  .card b { color:var(--teal); font-size:11px; text-transform:uppercase; letter-spacing:.8px;
+            display:block; margin-bottom:4px; }
+  .step { padding:8px 0; border-bottom:1px dashed var(--line); }
+  .step:last-child { border-bottom:0; }
+  .step .t { font-weight:600; }
+  .step .n { color:var(--dim); }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .chip { background:#0f1f1d; border:1px solid #1d4a44; color:var(--teal);
+          padding:2px 9px; border-radius:99px; font-size:11px; }
+  .note { color:var(--amber); font-size:12px; }
+  #library { padding:0 20px 26px; }
+  #library h3 { color:var(--dim); font-size:12px; text-transform:uppercase; letter-spacing:.8px; }
+  #libgrid { display:flex; flex-wrap:wrap; gap:8px; }
+  #libgrid button { background:var(--panel); border:1px solid var(--line); color:var(--text);
+                    border-radius:10px; padding:8px 14px; cursor:pointer; }
+  #libgrid button:hover { border-color:var(--teal); }
+  .meta { color:var(--dim); font-size:11px; margin-top:8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SPATAIL <span style="color:var(--teal)">asset viewer</span></h1>
+  <span>flat preview of the content pipeline — the end product is mixed reality on the phone</span>
+</header>
+
+<div class="bar">
+  <input id="prompt" placeholder="how does a fire extinguisher work…" autofocus>
+  <button id="go">Generate</button>
+</div>
+<div id="status"></div>
+
+<main>
+  <div class="stage">
+    <model-viewer id="mv" autoplay camera-controls shadow-intensity="0.9"
+                  exposure="1.05" interaction-prompt="none" style="display:none"></model-viewer>
+    <div class="empty" id="empty">prompt something, or pick a library asset below</div>
+  </div>
+  <div class="panel" id="panel">
+    <h2 id="title">—</h2>
+    <p class="sum" id="summary">The explanation the phone narrates appears here.</p>
+    <div class="card" id="placementCard" style="display:none">
+      <b>Placement (design system)</b>
+      <div id="placement"></div>
+      <div class="chips" id="actions"></div>
+      <div class="note" id="scaleNote"></div>
+    </div>
+    <div class="card" id="stepsCard" style="display:none">
+      <b>Sequence</b>
+      <div id="steps"></div>
+    </div>
+    <div class="meta" id="meta"></div>
+  </div>
+</main>
+
+<div id="library">
+  <h3>Library (Meshy-produced assets)</h3>
+  <div id="libgrid"><span class="meta">loading…</span></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const mv = $("mv");
+
+function status(t) { $("status").textContent = t || ""; }
+
+function showModel(url, caption) {
+  mv.src = url;
+  mv.style.display = "block";
+  $("empty").style.display = "none";
+  if (caption) $("meta").textContent = caption;
+}
+
+function renderContract(c) {
+  $("title").textContent = c.title || "Experience";
+  $("summary").textContent = (c.understanding && c.understanding.summary) || "";
+  const p = c.placement || {};
+  if (p.preset) {
+    $("placementCard").style.display = "block";
+    const anchor = (p.anchor || {});
+    const scale = (p.scale || {});
+    $("placement").textContent =
+      `${p.preset}  ·  anchor: ${anchor.type || "?"} (fallback ${anchor.fallback || "—"})` +
+      `  ·  scale: ${scale.mode || "?"}  ·  stream: ${(c.anchoring || {}).mode || "world"}`;
+    $("scaleNote").textContent = scale.scaleNote || "";
+    const acts = ((p.interaction || {}).semanticActions) || [];
+    $("actions").innerHTML = acts.map(a => `<span class="chip">${a}</span>`).join("");
+  }
+  const steps = c.sequence || [];
+  if (steps.length) {
+    $("stepsCard").style.display = "block";
+    $("steps").innerHTML = steps.map(s =>
+      `<div class="step"><div class="t">${s.title || s.id}</div>` +
+      `<div class="n">${s.narration || ""}</div></div>`).join("");
+  }
+}
+
+async function pollJob(id) {
+  for (let i = 0; i < 200; i++) {
+    const r = await fetch(`/jobs/${id}`);
+    const j = await r.json();
+    if (j.status === "done") return j;
+    if (j.status === "error") throw new Error(j.message || "generation failed");
+    status(`building the asset… ${j.stage || j.status}`);
+    await new Promise(res => setTimeout(res, 2500));
+  }
+  throw new Error("timed out");
+}
+
+async function generate() {
+  const text = $("prompt").value.trim();
+  if (!text) return;
+  $("go").disabled = true;
+  status("thinking…");
+  try {
+    const r = await fetch("/modular", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ kind: "text", text, use_llm: true, client: "webviewer" }),
+    });
+    if (!r.ok) throw new Error(`server ${r.status}`);
+    const c = await r.json();
+    renderContract(c);
+    const assets = c.assets || [];
+    const primary = assets.find(a => a.role === "primary_object") || assets[0] || {};
+    if (primary.glbUrl) {
+      showModel(primary.glbUrl, `library hit: ${primary.id}`);
+      status("ready (instant — library hit)");
+    } else if (c.generationJobId) {
+      status("new asset — the artist is at work (Gemini → Meshy → Blender)…");
+      const j = await pollJob(c.generationJobId);
+      if (j.glb_url) {
+        showModel(j.glb_url, `freshly produced: ${primary.id || c.generationJobId}`);
+        status("ready — newly produced and now cached in the library");
+      } else {
+        status("asset done but no web-viewable GLB (usdz only)");
+      }
+    } else {
+      status("ready (no 3D asset in this experience)");
+    }
+  } catch (e) {
+    status(`error: ${e.message}`);
+  } finally {
+    $("go").disabled = false;
+  }
+}
+
+async function loadLibrary() {
+  try {
+    const r = await fetch("/web/assets");
+    const j = await r.json();
+    const grid = $("libgrid");
+    if (!j.assets || !j.assets.length) {
+      grid.innerHTML = '<span class="meta">no Meshy assets yet — prompt one above</span>';
+      return;
+    }
+    grid.innerHTML = "";
+    for (const a of j.assets) {
+      const b = document.createElement("button");
+      b.textContent = a.name + (a.animated ? " ▸" : "");
+      b.onclick = () => { showModel(a.glb, `${a.id} (${a.animated ? "animated" : "static"})`);
+                          status(""); };
+      grid.appendChild(b);
+    }
+  } catch (e) {
+    $("libgrid").innerHTML = `<span class="meta">library unavailable: ${e.message}</span>`;
+  }
+}
+
+$("go").onclick = generate;
+$("prompt").addEventListener("keydown", e => { if (e.key === "Enter") generate(); });
+loadLibrary();
+</script>
+</body>
+</html>

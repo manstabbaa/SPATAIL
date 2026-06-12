@@ -80,6 +80,20 @@ def _desc(subject: str, brief: str) -> str:
     return f"a {subject}"[:300] if subject else "an object"
 
 
+_SWING_WORDS = ("pendulum", "swing", "metronome", "wrecking ball")
+
+
+def _motion_for(subject: str, desc: str) -> dict:
+    """The animator's clip plan (deterministic v1: whole-object filler rigs).
+    swing for pendulum-class subjects; the universal 'showcase' (slow turntable
+    + breathing bob) for everything else — alive and inspectable from all sides.
+    Per-part rigging on split meshes is the next stage of the animator."""
+    text = f"{subject} {desc}".lower()
+    if any(w in text for w in _SWING_WORDS):
+        return {"kind": "swing", "amplitude_deg": 25.0}
+    return {"kind": "showcase"}
+
+
 def _run_blender(script: Path, spec: dict, result_path: Path, timeout: int = 1200) -> dict:
     """Run a studio/meshy bpy script headless against a spec file; return its result."""
     if result_path.exists():
@@ -184,6 +198,7 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
 
     # 4) Decimate to the mobile budget (~12K tris / 1K textures) → <slug>_ar.usdz
     ship_usdz = LIB_DIR / f"{slug}.usdz"
+    ship_glb = LIB_DIR / f"{slug}.glb"
     if os.environ.get("SPATAIL_MESHY_DECIMATE", "1").lower() not in ("0", "false", "no"):
         on_stage("optimizing for AR")
         try:
@@ -197,37 +212,74 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
             ar = LIB_DIR / f"{slug}_ar.usdz"
             if dec.get("done") and ar.exists():
                 ship_usdz = ar
+                if (LIB_DIR / f"{slug}_ar.glb").exists():
+                    ship_glb = LIB_DIR / f"{slug}_ar.glb"
         except Exception as exc:  # noqa: BLE001
             print(f"[asset] decimate skipped ({exc}) — shipping full-res USDZ")
     if not ship_usdz.exists():
         raise RuntimeError("no USDZ produced")
 
-    # 5) Publish into the job's artifacts (existing phone polling streams it in)
+    # 4.5) ANIMATE — the studio's "artist bakes the motion" stage: whole-object
+    # filler-rig clips keyframed in Blender onto the optimized mesh, exported
+    # WITH animation. Non-fatal: a static asset still ships if this fails.
+    clips: list = []
+    if os.environ.get("SPATAIL_MESHY_ANIMATE", "1").lower() not in ("0", "false", "no"):
+        on_stage("animating (Blender)")
+        try:
+            motion = _motion_for(subject, desc)
+            anim = _run_blender(
+                HERE / "animate.py",
+                {"result_path": str(OUT / f"_{slug}_animate.json"),
+                 "assets": [{"assetId": slug, "glb_in": str(ship_glb),
+                             "out_dir": str(LIB_DIR), "motion": motion,
+                             "fps": 30, "seconds": 6.0}]},
+                OUT / f"_{slug}_animate.json")
+            d = (anim.get("done") or [{}])[0]
+            a_usdz, a_glb = LIB_DIR / f"{slug}_anim.usdz", LIB_DIR / f"{slug}_anim.glb"
+            if d.get("clips") and a_glb.exists():
+                clips = d["clips"]
+                ship_glb = a_glb
+                if a_usdz.exists():
+                    ship_usdz = a_usdz
+                print(f"[asset] {slug}: animated ({clips[0]['name']}, {d.get('fcurves')} fcurves)")
+        except Exception as exc:  # noqa: BLE001
+            print(f"[asset] animate skipped ({exc}) — shipping static asset")
+
+    # 5) Publish into the job's artifacts (existing phone polling streams it in).
+    # USDZ feeds the phone; the GLB twin feeds the web viewer (model-viewer).
     on_stage("publishing")
     usdz_name = f"{job_id}.usdz"
     shutil.copyfile(ship_usdz, artifacts_dir / usdz_name)
-    # library URLs follow what we actually ship: the decimated _ar cut when it
-    # exists (so library hits stream the mobile budget, not the 12–22 MB original)
-    shipped_ar = ship_usdz.name.endswith("_ar.usdz")
-    lib_glb = f"{LIB_URL}/{slug}_ar.glb" if (shipped_ar and (LIB_DIR / f"{slug}_ar.glb").exists()) \
-        else f"{LIB_URL}/{slug}.glb"
+    glb_name = ""
+    if ship_glb.exists():
+        glb_name = f"{job_id}.glb"
+        shutil.copyfile(ship_glb, artifacts_dir / glb_name)
+    # library URLs follow what we actually ship (animated > decimated > full-res)
+    lib_glb = f"{LIB_URL}/{ship_glb.name}"
     lib_usdz = f"{LIB_URL}/{ship_usdz.name}"
     meta = {
         "source": "meshy", "subject": subject, "desc": desc, "assetId": slug,
-        "scaleMeters": scale_m, "credits": credits,
+        "scaleMeters": scale_m, "credits": credits, "clips": clips,
         "usdzBytes": (artifacts_dir / usdz_name).stat().st_size,
         "libraryGlb": lib_glb, "libraryUsdz": lib_usdz,
         "elapsedS": round(time.time() - t0, 1),
     }
     metadata_name = f"{job_id}_metadata.json"
     (artifacts_dir / metadata_name).write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    # the Blender↔composer contract: clips the sequencer can play by name
+    if clips:
+        (artifacts_dir / f"{job_id}_manifest.json").write_text(
+            json.dumps({"assetId": slug, "parts": [], "clips": clips}, indent=2),
+            encoding="utf-8")
 
     # 6) Library registration → the next prompt for this subject skips generation
     _register(slug, subject, desc, scale_m, category, lib_glb, lib_usdz)
 
     print(f"[asset] {slug}: meshy asset ready in {meta['elapsedS']}s "
-          f"({meta['usdzBytes'] / 1e6:.1f} MB, {credits} credits)")
+          f"({meta['usdzBytes'] / 1e6:.1f} MB, {credits} credits, "
+          f"{'clip ' + clips[0]['name'] if clips else 'static'})")
     return {"usdz_name": usdz_name, "metadata_name": metadata_name,
+            "glb_name": glb_name, "clips": clips,
             "max_dim": max(scale_m), "spec": {"source": "meshy", "assetId": slug},
             "bbox_yup": {"size": scale_m}}
 

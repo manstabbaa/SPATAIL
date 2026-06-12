@@ -26,6 +26,7 @@ final class ModularRuntime: NSObject {
     private var firedOnce: Set<String> = []
     private var gazeStart: [String: TimeInterval] = [:]
     private var placedTransform: simd_float4x4?
+    private var tapRecognizer: UITapGestureRecognizer?
     private var updateSub: Cancellable?
     private var labels: [Entity] = []
     private var caption: ModelEntity?
@@ -255,8 +256,12 @@ final class ModularRuntime: NSObject {
 
     // MARK: - interaction (triggers)
     private func installTap() {
-        guard let view else { return }
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap(_:))))
+        // once per view: present() runs per experience, and stacked identical
+        // recognizers all fire — every tap would advance one extra step per re-present
+        guard let view, tapRecognizer == nil else { return }
+        let tap = UITapGestureRecognizer(target: self, action: #selector(onTap(_:)))
+        view.addGestureRecognizer(tap)
+        tapRecognizer = tap
     }
     @objc private func onTap(_ g: UITapGestureRecognizer) {
         guard let view else { return }
@@ -482,6 +487,9 @@ final class ModularRuntime: NSObject {
         updateSub = nil; labels.removeAll(); caption = nil
         if let anchor, let view { view.scene.removeAnchor(anchor) }
         anchor = nil; holders.removeAll(); nodes.removeAll(); exp = nil; stepIndex = 0
+        // re-solve placement per experience: a raycast placement taken while the
+        // room was still unknown must not lock later prompts out of the solver path
+        placedTransform = nil
     }
 }
 

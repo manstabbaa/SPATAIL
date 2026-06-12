@@ -100,8 +100,44 @@ const mv = $("mv");
 
 function status(t) { $("status").textContent = t || ""; }
 
+// ── API base resolution ──────────────────────────────────────────────────────
+// Served by the job server itself → same origin ("" prefix). Opened anywhere
+// else (editor preview panel, file on disk) → probe known servers, or take an
+// explicit ?api=http://host:port (remembered in localStorage).
+let API = null;
+async function resolveApi() {
+  const q = new URLSearchParams(location.search).get("api");
+  if (q) localStorage.setItem("spatail.api", q.replace(/\/+$/, ""));
+  const saved = localStorage.getItem("spatail.api");
+  const candidates = [];
+  if (saved) candidates.push(saved);
+  if (location.protocol === "http:" || location.protocol === "https:")
+    candidates.push(location.origin);
+  candidates.push("http://localhost:8787", "http://127.0.0.1:8787",
+                  "http://localhost:8788", "http://127.0.0.1:8788");
+  for (const base of [...new Set(candidates)]) {
+    try {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), 2500);
+      // probe /web/assets, not /health — health pings the Blender bridge and can
+      // take seconds when Blender is down; the asset index is a pure dir listing
+      const r = await fetch(base + "/web/assets", { signal: ctl.signal });
+      clearTimeout(t);
+      if (r.ok) {
+        API = (location.protocol.startsWith("http") && base === location.origin) ? "" : base;
+        return true;
+      }
+    } catch (e) { /* try the next one */ }
+  }
+  API = null;
+  status("can't reach the SPATAIL server — start it (python studio/server/job_server.py), " +
+         "open this page at the server's address, or append ?api=http://host:8787 to this URL");
+  return false;
+}
+const api = path => (API || "") + path;
+
 function showModel(url, caption) {
-  mv.src = url;
+  mv.src = url.startsWith("http") ? url : api(url);
   mv.style.display = "block";
   $("empty").style.display = "none";
   if (caption) $("meta").textContent = caption;
@@ -133,7 +169,7 @@ function renderContract(c) {
 
 async function pollJob(id) {
   for (let i = 0; i < 200; i++) {
-    const r = await fetch(`/jobs/${id}`);
+    const r = await fetch(api(`/jobs/${id}`));
     const j = await r.json();
     if (j.status === "done") return j;
     if (j.status === "error") throw new Error(j.message || "generation failed");
@@ -146,10 +182,11 @@ async function pollJob(id) {
 async function generate() {
   const text = $("prompt").value.trim();
   if (!text) return;
+  if (API === null && !(await resolveApi())) return;
   $("go").disabled = true;
   status("thinking…");
   try {
-    const r = await fetch("/modular", {
+    const r = await fetch(api("/modular"), {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ kind: "text", text, use_llm: true, client: "webviewer" }),
     });
@@ -182,7 +219,7 @@ async function generate() {
 
 async function loadLibrary() {
   try {
-    const r = await fetch("/web/assets");
+    const r = await fetch(api("/web/assets"));
     const j = await r.json();
     const grid = $("libgrid");
     if (!j.assets || !j.assets.length) {
@@ -204,7 +241,7 @@ async function loadLibrary() {
 
 $("go").onclick = generate;
 $("prompt").addEventListener("keydown", e => { if (e.key === "Enter") generate(); });
-loadLibrary();
+resolveApi().then(ok => { if (ok) loadLibrary(); });
 </script>
 </body>
 </html>

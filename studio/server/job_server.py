@@ -358,9 +358,21 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        # CORS: the web viewer may be opened OUTSIDE this origin (editor preview
+        # panel, file on disk) and still call the API. Harmless for same-origin
+        # clients (the phone uses plain URLSession, no CORS at all).
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         if self.command != "HEAD":
             self.wfile.write(body)
+
+    def do_OPTIONS(self):  # CORS preflight (POST /modular sends application/json)
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Max-Age", "86400")
+        self.end_headers()
 
     def log_message(self, fmt, *args):  # concise access log
         print(f"[http] {self.address_string()} {fmt % args}", flush=True)
@@ -600,6 +612,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(body)))
             self.send_header("Content-Disposition", f'inline; filename="{fname}"')
             self.send_header("Cache-Control", "no-store")
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
             if self.command != "HEAD":
                 self.wfile.write(body)

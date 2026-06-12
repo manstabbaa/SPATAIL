@@ -171,11 +171,34 @@ final class ModularRuntime: NSObject {
         clear(); guard view != nil else { return }; present(e, on: host)
     }
 
-    /// §7 comfort: re-place the current experience against the freshest RoomModel
-    /// ("recentering when placement feels awkward"). Keeps the built scene — loaded
-    /// models, clips, step state all survive; only the anchor and layout move.
+    /// §7 comfort: re-place the current experience ("recentering when placement
+    /// feels awkward"). Keeps the built scene — loaded models, clips, step state
+    /// all survive; only the anchor and layout move. Decision ladder per §2:
+    ///   1. USER INTENT — they pressed the button while aiming at a horizontal
+    ///      surface: the experience goes where they're looking (floor or table).
+    ///   2. the PlacementSolver's best spot against the freshest RoomModel
+    ///   3. the legacy screen-centre raycast transform
     func reposition() {
         guard let e = exp, let view, anchor != nil, e.anchoring.mode != "object" else { return }
+        let centre = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
+        if let hit = (view.raycast(from: centre, allowing: .existingPlaneGeometry, alignment: .horizontal).first
+                   ?? view.raycast(from: centre, allowing: .estimatedPlane, alignment: .horizontal).first) {
+            let c = hit.worldTransform.columns.3
+            let origin = SIMD3(c.x, c.y, c.z)
+            let cam = view.cameraTransform.translation
+            let yaw = atan2(cam.x - origin.x, cam.z - origin.z)   // face the user
+            let t = Transform(scale: .one, rotation: simd_quatf(angle: yaw, axis: SIMD3(0, 1, 0)),
+                              translation: origin).matrix
+            placedTransform = t
+            relocateAnchor(to: t)
+            let cls: String
+            if let fl = roomModel?.floor(), abs(origin.y - fl.height) < 0.25 { cls = "floor" }
+            else if let tb = roomModel?.bestTable(), abs(origin.y - tb.height) < 0.25 { cls = "table" }
+            else { cls = "surface" }
+            print("SPATAIL reposition: aimed hit @\(origin) → \(cls)")
+            onStatus("repositioned onto the \(cls) you're aiming at")
+            return
+        }
         if let solved = solvedPlacement(e) {
             let newPos = SIMD3(solved.root.columns.3.x, solved.root.columns.3.y, solved.root.columns.3.z)
             let newFwd = SIMD3(solved.root.columns.2.x, solved.root.columns.2.y, solved.root.columns.2.z)

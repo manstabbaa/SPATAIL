@@ -128,9 +128,24 @@ final class ModularRuntime: NSObject {
             let r = mapRot.act(SIMD3(s.x, 0, s.z))
             return SIMD3(rm.user.position.x + r.x, s.y, rm.user.position.z + r.z)
         }
+        // The solver assumes the spine frame contract (room_model.py): user at the
+        // origin, surface dead ahead, floor at y 0. ARKit feeds world-frame surfaces
+        // and a live pose instead, so pin the solved arc onto the REAL surface:
+        // the table's detected centre (§6: centre on the detected table), or the
+        // floor's detected world height (ARKit world y=0 is the session-start pose,
+        // ~1.4 m above the real floor — never a place to stand content).
+        let heroArc = toWorld(hero.position)
+        let pin: SIMD3<Float>
+        if plan.anchor == "table", let t = rm.bestTable() {
+            pin = SIMD3(t.center.x - heroArc.x, t.height - heroArc.y, t.center.z - heroArc.z)
+        } else if plan.anchor == "floor", let fl = rm.floor() {
+            pin = SIMD3(0, fl.height - heroArc.y, 0)   // ahead of the user, on the real floor
+        } else {
+            return nil                                  // no real surface → raycast fallback
+        }
         // root sits at the hero slot, rotated to face the user (matches the
         // raycast path's convention so captions/labels hang the same way)
-        let heroW = toWorld(hero.position)
+        let heroW = heroArc + pin
         let toUser = rm.user.position - heroW
         let rootYaw = atan2(toUser.x, toUser.z)
         let rootRot = simd_quatf(angle: rootYaw, axis: SIMD3(0, 1, 0))
@@ -138,7 +153,7 @@ final class ModularRuntime: NSObject {
         let inv = rootRot.inverse
         var locals: [String: SIMD3<Float>] = [:]
         for p in plan.placements {
-            locals[p.assetId] = inv.act(toWorld(p.position) - heroW)
+            locals[p.assetId] = inv.act(toWorld(p.position) + pin - heroW)
         }
         return (root, locals, hero.scale, plan.anchor)
     }

@@ -13,6 +13,7 @@ struct ModularEntryView: View {
     @State private var status = "Type what to explain, or tap the camera."
     @State private var busy = false
     @State private var experience: ModularExperience?
+    @State private var experienceEpoch = 0
     @State private var streamModel: StreamPayload? = nil
     @State private var showCamera = false
     // The two streams of a spatial experience: overlay the REAL object in front of
@@ -23,7 +24,8 @@ struct ModularEntryView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            ModularARView(experience: experience, streamModel: streamModel, onStatus: { status = $0 })
+            ModularARView(experience: experience, epoch: experienceEpoch,
+                          streamModel: streamModel, onStatus: { status = $0 })
                 .ignoresSafeArea()
 
             VStack(spacing: 8) {
@@ -97,6 +99,7 @@ struct ModularEntryView: View {
                 text: t, tracked: trackObject,
                 trackedObjectId: trackable?.id ?? "",
                 referenceObjectUrl: trackable?.url ?? "")
+            experienceEpoch += 1
             status = "ready — tap to step"
         } catch { status = "error: \(error.localizedDescription)" }
         busy = false
@@ -113,6 +116,7 @@ struct ModularEntryView: View {
                 trackedObjectId: trackable?.id ?? "",
                 referenceObjectUrl: trackable?.url ?? "")
             experience = exp
+            experienceEpoch += 1
             busy = false
             if let jid = exp.generationJobId, !jid.isEmpty {
                 status = "Blender is building a real model… (a few minutes)"
@@ -141,8 +145,12 @@ struct ModularEntryView: View {
 struct StreamPayload: Equatable { let assetId: String; let url: URL }
 
 /// SwiftUI host for an ARView running a ModularRuntime; re-presents when the experience changes.
+/// `epoch` is bumped by the owner on every new contract — the server's experienceId is a
+/// stable subject slug, so re-prompting the same subject must still re-present (and re-solve
+/// placement against the current room).
 struct ModularARView: UIViewRepresentable {
     let experience: ModularExperience?
+    var epoch: Int = 0
     var streamModel: StreamPayload? = nil
     let onStatus: (String) -> Void
 
@@ -161,8 +169,8 @@ struct ModularARView: UIViewRepresentable {
     }
 
     func updateUIView(_ v: ARView, context: Context) {
-        if let e = experience, context.coordinator.presentedId != e.experienceId {
-            context.coordinator.presentedId = e.experienceId
+        if let e = experience, context.coordinator.presentedEpoch != epoch {
+            context.coordinator.presentedEpoch = epoch
             context.coordinator.runtime?.present(e)
         }
         if let sm = streamModel, context.coordinator.streamedPath != sm.url.path {
@@ -173,7 +181,7 @@ struct ModularARView: UIViewRepresentable {
 
     @MainActor final class Coordinator: NSObject, ARSessionDelegate {
         var runtime: ModularRuntime?
-        var presentedId: String?
+        var presentedEpoch = -1
         var streamedPath: String?
         private let roomBuilder = RoomModelBuilder()
         private var lastRoomPush: TimeInterval = 0

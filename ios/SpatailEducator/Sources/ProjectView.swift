@@ -10,6 +10,9 @@ import SwiftUI
 final class ProjectSession: ObservableObject {
     @Published var conversation: [ConversationTurn] = []
     @Published var experience: ModularExperience?
+    /// Bumped on every new contract — experienceId is a stable subject slug, so the
+    /// AR host re-presents on epoch, not id (same-subject re-prompts must re-place).
+    @Published var experienceEpoch = 0
     @Published var streamModel: StreamPayload?
     @Published var status = ""
     @Published var busy = false
@@ -32,6 +35,7 @@ final class ProjectSession: ObservableObject {
         if let data = store.loadContract(m.id),
            let exp = try? JSONDecoder().decode(ModularExperience.self, from: data) {
             experience = exp
+            experienceEpoch += 1
             if title.isEmpty { title = exp.title }
         }
     }
@@ -71,6 +75,7 @@ final class ProjectSession: ObservableObject {
                     text: p, prior: prior, tracked: tracked,
                     trackedObjectId: trackableId, referenceObjectUrl: trackableUrl)
                 experience = result.experience
+                experienceEpoch += 1
                 store.saveContract(result.raw, for: pid)
                 if var m = meta {
                     m.updatedAt = Date()
@@ -139,7 +144,8 @@ struct CanvasView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            ModularARView(experience: session.experience, streamModel: session.streamModel,
+            ModularARView(experience: session.experience, epoch: session.experienceEpoch,
+                          streamModel: session.streamModel,
                           onStatus: { session.status = $0 })
                 .ignoresSafeArea()
             chat

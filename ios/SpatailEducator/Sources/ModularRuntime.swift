@@ -148,6 +148,8 @@ final class ModularRuntime: NSObject {
         } else {
             return nil                                  // no real surface → raycast fallback
         }
+        print("SPATAIL placement: anchor=\(plan.anchor) hero=\(heroArc + pin) "
+              + "surfaces=\(rm.surfaces.map { "\($0.cls)@\(String(format: "%.2f", $0.height))" })")
         // root sits at the hero slot, rotated to face the user (matches the
         // raycast path's convention so captions/labels hang the same way)
         let heroW = heroArc + pin

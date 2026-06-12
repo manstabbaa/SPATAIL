@@ -75,7 +75,7 @@ final class RoomModelBuilder {
         userFwd = simd_length(flat) > 1e-4 ? simd_normalize(flat) : SIMD3(0, 0, -1)
     }
 
-    private static func classify(_ p: ARPlaneAnchor) -> String {
+    private static func classify(_ p: ARPlaneAnchor, floorY: Float, cameraY: Float) -> String {
         switch p.classification {
         case .floor:   return "floor"
         case .table:   return "table"
@@ -83,9 +83,13 @@ final class RoomModelBuilder {
         case .ceiling: return "ceiling"
         case .seat:    return "seat"
         default:
-            // unclassified: infer from alignment + height (the current heuristic)
+            // unclassified: infer from height ABOVE THE FLOOR. ARKit world y=0 is the
+            // session-start phone pose (~1.4 m up), so an absolute threshold labels
+            // every table "floor" and the solver shoves content past the real table.
             if p.alignment == .horizontal {
-                return p.transform.columns.3.y < 0.3 ? "floor" : "table"
+                let y = p.transform.columns.3.y
+                if y > cameraY + 0.5 { return "ceiling" }
+                return y - floorY < 0.35 ? "floor" : "table"
             }
             return "wall"
         }
@@ -98,11 +102,18 @@ final class RoomModelBuilder {
         rm.user = (position: userPos, forward: userFwd,
                    eyeHeight: max(Float(1.2), userPos.y > 0.1 ? userPos.y : Float(1.45)))
         var minX: Float = 0, maxX: Float = 0, minZ: Float = 0, maxZ: Float = 0
+        // floor reference for the height heuristic: the lowest horizontal plane seen,
+        // or the camera's typical handheld height above the floor when none is lower
+        // (a lone table plane must not become its own "floor")
+        let lowestHorizontal = planes.values
+            .filter { $0.alignment == .horizontal }
+            .map { $0.transform.columns.3.y }.min() ?? .greatestFiniteMagnitude
+        let floorY = lowestHorizontal <= userPos.y - 1.0 ? lowestHorizontal : userPos.y - 1.4
         for (_, p) in planes {
             let c = p.transform.columns.3
             let ext = p.planeExtent
             rm.surfaces.append(RoomModel.Surface(
-                cls: Self.classify(p),
+                cls: Self.classify(p, floorY: floorY, cameraY: userPos.y),
                 center: SIMD3(c.x, c.y, c.z),
                 size: SIMD2(ext.width, ext.height),
                 normal: SIMD3(0, 1, 0),

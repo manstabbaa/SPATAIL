@@ -43,6 +43,10 @@ final class ModularRuntime: NSObject {
 
     init(view: ARView, onStatus: @escaping (String) -> Void = { _ in }) {
         self.view = view; self.onStatus = onStatus; super.init()
+        // .playback so narration survives the ring/silent switch (the default
+        // .soloAmbient is muted by it, which reads as "narration is broken")
+        try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
     }
 
     // MARK: - present
@@ -221,6 +225,7 @@ final class ModularRuntime: NSObject {
         for (id, h) in holders { setOpacity(h, id == step.focus ? 1.0 : 0.35) }
         playClipOn(step.focus)
         setCaption(stepCaption(step))
+        synth.stopSpeaking(at: .immediate)   // narration follows the visible step, not a queue
         if !step.narration.isEmpty { speak(step.narration) }
         onStatus("step \(stepIndex + 1)/\(e.sequence.count): \(step.title)")
     }
@@ -484,6 +489,7 @@ final class ModularRuntime: NSObject {
 
     func clear() {
         objectAnchoring.stop()
+        synth.stopSpeaking(at: .immediate)
         updateSub = nil; labels.removeAll(); caption = nil
         if let anchor, let view { view.scene.removeAnchor(anchor) }
         anchor = nil; holders.removeAll(); nodes.removeAll(); exp = nil; stepIndex = 0

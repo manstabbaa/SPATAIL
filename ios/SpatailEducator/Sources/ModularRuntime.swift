@@ -29,7 +29,10 @@ final class ModularRuntime: NSObject {
     private var tapRecognizer: UITapGestureRecognizer?
     private var updateSub: Cancellable?
     private var labels: [Entity] = []
-    private var caption: ModelEntity?
+    // spatial step UI (anchored callout + highlight marker + side panel)
+    private var stepUI: [Entity] = []
+    private var pulseMarkers: [Entity] = []
+    private var tintedParts: [(ModelEntity, [any RealityKit.Material])] = []
     private let synth = AVSpeechSynthesizer()
     private let onStatus: (String) -> Void
 
@@ -180,6 +183,7 @@ final class ModularRuntime: NSObject {
     ///   3. the legacy screen-centre raycast transform
     func reposition() {
         guard let e = exp, let view, anchor != nil, e.anchoring.mode != "object" else { return }
+        defer { refreshStepUI() }    // re-anchor the step's callout/panel to the moved scene
         let centre = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
         if let hit = (view.raycast(from: centre, allowing: .existingPlaneGeometry, alignment: .horizontal).first
                    ?? view.raycast(from: centre, allowing: .estimatedPlane, alignment: .horizontal).first) {
@@ -239,7 +243,6 @@ final class ModularRuntime: NSObject {
         let a = AnchorEntity(world: t)
         view.scene.addAnchor(a)
         for (_, h) in holders { a.addChild(h) }       // keeps local transforms
-        if let caption { a.addChild(caption) }
         if let old = anchor { view.scene.removeAnchor(old) }
         anchor = a
     }
@@ -300,28 +303,196 @@ final class ModularRuntime: NSObject {
         // focus: play the focus asset's clip; gently ghost the others
         for (id, h) in holders { setOpacity(h, id == step.focus ? 1.0 : 0.35) }
         playClipOn(step.focus)
-        setCaption(stepCaption(step))
+        buildStepUI(step)        // anchored callout + part highlight + side panel
         synth.stopSpeaking(at: .immediate)   // narration follows the visible step, not a queue
         if !step.narration.isEmpty { speak(step.narration) }
         onStatus("step \(stepIndex + 1)/\(e.sequence.count): \(step.title)")
     }
 
-    private func stepCaption(_ step: ModularExperience.Step) -> String {
-        var lines = [step.title, step.narration].filter { !$0.isEmpty }
+    /// The step's reading content (everything except the title, which lives in the
+    /// anchored callout): narration + fact panels + quiz.
+    private func sidePanelText(_ step: ModularExperience.Step) -> String {
+        var lines = [step.narration].filter { !$0.isEmpty }
         for p in step.panels {
             if p.kind == "quiz", !p.question.isEmpty {
-                lines.append("❓ " + p.question)
+                lines.append("? " + p.question)
                 lines.append(p.options.enumerated().map { "\($0.0 + 1). \($0.1)" }.joined(separator: "   "))
             } else if !p.body.isEmpty {
-                lines.append(p.body)
+                lines.append((p.title.isEmpty ? "" : p.title + " — ") + p.body)
             }
         }
-        return lines.joined(separator: "\n")
+        return lines.joined(separator: "\n\n")
     }
 
+    /// Step advance: labels AND step UI go.
     private func resetTransient() {
         for l in labels { l.removeFromParent() }
         labels.removeAll()
+        clearStepUI()
+    }
+
+    /// In-place UI refresh (reposition / model swap): step UI only — the §5 scale
+    /// note and trigger-spawned labels must survive until the next step.
+    private func clearStepUI() {
+        for e in stepUI { e.removeFromParent() }
+        stepUI.removeAll()
+        pulseMarkers.removeAll()
+        for (m, mats) in tintedParts { m.model?.materials = mats }   // un-highlight
+        tintedParts.removeAll()
+    }
+
+    // MARK: - spatial step UI (the immersive layer: the explanation happens ON the model)
+    /// Design system §9: title rides in a callout anchored to the part being explained
+    /// (leader line + pulsing marker + material highlight when the part is found);
+    /// the reading content sits on a flat panel BESIDE the object, facing the user.
+    private func buildStepUI(_ step: ModularExperience.Step) {
+        guard let a = anchor, let e = exp else { return }
+        let focusId = holders[step.focus] != nil
+            ? step.focus
+            : (e.assets.first(where: { $0.role == "primary_object" })?.id ?? e.assets.first?.id ?? "")
+        guard let holder = holders[focusId] else { return }
+        let node = nodes[focusId] ?? holder
+        let b = node.visualBounds(relativeTo: a)
+        let (point, part) = resolveStepAnchor(step, node: node, bounds: b, in: a)
+        if !step.title.isEmpty { addCallout(step.title, at: point, in: a) }
+        addMarker(at: point, in: a)
+        if let part { highlight(part) }
+        let body = sidePanelText(step)
+        if !body.isEmpty { addSidePanel(body, bounds: b, in: a) }
+    }
+
+    /// Rebuild the current step's UI in place (after reposition or a model swap) —
+    /// no narration restart, no step change, labels untouched.
+    private func refreshStepUI() {
+        guard let e = exp, !e.sequence.isEmpty else { return }
+        clearStepUI()
+        buildStepUI(e.sequence[stepIndex])
+    }
+
+    /// Where the explanation POINTS. Priority is the §2 hierarchy: the contract's
+    /// explicit anchor (normalized bbox offset from the director, or a named part),
+    /// then a fuzzy name match from the step title, then deterministic bbox points
+    /// so consecutive steps land on different regions of the model.
+    private func resolveStepAnchor(_ step: ModularExperience.Step, node: Entity,
+                                   bounds: BoundingBox, in root: Entity) -> (SIMD3<Float>, Entity?) {
+        if step.anchorOffset.count == 3 {
+            let o = SIMD3(Float(step.anchorOffset[0]), Float(step.anchorOffset[1]), Float(step.anchorOffset[2]))
+            return (bounds.min + o * bounds.extents, nil)
+        }
+        var needles: [String] = step.target.isEmpty ? [] : [step.target]
+        needles += Self.keywords(step.title)
+        for n in needles {
+            if let hit = Self.findEntity(in: node, fuzzy: n), hit !== node {
+                // geometry-free nodes (rig locators, lights) have EMPTY bounds —
+                // min=(inf), max=(-inf) — which would place the callout at y=-inf
+                let hb = hit.visualBounds(relativeTo: root)
+                guard hb.max.y.isFinite, hb.max.y >= hb.min.y else { continue }
+                return (SIMD3(hb.center.x, hb.max.y, hb.center.z), hit)
+            }
+        }
+        let pts: [SIMD3<Float>] = [
+            SIMD3(bounds.center.x, bounds.max.y, bounds.center.z),                                  // top
+            SIMD3(bounds.max.x, bounds.center.y + bounds.extents.y * 0.2, bounds.center.z),         // right
+            SIMD3(bounds.center.x, bounds.center.y + bounds.extents.y * 0.3, bounds.max.z),         // front
+            SIMD3(bounds.min.x, bounds.center.y + bounds.extents.y * 0.2, bounds.center.z),         // left
+        ]
+        return (pts[stepIndex % pts.count], nil)
+    }
+
+    private static func keywords(_ s: String) -> [String] {
+        let stop: Set<String> = ["the", "a", "an", "of", "and", "how", "what", "meet", "its",
+                                 "this", "that", "with", "your", "world", "amazing", "inside"]
+        var out: [String] = []
+        for raw in s.lowercased().split(whereSeparator: { !$0.isLetter }) {
+            let t = String(raw)
+            guard t.count > 2, !stop.contains(t) else { continue }
+            out.append(t)
+            if t.hasSuffix("s") { out.append(String(t.dropLast())) }
+        }
+        return out
+    }
+
+    private static func findEntity(in root: Entity, fuzzy needle: String) -> Entity? {
+        guard needle.count > 2 else { return nil }
+        let n = needle.lowercased()
+        var stack: [Entity] = [root]
+        while let e = stack.popLast() {
+            if e.name.lowercased().contains(n) { return e }
+            stack.append(contentsOf: e.children)
+        }
+        return nil
+    }
+
+    /// "Set in another material": swap the part's materials for a highlight tint;
+    /// the originals are restored on the next step (resetTransient).
+    private func highlight(_ part: Entity) {
+        var stack: [Entity] = [part]
+        while let e = stack.popLast() {
+            if let m = e as? ModelEntity, let model = m.model {
+                tintedParts.append((m, model.materials))
+                m.model?.materials = [SimpleMaterial(color: UIColor.systemTeal.withAlphaComponent(0.9),
+                                                     roughness: 0.35, isMetallic: false)]
+            }
+            stack.append(contentsOf: e.children)
+        }
+    }
+
+    /// Pulsing dot at the anchored point — "something has to happen" on the model.
+    private func addMarker(at p: SIMD3<Float>, in root: Entity) {
+        let m = ModelEntity(mesh: .generateSphere(radius: 0.009),
+                            materials: [UnlitMaterial(color: .systemTeal)])
+        m.position = p
+        root.addChild(m)
+        stepUI.append(m); pulseMarkers.append(m)
+    }
+
+    /// Title bubble above the anchor point, tied down with a leader line.
+    private func addCallout(_ text: String, at p: SIMD3<Float>, in root: Entity) {
+        let lift: Float = 0.10
+        let bubble = makeTextBubble(text, width: 0.22, fontSize: 0.018)
+        bubble.position = SIMD3(p.x, p.y + lift, p.z)
+        if #available(iOS 18.0, *) { bubble.components.set(BillboardComponent()) }
+        root.addChild(bubble)
+        let line = ModelEntity(mesh: .generateBox(size: SIMD3(0.0015, lift - 0.02, 0.0015)),
+                               materials: [UnlitMaterial(color: .white)])
+        line.position = SIMD3(p.x, p.y + (lift - 0.02) / 2, p.z)
+        root.addChild(line)
+        stepUI.append(bubble); stepUI.append(line)
+    }
+
+    /// §9: the reading content goes BESIDE the object, flat and user-facing —
+    /// never stacked on top of it.
+    private func addSidePanel(_ text: String, bounds: BoundingBox, in root: Entity) {
+        let panel = makeTextBubble(text, width: 0.26, fontSize: 0.013)
+        panel.position = SIMD3(bounds.max.x + 0.18,
+                               max(bounds.center.y + 0.06, 0.10),
+                               bounds.center.z)
+        if #available(iOS 18.0, *) { panel.components.set(BillboardComponent()) }
+        root.addChild(panel)
+        stepUI.append(panel)
+    }
+
+    /// Plain text on a dark backing — graphics pass comes later, structure first.
+    private func makeTextBubble(_ text: String, width: CGFloat, fontSize: CGFloat) -> Entity {
+        let mesh = MeshResource.generateText(text, extrusionDepth: 0.0008,
+            font: .systemFont(ofSize: fontSize, weight: .medium),
+            containerFrame: CGRect(x: 0, y: 0, width: width, height: width),
+            alignment: .left, lineBreakMode: .byWordWrapping)
+        let label = ModelEntity(mesh: mesh, materials: [UnlitMaterial(color: .white)])
+        let tb = label.visualBounds(relativeTo: nil)
+        let pad: Float = 0.012
+        let backing = ModelEntity(
+            mesh: .generatePlane(width: tb.extents.x + pad * 2, depth: tb.extents.y + pad * 2, cornerRadius: 0.012),
+            materials: [UnlitMaterial(color: .black)])
+        backing.orientation = simd_quatf(angle: .pi / 2, axis: SIMD3(1, 0, 0))   // face +z
+        if #available(iOS 18.0, *) { backing.components.set(OpacityComponent(opacity: 0.6)) }
+        let group = Entity()
+        // centre the text block on the group origin; backing just behind it
+        label.position = SIMD3(-tb.center.x, -tb.center.y, 0.001)
+        backing.position = SIMD3(0, 0, 0)
+        group.addChild(backing)
+        group.addChild(label)
+        return group
     }
 
     // MARK: - clip playback (play the asset's baked animation)
@@ -332,8 +503,15 @@ final class ModularRuntime: NSObject {
         }
     }
 
-    // MARK: - per-frame tick (spatial triggers only — no procedural motion)
-    private func tick() { checkSpatialTriggers(CACurrentMediaTime()) }
+    // MARK: - per-frame tick (spatial triggers + marker pulse — no procedural motion)
+    private func tick() {
+        let now = CACurrentMediaTime()
+        if !pulseMarkers.isEmpty {
+            let s = 1 + 0.3 * Float(sin(now * 5))
+            for m in pulseMarkers { m.scale = SIMD3(repeating: s) }
+        }
+        checkSpatialTriggers(now)
+    }
 
     // MARK: - interaction (triggers)
     private func installTap() {
@@ -491,6 +669,7 @@ final class ModularRuntime: NSObject {
             print("SPATAIL: loadModel \(assetId) — \(clips.count) animation clip(s)")
             if clips.isEmpty { print("SPATAIL: WARNING no animations on \(assetId); model is static.") }
             for anim in clips { entity.playAnimation(anim.repeat(), transitionDuration: 0.2) }
+            refreshStepUI()       // re-anchor callout/panel to the real geometry
         } catch { print("SPATAIL: loadModel \(assetId) FAILED: \(error) — keeping box") }
     }
 
@@ -512,6 +691,7 @@ final class ModularRuntime: NSObject {
                 print("SPATAIL: streamLocalModel \(assetId) ← \(fileURL.lastPathComponent) — \(clips.count) animation clip(s)")
                 if clips.isEmpty { print("SPATAIL: WARNING no animations on \(assetId); model is static.") }
                 for anim in clips { entity.playAnimation(anim.repeat(), transitionDuration: 0.3) }
+                self.refreshStepUI()   // re-anchor callout/panel to the real geometry
                 self.onStatus("real model ready")
             } catch {
                 print("SPATAIL: streamLocalModel \(assetId) FAILED: \(error)")
@@ -551,22 +731,14 @@ final class ModularRuntime: NSObject {
         e.position = SIMD3(-0.12, 0.16, 0); h.addChild(e); labels.append(e)
     }
 
-    private func setCaption(_ text: String) {
-        caption?.removeFromParent()
-        guard let anchor, !text.isEmpty else { return }
-        let mesh = MeshResource.generateText(text, extrusionDepth: 0.001, font: .systemFont(ofSize: 0.03, weight: .medium),
-            containerFrame: CGRect(x: 0, y: 0, width: 0.6, height: 0.24), alignment: .center, lineBreakMode: .byWordWrapping)
-        let m = ModelEntity(mesh: mesh, materials: [UnlitMaterial(color: .white)])
-        m.position = SIMD3(-0.3, 0.42, 0.05); anchor.addChild(m); caption = m
-    }
-
     private func speak(_ text: String) { let u = AVSpeechUtterance(string: text); u.rate = 0.5; synth.speak(u) }
     private func playCue(_ cue: String) { AudioServicesPlaySystemSound(cue == "correct" ? 1054 : (cue == "pickup" ? 1104 : 1103)) }
 
     func clear() {
         objectAnchoring.stop()
         synth.stopSpeaking(at: .immediate)
-        updateSub = nil; labels.removeAll(); caption = nil
+        updateSub = nil; labels.removeAll()
+        stepUI.removeAll(); pulseMarkers.removeAll(); tintedParts.removeAll()
         if let anchor, let view { view.scene.removeAnchor(anchor) }
         anchor = nil; holders.removeAll(); nodes.removeAll(); exp = nil; stepIndex = 0
         // re-solve placement per experience: a raycast placement taken while the

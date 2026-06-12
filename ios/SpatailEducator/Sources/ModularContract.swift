@@ -214,6 +214,13 @@ struct ModularExperience: Decodable {
         var title = "", narration = "", focus = "scene", clip = "demo", advance = "tap"
         var loop = true
         var panels: [Panel] = []
+        /// Spatial-UI anchoring (immersive callouts): `target` names a part of the
+        /// focus model to highlight ("eye"); `anchorOffset` is a normalized [0..1]^3
+        /// position inside the model's bounding box (the director can emit it from
+        /// Gemini's multi-view understanding without any mesh splitting). Both
+        /// optional — the runtime falls back to name-matching, then bbox heuristics.
+        var target = ""
+        var anchorOffset: [Double] = []
         init(from d: Decoder) throws {
             let c = try d.container(keyedBy: K.self)
             id = (try? c.decode(String.self, forKey: .id)) ?? UUID().uuidString
@@ -224,8 +231,14 @@ struct ModularExperience: Decodable {
             advance = (try? c.decode(String.self, forKey: .advance)) ?? "tap"
             loop = (try? c.decode(Bool.self, forKey: .loop)) ?? true
             panels = (try? c.decode([Panel].self, forKey: .panels)) ?? []
+            target = (try? c.decode(String.self, forKey: .target))
+                  ?? (try? c.decode(String.self, forKey: .highlight)) ?? ""
+            anchorOffset = (try? c.decode([Double].self, forKey: .anchorOffset)) ?? []
         }
-        enum K: String, CodingKey { case id, title, narration, focus, clip, advance, loop, panels }
+        enum K: String, CodingKey {
+            case id, title, narration, focus, clip, advance, loop, panels,
+                 target, highlight, anchorOffset
+        }
     }
 
     struct Panel: Decodable {

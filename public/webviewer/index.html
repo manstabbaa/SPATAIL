@@ -185,11 +185,20 @@ async function generate() {
   if (API === null && !(await resolveApi())) return;
   $("go").disabled = true;
   status("thinking…");
+  // the panel is NEVER blank: show a skeleton immediately while the brain works
+  $("title").textContent = text;
+  $("summary").textContent = "designing the spatial experience…";
+  $("placementCard").style.display = "none";
+  $("stepsCard").style.display = "none";
   try {
+    const ctl = new AbortController();
+    const kill = setTimeout(() => ctl.abort(), 120000);
     const r = await fetch(api("/modular"), {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ kind: "text", text, use_llm: true, client: "webviewer" }),
+      signal: ctl.signal,
     });
+    clearTimeout(kill);
     if (!r.ok) throw new Error(`server ${r.status}`);
     const c = await r.json();
     renderContract(c);
@@ -211,7 +220,10 @@ async function generate() {
       status("ready (no 3D asset in this experience)");
     }
   } catch (e) {
-    status(`error: ${e.message}`);
+    const why = e.name === "AbortError" ? "the server took too long (120s)" : e.message;
+    status(`error: ${why}` + (API ? ` — server: ${API || location.origin}` : "") +
+           " · tip: open this page at the server itself (e.g. http://localhost:8788)");
+    $("summary").textContent = "request failed — see the status line above.";
   } finally {
     $("go").disabled = false;
   }

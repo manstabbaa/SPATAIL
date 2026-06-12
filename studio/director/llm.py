@@ -77,7 +77,9 @@ def compose(understanding: dict, assets: list[dict], clips: list[dict]) -> list[
     req = urllib.request.Request(API.format(model=MODEL, key=_key()),
                                  data=json.dumps(body).encode(),
                                  headers={"Content-Type": "application/json"})
-    r = urllib.request.urlopen(req, timeout=90)
+    # Tight cap: /modular is SYNCHRONOUS for the phone and the web viewer — a slow
+    # LLM must fail fast into the deterministic sequencer, not stall the contract.
+    r = urllib.request.urlopen(req, timeout=30)
     data = json.load(r)
     txt = "".join(p.get("text", "") for p in data["candidates"][0]["content"]["parts"])
     return json.loads(txt).get("sequence", [])

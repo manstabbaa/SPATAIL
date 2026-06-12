@@ -58,7 +58,8 @@ struct PlacementSolver {
     static func solve(room: RoomModel, assets: [AssetReq],
                       anchorPreference: String = "table",
                       scaleMode: String = "dynamic",
-                      primary: String? = nil) -> Plan {
+                      primary: String? = nil,
+                      coverage: Float = 0.8) -> Plan {   // design system §5: ≤60–70% of surface
         let n = assets.count
         guard n > 0 else { return Plan(placements: [], anchor: "table", scaleVariant: "tabletop") }
         let hero = primary ?? assets[0].id
@@ -85,7 +86,7 @@ struct PlacementSolver {
         let widths = ordered.map { max($0.footprint.x, 0.03) }
         let gap: Float = 0.12
         let neededW = widths.reduce(0, +) + gap * Float(n - 1)
-        let availW = max(0.2, surfW * 0.8)
+        let availW = max(0.2, surfW * min(max(coverage, 0.2), 0.95))
         let fitScale = neededW > 0 ? min(1.0, availW / neededW) : 1.0
         let scale: Float = variant == "real" ? 1.0 : fitScale
 

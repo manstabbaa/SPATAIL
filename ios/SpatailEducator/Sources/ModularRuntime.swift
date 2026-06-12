@@ -74,8 +74,19 @@ final class ModularRuntime: NSObject {
     }
 
     /// PLACED stream: anchor in the world per the Placement Design System policy.
+    /// Preferred path = the PlacementSolver against the live RoomModel (the REAL
+    /// table/floor: extent-aware packing, comfort distance, facing the user).
+    /// Fallback = the original raycast placement when the room isn't known yet.
     private func presentWorldPlaced(_ e: ModularExperience, in view: ARView) {
         objectAnchoring.stop()
+        if placedTransform == nil, let solved = solvedPlacement(e) {
+            let a = AnchorEntity(world: solved.root)
+            view.scene.addAnchor(a)
+            anchor = a
+            present(e, on: a, layout: solved.locals, layoutScale: solved.scale)
+            onStatus("placed on the \(solved.anchor) (design system)")
+            return
+        }
         let t = placedTransform ?? Self.placementTransform(in: view,
                                                            anchorType: e.placement.anchorType)
         placedTransform = t
@@ -84,12 +95,61 @@ final class ModularRuntime: NSObject {
         present(e, on: a)
     }
 
+    /// Resolve the design-system policy against the live RoomModel: pick the real
+    /// surface, pack assets to its extent × maxSurfaceCoverage, keep the comfort
+    /// distance, face the user. Returns nil whenever the room can't answer yet —
+    /// the caller falls back to raycast placement (§10: always provide a fallback).
+    private func solvedPlacement(_ e: ModularExperience)
+        -> (root: simd_float4x4, locals: [String: SIMD3<Float>], scale: Float, anchor: String)? {
+        guard let rm = roomModel, !rm.surfaces.isEmpty, !e.assets.isEmpty else { return nil }
+        let pref = e.placement.anchorType
+        guard pref == "table" || pref == "floor" || pref == "room" else { return nil } // wall → raycast path
+        let reqs = e.assets.map { a -> PlacementSolver.AssetReq in
+            let d = a.scaleMeters
+            let fp = SIMD3<Float>(Float(d.count > 0 ? d[0] : 0.2),
+                                  Float(d.count > 1 ? d[1] : 0.2),
+                                  Float(d.count > 2 ? d[2] : 0.2))
+            return PlacementSolver.AssetReq(id: a.id, footprint: fp, role: a.role)
+        }
+        let primary = e.assets.first(where: { $0.role == "primary_object" })?.id ?? e.assets[0].id
+        let plan = PlacementSolver.solve(
+            room: rm, assets: reqs,
+            anchorPreference: pref == "room" ? "floor" : pref,
+            scaleMode: e.placement.scaleMode == "true_scale" ? "real" : "dynamic",
+            primary: primary,
+            coverage: Float(e.placement.maxSurfaceCoverage))
+        guard let hero = plan.placements.first, hero.fits else { return nil }
+
+        // solver frame (user at origin, looking -Z) → world
+        let f = rm.user.forward
+        let theta = atan2(-f.x, -f.z)
+        let mapRot = simd_quatf(angle: theta, axis: SIMD3(0, 1, 0))
+        func toWorld(_ s: SIMD3<Float>) -> SIMD3<Float> {
+            let r = mapRot.act(SIMD3(s.x, 0, s.z))
+            return SIMD3(rm.user.position.x + r.x, s.y, rm.user.position.z + r.z)
+        }
+        // root sits at the hero slot, rotated to face the user (matches the
+        // raycast path's convention so captions/labels hang the same way)
+        let heroW = toWorld(hero.position)
+        let toUser = rm.user.position - heroW
+        let rootYaw = atan2(toUser.x, toUser.z)
+        let rootRot = simd_quatf(angle: rootYaw, axis: SIMD3(0, 1, 0))
+        let root = Transform(scale: .one, rotation: rootRot, translation: heroW).matrix
+        let inv = rootRot.inverse
+        var locals: [String: SIMD3<Float>] = [:]
+        for p in plan.placements {
+            locals[p.assetId] = inv.act(toWorld(p.position) - heroW)
+        }
+        return (root, locals, hero.scale, plan.anchor)
+    }
+
     /// Present onto a caller-owned anchor (Live Explainer overlay).
     func present(_ e: ModularExperience, into host: AnchorEntity) {
         clear(); guard view != nil else { return }; present(e, on: host)
     }
 
-    private func present(_ e: ModularExperience, on a: AnchorEntity) {
+    private func present(_ e: ModularExperience, on a: AnchorEntity,
+                         layout: [String: SIMD3<Float>]? = nil, layoutScale: Float = 1.0) {
         guard let view else { return }
         exp = e; anchor = a
         triggers = e.triggers
@@ -99,7 +159,12 @@ final class ModularRuntime: NSObject {
         let poses = Self.ringPoses(count: e.assets.count, footprintWidths: widths)
         for (i, asset) in e.assets.enumerated() {
             let holder = Entity()
-            holder.position = poses[i]
+            // solver-resolved pose (the design system against the real room) when
+            // available; the generic ring otherwise.
+            holder.position = layout?[asset.id] ?? poses[i]
+            if layoutScale != 1.0 {
+                holder.scale = SIMD3(repeating: max(layoutScale, 0.05))
+            }
             a.addChild(holder)
             holders[asset.id] = holder
             holder.addChild(makeContactShadow(radius: max(widths[i], 0.06) * 0.75))

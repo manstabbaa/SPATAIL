@@ -36,8 +36,23 @@ struct RoomModel {
     var source = "default"
 
     func surfaces(of cls: String) -> [Surface] { surfaces.filter { $0.cls == cls } }
+    /// The table the USER is engaging with — not the biggest slab in the room.
+    /// Gate out implausible "tables" first (ARKit's ML sometimes labels floor-level
+    /// planes .table), then prefer near + in-front of the user (§6: centre on the
+    /// detected table, main content in front of the user); area is only a tiebreak.
     func bestTable() -> Surface? {
-        surfaces(of: "table").max { $0.size.x * $0.size.y < $1.size.x * $1.size.y }
+        let floorH = floor()?.height
+        let plausible = surfaces(of: "table").filter { t in
+            let above = floorH.map { t.height - $0 } ?? 0.7   // no floor yet → trust the label
+            return above > 0.25 && above < 1.3 && t.size.x * t.size.y > 0.05
+        }
+        func score(_ t: Surface) -> Float {
+            let to = SIMD3(t.center.x - user.position.x, 0, t.center.z - user.position.z)
+            let d = simd_length(to)
+            let behind: Float = d > 0.3 && simd_dot(to / d, user.forward) < 0 ? 2.0 : 0
+            return d + behind - min(t.size.x * t.size.y, 1.0) * 0.3
+        }
+        return plausible.min { score($0) < score($1) }
     }
     func floor() -> Surface? {
         surfaces(of: "floor").max { $0.size.x * $0.size.y < $1.size.x * $1.size.y }

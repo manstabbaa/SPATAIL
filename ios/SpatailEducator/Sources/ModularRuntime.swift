@@ -88,6 +88,7 @@ final class ModularRuntime: NSObject {
             let a = AnchorEntity(world: solved.root)
             view.scene.addAnchor(a)
             anchor = a
+            placedTransform = solved.root
             present(e, on: a, layout: solved.locals, layoutScale: solved.scale)
             onStatus("placed on the \(solved.anchor) (design system)")
             return
@@ -176,13 +177,24 @@ final class ModularRuntime: NSObject {
     func reposition() {
         guard let e = exp, let view, anchor != nil, e.anchoring.mode != "object" else { return }
         if let solved = solvedPlacement(e) {
+            let newPos = SIMD3(solved.root.columns.3.x, solved.root.columns.3.y, solved.root.columns.3.z)
+            let newFwd = SIMD3(solved.root.columns.2.x, solved.root.columns.2.y, solved.root.columns.2.z)
+            let oldPos = placedTransform.map { SIMD3($0.columns.3.x, $0.columns.3.y, $0.columns.3.z) }
+            let oldFwd = placedTransform.map { SIMD3($0.columns.2.x, $0.columns.2.y, $0.columns.2.z) }
             placedTransform = solved.root
             relocateAnchor(to: solved.root)
             for (id, h) in holders {
                 if let l = solved.locals[id] { h.position = l }
                 h.scale = SIMD3(repeating: max(solved.scale, 0.05))
             }
-            onStatus("repositioned onto the \(solved.anchor) (design system)")
+            // unchanged = same spot AND same facing (walking around the table keeps
+            // the table centre but re-faces the content — that IS a reposition)
+            if let op = oldPos, simd_length(op - newPos) < 0.05,
+               let of = oldFwd, simd_dot(simd_normalize(of), simd_normalize(newFwd)) > 0.985 {
+                onStatus("placement unchanged — still the best \(solved.anchor) spot")
+            } else {
+                onStatus("repositioned onto the \(solved.anchor) (design system)")
+            }
             return
         }
         let t = Self.placementTransform(in: view, anchorType: e.placement.anchorType)

@@ -21,6 +21,7 @@ on re-runs, so repeating a subject costs 0 credits and only re-runs Blender.
 
 Knobs:
     SPATAIL_ASSET_PATH=meshy|procedural   default meshy (when both API keys exist)
+    SPATAIL_MESHY_ANCHORS=1|0             default 1 (Blender-computed surface anchors)
     SPATAIL_MESHY_DECIMATE=1|0            default 1 (ship the _ar.usdz budget cut)
     SPATAIL_MESHY_POLL_S=540              Meshy task poll timeout (seconds)
     BLENDER_EXE                           headless Blender (defaults to 5.1 path)
@@ -44,6 +45,7 @@ for p in (str(HERE), str(HERE.parent)):          # config/meshy_client/gemini_im
 
 import config         # noqa: E402
 import meshy_client   # noqa: E402
+import asset_manifest as am  # noqa: E402  (studio/ — the Blender↔SPATAIL contract)
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "studio" / "out" / "meshy"
@@ -196,6 +198,30 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
     if not norm.get("done"):
         raise RuntimeError(f"normalize failed: {norm.get('failed')}")
 
+    # 3.5) ANCHORS — Blender-computed semantic surface anchors (Phase 1 of the
+    # spatial-intelligence plan): render canonical views of the normalized mesh,
+    # Gemini points at the features, back-project onto the mesh (BVH), QA with
+    # marker dots. Non-fatal: an asset without anchors still ships (the phone
+    # falls back to its bbox heuristics, as today).
+    anchors: list = []
+    if os.environ.get("SPATAIL_MESHY_ANCHORS", "1").lower() not in ("0", "false", "no"):
+        on_stage("locating the features (anchors)")
+        try:
+            anc = _run_blender(
+                HERE / "anchors.py",
+                {"result_path": str(OUT / f"_{slug}_anchors.json"),
+                 "assets": [{"assetId": slug, "subject": subject, "desc": desc,
+                             "glb_in": str(LIB_DIR / f"{slug}.glb"),
+                             "out_dir": str(asset_out / "anchors")}]},
+                OUT / f"_{slug}_anchors.json")
+            if anc.get("failed"):
+                raise RuntimeError(anc["failed"][0].get("error", "anchors stage failed"))
+            anchors = am.normalize_anchors((anc.get("done") or [{}])[0].get("anchors"))
+            print(f"[asset] {slug}: {len(anchors)} anchors "
+                  f"({', '.join(x['name'] for x in anchors) or 'none'})")
+        except Exception as exc:  # noqa: BLE001
+            print(f"[asset] anchors skipped ({exc}) — shipping without anchors")
+
     # 4) Decimate to the mobile budget (~12K tris / 1K textures) → <slug>_ar.usdz
     ship_usdz = LIB_DIR / f"{slug}.usdz"
     ship_glb = LIB_DIR / f"{slug}.glb"
@@ -260,17 +286,22 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
     meta = {
         "source": "meshy", "subject": subject, "desc": desc, "assetId": slug,
         "scaleMeters": scale_m, "credits": credits, "clips": clips,
+        "anchors": anchors,
         "usdzBytes": (artifacts_dir / usdz_name).stat().st_size,
         "libraryGlb": lib_glb, "libraryUsdz": lib_usdz,
         "elapsedS": round(time.time() - t0, 1),
     }
     metadata_name = f"{job_id}_metadata.json"
     (artifacts_dir / metadata_name).write_text(json.dumps(meta, indent=2), encoding="utf-8")
-    # the Blender↔composer contract: clips the sequencer can play by name
-    if clips:
-        (artifacts_dir / f"{job_id}_manifest.json").write_text(
-            json.dumps({"assetId": slug, "parts": [], "clips": clips}, indent=2),
-            encoding="utf-8")
+    # the Blender↔composer contract: clips the sequencer plays by name + anchors the
+    # director pins steps to. Written under BOTH names: {job_id}_ (the phone's
+    # manifest_url when polling this job) and {slug}_ (what the composer's
+    # experience._load_manifest reads by ASSET id when composing the contract).
+    if clips or anchors:
+        manifest = json.dumps({"schema": am.SCHEMA, "assetId": slug, "parts": [],
+                               "clips": clips, "anchors": anchors}, indent=2)
+        (artifacts_dir / f"{job_id}_manifest.json").write_text(manifest, encoding="utf-8")
+        (artifacts_dir / f"{slug}_manifest.json").write_text(manifest, encoding="utf-8")
 
     # 6) Library registration → the next prompt for this subject skips generation
     _register(slug, subject, desc, scale_m, category, lib_glb, lib_usdz)
@@ -279,7 +310,7 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
           f"({meta['usdzBytes'] / 1e6:.1f} MB, {credits} credits, "
           f"{'clip ' + clips[0]['name'] if clips else 'static'})")
     return {"usdz_name": usdz_name, "metadata_name": metadata_name,
-            "glb_name": glb_name, "clips": clips,
+            "glb_name": glb_name, "clips": clips, "anchors": anchors,
             "max_dim": max(scale_m), "spec": {"source": "meshy", "assetId": slug},
             "bbox_yup": {"size": scale_m}}
 

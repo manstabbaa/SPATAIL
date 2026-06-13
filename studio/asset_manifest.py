@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import re
 
-SCHEMA = "spatail-asset-manifest/2"
+SCHEMA = "spatail-asset-manifest/3"   # /3 adds anchors: Blender-computed surface points
 
 # Part name -> semantic role. Used for LABELS and TAP-A-PART targeting only; motion
 # is now baked into clips, not derived from the role.
@@ -54,6 +54,37 @@ def enrich_parts(raw_parts: list[dict]) -> list[dict]:
             "pivot_m": p.get("pivot_m", [0.0, 0.0, 0.0]),
             "size_m": p.get("size_m"),
         })
+    return out
+
+
+# ── anchors (schema /3): Blender-computed semantic surface points ────────────────
+
+def normalize_anchors(raw, max_anchors: int = 8) -> list[dict]:
+    """Validate the anchors the Blender anchors stage computed. Each anchor is a
+    semantic point ON the mesh in the asset's exported Y-up space: pos_m in metres,
+    `offset` normalized to the bbox ((pos − min) / extents — exactly the phone's
+    step.anchorOffset convention), a unit normal, and a 0..1 view-consensus
+    confidence. Names are snake_case so the director can reference them."""
+    out, seen = [], set()
+    for a in raw or []:
+        try:
+            name = re.sub(r"[^a-z0-9]+", "_", str(a.get("name") or "").lower()).strip("_")[:48]
+            off = [min(max(float(x), 0.0), 1.0) for x in (a.get("offset") or [])][:3]
+            if not name or name in seen or len(off) != 3:
+                continue
+            seen.add(name)
+            out.append({
+                "name": name,
+                "pos_m": [float(x) for x in (a.get("pos_m") or [0, 0, 0])][:3],
+                "normal": [float(x) for x in (a.get("normal") or [0, 1, 0])][:3],
+                "offset": off,
+                "confidence": min(max(float(a.get("confidence", 0.5)), 0.0), 1.0),
+                "verified": bool(a.get("verified", False)),
+            })
+        except Exception:
+            continue
+        if len(out) >= max_anchors:
+            break
     return out
 
 

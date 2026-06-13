@@ -12,6 +12,7 @@ the always-on offline guarantee.
 """
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -22,6 +23,29 @@ import asset_manifest as am  # noqa: E402
 
 def _clip_names(asset: dict) -> list[str]:
     return [c.get("name") for c in (asset.get("clips") or []) if c.get("name")]
+
+
+def _anchor_for(step: dict, asset: dict | None) -> dict | None:
+    """Map a step to one of the focus asset's Blender-computed surface anchors so the
+    callout lands ON the mesh ("the frog's eye") instead of a guessed bbox corner.
+    Prefers an explicit `anchor`/`target` name the LLM gave, else picks the anchor
+    whose name words best overlap the step's title + narration."""
+    anchors = (asset or {}).get("anchors") or []
+    if not anchors:
+        return None
+    by_name = {a["name"]: a for a in anchors if a.get("name")}
+    want = re.sub(r"[^a-z0-9]+", "_",
+                  str(step.get("anchor") or step.get("target") or "").lower()).strip("_")
+    if want in by_name:
+        return by_name[want]
+    text = f"{step.get('title', '')} {step.get('narration', '')}".lower()
+    best, best_score = None, 0
+    for a in anchors:
+        words = [w for w in a["name"].split("_") if len(w) > 2] or [a["name"]]
+        score = sum(1 for w in words if w in text)
+        if score > best_score:
+            best, best_score = a, score
+    return best if best_score > 0 else None
 
 
 def _hero_clips(assets: list[dict]) -> list[dict]:
@@ -96,7 +120,9 @@ def _triggers(understanding: dict, assets: list[dict]) -> list[dict]:
 
 def _validate_sequence(seq: list[dict], assets: list[dict]) -> list[dict]:
     """Keep steps sane: real focus asset, a clip name that exists on the focus asset
-    (else its primary), bounded panels."""
+    (else its primary), bounded panels. ALSO pins each step to a surface anchor when
+    the focus asset carries Blender-computed anchors → emits step.target +
+    step.anchorOffset (the phone decodes both; anchorOffset is the on-mesh point)."""
     ids = {a["id"] for a in assets} | {"scene"}
     hero = assets[0]["id"] if assets else "scene"
     by_id = {a["id"]: a for a in assets}
@@ -108,14 +134,27 @@ def _validate_sequence(seq: list[dict], assets: list[dict]) -> list[dict]:
         clip = s.get("clip")
         if clip not in names:
             clip = am.primary_clip(asset.get("clips")) if asset and asset.get("clips") else "demo"
-        clean.append({
+        step = {
             "id": s.get("id") or f"step_{i}",
             "title": str(s.get("title", "") or "")[:120],
             "narration": str(s.get("narration", "") or "")[:400],
             "focus": focus, "clip": clip, "loop": bool(s.get("loop", True)),
             "panels": (s.get("panels") or [])[:4],
             "advance": s.get("advance", "tap") if s.get("advance") in ("tap", "auto") else "tap",
-        })
+        }
+        # anchoring: a resolved anchor wins; else keep an explicit anchorOffset the
+        # LLM authored (tolerant — the whitelist no longer strips these keys).
+        anc = _anchor_for(s, asset)
+        if anc:
+            step["target"] = anc["name"]
+            step["anchorOffset"] = anc["offset"]
+        else:
+            off = [float(x) for x in (s.get("anchorOffset") or [])][:3]
+            if len(off) == 3:
+                step["anchorOffset"] = off
+            if s.get("target"):
+                step["target"] = str(s["target"])[:64]
+        clean.append(step)
     return clean
 
 

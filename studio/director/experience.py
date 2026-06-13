@@ -41,13 +41,13 @@ def _load_library():
 
 
 def _load_manifest(asset_id: str) -> dict:
-    """Read {asset_id}_manifest.json (the Blender->SPATAIL contract: parts + clips)
-    from the gen artifacts dir if a build produced one."""
+    """Read {asset_id}_manifest.json (the Blender->SPATAIL contract: parts + clips +
+    anchors) from the gen artifacts dir if a build produced one."""
     try:
         import json
         root = Path(__file__).resolve().parents[2]          # SPATAIL_MAX
         mf = root / "studio" / "out" / "gen" / f"{asset_id}_manifest.json"
-        if mf.exists():
+        if asset_id and mf.exists():
             return json.loads(mf.read_text(encoding="utf-8")) or {}
     except Exception:
         pass
@@ -83,14 +83,19 @@ def _resolve_assets(plan, manifest, lib) -> list[dict]:
                        else "placeholder"),
             "animation": None,        # filled by the mass asset+animation gen stage
         }
-        # attach the Blender->SPATAIL contract (manifest parts + baked clips) if a
-        # build produced one, so the sequencer can play the asset's clips and the
-        # runtime can label / tap its parts.
-        man = _load_manifest(a["id"])
+        # attach the Blender->SPATAIL contract (manifest parts + baked clips +
+        # surface anchors) if a build produced one, so the sequencer can play the
+        # asset's clips, the runtime can label / tap its parts, and the director
+        # can pin steps to the anchors. Manifests are keyed by the PRODUCED asset
+        # id — for library hits that's the resolved library id, so try it too.
+        man = _load_manifest(a["id"]) or _load_manifest(
+            getattr(res, "libraryAssetId", "") if res else "")
         if man.get("parts"):
             a["parts"] = man["parts"]
         if man.get("clips"):
             a["clips"] = man["clips"]
+        if man.get("anchors"):
+            a["anchors"] = man["anchors"]
         # Drop assets that resolve to the SAME model as one already kept — the library
         # returns the whole object for unknown "parts", which would otherwise render as
         # N identical copies (e.g. "a v8 engine" -> 4 engine blocks). Real distinct

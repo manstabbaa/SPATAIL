@@ -36,8 +36,9 @@ def _assets_brief(assets: list[dict]) -> str:
     for a in assets:
         clips = ", ".join(c.get("name", "") for c in (a.get("clips") or [])) or "demo"
         parts = ", ".join(p.get("name", "") for p in (a.get("parts") or [])[:12]) or "—"
+        anchors = ", ".join(x.get("name", "") for x in (a.get("anchors") or [])[:12]) or "—"
         out.append(f"- id={a['id']} name={a.get('name', a['id'])} role={a.get('role', 'object')}"
-                   f" | clips: {clips} | parts: {parts}")
+                   f" | clips: {clips} | parts: {parts} | anchors: {anchors}")
     return "\n".join(out)
 
 
@@ -47,7 +48,12 @@ SEQUENCING those clips into ordered steps: each step plays one clip on a focus a
 with spoken narration and optional text panels. You do NOT invent motion — only use
 clip names listed for the asset. Keep 3-6 steps; build understanding in order.
 
-ASSETS (use these exact ids for focus, and only these clip names):
+Each asset may list ANCHORS — named points ON its surface (e.g. eye, mouth, nozzle).
+When a step talks ABOUT a specific feature, set that step's "anchor" to the anchor
+name so the on-screen callout pins directly to that spot on the object. Use ONLY the
+anchor names listed for the focus asset; omit "anchor" for whole-object steps.
+
+ASSETS (use these exact ids for focus, only these clip names, only these anchor names):
 {assets}
 
 CONTENT:
@@ -59,7 +65,8 @@ summary: {summary}
 Return STRICT JSON ONLY in this shape:
 {{"sequence": [
   {{"id": "short_id", "title": "...", "narration": "1-2 sentences",
-    "focus": "<assetId>", "clip": "<clip name on that asset>", "loop": true,
+    "focus": "<assetId>", "clip": "<clip name on that asset>",
+    "anchor": "<anchor name on that asset, or omit>", "loop": true,
     "panels": [{{"kind": "title|fact|caption|quiz", "title": "...", "body": "...",
                 "question": "...", "options": [".."], "answer": 0}}],
     "advance": "tap"}}

@@ -179,11 +179,18 @@ final class RoomModelBuilder {
             .map { $0.transform.columns.3.y }.min() ?? .greatestFiniteMagnitude
         let floorY = lowestHorizontal <= userPos.y - 1.0 ? lowestHorizontal : userPos.y - 1.4
         for (_, p) in planes {
-            let c = p.transform.columns.3
+            // The plane's VISUAL centre is transform * center (the centroid of the
+            // detected EXTENT), NOT transform.columns.3 (the anchor's pose origin).
+            // The two diverge as a plane grows from a partial scan — and since the demo
+            // is pinned 1:1 to this centre, using the pose origin slid it off the table.
+            // transform * center matches planeExtent, so size + centre share one origin.
+            let lc = p.center
+            let cw = p.transform * SIMD4<Float>(lc.x, lc.y, lc.z, 1)
+            let c = SIMD3<Float>(cw.x, cw.y, cw.z)
             let ext = p.planeExtent
             rm.surfaces.append(RoomModel.Surface(
                 cls: Self.classify(p, floorY: floorY, cameraY: userPos.y),
-                center: SIMD3(c.x, c.y, c.z),
+                center: c,
                 size: SIMD2(ext.width, ext.height),
                 normal: SIMD3(0, 1, 0),
                 yaw: ext.rotationOnYAxis,

@@ -39,13 +39,14 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-for p in (str(HERE), str(HERE.parent)):          # config/meshy_client/gemini_images, library.*
+for p in (str(HERE), str(HERE.parent), str(HERE.parent / "spatail")):  # config/meshy_client; asset_manifest; object_size
     if p not in sys.path:
         sys.path.insert(0, p)
 
 import config         # noqa: E402
 import meshy_client   # noqa: E402
 import asset_manifest as am  # noqa: E402  (studio/ — the Blender↔SPATAIL contract)
+import object_size as osize   # noqa: E402  (studio/spatail — real-world scale grounding)
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "studio" / "out" / "meshy"
@@ -154,8 +155,16 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
     artifacts_dir = Path(artifacts_dir)
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     slug = _slug(asset_id or subject)
-    scale_m = list(scale_meters or DEFAULT_SCALE_M)
     desc = _desc(subject, brief)
+    scale_m = list(scale_meters or DEFAULT_SCALE_M)       # GLB authoring size (stable)
+    # Correct scale detection (studio/spatail/object_size): the subject's REAL-WORLD
+    # size, LLM-grounded + cached. Carried as METADATA for the placer/solver — it does
+    # NOT resize the GLB, so the authoring size (and the anchor/animate stages that run
+    # on it) stay robust; the placer rescales the mesh to this real size at placement.
+    est = osize.estimate(subject, brief)
+    real_size_m = est["size_m"] if est.get("source") != "fallback" else None
+    if real_size_m:
+        print(f"[asset] {slug}: real size {real_size_m} m ({est['source']}; {est.get('note', '')})")
     asset_out = OUT / slug
     asset_out.mkdir(parents=True, exist_ok=True)
     credits = 0
@@ -285,8 +294,8 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
     lib_usdz = f"{LIB_URL}/{ship_usdz.name}"
     meta = {
         "source": "meshy", "subject": subject, "desc": desc, "assetId": slug,
-        "scaleMeters": scale_m, "credits": credits, "clips": clips,
-        "anchors": anchors,
+        "scaleMeters": scale_m, "realSizeMeters": real_size_m, "credits": credits,
+        "clips": clips, "anchors": anchors,
         "usdzBytes": (artifacts_dir / usdz_name).stat().st_size,
         "libraryGlb": lib_glb, "libraryUsdz": lib_usdz,
         "elapsedS": round(time.time() - t0, 1),
@@ -297,9 +306,10 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
     # director pins steps to. Written under BOTH names: {job_id}_ (the phone's
     # manifest_url when polling this job) and {slug}_ (what the composer's
     # experience._load_manifest reads by ASSET id when composing the contract).
-    if clips or anchors:
+    if clips or anchors or real_size_m:
         manifest = json.dumps({"schema": am.SCHEMA, "assetId": slug, "parts": [],
-                               "clips": clips, "anchors": anchors}, indent=2)
+                               "clips": clips, "anchors": anchors,
+                               "realSizeMeters": real_size_m}, indent=2)
         (artifacts_dir / f"{job_id}_manifest.json").write_text(manifest, encoding="utf-8")
         (artifacts_dir / f"{slug}_manifest.json").write_text(manifest, encoding="utf-8")
 
@@ -311,6 +321,7 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
           f"{'clip ' + clips[0]['name'] if clips else 'static'})")
     return {"usdz_name": usdz_name, "metadata_name": metadata_name,
             "glb_name": glb_name, "clips": clips, "anchors": anchors,
+            "realSizeMeters": real_size_m,
             "max_dim": max(scale_m), "spec": {"source": "meshy", "assetId": slug},
             "bbox_yup": {"size": scale_m}}
 

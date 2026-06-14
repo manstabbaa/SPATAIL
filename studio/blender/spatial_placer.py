@@ -16,8 +16,9 @@ Pipeline:
        - "table" : fit-to-surface, longest footprint = min(table) x coverage (~0.65)
   4. SEAT it: raycast straight down onto the support surface so it RESTS (never floats
      or sinks), centred on the surface, facing the user
-  5. COLLIDE: AABB keep-out vs obstacle boxes + a BVH penetration test vs the surface;
-     verify the footprint fits the surface extent; report fits + a human reason
+  5. COLLIDE: AABB keep-out vs obstacle boxes that REST on the support (floor furniture
+     below the surface is ignored — the surface shields the hero); if the centre is
+     blocked, nudge to a free spot; verify the footprint fits; report fits + a reason
   6. bake {position_m (device Y-up), yaw_rad, scale, size_m, fits} per variant, and
      render a preview PNG so the placement is VISIBLE.
 
@@ -38,6 +39,7 @@ from mathutils.bvhtree import BVHTree
 RES = 900
 COVERAGE_DEFAULT = 0.65
 EYE_HEIGHT_M = 1.45
+FLOOR_FIT_CAP_M = 1.0          # cap the fit-to-surface footprint on a floor (no giant props)
 
 
 # ── frame conversion: device (Y-up, -Z fwd) <-> Blender (Z-up, +Y fwd) ───────────
@@ -231,6 +233,8 @@ def _build_and_place(hero, mode, support, anchor, coverage, real, target_xy,
         note = f"true scale (real {max(real):.2f} m)"
     else:
         avail = (min(support["size_m"]) * coverage) if support else 0.3
+        if anchor != "table":
+            avail = min(avail, FLOOR_FIT_CAP_M)          # don't make a 3 m teapot on a big floor
         footprint = max(dims.x, dims.y) or 1.0           # horizontal extent (Z-up)
         s = avail / footprint
         note = f"fit to {anchor} ({coverage:.0%})"
@@ -241,11 +245,11 @@ def _build_and_place(hero, mode, support, anchor, coverage, real, target_xy,
     mn, mx = _world_aabb(obj)
     foot = (mx.x - mn.x, mx.y - mn.y)
     xy, moved, _clear = _resolve_xy(foot, target_xy, support, coverage, obstacles,
-                                    (mn.z, mx.z))
+                                    (mn.z, mx.z), support_top_z)
     if moved:
         rest_z = _seat_and_place(obj, xy, support_bvh, support_top_z, floor_y)
     fits, fit_reason = _footprint_fits(obj, support, coverage)
-    hit = _obstacle_overlap(obj, obstacles)
+    hit = _obstacle_overlap(obj, obstacles, support_top_z)
     if hit:
         fits = False
         fit_reason += f"; overlaps {hit} (no free spot found)"
@@ -265,8 +269,11 @@ def _build_and_place(hero, mode, support, anchor, coverage, real, target_xy,
 
 
 def _yaw_face_user(x, y):
-    """Yaw (about Z) so the hero's -Y(front) turns toward the user at the origin."""
-    return math.atan2(-x, -y) if (abs(x) + abs(y)) > 1e-4 else 0.0
+    """Yaw (about Z) so the hero's local -Y (front, Blender front-view convention)
+    points from its position (x, y) back toward the user at the origin. Rotating -Y
+    by yaw gives (sin yaw, -cos yaw); aiming it at (-x, -y) needs cos yaw = y/r, i.e.
+    atan2(-x, y). (atan2(-x, -y) faced the hero 180deg AWAY from the user.)"""
+    return math.atan2(-x, y) if (abs(x) + abs(y)) > 1e-4 else 0.0
 
 
 def _seat_and_place(obj, target_xy, support_bvh, support_top_z, floor_y):
@@ -305,29 +312,41 @@ def _footprint_fits(obj, support, coverage):
                    f"{support['cls']} ({aw:.2f}x{ad:.2f} m)")
 
 
-def _obstacle_overlap(obj, obstacles, margin=0.02):
-    """AABB keep-out: does the hero's footprint intersect any obstacle box (in XY,
-    at overlapping Z)? Returns the first hit category or None."""
+def _on_support(lo, hi, support_top_z, z_range):
+    """Is this obstacle relevant to a hero seated on a surface at support_top_z? Only
+    if it RESTS on/above that surface (lo.z >= surface) AND its z-span meets the hero's
+    — so floor furniture (a chair tucked under a table) is shielded by the tabletop and
+    ignored, instead of false-positiving against a hero resting above it."""
+    if lo.z < support_top_z - 0.05:                      # rises from below the support
+        return False
+    return lo.z <= z_range[1] + 0.05 and hi.z >= z_range[0] - 0.05
+
+
+def _obstacle_overlap(obj, obstacles, support_top_z, margin=0.02):
+    """AABB keep-out: does the hero's footprint intersect any obstacle box that rests on
+    the support (in XY, at overlapping Z)? Returns the first hit category or None."""
     mn, mx = _world_aabb(obj)
     for _ob, lo, hi, cat in obstacles:
+        if not _on_support(lo, hi, support_top_z, (mn.z, mx.z)):
+            continue
         if (mn.x - margin <= hi.x and mx.x + margin >= lo.x and
-                mn.y - margin <= hi.y and mx.y + margin >= lo.y and
-                mn.z <= hi.z and mx.z >= lo.z):
+                mn.y - margin <= hi.y and mx.y + margin >= lo.y):
             return cat
     return None
 
 
-def _resolve_xy(foot, base_xy, support, coverage, obstacles, z_range, margin=0.03):
+def _resolve_xy(foot, base_xy, support, coverage, obstacles, z_range, support_top_z,
+                margin=0.03):
     """Find a free XY for a footprint (foot=(w,d)) on the support: try the centre,
     then a widening ring, keeping the footprint inside `coverage` of the surface and
-    clear of any obstacle box that lives within the surface's vertical span. Returns
-    (xy, moved_bool, clear_bool)."""
+    clear of any obstacle box that RESTS on the support within the hero's z-span.
+    Returns (xy, moved_bool, clear_bool)."""
     aw = support["size_m"][0] * coverage if support else foot[0]
     ad = support["size_m"][1] * coverage if support else foot[1]
     hx = max(0.0, aw / 2 - foot[0] / 2)                  # how far the centre can roam
     hy = max(0.0, ad / 2 - foot[1] / 2)
     on_surface = [(lo, hi) for _o, lo, hi, _c in obstacles
-                  if lo.z <= z_range[1] + 0.05 and hi.z >= z_range[0] - 0.05]
+                  if _on_support(lo, hi, support_top_z, z_range)]
 
     def clear(x, y):
         fmnx, fmxx = x - foot[0] / 2 - margin, x + foot[0] / 2 + margin
@@ -440,6 +459,7 @@ def place(spec):
         "assetId": hero.get("assetId", "hero"),
         "anchor": anchor,
         "default": default,
+        "defaultFits": bool(variants[default]["fits"]) if default in variants else False,
         "variants": variants,
         "support": {"cls": anchor, "center_m": (support or {}).get("center_m"),
                     "size_m": (support or {}).get("size_m"),

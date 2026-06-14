@@ -127,7 +127,11 @@ final class ModularRuntime: NSObject {
             scaleMode: e.placement.scaleMode == "true_scale" ? "real" : "dynamic",
             primary: primary,
             coverage: Float(e.placement.maxSurfaceCoverage))
-        guard let hero = plan.placements.first, hero.fits else { return nil }
+        // Centre on the detected surface even when the fit is TIGHT — a tight/!fits
+        // result (or a spurious obstacle flag) must not drop the demo to a raycast-at-aim
+        // placement. The solver already scaled the set to the surface; centring on the
+        // real table beats landing wherever the camera points.
+        guard let hero = plan.placements.first else { return nil }
 
         // solver frame (user at origin, looking -Z) → world
         let f = rm.user.forward
@@ -174,35 +178,15 @@ final class ModularRuntime: NSObject {
         clear(); guard view != nil else { return }; present(e, on: host)
     }
 
-    /// §7 comfort: re-place the current experience ("recentering when placement
-    /// feels awkward"). Keeps the built scene — loaded models, clips, step state
-    /// all survive; only the anchor and layout move. Decision ladder per §2:
-    ///   1. USER INTENT — they pressed the button while aiming at a horizontal
-    ///      surface: the experience goes where they're looking (floor or table).
-    ///   2. the PlacementSolver's best spot against the freshest RoomModel
-    ///   3. the legacy screen-centre raycast transform
+    /// §7 comfort: RE-RUN the SPATAIL spatial design for the current experience —
+    /// re-centre on the table you're at (or the floor in front of you) and re-face the
+    /// user, against the FRESHEST RoomModel. Keeps the built scene (loaded models, clips,
+    /// step state); only the anchor + layout move. This is a "redo the intelligent
+    /// placement" action, NOT a drag-to-where-you-aim: standing still re-solves to the
+    /// SAME spot (no jitter); walking around re-centres/re-faces the content.
     func reposition() {
         guard let e = exp, let view, anchor != nil, e.anchoring.mode != "object" else { return }
         defer { refreshStepUI() }    // re-anchor the step's callout/panel to the moved scene
-        let centre = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
-        if let hit = (view.raycast(from: centre, allowing: .existingPlaneGeometry, alignment: .horizontal).first
-                   ?? view.raycast(from: centre, allowing: .estimatedPlane, alignment: .horizontal).first) {
-            let c = hit.worldTransform.columns.3
-            let origin = SIMD3(c.x, c.y, c.z)
-            let cam = view.cameraTransform.translation
-            let yaw = atan2(cam.x - origin.x, cam.z - origin.z)   // face the user
-            let t = Transform(scale: .one, rotation: simd_quatf(angle: yaw, axis: SIMD3(0, 1, 0)),
-                              translation: origin).matrix
-            placedTransform = t
-            relocateAnchor(to: t)
-            let cls: String
-            if let fl = roomModel?.floor(), abs(origin.y - fl.height) < 0.25 { cls = "floor" }
-            else if let tb = roomModel?.bestTable(), abs(origin.y - tb.height) < 0.25 { cls = "table" }
-            else { cls = "surface" }
-            print("SPATAIL reposition: aimed hit @\(origin) → \(cls)")
-            onStatus("repositioned onto the \(cls) you're aiming at")
-            return
-        }
         if let solved = solvedPlacement(e) {
             let newPos = SIMD3(solved.root.columns.3.x, solved.root.columns.3.y, solved.root.columns.3.z)
             let newFwd = SIMD3(solved.root.columns.2.x, solved.root.columns.2.y, solved.root.columns.2.z)
@@ -705,7 +689,13 @@ final class ModularRuntime: NSObject {
         let longest = max(b.extents.x, max(b.extents.y, b.extents.z), 0.001)
         entity.scale = SIMD3(repeating: target / longest)
         let b2 = entity.visualBounds(relativeTo: nil)
-        entity.position.y = b2.extents.y / 2
+        // Rest the model's ACTUAL bottom on the holder origin (the surface). Using
+        // extents.y/2 alone only works when the mesh origin is at its vertical centre;
+        // Meshy/animated USDZs carry an offset root, so subtract the bounds centre too —
+        // otherwise the asset floats above (or sinks into) the table.
+        entity.position.y = b2.extents.y / 2 - b2.center.y
+        entity.position.x -= b2.center.x                  // centre the footprint on the holder
+        entity.position.z -= b2.center.z
     }
 
     private func makeContactShadow(radius: Float) -> ModelEntity {

@@ -93,9 +93,13 @@ struct PlacementSolver {
         let spread = min(coneDeg, 8.0 + 7.0 * Float(max(0, n - 1)))
         let slots = arc(n, distance: distance, height: baseH, spreadDeg: spread)
 
-        let obstaclesXZ = room.obstacles.map {
-            (SIMD2($0.bboxMin.x, $0.bboxMin.z), SIMD2($0.bboxMax.x, $0.bboxMax.z))
-        }
+        // keep-out only against obstacles that REST ON the chosen surface — floor
+        // furniture (a chair tucked under a table) is shielded by the tabletop, so it
+        // must not block a table placement (mirrors the Blender placer's _on_support
+        // gate). For a floor placement baseH = 0, so floor obstacles still count.
+        let obstaclesXZ = room.obstacles
+            .filter { $0.bboxMin.y >= baseH - 0.05 }
+            .map { (SIMD2($0.bboxMin.x, $0.bboxMin.z), SIMD2($0.bboxMax.x, $0.bboxMax.z)) }
 
         var placements: [Placement] = []
         for (i, a) in ordered.enumerated() {

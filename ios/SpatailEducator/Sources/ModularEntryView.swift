@@ -164,6 +164,11 @@ struct ModularARView: UIViewRepresentable {
         // horizontal + vertical so the RoomModelBuilder can classify floor/table/wall
         cfg.planeDetection = [.horizontal, .vertical]
         cfg.environmentTexturing = .automatic
+        // LiDAR scene mesh -> real obstacle hitboxes for the placer's keep-out (degrades
+        // gracefully on non-LiDAR devices: the obstacles list just stays empty).
+        if ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) {
+            cfg.sceneReconstruction = .meshWithClassification
+        }
         v.session.run(cfg)
         v.session.delegate = context.coordinator         // feeds the RoomModel
         context.coordinator.runtime = ModularRuntime(view: v, onStatus: onStatus)
@@ -193,32 +198,51 @@ struct ModularARView: UIViewRepresentable {
         var streamedPath: String?
         private let roomBuilder = RoomModelBuilder()
         private var lastRoomPush: TimeInterval = 0
+        private var lastMeshParse: TimeInterval = 0       // throttle the LiDAR mesh -> obstacles
 
         // ARKit callbacks arrive off the main actor; hop to MainActor for state.
-        // Planes feed the RoomModel; ARObjectAnchors (the TRACKED stream, iOS 27
-        // object tracking) forward to the runtime's ObjectAnchoringController.
+        // Planes feed the RoomModel surfaces; ARMeshAnchors (LiDAR scene mesh) feed the
+        // obstacle hitboxes (parsed off-main, then stored); ARObjectAnchors (the TRACKED
+        // stream, iOS 27 object tracking) forward to the ObjectAnchoringController.
         nonisolated func session(_ s: ARSession, didAdd anchors: [ARAnchor]) {
             let planes = anchors.compactMap { $0 as? ARPlaneAnchor }
             let objects = anchors.compactMap { $0 as? ARObjectAnchor }
-            if planes.isEmpty && objects.isEmpty { return }
+            let meshes = anchors.compactMap { $0 as? ARMeshAnchor }
+            if planes.isEmpty && objects.isEmpty && meshes.isEmpty { return }
             Task { @MainActor in
                 if !planes.isEmpty { self.roomBuilder.update(planes: planes) }
+                if !meshes.isEmpty { self.ingestMesh(meshes) }
                 if !objects.isEmpty { self.runtime?.objectAnchoring.objectAnchorsAdded(objects) }
             }
         }
         nonisolated func session(_ s: ARSession, didUpdate anchors: [ARAnchor]) {
             let planes = anchors.compactMap { $0 as? ARPlaneAnchor }
             let objects = anchors.compactMap { $0 as? ARObjectAnchor }
-            if planes.isEmpty && objects.isEmpty { return }
+            let meshes = anchors.compactMap { $0 as? ARMeshAnchor }
+            if planes.isEmpty && objects.isEmpty && meshes.isEmpty { return }
             Task { @MainActor in
                 if !planes.isEmpty { self.roomBuilder.update(planes: planes) }
+                if !meshes.isEmpty { self.ingestMesh(meshes) }
                 if !objects.isEmpty { self.runtime?.objectAnchoring.objectAnchorsUpdated(objects) }
             }
         }
         nonisolated func session(_ s: ARSession, didRemove anchors: [ARAnchor]) {
             let objects = anchors.compactMap { $0 as? ARObjectAnchor }
-            if objects.isEmpty { return }
-            Task { @MainActor in self.runtime?.objectAnchoring.objectAnchorsRemoved(objects) }
+            let meshIds = anchors.compactMap { ($0 as? ARMeshAnchor)?.identifier }
+            if objects.isEmpty && meshIds.isEmpty { return }
+            Task { @MainActor in
+                if !meshIds.isEmpty { self.roomBuilder.remove(meshIds) }
+                if !objects.isEmpty { self.runtime?.objectAnchoring.objectAnchorsRemoved(objects) }
+            }
+        }
+
+        /// Parse LiDAR mesh anchors -> obstacle boxes, throttled to ~2 Hz so the rapid
+        /// mesh refinement doesn't churn (matches the lastRoomPush pattern). MainActor.
+        @MainActor private func ingestMesh(_ meshes: [ARMeshAnchor]) {
+            let now = CACurrentMediaTime()
+            guard now - lastMeshParse > 0.5 else { return }
+            lastMeshParse = now
+            roomBuilder.update(mesh: meshes)
         }
         nonisolated func session(_ s: ARSession, didUpdate frame: ARFrame) {
             let cam = frame.camera.transform

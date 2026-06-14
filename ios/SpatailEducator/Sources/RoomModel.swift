@@ -69,12 +69,66 @@ import ARKit
 @MainActor
 final class RoomModelBuilder {
     private var planes: [UUID: ARPlaneAnchor] = [:]
+    // Real obstacle boxes distilled from the LiDAR scene mesh, per mesh anchor (world
+    // AABBs). This is what finally populates RoomModel.obstacles[] so the on-device
+    // PlacementSolver's keep-out stops being a no-op.
+    private var meshBoxes: [UUID: [(lo: SIMD3<Float>, hi: SIMD3<Float>, cat: String)]] = [:]
     private var light = RoomModel.Light(intensity: 1000, colorTempK: 6500, keyDirection: [0, -1, 0])
     private var userPos = SIMD3<Float>(repeating: 0)
     private var userFwd = SIMD3<Float>(0, 0, -1)
 
     func update(planes anchors: [ARPlaneAnchor]) { for a in anchors { planes[a.identifier] = a } }
-    func remove(_ ids: [UUID]) { for id in ids { planes[id] = nil } }
+    func update(mesh anchors: [ARMeshAnchor]) {
+        for a in anchors { meshBoxes[a.identifier] = Self.boxes(from: a) }
+    }
+    func remove(_ ids: [UUID]) { for id in ids { planes[id] = nil; meshBoxes[id] = nil } }
+
+    // AABB the faces of each KEEP-OUT class (chairs/sofas + unclassified solids) of one
+    // scene-mesh chunk, in world space. Excludes wall/floor/ceiling/table (structure or
+    // the support surface). Coarse — many chunks over-segment one object into several
+    // boxes — but the solver just avoids all of them. nonisolated so the delegate can
+    // parse off the main actor. Reads ARMeshGeometry's raw buffers (Apple's layout:
+    // vertices = packed float3 at offset/stride; faces = triangles of bytesPerIndex
+    // indices; classification = one UInt8 per face).
+    nonisolated static func boxes(from m: ARMeshAnchor)
+        -> [(lo: SIMD3<Float>, hi: SIMD3<Float>, cat: String)] {
+        let g = m.geometry
+        guard let cls = g.classification else { return [] }
+        let vsrc = g.vertices, faces = g.faces, T = m.transform
+        let vbuf = vsrc.buffer.contents(), cbuf = cls.buffer.contents(), ibuf = faces.buffer.contents()
+        let bpi = faces.bytesPerIndex
+        var acc: [String: (lo: SIMD3<Float>, hi: SIMD3<Float>)] = [:]
+        for f in 0..<faces.count {
+            let raw = cbuf.advanced(by: cls.offset + cls.stride * f)
+                          .assumingMemoryBound(to: UInt8.self).pointee
+            guard let cat = obstacleCategory(raw) else { continue }
+            for k in 0..<3 {
+                let ip = ibuf.advanced(by: bpi * (f * 3 + k))
+                let vi = bpi == 2 ? Int(ip.assumingMemoryBound(to: UInt16.self).pointee)
+                                  : Int(ip.assumingMemoryBound(to: UInt32.self).pointee)
+                let fp = vbuf.advanced(by: vsrc.offset + vsrc.stride * vi)
+                             .assumingMemoryBound(to: Float.self)
+                let w = T * SIMD4<Float>(fp[0], fp[1], fp[2], 1)
+                let p = SIMD3<Float>(w.x, w.y, w.z)
+                if let b = acc[cat] {
+                    acc[cat] = (SIMD3(Swift.min(b.lo.x, p.x), Swift.min(b.lo.y, p.y), Swift.min(b.lo.z, p.z)),
+                                SIMD3(Swift.max(b.hi.x, p.x), Swift.max(b.hi.y, p.y), Swift.max(b.hi.z, p.z)))
+                } else { acc[cat] = (p, p) }
+            }
+        }
+        return acc.map { ($0.value.lo, $0.value.hi, $0.key) }
+    }
+
+    // ARMeshClassification raw: none=0, wall=1, floor=2, ceiling=3, table=4, seat=5,
+    // window=6, door=7. Only chairs and unclassified solids are keep-out volumes; the
+    // table is the SUPPORT (place ON it), walls/floor/ceiling are structure.
+    nonisolated private static func obstacleCategory(_ raw: UInt8) -> String? {
+        switch raw {
+        case 5: return "seat"
+        case 0: return "object"
+        default: return nil
+        }
+    }
 
     func update(light est: ARLightEstimate?) {
         guard let e = est else { return }
@@ -137,6 +191,17 @@ final class RoomModelBuilder {
                 confidence: 1))
             minX = min(minX, c.x - ext.width / 2);  maxX = max(maxX, c.x + ext.width / 2)
             minZ = min(minZ, c.z - ext.height / 2); maxZ = max(maxZ, c.z + ext.height / 2)
+        }
+        // real obstacles from the scene mesh: keep solid things that sit ABOVE the floor
+        // and aren't room-spanning noise (filters stray "object" faces on walls/floor).
+        for (_, boxes) in meshBoxes {
+            for b in boxes {
+                let size = b.hi - b.lo
+                let footprint = max(size.x, size.z)
+                guard b.hi.y > floorY + 0.10, footprint > 0.08, footprint < 2.2,
+                      size.y > 0.05 else { continue }
+                rm.obstacles.append(RoomModel.Obstacle(bboxMin: b.lo, bboxMax: b.hi, category: b.cat))
+            }
         }
         rm.bounds = SIMD3(max(4, maxX - minX), max(3, maxZ - minZ), 2.6)
         return rm

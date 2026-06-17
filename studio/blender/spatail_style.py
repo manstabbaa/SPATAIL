@@ -52,8 +52,21 @@ BMIN = %(BMIN)f
 BMAX = %(BMAX)f
 
 root = bpy.data.objects.get("gen_root")
-changed = {"beveled": 0, "matted": 0, "smoothed": 0}
+changed = {"beveled": 0, "matted": 0, "smoothed": 0, "textured_preserved": 0}
 meshes = []
+
+
+def _is_textured(bsdf):
+    """A material with ANY image texture wired into the BSDF is a real texture pack
+    (e.g. a Meshy PBR asset) — the master material must use it AS-IS, never clay it."""
+    for inp in bsdf.inputs:
+        if inp.is_linked:
+            for ln in inp.links:
+                n = ln.from_node
+                if n.type in ('TEX_IMAGE', 'TEX_ENVIRONMENT') or (
+                        n.type == 'NORMAL_MAP') or n.bl_idname == 'ShaderNodeTexImage':
+                    return True
+    return False
 if root:
     for o in root.children_recursive:
         if o.type == 'MESH' and o.data:
@@ -91,6 +104,12 @@ for o in meshes:
             mat.use_nodes = True
             bsdf = mat.node_tree.nodes.get("Principled BSDF")
             if not bsdf:
+                continue
+            # Seamless Meshy ingest: a textured PBR material is left exactly as authored
+            # (its albedo/normal/roughness-metallic/emissive maps ARE the look). The clay
+            # matte pass only restyles flat, untextured authored materials.
+            if _is_textured(bsdf):
+                changed["textured_preserved"] += 1
                 continue
             if "Roughness" in bsdf.inputs:
                 bsdf.inputs["Roughness"].default_value = 0.62
@@ -133,29 +152,99 @@ import bpy
 
 root = bpy.data.objects.get("gen_root")
 parts, sockets, materials = [], [], []
+highlight_regions = []          # the named meshes a step.effect can target individually
 seen = set()
+
+
+def _bsdf(mat):
+    return mat.node_tree.nodes.get("Principled BSDF") if (mat and mat.use_nodes) else None
+
+
+def _linked(bsdf, key):
+    return bool(bsdf and key in bsdf.inputs and bsdf.inputs[key].is_linked)
+
+
+def _emission_of(mat):
+    """Read (emissive_bool, [r,g,b,a], strength) tolerantly across Blender versions.
+    Trusts the SpatailUber `spatail_emissive` tag, a linked emission MAP (Meshy), or a
+    non-zero flat emission."""
+    if not mat:
+        return (False, [0.0, 0.0, 0.0, 1.0], 0.0)
+    tagged = bool(mat.get("spatail_emissive", False))
+    col = [0.0, 0.0, 0.0, 1.0]
+    strength = 0.0
+    bsdf = _bsdf(mat)
+    linked_em = False
+    if bsdf:
+        if "Emission Strength" in bsdf.inputs:
+            try: strength = float(bsdf.inputs["Emission Strength"].default_value)
+            except Exception: pass
+        for key in ("Emission Color", "Emission"):
+            if key in bsdf.inputs:
+                linked_em = linked_em or _linked(bsdf, key)
+                try: col = [round(float(c), 3) for c in bsdf.inputs[key].default_value]
+                except Exception: pass
+                break
+    is_em = tagged or linked_em or (strength > 0.001 and any(c > 0.001 for c in col[:3]))
+    return (is_em, col, round(strength, 3))
+
+
+def _maps_of(mat):
+    """Which texture-pack channels are wired into the material (Meshy ingest). Returns
+    the list of present maps + a `textured` flag — so the manifest advertises that this
+    material carries its OWN PBR maps and must be used as-is, not restyled."""
+    bsdf = _bsdf(mat)
+    if not bsdf:
+        return (False, [])
+    probe = [("baseColor", "Base Color"), ("roughness", "Roughness"),
+             ("metallic", "Metallic"), ("normal", "Normal"),
+             ("emissive", "Emission Color"), ("emissive", "Emission"),
+             ("alpha", "Alpha")]
+    maps = []
+    for label, key in probe:
+        if _linked(bsdf, key) and label not in maps:
+            maps.append(label)
+    return (len(maps) > 0, maps)
+
+
 if root:
     for o in root.children_recursive:
         if o.type == 'MESH':
             loc = o.matrix_world.translation
             dim = o.dimensions
+            slot_mats = [s.material for s in o.material_slots if s.material]
+            part_emissive = False
+            part_textured = False
+            for m in slot_mats:
+                em, ecol, estr = _emission_of(m)
+                part_emissive = part_emissive or em
+                part_textured = part_textured or _maps_of(m)[0]
+                if m.name not in seen:
+                    seen.add(m.name)
+                    bc = [0.8, 0.8, 0.8, 1.0]
+                    bsdf = _bsdf(m)
+                    if bsdf and "Base Color" in bsdf.inputs:
+                        bc = [round(c, 3) for c in bsdf.inputs["Base Color"].default_value]
+                    textured, maps = _maps_of(m)
+                    materials.append({"name": m.name, "baseColor": bc,
+                                      "emissive": em, "emissionColor": ecol,
+                                      "emissionStrength": estr,
+                                      "textured": textured, "maps": maps})
             # geometry facts per part, in the asset's RENDERED Y-up frame
             # (USDZ export turns Blender +Z-up into +Y-up: [x, z, -y]).
             parts.append({
                 "name": o.name,
                 "pivot_m": [round(loc.x, 4), round(loc.z, 4), round(-loc.y, 4)],
                 "size_m": [round(dim.x, 4), round(dim.z, 4), round(dim.y, 4)],
+                "material": slot_mats[0].name if slot_mats else None,
+                "emissive": part_emissive,
+                "textured": part_textured,
             })
-            for slot in o.material_slots:
-                m = slot.material
-                if m and m.name not in seen:
-                    seen.add(m.name)
-                    bc = [0.8, 0.8, 0.8, 1.0]
-                    if m.use_nodes:
-                        bsdf = m.node_tree.nodes.get("Principled BSDF")
-                        if bsdf and "Base Color" in bsdf.inputs:
-                            bc = [round(c, 3) for c in bsdf.inputs["Base Color"].default_value]
-                    materials.append({"name": m.name, "baseColor": bc})
+            # every distinctly-named mesh is an addressable highlight region: the
+            # runtime resolves step.target -> this prim/entity by name and applies
+            # the step's effect to JUST this sub-region (not the whole object).
+            highlight_regions.append({"name": o.name, "emissive": part_emissive,
+                                      "textured": part_textured})
         elif o.type == 'EMPTY' and o.name.lower().startswith("socket"):
             w = o.matrix_world.translation
             sockets.append({"name": o.name,
@@ -167,5 +256,6 @@ for a in bpy.data.actions:
     fr = a.frame_range
     clips.append({"name": a.name, "frame_start": round(fr[0], 1), "frame_end": round(fr[1], 1)})
 
-result = {"parts": parts, "sockets": sockets, "materials": materials, "clips": clips}
+result = {"parts": parts, "sockets": sockets, "materials": materials,
+          "clips": clips, "highlightRegions": highlight_regions}
 '''

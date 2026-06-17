@@ -33,6 +33,7 @@ final class ModularRuntime: NSObject {
     private var stepUI: [Entity] = []
     private var pulseMarkers: [Entity] = []
     private var tintedParts: [(ModelEntity, [any RealityKit.Material])] = []
+    private var ghostedParts: [Entity] = []   // parts the step's `ghost` effect made translucent
     private let synth = AVSpeechSynthesizer()
     private let onStatus: (String) -> Void
 
@@ -323,6 +324,8 @@ final class ModularRuntime: NSObject {
         pulseMarkers.removeAll()
         for (m, mats) in tintedParts { m.model?.materials = mats }   // un-highlight
         tintedParts.removeAll()
+        for e in ghostedParts { setOpacity(e, 1.0) }                 // un-ghost
+        ghostedParts.removeAll()
     }
 
     // MARK: - spatial step UI (the immersive layer: the explanation happens ON the model)
@@ -340,7 +343,7 @@ final class ModularRuntime: NSObject {
         let (point, part) = resolveStepAnchor(step, node: node, bounds: b, in: a)
         if !step.title.isEmpty { addCallout(step.title, at: point, in: a) }
         addMarker(at: point, in: a)
-        if let part { highlight(part) }
+        if let part { applyEffect(step.effect, to: part) }
         let body = sidePanelText(step)
         if !body.isEmpty { addSidePanel(body, bounds: b, in: a) }
     }
@@ -407,15 +410,40 @@ final class ModularRuntime: NSObject {
         return nil
     }
 
-    /// "Set in another material": swap the part's materials for a highlight tint;
-    /// the originals are restored on the next step (resetTransient).
-    private func highlight(_ part: Entity) {
+    /// Apply the step's named visual EFFECT to its target part (the brain's per-beat
+    /// emphasis choice, contract `step.effect`). All effects are NON-DESTRUCTIVE: the
+    /// part's authored look (clay finish) is kept and restored on the next step
+    /// (clearStepUI). Empty/unknown → highlight (the default). USDZ only carries
+    /// baseColor/emissive/opacity, so every effect is expressible on-device.
+    private func applyEffect(_ effect: String, to part: Entity) {
+        let e = effect.isEmpty ? "highlight" : effect.lowercased()
+        switch e {
+        case "none":
+            return
+        case "ghost":
+            setOpacity(part, 0.3); ghostedParts.append(part)
+        case "emissive":
+            mutateMaterials(of: part) { SpatailMaterials.emissive($0) }
+        case let t where t.hasPrefix("tint:"):
+            if let col = SpatailMaterials.color(fromHex: String(t.dropFirst(5))) {
+                mutateMaterials(of: part) { SpatailMaterials.tinted($0, color: col) }
+            } else {
+                mutateMaterials(of: part) { SpatailMaterials.highlighted($0) }
+            }
+        default:   // "highlight" + anything unrecognised
+            mutateMaterials(of: part) { SpatailMaterials.highlighted($0) }
+        }
+    }
+
+    /// Walk a part's subtree, remap every material slot through `transform`, and stash
+    /// the originals so multi-material parts keep their regions and can be restored.
+    private func mutateMaterials(of part: Entity,
+                                 _ transform: (any RealityKit.Material) -> any RealityKit.Material) {
         var stack: [Entity] = [part]
         while let e = stack.popLast() {
             if let m = e as? ModelEntity, let model = m.model {
                 tintedParts.append((m, model.materials))
-                m.model?.materials = [SimpleMaterial(color: UIColor.systemTeal.withAlphaComponent(0.9),
-                                                     roughness: 0.35, isMetallic: false)]
+                m.model?.materials = model.materials.map(transform)
             }
             stack.append(contentsOf: e.children)
         }
@@ -728,7 +756,7 @@ final class ModularRuntime: NSObject {
         objectAnchoring.stop()
         synth.stopSpeaking(at: .immediate)
         updateSub = nil; labels.removeAll()
-        stepUI.removeAll(); pulseMarkers.removeAll(); tintedParts.removeAll()
+        stepUI.removeAll(); pulseMarkers.removeAll(); tintedParts.removeAll(); ghostedParts.removeAll()
         if let anchor, let view { view.scene.removeAnchor(anchor) }
         anchor = nil; holders.removeAll(); nodes.removeAll(); exp = nil; stepIndex = 0
         // re-solve placement per experience: a raycast placement taken while the

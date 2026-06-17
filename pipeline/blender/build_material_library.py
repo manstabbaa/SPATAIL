@@ -1,18 +1,30 @@
 """
-build_material_library.py — writes assets_authoring/materials/spatail_pbr_library.blend
-with one Principled-BSDF material per MATERIAL_CLASSES entry.
+build_material_library.py — writes assets_authoring/materials/spatail_pbr_library.blend,
+one material per PRESETS entry, all from a SINGLE shading model: SpatailUber.
 
-Authoring scripts then `bpy.data.libraries.load(... materials=...)` to
-append the right material onto a freshly-imported mesh.
+SpatailUber is the SPATAIL "master material": ONE factory (make_material) with a fixed
+knob set — base colour, metallic, roughness, emission colour + strength, alpha. Every
+preset is just data fed to it, so the look is consistent and a new effect (e.g. an
+emissive callout region) is a one-line preset, not a bespoke node graph.
+
+WHY A FLAT PRINCIPLED BSDF, NOT A NODE GROUP: the asset's real renderer is RealityKit
+on iOS, reached via USDZ. Blender's USD exporter only traces a TOP-LEVEL Principled
+BSDF into UsdPreviewSurface; wrapping it in a ShaderNodeGroup makes the exporter miss
+it and silently drop roughness/metallic/EMISSIVE on device. So the master material is
+a factory over a flat Principled — full effect freedom that actually survives export.
+The four channels that travel (baseColor, emission, roughness/metallic, opacity) are
+exactly the ones the runtime effect vocabulary drives (SpatailMaterials.swift).
+
+Authoring scripts then `bpy.data.libraries.load(... materials=...)` to append the right
+material onto a freshly-imported mesh.
 
 Run:
     blender --background --factory-startup \
         --python pipeline/blender/build_material_library.py \
         -- <output.blend>
 
-The presets are deliberately shallow — albedo + roughness + metallic +
-optional emission. No texture maps. Rough capability over depth, per
-the product brief.
+The presets are deliberately shallow — albedo + roughness + metallic + optional
+emission. No texture maps. Rough capability over depth, per the product brief.
 """
 
 import os
@@ -25,6 +37,9 @@ except ImportError:
 
 # Single source of truth. The Python classifier ships its own copy of the
 # enum; this file's job is to materialise each name as a Blender material.
+# The emissive/state presets at the bottom mirror the on-device runtime effect
+# vocabulary (highlight/emissive/tint) so a BAKED always-on glow on an asset region
+# matches what the runtime does dynamically per beat.
 PRESETS = {
     # name                  (baseColor RGBA,         metallic, roughness, emission_strength, emission RGBA)
     "metal_polished":      ((0.92, 0.93, 0.95, 1.0), 1.00, 0.06, 0.0, (0, 0, 0, 1)),
@@ -38,6 +53,10 @@ PRESETS = {
     "wood":                ((0.36, 0.22, 0.13, 1.0), 0.00, 0.65, 0.0, (0, 0, 0, 1)),
     "fabric":              ((0.28, 0.28, 0.32, 1.0), 0.00, 0.90, 0.0, (0, 0, 0, 1)),
     "placeholder_neutral": ((0.50, 0.50, 0.55, 1.0), 0.00, 0.60, 0.0, (0, 0, 0, 1)),
+    # ── effect presets (baked equivalents of the runtime effect vocabulary) ──
+    "accent_glow":         ((0.30, 0.34, 0.38, 1.0), 0.00, 0.40, 2.0, (0.10, 0.65, 0.70, 1)),  # = runtime "highlight"
+    "state_hot":           ((0.50, 0.08, 0.05, 1.0), 0.00, 0.50, 1.2, (1.00, 0.15, 0.05, 1)),  # = tint:#ff2600
+    "state_cold":          ((0.06, 0.18, 0.40, 1.0), 0.00, 0.50, 1.0, (0.10, 0.45, 1.00, 1)),  # = tint:#1a73ff
 }
 
 MATERIAL_NAME_PREFIX = "SPATAIL_PBR_"
@@ -75,9 +94,10 @@ def make_material(name, base_color, metallic, roughness, emission_strength, emis
         mat.blend_method = "BLEND"
         if "Alpha" in bsdf.inputs:
             bsdf.inputs["Alpha"].default_value = base_color[3]
-    # Tag with a custom property so the authoring import can introspect
-    # which preset a slot was filled from later.
+    # Tag with custom properties so the authoring import + manifest introspection
+    # can read back which preset a slot used and whether it self-illuminates.
     mat["spatail_class"] = name
+    mat["spatail_emissive"] = bool(emission_strength > 0.0)
     return mat
 
 

@@ -221,6 +221,10 @@ struct ModularExperience: Decodable {
         /// optional — the runtime falls back to name-matching, then bbox heuristics.
         var target = ""
         var anchorOffset: [Double] = []
+        /// Visual EFFECT for this beat's target part (composer._clean_effect):
+        /// "highlight" (default) | "emissive" | "ghost" | "tint:#RRGGBB" | "none".
+        /// Empty → the runtime defaults to highlight.
+        var effect = ""
         init(from d: Decoder) throws {
             let c = try d.container(keyedBy: K.self)
             id = (try? c.decode(String.self, forKey: .id)) ?? UUID().uuidString
@@ -234,10 +238,11 @@ struct ModularExperience: Decodable {
             target = (try? c.decode(String.self, forKey: .target))
                   ?? (try? c.decode(String.self, forKey: .highlight)) ?? ""
             anchorOffset = (try? c.decode([Double].self, forKey: .anchorOffset)) ?? []
+            effect = (try? c.decode(String.self, forKey: .effect)) ?? ""
         }
         enum K: String, CodingKey {
             case id, title, narration, focus, clip, advance, loop, panels,
-                 target, highlight, anchorOffset
+                 target, highlight, anchorOffset, effect
         }
     }
 

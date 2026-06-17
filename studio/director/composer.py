@@ -118,11 +118,40 @@ def _triggers(understanding: dict, assets: list[dict]) -> list[dict]:
     return out
 
 
+# Per-step visual EFFECT vocabulary (Phase 2). The brain names how the step's target
+# part should READ; the runtime renders it non-destructively (SpatailMaterials.swift):
+#   highlight  — emissive accent glow, keeps the part's look (default; "look here")
+#   emissive   — strong self-illumination ("this part is active / energized / powered")
+#   ghost      — make the target part translucent ("see through / inside this")
+#   tint:#hex  — recolour to a state colour ("hot" red, "cold" blue), keeps the finish
+#   none       — no material change (callout/marker only)
+# Empty/unknown → runtime defaults to highlight. USDZ→UsdPreviewSurface only carries
+# baseColor/emissive/opacity, so every effect here is expressible on-device.
+_EFFECTS = {"highlight", "emissive", "ghost", "none"}
+_HEX6_RE = re.compile(r"[0-9a-f]{6}")
+
+
+def _clean_effect(val) -> str:
+    """Validate a step's effect against the vocabulary; return '' for unknown so the
+    runtime falls back to its default (highlight)."""
+    if not val:
+        return ""
+    v = str(val).strip().lower()
+    if v in _EFFECTS:
+        return v
+    if v.startswith("tint:"):
+        hexpart = v[5:].lstrip("#")
+        if _HEX6_RE.fullmatch(hexpart):
+            return f"tint:#{hexpart}"
+    return ""
+
+
 def _validate_sequence(seq: list[dict], assets: list[dict]) -> list[dict]:
     """Keep steps sane: real focus asset, a clip name that exists on the focus asset
     (else its primary), bounded panels. ALSO pins each step to a surface anchor when
     the focus asset carries Blender-computed anchors → emits step.target +
-    step.anchorOffset (the phone decodes both; anchorOffset is the on-mesh point)."""
+    step.anchorOffset (the phone decodes both; anchorOffset is the on-mesh point), and
+    carries a validated per-step `effect` (the brain's visual-emphasis choice)."""
     ids = {a["id"] for a in assets} | {"scene"}
     hero = assets[0]["id"] if assets else "scene"
     by_id = {a["id"]: a for a in assets}
@@ -142,6 +171,9 @@ def _validate_sequence(seq: list[dict], assets: list[dict]) -> list[dict]:
             "panels": (s.get("panels") or [])[:4],
             "advance": s.get("advance", "tap") if s.get("advance") in ("tap", "auto") else "tap",
         }
+        eff = _clean_effect(s.get("effect"))
+        if eff:
+            step["effect"] = eff
         # anchoring: a resolved anchor wins; else keep an explicit anchorOffset the
         # LLM authored (tolerant — the whitelist no longer strips these keys).
         anc = _anchor_for(s, asset)

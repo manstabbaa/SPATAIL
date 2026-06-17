@@ -53,6 +53,12 @@ When a step talks ABOUT a specific feature, set that step's "anchor" to the anch
 name so the on-screen callout pins directly to that spot on the object. Use ONLY the
 anchor names listed for the focus asset; omit "anchor" for whole-object steps.
 
+Each step may also set an "effect" — how the targeted part should READ for that beat:
+  "highlight" (default; "look here"), "emissive" (the part is active/energized/powered),
+  "ghost" (make it translucent to see inside/through it), "tint:#RRGGBB" (a state colour,
+  e.g. tint:#ff3300 for hot, tint:#2299ff for cold), or "none". Omit it to use highlight.
+Pick the effect that best matches what the narration is explaining.
+
 ASSETS (use these exact ids for focus, only these clip names, only these anchor names):
 {assets}
 
@@ -66,7 +72,8 @@ Return STRICT JSON ONLY in this shape:
 {{"sequence": [
   {{"id": "short_id", "title": "...", "narration": "1-2 sentences",
     "focus": "<assetId>", "clip": "<clip name on that asset>",
-    "anchor": "<anchor name on that asset, or omit>", "loop": true,
+    "anchor": "<anchor name on that asset, or omit>",
+    "effect": "highlight|emissive|ghost|tint:#RRGGBB|none (or omit)", "loop": true,
     "panels": [{{"kind": "title|fact|caption|quiz", "title": "...", "body": "...",
                 "question": "...", "options": [".."], "answer": 0}}],
     "advance": "tap"}}

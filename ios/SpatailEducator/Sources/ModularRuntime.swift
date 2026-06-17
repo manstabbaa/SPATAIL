@@ -34,6 +34,7 @@ final class ModularRuntime: NSObject {
     private var pulseMarkers: [Entity] = []
     private var tintedParts: [(ModelEntity, [any RealityKit.Material])] = []
     private var ghostedParts: [Entity] = []   // parts the step's `ghost` effect made translucent
+    private var enabledOverlays: [Entity] = []   // story region overlays summoned for the current step
     private let synth = AVSpeechSynthesizer()
     private let onStatus: (String) -> Void
 
@@ -115,11 +116,16 @@ final class ModularRuntime: NSObject {
         let pref = e.placement.anchorType
         guard pref == "table" || pref == "floor" || pref == "room" else { return nil } // wall → raycast path
         let reqs = e.assets.map { a -> PlacementSolver.AssetReq in
-            let d = a.scaleMeters
+            // Pack against the asset's REAL footprint when known (realSizeMeters), so the
+            // solver's coverage-fit matches what the render path actually draws; fall back
+            // to scaleMeters otherwise. realScaleBaked rides along so a metric-baked hero
+            // is not coverage-shrunk below 1.0.
+            let d = (a.realSizeMeters?.count == 3) ? a.realSizeMeters! : a.scaleMeters
             let fp = SIMD3<Float>(Float(d.count > 0 ? d[0] : 0.2),
                                   Float(d.count > 1 ? d[1] : 0.2),
                                   Float(d.count > 2 ? d[2] : 0.2))
-            return PlacementSolver.AssetReq(id: a.id, footprint: fp, role: a.role)
+            return PlacementSolver.AssetReq(id: a.id, footprint: fp, role: a.role,
+                                            realScaleBaked: a.realScaleBaked)
         }
         let primary = e.assets.first(where: { $0.role == "primary_object" })?.id ?? e.assets[0].id
         let plan = PlacementSolver.solve(
@@ -322,10 +328,16 @@ final class ModularRuntime: NSObject {
         for e in stepUI { e.removeFromParent() }
         stepUI.removeAll()
         pulseMarkers.removeAll()
-        for (m, mats) in tintedParts { m.model?.materials = mats }   // un-highlight
+        // INVARIANT: restore materials BEFORE disabling overlays. A summoned region
+        // overlay's ModelEntity is captured in tintedParts by applyEffect→mutateMaterials,
+        // so this loop resets its baked look first; only then do we hide it. Reordering
+        // these two loops would strand the mutated material on a re-summoned overlay.
+        for (m, mats) in tintedParts { m.model?.materials = mats }   // un-highlight (incl. overlays)
         tintedParts.removeAll()
         for e in ghostedParts { setOpacity(e, 1.0) }                 // un-ghost
         ghostedParts.removeAll()
+        for e in enabledOverlays { e.isEnabled = false }             // un-summon region overlays
+        enabledOverlays.removeAll()
     }
 
     // MARK: - spatial step UI (the immersive layer: the explanation happens ON the model)
@@ -340,7 +352,8 @@ final class ModularRuntime: NSObject {
         guard let holder = holders[focusId] else { return }
         let node = nodes[focusId] ?? holder
         let b = node.visualBounds(relativeTo: a)
-        let (point, part) = resolveStepAnchor(step, node: node, bounds: b, in: a)
+        let asset = e.assets.first(where: { $0.id == focusId })
+        let (point, part) = resolveStepAnchor(step, node: node, bounds: b, in: a, asset: asset)
         if !step.title.isEmpty { addCallout(step.title, at: point, in: a) }
         addMarker(at: point, in: a)
         if let part { applyEffect(step.effect, to: part) }
@@ -361,7 +374,26 @@ final class ModularRuntime: NSObject {
     /// then a fuzzy name match from the step title, then deterministic bbox points
     /// so consecutive steps land on different regions of the model.
     private func resolveStepAnchor(_ step: ModularExperience.Step, node: Entity,
-                                   bounds: BoundingBox, in root: Entity) -> (SIMD3<Float>, Entity?) {
+                                   bounds: BoundingBox, in root: Entity,
+                                   asset: ModularExperience.Asset? = nil) -> (SIMD3<Float>, Entity?) {
+        // §2.0 — a STORY-baked REGION wins: enable its overlay mesh and return it as the
+        // effect target, so the glow lands on exactly that patch (the lion's eye) instead
+        // of the whole head. Falls through to the offset/name/bbox hierarchy if missing.
+        if !step.region.isEmpty,
+           let region = asset?.regions.first(where: { $0.id == step.region || $0.role == step.region }) {
+            if let overlay = Self.findRegionOverlay(in: node, node: region.overlayNode, id: region.id) {
+                overlay.isEnabled = true
+                enabledOverlays.append(overlay)
+                let hb = overlay.visualBounds(relativeTo: root)
+                if hb.max.y.isFinite, hb.max.y >= hb.min.y {
+                    return (SIMD3(hb.center.x, hb.max.y, hb.center.z), overlay)
+                }
+            }
+            if region.offset.count == 3 {       // overlay missing → still point at the part
+                let o = SIMD3(Float(region.offset[0]), Float(region.offset[1]), Float(region.offset[2]))
+                return (bounds.min + o * bounds.extents, nil)
+            }
+        }
         if step.anchorOffset.count == 3 {
             let o = SIMD3(Float(step.anchorOffset[0]), Float(step.anchorOffset[1]), Float(step.anchorOffset[2]))
             return (bounds.min + o * bounds.extents, nil)
@@ -408,6 +440,33 @@ final class ModularRuntime: NSObject {
             stack.append(contentsOf: e.children)
         }
         return nil
+    }
+
+    /// Find a baked region overlay by its exported node name (preferred), else any
+    /// `spatail_region…__<id>` entity — robust to USD prim renaming on import.
+    private static func findRegionOverlay(in root: Entity, node: String, id: String) -> Entity? {
+        let want = node.lowercased(), suffix = "__" + id.lowercased()
+        var stack: [Entity] = [root]
+        var fallback: Entity? = nil
+        while let e = stack.popLast() {
+            let nm = e.name.lowercased()
+            if !want.isEmpty, nm == want || nm.contains(want) { return e }
+            if nm.contains("spatail_region"), nm.hasSuffix(suffix) { fallback = e }
+            stack.append(contentsOf: e.children)
+        }
+        return fallback
+    }
+
+    /// Region overlays ship visible (so they survive GLB/USDZ export) but must stay OFF
+    /// until a step summons them — hide every `spatail_region…` entity on load.
+    @discardableResult
+    private static func disableRegionOverlays(in root: Entity) -> Int {
+        var stack: [Entity] = [root], n = 0
+        while let e = stack.popLast() {
+            if e.name.lowercased().contains("spatail_region") { e.isEnabled = false; n += 1 }
+            stack.append(contentsOf: e.children)
+        }
+        return n
     }
 
     /// Apply the step's named visual EFFECT to its target part (the brain's per-beat
@@ -670,13 +729,21 @@ final class ModularRuntime: NSObject {
             let entity: Entity
             if #available(iOS 18.0, *) { entity = try await Entity(contentsOf: dst) } else { entity = try Entity.load(contentsOf: dst) }
             guard let holder = holders[assetId] else { return }
-            // §5: true-scale experiences keep real-world dimensions (capped for safety);
-            // fit-to-surface/miniature use the tabletop budget.
+            // Honour the asset's real-world scale contract; the footprint budget is only
+            // the FALLBACK (no baked/real size). §5: true-scale experiences keep
+            // real-world dimensions (capped for safety); fit-to-surface/miniature use
+            // the tabletop budget.
             let trueScale = (exp?.placement.scaleMode == "true_scale")
-            fit(entity, to: trueScale ? max(min(footprintW, 1.2), 0.05)
-                                      : max(min(footprintW, 0.3), 0.05))
+            let budget: Float = trueScale ? max(min(footprintW, 1.2), 0.05)
+                                          : max(min(footprintW, 0.3), 0.05)
+            if let asset = exp?.assets.first(where: { $0.id == assetId }) {
+                fitToRealScale(entity, asset: asset, footprintBudget: budget)
+            } else {
+                fit(entity, to: budget)
+            }
             nodes[assetId]?.isEnabled = false
             holder.addChild(entity); nodes[assetId] = entity
+            Self.disableRegionOverlays(in: entity)   // story overlays off until a step summons them
             let clips = entity.availableAnimations
             print("SPATAIL: loadModel \(assetId) — \(clips.count) animation clip(s)")
             if clips.isEmpty { print("SPATAIL: WARNING no animations on \(assetId); model is static.") }
@@ -692,9 +759,19 @@ final class ModularRuntime: NSObject {
             do {
                 let entity: Entity
                 if #available(iOS 18.0, *) { entity = try await Entity(contentsOf: fileURL) } else { entity = try Entity.load(contentsOf: fileURL) }
-                self.fit(entity, to: 0.3)
+                // Same real-world scale contract as loadModel: a streamed Blender USDZ
+                // that carries a baked/real size renders at its true dimensions, not the
+                // ~0.3 m budget. Falls back to the budget when the id has no contract.
+                let trueScale = (self.exp?.placement.scaleMode == "true_scale")
+                let budget: Float = trueScale ? 1.2 : 0.3
+                if let asset = self.exp?.assets.first(where: { $0.id == assetId }) {
+                    self.fitToRealScale(entity, asset: asset, footprintBudget: budget)
+                } else {
+                    self.fit(entity, to: 0.3)
+                }
                 self.nodes[assetId]?.removeFromParent()
                 holder.addChild(entity); self.nodes[assetId] = entity
+                Self.disableRegionOverlays(in: entity)   // story overlays off until summoned
                 for (id, h) in self.holders where id != assetId {
                     let placeholder = (self.exp?.assets.first(where: { $0.id == id })?.usdzUrl.isEmpty) ?? true
                     if placeholder { h.isEnabled = false }
@@ -712,18 +789,48 @@ final class ModularRuntime: NSObject {
         }
     }
 
+    /// Size a model to its REAL-WORLD scale per the asset's contract (studio
+    /// asset_service + the vision pipeline bake it). This is the consumer the contract
+    /// was always missing — without it every model was re-fit to the tabletop budget,
+    /// so a 0.08 m frog and a 0.55 m extinguisher rendered at the same ~0.3 m.
+    ///  • realScaleBaked → the GLB is already metric; render at scale 1.0 (do NOT
+    ///    re-fit to a footprint budget).
+    ///  • realSizeMeters present → scale the longest dim to that real size.
+    ///  • neither → fall back to the legacy tabletop footprint budget.
+    private func fitToRealScale(_ entity: Entity, asset: ModularExperience.Asset,
+                                footprintBudget: Float) {
+        if asset.realScaleBaked {
+            entity.scale = .one                            // already metric-correct
+            seat(entity)
+            print("SPATAIL: \(asset.id) real-scale BAKED → scale 1.0 (size \(asset.realSizeMeters ?? []))")
+        } else if let real = asset.realSizeMeters, let longestReal = real.max(), longestReal > 0.01 {
+            let b = entity.visualBounds(relativeTo: nil)
+            let longest = max(b.extents.x, max(b.extents.y, b.extents.z), 0.001)
+            entity.scale = SIMD3(repeating: Float(longestReal) / longest)
+            seat(entity)
+            print("SPATAIL: \(asset.id) fit to realSizeMeters → longest \(longestReal) m")
+        } else {
+            fit(entity, to: footprintBudget)
+        }
+    }
+
+    /// Footprint-budget fallback: scale the longest dim to `target`, then seat.
     private func fit(_ entity: Entity, to target: Float) {
         let b = entity.visualBounds(relativeTo: nil)
         let longest = max(b.extents.x, max(b.extents.y, b.extents.z), 0.001)
         entity.scale = SIMD3(repeating: target / longest)
-        let b2 = entity.visualBounds(relativeTo: nil)
-        // Rest the model's ACTUAL bottom on the holder origin (the surface). Using
-        // extents.y/2 alone only works when the mesh origin is at its vertical centre;
-        // Meshy/animated USDZs carry an offset root, so subtract the bounds centre too —
-        // otherwise the asset floats above (or sinks into) the table.
-        entity.position.y = b2.extents.y / 2 - b2.center.y
-        entity.position.x -= b2.center.x                  // centre the footprint on the holder
-        entity.position.z -= b2.center.z
+        seat(entity)
+    }
+
+    /// Rest the model's ACTUAL bottom on the holder origin (the surface) and centre its
+    /// footprint. Using extents.y/2 alone only works when the mesh origin is at its
+    /// vertical centre; Meshy/animated USDZs carry an offset root, so subtract the
+    /// bounds centre too — otherwise the asset floats above (or sinks into) the table.
+    private func seat(_ entity: Entity) {
+        let b = entity.visualBounds(relativeTo: nil)
+        entity.position.y = b.extents.y / 2 - b.center.y
+        entity.position.x -= b.center.x                   // centre the footprint on the holder
+        entity.position.z -= b.center.z
     }
 
     private func makeContactShadow(radius: Float) -> ModelEntity {
@@ -757,6 +864,7 @@ final class ModularRuntime: NSObject {
         synth.stopSpeaking(at: .immediate)
         updateSub = nil; labels.removeAll()
         stepUI.removeAll(); pulseMarkers.removeAll(); tintedParts.removeAll(); ghostedParts.removeAll()
+        enabledOverlays.removeAll()
         if let anchor, let view { view.scene.removeAnchor(anchor) }
         anchor = nil; holders.removeAll(); nodes.removeAll(); exp = nil; stepIndex = 0
         // re-solve placement per experience: a raycast placement taken while the

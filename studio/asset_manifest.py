@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import re
 
-SCHEMA = "spatail-asset-manifest/3"   # /3 adds anchors: Blender-computed surface points
+SCHEMA = "spatail-asset-manifest/4"   # /3 anchors (surface points); /4 regions (story-driven addressable sub-mesh overlays)
 
 # Part name -> semantic role. Used for LABELS and TAP-A-PART targeting only; motion
 # is now baked into clips, not derived from the role.
@@ -84,6 +84,54 @@ def normalize_anchors(raw, max_anchors: int = 8) -> list[dict]:
         except Exception:
             continue
         if len(out) >= max_anchors:
+            break
+    return out
+
+
+# ── regions (schema /4): story-driven addressable sub-mesh overlays ──────────────
+
+def normalize_regions(raw, max_regions: int = 16) -> list[dict]:
+    """Validate the regions the Blender regions stage baked. A region turns a
+    STORY-required part (the lion's eye) into something the runtime can light up
+    PRECISELY: a separate overlay mesh baked over just that patch of surface, named
+    so the runtime can find it, plus a normalized `offset` (same bbox convention as
+    anchors / iOS step.anchorOffset) for the callout, and the effect families the
+    brief said the part must support.
+
+    Each record:
+      {id, label, role, overlayNode, offset:[x,y,z]∈[0,1]³, radiusNorm,
+       effects:[…], verified}
+    `overlayNode` is the exported entity name (`spatail_region__<mesh>__<id>`) the iOS
+    runtime enables + effects; the base mesh is never touched (non-destructive)."""
+    out, seen = [], set()
+    for r in raw or []:
+        try:
+            rid = re.sub(r"[^a-z0-9]+", "_", str(r.get("id") or "").lower()).strip("_")[:48]
+            node = str(r.get("overlayNode") or "").strip()[:128]
+            off = [min(max(float(x), 0.0), 1.0) for x in (r.get("offset") or [])][:3]
+            if not rid or rid in seen or not node or len(off) != 3:
+                continue
+            seen.add(rid)
+            effects, eseen = [], set()
+            for e in r.get("effects") or ["highlight"]:
+                fam = str(e or "").strip().lower()
+                fam = fam.split(":", 1)[0] if fam.startswith("tint:") else fam
+                if fam in ("highlight", "emissive", "ghost", "tint", "none") and fam not in eseen:
+                    eseen.add(fam)
+                    effects.append(fam)
+            out.append({
+                "id": rid,
+                "label": str(r.get("label") or rid.replace("_", " ").title())[:64],
+                "role": re.sub(r"[^a-z0-9]+", "_", str(r.get("role") or rid).lower()).strip("_")[:48],
+                "overlayNode": node,
+                "offset": [round(o, 4) for o in off],
+                "radiusNorm": round(min(max(float(r.get("radiusNorm", 0.1)), 0.0), 1.0), 4),
+                "effects": effects or ["highlight"],
+                "verified": bool(r.get("verified", False)),
+            })
+        except Exception:
+            continue
+        if len(out) >= max_regions:
             break
     return out
 

@@ -22,6 +22,7 @@ for p in (_STUDIO, _STUDIO / "server", _STUDIO / "mechanics", _STUDIO / "directo
         sys.path.insert(0, sp)
 
 import composer  # noqa: E402
+import asset_brief as abrief  # noqa: E402  (the story→asset requirements contract)
 from representation.engine import RepresentationEngine  # noqa: E402
 from spatail.design_system import decide_placement  # noqa: E402  (Placement Design System)
 
@@ -96,6 +97,19 @@ def _resolve_assets(plan, manifest, lib) -> list[dict]:
             a["clips"] = man["clips"]
         if man.get("anchors"):
             a["anchors"] = man["anchors"]
+        # story-driven addressable regions (slice 1): each is an overlay the runtime
+        # lights up PRECISELY, so a step's effect lands on exactly that part.
+        if man.get("regions"):
+            a["regions"] = man["regions"]
+        # Real-world scale contract (asset_service.produce → library): the runtime
+        # branches on these so each asset renders at its true size — realScaleBaked
+        # means the GLB is already metric (render at 1.0); realSizeMeters is the size
+        # to fit the longest dim to when it isn't baked. Absent → tabletop footprint.
+        if res is not None:
+            if getattr(res, "realSizeMeters", None):
+                a["realSizeMeters"] = list(res.realSizeMeters)
+            if getattr(res, "realScaleBaked", False):
+                a["realScaleBaked"] = True
         # Drop assets that resolve to the SAME model as one already kept — the library
         # returns the whole object for unknown "parts", which would otherwise render as
         # N identical copies (e.g. "a v8 engine" -> 4 engine blocks). Real distinct
@@ -126,6 +140,16 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
     }
     design = composer.compose(understanding, assets, use_llm=use_llm)
 
+    # STORY→ASSET briefs (slice 1): from the composed sequence, derive — per asset —
+    # which named parts the lesson points at / makes emissive, so a not-yet-generated
+    # asset is BUILT to satisfy the story (anchors find those parts, regions bake them).
+    # Threaded to the generation job by job_server; carried here for transparency.
+    asset_requirements = {}
+    for a in assets:
+        b = abrief.build_brief(a["id"], sequence=design["sequence"])
+        if abrief.has_requirements(b):
+            asset_requirements[a["id"]] = b
+
     # Placement Design System (docs/spatail-placement-design-system.md): the §12
     # placement contract — POLICY the on-device solver resolves against the room.
     # Also carries the stream split: anchoring.mode = "object" (tracked) | "world".
@@ -145,6 +169,7 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
         "placement": placement,
         "anchoring": placement["anchoring"],
         "assets": assets,
+        "assetRequirements": asset_requirements,
         "composer": design["composer"],
         # the experience = a SEQUENCE of steps that play baked clips, + triggers
         # (interaction). Motion lives in the asset's clips; SPATAIL plays/sequences.

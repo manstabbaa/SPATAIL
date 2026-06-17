@@ -48,6 +48,33 @@ def _anchor_for(step: dict, asset: dict | None) -> dict | None:
     return best if best_score > 0 else None
 
 
+def _region_for(step: dict, asset: dict | None) -> dict | None:
+    """Map a step to one of the focus asset's STORY-baked addressable regions (the
+    overlay the runtime lights up PRECISELY). Prefers an explicit region/target/anchor
+    name, then the region whose id words best overlap the step's title + narration.
+    A region beats a bare anchor because the effect lands on exactly that part."""
+    regions = (asset or {}).get("regions") or []
+    if not regions:
+        return None
+    by_key = {}
+    for r in regions:
+        for k in (r.get("id"), r.get("role")):
+            if k:
+                by_key.setdefault(k, r)
+    want = re.sub(r"[^a-z0-9]+", "_",
+                  str(step.get("region") or step.get("anchor") or step.get("target") or "").lower()).strip("_")
+    if want in by_key:
+        return by_key[want]
+    text = f"{step.get('title', '')} {step.get('narration', '')}".lower()
+    best, best_score = None, 0
+    for r in regions:
+        words = [w for w in str(r.get("id", "")).split("_") if len(w) > 2] or [r.get("id", "")]
+        score = sum(1 for w in words if w in text)
+        if score > best_score:
+            best, best_score = r, score
+    return best if best_score > 0 else None
+
+
 def _hero_clips(assets: list[dict]) -> list[dict]:
     return (assets[0].get("clips") if assets else None) or am.default_clips(120)
 
@@ -174,10 +201,16 @@ def _validate_sequence(seq: list[dict], assets: list[dict]) -> list[dict]:
         eff = _clean_effect(s.get("effect"))
         if eff:
             step["effect"] = eff
-        # anchoring: a resolved anchor wins; else keep an explicit anchorOffset the
-        # LLM authored (tolerant — the whitelist no longer strips these keys).
+        # anchoring priority: a STORY-baked REGION wins (the effect lands on exactly
+        # that overlay), then a surface anchor, then an explicit anchorOffset the LLM
+        # authored. `region` carries the overlay id the runtime enables + effects.
+        reg = _region_for(s, asset)
         anc = _anchor_for(s, asset)
-        if anc:
+        if reg:
+            step["target"] = reg["id"]
+            step["region"] = reg["id"]
+            step["anchorOffset"] = reg["offset"]
+        elif anc:
             step["target"] = anc["name"]
             step["anchorOffset"] = anc["offset"]
         else:

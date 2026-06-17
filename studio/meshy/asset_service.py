@@ -39,7 +39,8 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-for p in (str(HERE), str(HERE.parent), str(HERE.parent / "spatail")):  # config/meshy_client; asset_manifest; object_size
+for p in (str(HERE), str(HERE.parent), str(HERE.parent / "spatail"),
+          str(HERE.parent / "director")):  # config/meshy_client; asset_manifest; object_size; asset_brief
     if p not in sys.path:
         sys.path.insert(0, p)
 
@@ -47,6 +48,7 @@ import config         # noqa: E402
 import meshy_client   # noqa: E402
 import asset_manifest as am  # noqa: E402  (studio/ — the Blender↔SPATAIL contract)
 import object_size as osize   # noqa: E402  (studio/spatail — real-world scale grounding)
+import asset_brief as abrief  # noqa: E402  (studio/director — the story→asset contract)
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "studio" / "out" / "meshy"
@@ -168,9 +170,14 @@ def _vision_normalize(slug, subject, glb_in, real_size_m, asset_out):
 
 
 def _register(slug: str, name: str, desc: str, scale_m: list, category: str,
-              glb_url: str, usdz_url: str) -> None:
+              glb_url: str, usdz_url: str, *,
+              real_size_m: list | None = None, real_scale_baked: bool = False) -> None:
     """Best-effort library registration so the next prompt resolves this asset
-    directly (no generation job at all). Failure here never fails the build."""
+    directly (no generation job at all). Failure here never fails the build.
+
+    real_size_m/real_scale_baked carry the real-world scale contract into the library
+    so the modular contract (and the iOS runtime) can render the asset at its true size
+    instead of re-fitting every model to the tabletop footprint budget."""
     try:
         from library.asset_library import AssetLibrary
         words = re.split(r"[^a-z0-9]+", f"{slug} {name} {desc}".lower())
@@ -186,7 +193,8 @@ def _register(slug: str, name: str, desc: str, scale_m: list, category: str,
             representation_uses=["real_scale_placement", "part_to_whole_explanation"],
             usdz_path=usdz_url, fallback_primitive="cube",
             placement_types=["table", "floor"], bbox_m={"size": scale_m},
-            asset_state="generated")
+            asset_state="generated",
+            real_size_meters=real_size_m, real_scale_baked=real_scale_baked)
         print(f"[asset] registered {slug} in the library -> {usdz_url}")
     except Exception as exc:  # noqa: BLE001
         print(f"[asset] library registration skipped: {exc}")
@@ -194,16 +202,26 @@ def _register(slug: str, name: str, desc: str, scale_m: list, category: str,
 
 def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
             asset_id: str | None = None, scale_meters: list | None = None,
-            category: str = "general",
+            category: str = "general", story_requirements: dict | None = None,
             on_stage=lambda s: None) -> dict:
     """Full chain. Returns the SAME shape generator/headless_build return
     ({usdz_name, metadata_name, max_dim, spec}) so job_server's done-handling and
-    the phone's polling work unchanged. Raises on failure → caller falls back."""
+    the phone's polling work unchanged. Raises on failure → caller falls back.
+
+    story_requirements (asset_brief): the STORY's per-asset demands the director
+    emitted BEFORE generation — which named parts must be addressable (so a step can
+    make exactly the lion's eye emissive). It biases the anchors stage to FIND those
+    parts and drives the regions stage to bake them as precise overlays."""
     t0 = time.time()
     artifacts_dir = Path(artifacts_dir)
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     slug = _slug(asset_id or subject)
     desc = _desc(subject, brief)
+    # The story→asset contract (slice 1): which parts the lesson will point at.
+    asset_brief = abrief.validate(story_requirements) if story_requirements else None
+    if abrief.has_requirements(asset_brief):
+        print(f"[asset] {slug}: story brief — addressable parts "
+              f"{[p['id'] for p in abrief.addressable_parts(asset_brief)]}")
     scale_m = list(scale_meters or DEFAULT_SCALE_M)       # GLB authoring size (stable)
     # Correct scale detection (studio/spatail/object_size): the subject's REAL-WORLD
     # size, LLM-grounded + cached. Carried as METADATA for the placer/solver — it does
@@ -275,6 +293,7 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
     # marker dots. Non-fatal: an asset without anchors still ships (the phone
     # falls back to its bbox heuristics, as today).
     anchors: list = []
+    raw_anchors: list = []           # carries pos_world (Blender Z-up) for the regions stage
     if os.environ.get("SPATAIL_MESHY_ANCHORS", "1").lower() not in ("0", "false", "no"):
         on_stage("locating the features (anchors)")
         try:
@@ -283,15 +302,60 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
                 {"result_path": str(OUT / f"_{slug}_anchors.json"),
                  "assets": [{"assetId": slug, "subject": subject, "desc": desc,
                              "glb_in": str(LIB_DIR / f"{slug}.glb"),
+                             # story-driven bias: find the parts the lesson will explain
+                             "required_names": abrief.required_part_names(asset_brief)
+                             if asset_brief else [],
                              "out_dir": str(asset_out / "anchors")}]},
                 OUT / f"_{slug}_anchors.json")
             if anc.get("failed"):
                 raise RuntimeError(anc["failed"][0].get("error", "anchors stage failed"))
-            anchors = am.normalize_anchors((anc.get("done") or [{}])[0].get("anchors"))
+            raw_anchors = (anc.get("done") or [{}])[0].get("anchors") or []
+            anchors = am.normalize_anchors(raw_anchors)
             print(f"[asset] {slug}: {len(anchors)} anchors "
                   f"({', '.join(x['name'] for x in anchors) or 'none'})")
         except Exception as exc:  # noqa: BLE001
             print(f"[asset] anchors skipped ({exc}) — shipping without anchors")
+
+    # 3.6) REGIONS — story-driven addressable sub-mesh overlays (slice 1). For each
+    # part the director declared addressable that the anchors stage localized, bake a
+    # precise overlay (`spatail_region__<mesh>__<id>`) and re-export the GLB so the
+    # downstream decimate/animate stages carry the overlays into the shipped USDZ.
+    # Non-fatal: the asset still ships (steps fall back to anchor/bbox) if this fails.
+    regions: list = []
+    want_parts = abrief.addressable_parts(asset_brief) if asset_brief else []
+    if want_parts and raw_anchors:
+        on_stage("carving the parts (regions)")
+        try:
+            by_name = {a.get("name"): a for a in raw_anchors if a.get("name")}
+            specs = []
+            for p in want_parts:
+                anc_hit = next((by_name[n] for n in
+                                [p["id"], p.get("role")] + list(p.get("aliases") or [])
+                                if n in by_name), None)
+                if not anc_hit:
+                    continue
+                specs.append({
+                    "id": p["id"], "label": p["id"].replace("_", " ").title(),
+                    "role": p.get("role") or p["id"],
+                    "effects": p.get("effects") or ["highlight"],
+                    "pos_world": anc_hit.get("pos_world"), "pos_m": anc_hit.get("pos_m"),
+                    "offset": anc_hit.get("offset"), "verified": anc_hit.get("verified", False),
+                })
+            if specs:
+                reg = _run_blender(
+                    HERE / "regions.py",
+                    {"result_path": str(OUT / f"_{slug}_regions.json"),
+                     "export_usdz": True,
+                     "assets": [{"assetId": slug, "glb_in": str(LIB_DIR / f"{slug}.glb"),
+                                 "out_dir": str(LIB_DIR), "regions": specs}]},
+                    OUT / f"_{slug}_regions.json")
+                if reg.get("failed"):
+                    raise RuntimeError(reg["failed"][0].get("error", "regions stage failed"))
+                regions = am.normalize_regions((reg.get("done") or [{}])[0].get("regions"))
+                print(f"[asset] {slug}: {len(regions)} regions "
+                      f"({', '.join(x['id'] for x in regions) or 'none'})")
+        except Exception as exc:  # noqa: BLE001
+            print(f"[asset] regions skipped ({exc}) — shipping without regions")
 
     # 4) Decimate to the mobile budget (~12K tris / 1K textures) → <slug>_ar.usdz
     ship_usdz = LIB_DIR / f"{slug}.usdz"
@@ -357,7 +421,7 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
     meta = {
         "source": "meshy", "subject": subject, "desc": desc, "assetId": slug,
         "scaleMeters": scale_m, "realSizeMeters": real_size_m, "credits": credits,
-        "clips": clips, "anchors": anchors,
+        "clips": clips, "anchors": anchors, "regions": regions,
         "usdzBytes": (artifacts_dir / usdz_name).stat().st_size,
         "libraryGlb": lib_glb, "libraryUsdz": lib_usdz,
         "elapsedS": round(time.time() - t0, 1),
@@ -384,26 +448,32 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
     # director pins steps to. Written under BOTH names: {job_id}_ (the phone's
     # manifest_url when polling this job) and {slug}_ (what the composer's
     # experience._load_manifest reads by ASSET id when composing the contract).
-    if clips or anchors or real_size_m:
+    if clips or anchors or regions or real_size_m:
         manifest = json.dumps({"schema": am.SCHEMA, "assetId": slug, "parts": [],
-                               "clips": clips, "anchors": anchors,
+                               "clips": clips, "anchors": anchors, "regions": regions,
                                "realSizeMeters": real_size_m}, indent=2)
         (artifacts_dir / f"{job_id}_manifest.json").write_text(manifest, encoding="utf-8")
         (artifacts_dir / f"{slug}_manifest.json").write_text(manifest, encoding="utf-8")
 
     # 6) Library registration → the next prompt for this subject skips generation.
-    # When vision baked real scale into the GLB, register that real size as scaleMeters
-    # (the solver/footprint truth) instead of the [0.4,0.4,0.4] authoring guess.
+    # Carry the real-world scale contract through so the runtime renders at true size:
+    #  - vision path BAKED real scale into the GLB → realScaleBaked, and the baked size
+    #    doubles as scaleMeters (solver/footprint truth) instead of the authoring guess.
+    #  - uniform-fit path leaves the GLB at authoring scale but knows the real size
+    #    (object_size estimate) → realSizeMeters tells the runtime what to fit it to.
     register_scale = scale_m
-    if vision and vision.get("applied", {}).get("final_size_m"):
+    real_baked = bool(vision and vision.get("applied", {}).get("final_size_m"))
+    if real_baked:
         register_scale = vision["applied"]["final_size_m"]
-    _register(slug, subject, desc, register_scale, category, lib_glb, lib_usdz)
+    real_size_contract = vision["applied"]["final_size_m"] if real_baked else real_size_m
+    _register(slug, subject, desc, register_scale, category, lib_glb, lib_usdz,
+              real_size_m=real_size_contract, real_scale_baked=real_baked)
 
     print(f"[asset] {slug}: meshy asset ready in {meta['elapsedS']}s "
           f"({meta['usdzBytes'] / 1e6:.1f} MB, {credits} credits, "
           f"{'clip ' + clips[0]['name'] if clips else 'static'})")
     return {"usdz_name": usdz_name, "metadata_name": metadata_name,
-            "glb_name": glb_name, "clips": clips, "anchors": anchors,
+            "glb_name": glb_name, "clips": clips, "anchors": anchors, "regions": regions,
             "realSizeMeters": real_size_m,
             "max_dim": max(scale_m), "spec": {"source": "meshy", "assetId": slug},
             "bbox_yup": {"size": scale_m}}

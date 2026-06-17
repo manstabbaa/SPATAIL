@@ -156,10 +156,18 @@ struct ModularExperience: Decodable {
         var name = "", role = "part", description = ""
         var glbUrl = "", usdzUrl = "", fallbackPrimitive = "cube"
         var scaleMeters: [Double] = [0.2, 0.2, 0.2]
+        /// Real-world scale contract (studio asset_service + vision pipeline). When
+        /// `realScaleBaked` is true the GLB is already metric — the runtime renders it
+        /// at scale 1.0 and does NOT re-fit to the footprint budget. Otherwise, when
+        /// `realSizeMeters` is present, the runtime fits the longest dimension to that
+        /// real size. Neither present → the legacy tabletop footprint budget.
+        var realSizeMeters: [Double]? = nil
+        var realScaleBaked = false
         var supportsAnimation = false, supportsHighlight = false, supportsTransparency = false
         var status = "placeholder"
         var clips: [Clip] = []
         var parts: [Part] = []
+        var regions: [Region] = []
         init(from d: Decoder) throws {
             let c = try d.container(keyedBy: K.self)
             id = (try? c.decode(String.self, forKey: .id)) ?? UUID().uuidString
@@ -170,17 +178,21 @@ struct ModularExperience: Decodable {
             usdzUrl = (try? c.decode(String.self, forKey: .usdzUrl)) ?? ""
             fallbackPrimitive = (try? c.decode(String.self, forKey: .fallbackPrimitive)) ?? "cube"
             scaleMeters = (try? c.decode([Double].self, forKey: .scaleMeters)) ?? [0.2, 0.2, 0.2]
+            realSizeMeters = try? c.decode([Double].self, forKey: .realSizeMeters)
+            realScaleBaked = (try? c.decode(Bool.self, forKey: .realScaleBaked)) ?? false
             supportsAnimation = (try? c.decode(Bool.self, forKey: .supportsAnimation)) ?? false
             supportsHighlight = (try? c.decode(Bool.self, forKey: .supportsHighlight)) ?? false
             supportsTransparency = (try? c.decode(Bool.self, forKey: .supportsTransparency)) ?? false
             status = (try? c.decode(String.self, forKey: .status)) ?? "placeholder"
             clips = (try? c.decode([Clip].self, forKey: .clips)) ?? []
             parts = (try? c.decode([Part].self, forKey: .parts)) ?? []
+            regions = (try? c.decode([Region].self, forKey: .regions)) ?? []
         }
         enum K: String, CodingKey {
             case id, name, role, description, glbUrl, usdzUrl, fallbackPrimitive,
-                 scaleMeters, supportsAnimation, supportsHighlight, supportsTransparency,
-                 status, clips, parts
+                 scaleMeters, realSizeMeters, realScaleBaked,
+                 supportsAnimation, supportsHighlight, supportsTransparency,
+                 status, clips, parts, regions
         }
     }
 
@@ -192,6 +204,32 @@ struct ModularExperience: Decodable {
             role = (try? c.decode(String.self, forKey: .role)) ?? "part"
         }
         enum K: String, CodingKey { case name, role }
+    }
+
+    /// A STORY-baked addressable REGION (asset_manifest.normalize_regions). The part
+    /// the lesson points at (the lion's eye) is baked in Blender as a SEPARATE overlay
+    /// mesh named `overlayNode` (`spatail_region__<mesh>__<id>`). The runtime enables
+    /// that overlay and applies the step's effect to it ALONE — so the glow lands on
+    /// exactly that patch, not the whole head. `offset` is the normalized [0..1]^3 bbox
+    /// point for the callout (same convention as step.anchorOffset).
+    struct Region: Decodable {
+        var id = "", label = "", role = "part", overlayNode = ""
+        var offset: [Double] = []
+        var radiusNorm = 0.1
+        var effects: [String] = []
+        var verified = false
+        init(from d: Decoder) throws {
+            let c = try d.container(keyedBy: K.self)
+            id = (try? c.decode(String.self, forKey: .id)) ?? ""
+            label = (try? c.decode(String.self, forKey: .label)) ?? ""
+            role = (try? c.decode(String.self, forKey: .role)) ?? "part"
+            overlayNode = (try? c.decode(String.self, forKey: .overlayNode)) ?? ""
+            offset = (try? c.decode([Double].self, forKey: .offset)) ?? []
+            radiusNorm = (try? c.decode(Double.self, forKey: .radiusNorm)) ?? 0.1
+            effects = (try? c.decode([String].self, forKey: .effects)) ?? []
+            verified = (try? c.decode(Bool.self, forKey: .verified)) ?? false
+        }
+        enum K: String, CodingKey { case id, label, role, overlayNode, offset, radiusNorm, effects, verified }
     }
 
     struct Clip: Decodable {
@@ -225,6 +263,10 @@ struct ModularExperience: Decodable {
         /// "highlight" (default) | "emissive" | "ghost" | "tint:#RRGGBB" | "none".
         /// Empty → the runtime defaults to highlight.
         var effect = ""
+        /// STORY-baked region id (composer._region_for). When set + the focus asset
+        /// carries a matching Region, the runtime enables that overlay and applies the
+        /// effect to it ALONE — precise part spotting instead of fuzzy name-matching.
+        var region = ""
         init(from d: Decoder) throws {
             let c = try d.container(keyedBy: K.self)
             id = (try? c.decode(String.self, forKey: .id)) ?? UUID().uuidString
@@ -239,10 +281,11 @@ struct ModularExperience: Decodable {
                   ?? (try? c.decode(String.self, forKey: .highlight)) ?? ""
             anchorOffset = (try? c.decode([Double].self, forKey: .anchorOffset)) ?? []
             effect = (try? c.decode(String.self, forKey: .effect)) ?? ""
+            region = (try? c.decode(String.self, forKey: .region)) ?? ""
         }
         enum K: String, CodingKey {
             case id, title, narration, focus, clip, advance, loop, panels,
-                 target, highlight, anchorOffset, effect
+                 target, highlight, anchorOffset, effect, region
         }
     }
 

@@ -242,6 +242,7 @@ def _run_job(job_id: str) -> None:
                         asset_id=asset_req.get("assetId"),
                         scale_meters=asset_req.get("scaleMeters"),
                         category=asset_req.get("category") or "general",
+                        story_requirements=asset_req.get("assetRequirements"),
                         on_stage=lambda s, _id=job_id: _update(_id, stage=s))
                     lane = "meshy"
                 except Exception as exc:  # noqa: BLE001
@@ -505,6 +506,11 @@ class Handler(BaseHTTPRequestHandler):
                                       "subject": gen.get("subject") or "",
                                       "scaleMeters": gen_asset.get("scaleMeters"),
                                       "category": (contract.get("understanding") or {}).get("domain"),
+                                      # story→asset brief for THIS asset (slice 1): the
+                                      # parts the lesson will point at, so the producer
+                                      # finds them + bakes them as addressable regions.
+                                      "assetRequirements": (contract.get("assetRequirements")
+                                                            or {}).get(gen.get("assetId")),
                                   }}
                 _QUEUE.put(gid)
                 contract["generationJobId"] = gid

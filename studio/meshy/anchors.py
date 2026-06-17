@@ -303,7 +303,7 @@ Return STRICT JSON ONLY:
 
 
 def _ask_points(subject, desc, images, max_anchors, only=None, feedback=None,
-                marker_images=None):
+                marker_images=None, required=None):
     names = ", ".join(n for n, _ in images)
     if only:
         lines = "; ".join(f"{n}: {feedback.get(n, 'misplaced')}" for n in only)
@@ -312,10 +312,19 @@ def _ask_points(subject, desc, images, max_anchors, only=None, feedback=None,
                 f"{len(images) + len(marker_images or [])} show the SAME views with "
                 f"the current WRONG marker dots — give corrected locations.")
     else:
+        # Story-driven bias: when the lesson DECLARES the parts it will explain
+        # (asset_brief.required_part_names), force those by exact name so the part the
+        # story cares about (e.g. the eye) is FOUND, not dropped as "not meaningful".
+        must = ""
+        if required:
+            must = (f" You MUST also locate these specific named features if they are "
+                    f"visible anywhere on the object: {', '.join(required)}. Look "
+                    f"carefully — small features like an eye are easy to miss but are "
+                    f"required. ")
         task = (f"Identify the 3-{max_anchors} most semantically meaningful surface "
                 f"features of this {subject} — the spots a teacher would point at "
                 f"while explaining it (for an animal: eye, mouth, leg; for a tool: "
-                f"handle, trigger, nozzle). Use short lowercase snake_case names.")
+                f"handle, trigger, nozzle).{must}Use short lowercase snake_case names.")
     prompt = POINTS_PROMPT.format(n=len(images), desc=desc, views=names, task=task)
     parts = [{"text": prompt}] + _img_parts(images) + _img_parts(marker_images or [])
     data = _gemini_json(parts)
@@ -411,7 +420,12 @@ def _anchor_asset(a):
     subject = a.get("subject") or a["assetId"].replace("_", " ")
     desc = a.get("desc") or subject
     n_views = max(2, min(int(a.get("views", 4)), len(VIEW_ORDER)))
-    max_anchors = max(1, min(int(a.get("max_anchors", 6)), len(MARKER_COLORS)))
+    required = [re.sub(r"[^a-z0-9]+", "_", str(n).lower()).strip("_")
+                for n in (a.get("required_names") or [])]
+    required = [n for n in required if n]
+    # ensure the budget can hold the story's required parts PLUS a few generic ones
+    max_anchors = max(1, min(max(int(a.get("max_anchors", 6)), len(required) + 2),
+                             len(MARKER_COLORS)))
     out_dir = Path(a["out_dir"])
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -432,7 +446,7 @@ def _anchor_asset(a):
         print(f"[anchors] {a['assetId']}: {len(clean)} views rendered")
 
         # Gemini points → back-project → cluster
-        name_points = _ask_points(subject, desc, clean, max_anchors)
+        name_points = _ask_points(subject, desc, clean, max_anchors, required=required)
         anchors = _project(dict(list(name_points.items())[:max_anchors]),
                            cams_by_view, bvh, diag)
         print(f"[anchors] {a['assetId']}: {len(name_points)} features pointed, "
@@ -478,6 +492,11 @@ def _anchor_asset(a):
     result = []
     for name, c in anchors.items():
         result.append({"name": name, "pos_m": _yup(c["pos"]),
+                       # raw Blender Z-up world point — the regions stage re-imports the
+                       # SAME GLB, so it can sphere-select around this directly (no
+                       # exported-frame reconstruction). pos_m stays the iOS contract.
+                       "pos_world": [round(c["pos"].x, 5), round(c["pos"].y, 5),
+                                     round(c["pos"].z, 5)],
                        "normal": _yup(c["normal"]),
                        "offset": _offset_yup(c["pos"], mn, mx),
                        "confidence": c["confidence"], "views": c["views"],

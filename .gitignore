@@ -62,6 +62,8 @@ Package.resolved
 # tracked when useful. Strip clearly-volatile caches.
 # 4.7GB of segmented meshes — regenerable from skills
 assets_processed/
+# vision-guided pipeline output (renders + heavy GLB/USDZ exports; regenerable)
+asset_output/
 # ─── AI Asset Factory runtime output (regenerable; config/ + code stay tracked) ─
 asset_factory/cache/
 asset_factory/logs/

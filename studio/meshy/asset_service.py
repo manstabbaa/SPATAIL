@@ -119,6 +119,54 @@ def _run_blender(script: Path, spec: dict, result_path: Path, timeout: int = 120
     return json.loads(result_path.read_text(encoding="utf-8"))
 
 
+VISION_DIR = REPO / "studio" / "vision"
+
+
+def _vision_enabled() -> bool:
+    return os.environ.get("SPATAIL_MESHY_VISION", "0").lower() in ("1", "true", "yes", "on")
+
+
+def _vision_normalize(slug, subject, glb_in, real_size_m, asset_out):
+    """Opt-in (SPATAIL_MESHY_VISION=1): replace the blind uniform-fit normalize with the
+    vision-guided pipeline (studio/vision) — evidence -> Gemini review -> reorient +
+    real-scale + repair + verify render. Returns {glb, usdz, review, applied} or None on
+    any failure (caller then falls back to meshy_normalize, so this never breaks a build).
+    Note: this is a PREP-time path; the default live server path leaves it OFF so no
+    Gemini round-trip is added once a prompt is in flight."""
+    try:
+        out_root = Path(asset_out) / "vision"
+        cmd = [sys.executable, str(VISION_DIR / "driver.py"), "all",
+               "--asset", str(glb_in), "--subject", subject, "--gemini", "--out", str(out_root)]
+        if real_size_m and max(real_size_m) > 0:
+            cmd += ["--real-size", ",".join(str(round(float(x), 4)) for x in real_size_m)]
+        # outer budget must exceed the inner evidence + review + apply passes combined
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=4200)
+        od = out_root / slug
+        ap = od / "reports" / "apply_report.json"
+        glb = od / "exports" / "normalized.glb"
+        if not (ap.exists() and glb.exists()):
+            print(f"[asset] vision normalize incomplete; tail: "
+                  f"{(proc.stderr or proc.stdout or '')[-600:]}")
+            return None
+        applied = json.loads(ap.read_text(encoding="utf-8"))
+        rp = od / "reports" / "visual_review_result.json"
+        rev = json.loads(rp.read_text(encoding="utf-8")) if rp.exists() else {}
+        # Accept ONLY a validated result from a real reviewer; a failed validation or a
+        # neutral (reviewer="none") review falls back to the deterministic meshy_normalize.
+        val_ok = bool((applied.get("validation") or {}).get("ok", False))
+        reviewer = rev.get("reviewer", "")
+        if not val_ok or reviewer in ("", "none"):
+            print(f"[asset] vision normalize rejected (validation_ok={val_ok}, "
+                  f"reviewer={reviewer!r}) — falling back to meshy_normalize")
+            return None
+        usdz = od / "exports" / "normalized.usdz"
+        return {"glb": str(glb), "usdz": str(usdz) if usdz.exists() else "",
+                "review": rev, "applied": applied.get("applied", {})}
+    except Exception as exc:  # noqa: BLE001
+        print(f"[asset] vision normalize failed ({exc}) — falling back to meshy_normalize")
+        return None
+
+
 def _register(slug: str, name: str, desc: str, scale_m: list, category: str,
               glb_url: str, usdz_url: str) -> None:
     """Best-effort library registration so the next prompt resolves this asset
@@ -194,18 +242,32 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
     else:
         print(f"[asset] {slug}: reusing cached Meshy GLB (0 credits)")
 
-    # 3) Normalize to real scale (metres/Y-up, library exporters) → LIB_DIR
-    on_stage("bringing it to real scale")
+    # 3) Normalize to real scale (metres/Y-up, library exporters) → LIB_DIR.
+    # Opt-in (SPATAIL_MESHY_VISION=1): the vision-guided path SEES the mesh first —
+    # evidence pack → review → reorient + real-scale + repair — instead of the blind
+    # uniform-fit-to-0.4m that bakes in Meshy's arbitrary pose. Falls back on failure.
     LIB_DIR.mkdir(parents=True, exist_ok=True)
-    norm = _run_blender(
-        HERE / "meshy_normalize.py",
-        {"result_path": str(OUT / f"_{slug}_normalize.json"),
-         "assets": [{"assetId": slug, "category": category, "glb_in": str(glb_in),
-                     "scaleMeters": scale_m, "pivot": "center_bottom",
-                     "out_dir": str(LIB_DIR)}]},
-        OUT / f"_{slug}_normalize.json")
-    if not norm.get("done"):
-        raise RuntimeError(f"normalize failed: {norm.get('failed')}")
+    vision = _vision_normalize(slug, subject, glb_in, real_size_m, asset_out) \
+        if _vision_enabled() else None
+    if vision:
+        on_stage("vision-validated normalize (orient + real scale)")
+        shutil.copyfile(vision["glb"], LIB_DIR / f"{slug}.glb")
+        if vision.get("usdz"):
+            shutil.copyfile(vision["usdz"], LIB_DIR / f"{slug}.usdz")
+        ap = vision.get("applied", {})
+        print(f"[asset] {slug}: vision-normalized (class={ap.get('placement_class')}, "
+              f"size={ap.get('final_size_m')}, rotated={ap.get('reorient', {}).get('rotated')})")
+    else:
+        on_stage("bringing it to real scale")
+        norm = _run_blender(
+            HERE / "meshy_normalize.py",
+            {"result_path": str(OUT / f"_{slug}_normalize.json"),
+             "assets": [{"assetId": slug, "category": category, "glb_in": str(glb_in),
+                         "scaleMeters": scale_m, "pivot": "center_bottom",
+                         "out_dir": str(LIB_DIR)}]},
+            OUT / f"_{slug}_normalize.json")
+        if not norm.get("done"):
+            raise RuntimeError(f"normalize failed: {norm.get('failed')}")
 
     # 3.5) ANCHORS — Blender-computed semantic surface anchors (Phase 1 of the
     # spatial-intelligence plan): render canonical views of the normalized mesh,
@@ -300,6 +362,22 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
         "libraryGlb": lib_glb, "libraryUsdz": lib_usdz,
         "elapsedS": round(time.time() - t0, 1),
     }
+    if vision:
+        ap = vision.get("applied", {})
+        q = (vision.get("review", {}).get("quality") or {})
+        meta["vision"] = vision.get("review", {})
+        meta["placementClass"] = ap.get("placement_class")
+        meta["xrReady"] = bool(q.get("xr_ready", True))
+        # The vision path BAKES real scale into the GLB itself (unlike the uniform-fit
+        # path, where the GLB stays at authoring scale and realSizeMeters is metadata a
+        # placer applies). realScaleBaked records WHICH contract this asset follows.
+        # NOTE: no consumer reads it YET — the placer-wiring step (the "wire into Windows
+        # placement" follow-up) MUST branch on it: realScaleBaked → render at scale 1.0
+        # (already metric); else fit to realSizeMeters. The library registration below
+        # also carries the baked size as scaleMeters so the two stay consistent.
+        if ap.get("final_size_m"):
+            meta["realSizeMeters"] = ap["final_size_m"]
+            meta["realScaleBaked"] = True
     metadata_name = f"{job_id}_metadata.json"
     (artifacts_dir / metadata_name).write_text(json.dumps(meta, indent=2), encoding="utf-8")
     # the Blender↔composer contract: clips the sequencer plays by name + anchors the
@@ -313,8 +391,13 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
         (artifacts_dir / f"{job_id}_manifest.json").write_text(manifest, encoding="utf-8")
         (artifacts_dir / f"{slug}_manifest.json").write_text(manifest, encoding="utf-8")
 
-    # 6) Library registration → the next prompt for this subject skips generation
-    _register(slug, subject, desc, scale_m, category, lib_glb, lib_usdz)
+    # 6) Library registration → the next prompt for this subject skips generation.
+    # When vision baked real scale into the GLB, register that real size as scaleMeters
+    # (the solver/footprint truth) instead of the [0.4,0.4,0.4] authoring guess.
+    register_scale = scale_m
+    if vision and vision.get("applied", {}).get("final_size_m"):
+        register_scale = vision["applied"]["final_size_m"]
+    _register(slug, subject, desc, register_scale, category, lib_glb, lib_usdz)
 
     print(f"[asset] {slug}: meshy asset ready in {meta['elapsedS']}s "
           f"({meta['usdzBytes'] / 1e6:.1f} MB, {credits} credits, "

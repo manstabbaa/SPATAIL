@@ -243,7 +243,9 @@ def _run_job(job_id: str) -> None:
                         scale_meters=asset_req.get("scaleMeters"),
                         category=asset_req.get("category") or "general",
                         story_requirements=asset_req.get("assetRequirements"),
-                        on_stage=lambda s, _id=job_id: _update(_id, stage=s))
+                        on_stage=lambda s, _id=job_id: _update(
+                            _id, stage=s, stageIndex=meshy_assets.stage_index(s),
+                            stageTotal=len(meshy_assets.MESHY_STAGES)))
                     lane = "meshy"
                 except Exception as exc:  # noqa: BLE001
                     print(f"[job] {job_id} meshy path failed ({exc}) — "
@@ -567,6 +569,12 @@ class Handler(BaseHTTPRequestHandler):
                 "id": job["id"], "status": job["status"],
                 "stage": job.get("stage"), "message": job.get("message"),
             }
+            # Determinate build-progress (dev tool): step k / N + percent. Additive —
+            # old clients ignore these and keep showing the indeterminate spinner.
+            if job.get("stageTotal"):
+                out["stageIndex"] = job.get("stageIndex", 0)
+                out["stageTotal"] = job["stageTotal"]
+                out["percent"] = round(100.0 * out["stageIndex"] / max(job["stageTotal"], 1))
             # While still waiting for a lane, tell the phone its place in line so it
             # shows real progress ("queued (2 ahead)") instead of a blind countdown.
             if job["status"] == "queued":

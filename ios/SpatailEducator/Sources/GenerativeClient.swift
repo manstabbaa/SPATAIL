@@ -26,6 +26,11 @@ struct JobState: Decodable {
     let metadata_url: String?
     // queued jobs waiting for a Blender lane: how many are ahead (per-phone scheduler).
     var queuePosition: Int? = nil
+    // determinate build progress (dev tool): step k / N + percent (Meshy pipeline).
+    // Optional → a server that doesn't send them decodes to nil (indeterminate spinner).
+    var stageIndex: Int? = nil
+    var stageTotal: Int? = nil
+    var percent: Int? = nil
     // experience jobs (mode == "experience"):
     var experience_url: String? = nil
     var usdz_base: String? = nil
@@ -118,6 +123,7 @@ final class GenerativeClient {
     /// Submit a prompt, poll to completion, download the USDZ, return its local file URL.
     /// `onStage` reports human-readable progress for the UI.
     func generate(prompt: String,
+                  onProgress: ((Int, Int) -> Void)? = nil,
                   onStage: @escaping (String) -> Void) async throws -> URL {
         let create = try await submit(prompt: prompt)
         onStage("queued…")
@@ -133,6 +139,7 @@ final class GenerativeClient {
             try await Task.sleep(nanoseconds: 2_000_000_000) // poll every 2s
             state = try await poll(id: create.id)
             onStage(state.stage ?? state.status.rawValue)
+            onProgress?(state.stageIndex ?? 0, state.stageTotal ?? 0)   // determinate bar
         }
         guard let usdz = state.usdz_url else { throw GenError.server("Job done but no USDZ produced.") }
         onStage("downloading…")

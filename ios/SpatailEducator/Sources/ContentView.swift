@@ -36,6 +36,9 @@ final class SessionModel: ObservableObject {
     // generative loop
     @Published var prompt = ""
     @Published var genStage = ""
+    // determinate build progress (dev tool) — step k / N from the Meshy pipeline.
+    @Published var genStageIndex = 0
+    @Published var genStageTotal = 0
     @Published var genError: String?
     @Published var generatedURL: URL?
     @Published var serverURL = GenerativeClient.baseURL
@@ -123,6 +126,7 @@ final class SessionModel: ObservableObject {
         let p = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !p.isEmpty else { return }
         genError = nil; genStage = "submitting…"
+        genStageIndex = 0; genStageTotal = 0
         generatedURL = nil; experience = nil; representation = nil
         stage = .generating
         let mode = genMode
@@ -136,7 +140,9 @@ final class SessionModel: ObservableObject {
                     experience = exp; focusedStation = 0; selected = nil; chosen = nil
                     experienceEpoch += 1; stage = .experiencing
                 case .object:
-                    let url = try await gen.generate(prompt: p) { [weak self] s in
+                    let url = try await gen.generate(prompt: p, onProgress: { [weak self] i, t in
+                        Task { @MainActor in self?.genStageIndex = i; self?.genStageTotal = t }
+                    }) { [weak self] s in
                         Task { @MainActor in self?.genStage = s }
                     }
                     generatedURL = url; selected = nil; chosen = nil; stage = .placed
@@ -281,14 +287,23 @@ struct ContentView: View {
                 }
             case .generating:
                 card {
-                    HStack(spacing: 10) {
-                        ProgressView()
-                        VStack(alignment: .leading) {
-                            Text("Generating…").font(.headline)
-                            Text(model.genStage).font(.caption).foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Generating…").font(.headline)
+                        if model.genStageTotal > 0 {
+                            // determinate build bar (dev tool): step k / N
+                            ProgressView(value: Double(model.genStageIndex),
+                                         total: Double(model.genStageTotal))
+                            Text("\(model.genStageIndex)/\(model.genStageTotal) · \(model.genStage)")
+                                .font(.caption).foregroundStyle(.secondary)
+                        } else {
+                            HStack(spacing: 10) {
+                                ProgressView()
+                                Text(model.genStage.isEmpty ? "Preparing…" : model.genStage)
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
                         }
+                        Text("“\(model.prompt)”").font(.caption2).foregroundStyle(.secondary)
                     }
-                    Text("“\(model.prompt)”").font(.caption2).foregroundStyle(.secondary)
                 }
             case .analyzing:
                 card {

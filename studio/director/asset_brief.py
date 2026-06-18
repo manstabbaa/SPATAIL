@@ -86,12 +86,61 @@ def required_parts_from_sequence(sequence: list[dict], asset_id: str) -> list[di
     return out
 
 
+# Growth intent: when the lesson is ABOUT a thing coming into being, the asset should
+# GROW (the parametric grow stage) rather than do the generic showcase spin.
+_GROW_WORDS = ("grow", "growth", "growing", "sprout", "germinat", "bloom", "blossom",
+               "blooming", "lifecycle", "life cycle", "develop", "seedling", "unfurl",
+               "from a seed", "time-lapse", "time lapse", "photosynthesis")
+_ANIM_KINDS = {"grow"}
+
+
+_POT_WORDS = ("pot", "potted", "vase", "planter", "container", "jar", "bowl")
+
+
+def animation_from_story(understanding: dict | None, sequence: list[dict] | None) -> dict | None:
+    """Infer an animation REQUIREMENT from the story text. Slice-2 vocabulary: "grow"
+    (a plant growing, a seed germinating, a lifecycle). Returns {kind: "grow", ...} or
+    None. Explicit briefs can override; this is the deterministic default."""
+    u = understanding or {}
+    bits = [u.get("subject", ""), u.get("summary", ""), u.get("intent", "")]
+    for s in sequence or []:
+        bits += [s.get("title", ""), s.get("narration", "")]
+    text = " ".join(b for b in bits if b).lower()
+    if not any(w in text for w in _GROW_WORDS):
+        return None
+    anim = {"kind": "grow"}
+    if any(w in text for w in _POT_WORDS):
+        anim["static_floor"] = 0.3      # the pot/container stays solid; the plant rises
+    return anim
+
+
+def _validate_animation(a: dict | None) -> dict | None:
+    if not a or not isinstance(a, dict):
+        return None
+    kind = str(a.get("kind") or "").strip().lower()
+    if kind not in _ANIM_KINDS:
+        return None
+    rig = str(a.get("rig") or "armature").strip().lower()
+    out = {"kind": kind,
+           "rig": rig if rig in ("armature", "morph") else "armature",
+           "seconds": min(max(float(a.get("seconds", 4.0)), 0.5), 20.0),
+           "fps": int(a.get("fps", 30)),
+           "n_keys": min(max(int(a.get("n_keys", 8)), 2), 90),
+           "n_bones": min(max(int(a.get("n_bones", 6)), 2), 24)}
+    if a.get("static_floor") is not None:
+        out["static_floor"] = min(max(float(a["static_floor"]), 0.0), 0.95)
+    return out
+
+
 def build_brief(asset_id: str, *, sequence: list[dict] | None = None,
-                parts: list[dict] | None = None) -> dict:
-    """Assemble + validate a brief for one asset. `parts` (explicit) take priority;
-    otherwise the required parts are derived from `sequence`."""
+                parts: list[dict] | None = None, understanding: dict | None = None,
+                animation: dict | None = None) -> dict:
+    """Assemble + validate a brief for one asset. `parts`/`animation` (explicit) take
+    priority; otherwise they are derived from `sequence` + `understanding`."""
     raw = list(parts) if parts else required_parts_from_sequence(sequence or [], asset_id)
-    return validate({"schema": SCHEMA, "assetId": _slug(asset_id), "parts": raw})
+    anim = animation if animation is not None else animation_from_story(understanding, sequence)
+    return validate({"schema": SCHEMA, "assetId": _slug(asset_id), "parts": raw,
+                     "animation": anim})
 
 
 def validate(brief: dict) -> dict:
@@ -119,7 +168,8 @@ def validate(brief: dict) -> dict:
         parts.append({"id": pid, "role": _slug(p.get("role") or pid),
                       "aliases": aliases, "addressable": bool(p.get("addressable", True)),
                       "effects": effects})
-    return {"schema": SCHEMA, "assetId": asset_id, "parts": parts}
+    return {"schema": SCHEMA, "assetId": asset_id, "parts": parts,
+            "animation": _validate_animation((brief or {}).get("animation"))}
 
 
 def addressable_parts(brief: dict) -> list[dict]:
@@ -140,8 +190,19 @@ def required_part_names(brief: dict) -> list[str]:
     return out
 
 
+def animation_spec(brief: dict | None) -> dict | None:
+    """The story's animation requirement (e.g. {kind: 'grow', ...}) or None."""
+    return (brief or {}).get("animation")
+
+
+def has_animation(brief: dict | None) -> bool:
+    return bool(animation_spec(brief))
+
+
 def has_requirements(brief: dict | None) -> bool:
-    return bool(brief and addressable_parts(brief))
+    """True when the brief asks the producer for anything (addressable parts OR an
+    animation), i.e. it's worth threading to generation."""
+    return bool(brief and (addressable_parts(brief) or animation_spec(brief)))
 
 
 if __name__ == "__main__":

@@ -23,6 +23,7 @@ import config  # noqa: E402
 REPO = Path(__file__).resolve().parents[2]
 OUT_ROOT = REPO / "studio" / "out" / "meshy"
 BASE = "https://api.meshy.ai/openapi/v1/multi-image-to-3d"
+REMESH = "https://api.meshy.ai/openapi/v1/remesh"
 BALANCE = "https://api.meshy.ai/openapi/v1/balance"
 
 
@@ -75,10 +76,10 @@ def submit(image_paths, *, ai_model="meshy-6", should_texture=True, enable_pbr=T
     raise RuntimeError("submit failed")
 
 
-def poll(task_id: str, *, timeout_s: int = 900, interval: int = 6) -> dict:
-    url = f"{BASE}/{task_id}"
-    t0 = time.time()
-    last = -1
+def _poll_at(base: str, task_id: str, *, timeout_s: int = 900, interval: int = 6) -> dict:
+    """Poll any task endpoint (multi-image / remesh / …) to completion."""
+    url = f"{base}/{task_id}"
+    t0, last = time.time(), -1
     while True:
         req = urllib.request.Request(url, headers=_headers())
         obj = json.load(urllib.request.urlopen(req, timeout=60))
@@ -90,6 +91,47 @@ def poll(task_id: str, *, timeout_s: int = 900, interval: int = 6) -> dict:
         if time.time() - t0 > timeout_s:
             raise TimeoutError(f"task {task_id} still {st} after {timeout_s}s")
         time.sleep(interval)
+
+
+def poll(task_id: str, *, timeout_s: int = 900, interval: int = 6) -> dict:
+    return _poll_at(BASE, task_id, timeout_s=timeout_s, interval=interval)
+
+
+def remesh(input_task_id_or_url: str, *, topology: str = "quad",
+           target_polycount: int = 12000, target_formats=("glb", "usdz")) -> dict:
+    """Quad-remesh a prior Meshy asset to a lower poly count (5 credits). Returns the
+    SUCCEEDED poll dict (model_urls{glb,usdz,…}); feed model_urls to _download().
+
+    input_task_id_or_url: a prior SUCCEEDED task_id (preferred — re-topologizes the
+        server-side geometry) OR a public model URL / data-URI (.glb/.gltf/.obj/.fbx).
+    The clean quad topology + lower poly is what stops the on-device mesh from looking
+    chopped up (one connected surface) and makes it riggable (weight-paintable)."""
+    is_url = "://" in input_task_id_or_url or input_task_id_or_url.startswith("data:")
+    key = "model_url" if is_url else "input_task_id"
+    body = {key: input_task_id_or_url, "topology": topology,
+            "target_polycount": int(target_polycount), "target_formats": list(target_formats)}
+    task_id = None
+    for fmts in (list(target_formats), ["glb"]):       # usdz-reject fallback (mirrors submit)
+        body["target_formats"] = fmts
+        data = json.dumps(body).encode()
+        try:
+            req = urllib.request.Request(REMESH, data=data, headers=_headers(), method="POST")
+            obj = json.load(urllib.request.urlopen(req, timeout=90))
+            task_id = obj.get("result") or obj.get("id")
+            break
+        except urllib.error.HTTPError as e:
+            msg = e.read()[:300].decode("utf-8", "ignore")
+            if e.code == 400 and "format" in msg.lower() and fmts != ["glb"]:
+                print(f"[meshy] remesh format {fmts} rejected, retrying glb-only"); continue
+            raise RuntimeError(f"remesh HTTP {e.code}: {msg}")
+    if not task_id:
+        raise RuntimeError("remesh submit failed")
+    print(f"[meshy] remesh submitted -> task {task_id} ({topology}, {target_polycount} polys)")
+    res = _poll_at(REMESH, task_id)
+    if res.get("status") != "SUCCEEDED":
+        raise RuntimeError(f"remesh {task_id}: {res.get('task_error') or res.get('status')}")
+    print(f"[meshy] remesh done | {res.get('consumed_credits')} credits")
+    return res
 
 
 def _download(url: str, dest: Path) -> int:

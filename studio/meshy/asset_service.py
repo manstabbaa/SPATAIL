@@ -61,6 +61,36 @@ DEFAULT_SCALE_M = [0.4, 0.4, 0.4]
 AR_TRIS = int(os.environ.get("SPATAIL_MESHY_TRIS", "12000"))
 AR_TEX = int(os.environ.get("SPATAIL_MESHY_TEX", "1024"))
 
+# Canonical ordered pipeline stages → a determinate build-progress bar (dev tool).
+# on_stage() emits these labels in order; the server maps each to its index (job_server
+# stamps stageIndex/stageTotal). Some stages are conditional (anchors/regions/remesh), so
+# the bar advances monotonically and may skip — that's expected. Aliases map the
+# branch-specific labels (vision normalize, showcase animate) onto the canonical step.
+MESHY_STAGES = [
+    "imagining the object (multi-view)",
+    "sculpting the 3D model (Meshy)",
+    "re-topologizing (quad remesh)",
+    "bringing it to real scale",
+    "locating the features (anchors)",
+    "carving the parts (regions)",
+    "optimizing for AR",
+    "growing it (rig)",
+    "publishing",
+]
+_STAGE_ALIASES = {
+    "vision-validated normalize (orient + real scale)": "bringing it to real scale",
+    "animating (Blender)": "growing it (rig)",
+}
+
+
+def stage_index(label: str) -> int:
+    """1-based position of a stage label in MESHY_STAGES (0 if unknown). Monotonic."""
+    label = _STAGE_ALIASES.get(label, label)
+    try:
+        return MESHY_STAGES.index(label) + 1
+    except ValueError:
+        return 0
+
 
 def available() -> bool:
     """Meshy is the default path when enabled and both API keys + Blender exist."""
@@ -247,6 +277,7 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
 
     # 2) Meshy multi-image-to-3D (cached GLB per slug → re-runs spend 0 credits)
     glb_in = asset_out / "meshy" / f"{slug}.glb"
+    info = None
     if not glb_in.exists():
         on_stage("sculpting the 3D model (Meshy)")
         poll_s = int(os.environ.get("SPATAIL_MESHY_POLL_S", "540"))
@@ -259,6 +290,40 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
         _ = poll_s  # poll timeout currently fixed inside meshy_client.poll
     else:
         print(f"[asset] {slug}: reusing cached Meshy GLB (0 credits)")
+
+    # 2.5) QUAD REMESH (Meshy API, 5 credits) — re-topologize the raw multi-image
+    # tri-soup into ONE clean, lower-poly surface. This is the fix for the "chopped up /
+    # gaps on device" problem: a connected surface deforms without splitting, and it's
+    # riggable (weight-paintable). Quads survive only in FBX (GLB/USDZ triangulate), so
+    # we fetch the FBX too for the armature rig. Cached per slug → re-runs cost 0.
+    quad_fbx = asset_out / "meshy" / f"{slug}_quad.fbx"
+    if os.environ.get("SPATAIL_MESHY_REMESH", "1").lower() not in ("0", "false", "no"):
+        quad_glb = asset_out / "meshy" / f"{slug}_quad.glb"
+        if not quad_glb.exists():
+            on_stage("re-topologizing (quad remesh)")
+            try:
+                task_id = (info or {}).get("task_id")
+                if not task_id:
+                    rj = asset_out / "meshy" / "result.json"
+                    task_id = json.loads(rj.read_text(encoding="utf-8")).get("task_id") \
+                        if rj.exists() else None
+                if not task_id:
+                    raise RuntimeError("no Meshy task_id for remesh")
+                polys = int(os.environ.get("SPATAIL_MESHY_REMESH_POLYS", "12000"))
+                res = meshy_client.remesh(task_id, topology="quad", target_polycount=polys,
+                                          target_formats=("glb", "fbx"))
+                credits += res.get("consumed_credits") or 0
+                urls = res.get("model_urls") or {}
+                if urls.get("glb"):
+                    meshy_client._download(urls["glb"], quad_glb)
+                if urls.get("fbx"):
+                    meshy_client._download(urls["fbx"], quad_fbx)
+            except Exception as exc:  # noqa: BLE001
+                print(f"[asset] remesh skipped ({exc}) — using raw Meshy mesh")
+        else:
+            print(f"[asset] {slug}: reusing cached quad remesh (0 credits)")
+        if quad_glb.exists():
+            glb_in = quad_glb       # the rest of the pipeline works on the clean mesh
 
     # 3) Normalize to real scale (metres/Y-up, library exporters) → LIB_DIR.
     # Opt-in (SPATAIL_MESHY_VISION=1): the vision-guided path SEES the mesh first —
@@ -380,11 +445,53 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
     if not ship_usdz.exists():
         raise RuntimeError("no USDZ produced")
 
-    # 4.5) ANIMATE — the studio's "artist bakes the motion" stage: whole-object
-    # filler-rig clips keyframed in Blender onto the optimized mesh, exported
-    # WITH animation. Non-fatal: a static asset still ships if this fails.
+    # 4.4) GROW — STORY-driven growth rig (slice 2). When the brief declares an animation
+    # of kind "grow", the asset GROWS instead of doing the generic showcase spin. Two
+    # backends (brief `rig`): "armature" (DEFAULT — a weight-painted bone chain deforms the
+    # single connected mesh; no cutting, no gaps) or "morph" (geometry-nodes sparse
+    # shape-key bake, lighter). Runs on the optimized, remeshed ship mesh.
     clips: list = []
-    if os.environ.get("SPATAIL_MESHY_ANIMATE", "1").lower() not in ("0", "false", "no"):
+    grew = False
+    anim_spec = abrief.animation_spec(asset_brief) if asset_brief else None
+    if anim_spec and anim_spec.get("kind") == "grow":
+        rig = anim_spec.get("rig", "armature")
+        on_stage("growing it (rig)")
+        try:
+            common = {"assetId": slug, "glb_in": str(ship_glb), "out_dir": str(LIB_DIR),
+                      "fps": int(anim_spec.get("fps", 30)),
+                      "seconds": float(anim_spec.get("seconds", 4.0)),
+                      "static_floor": float(anim_spec.get("static_floor", 0.0))}
+            if rig == "armature":
+                script = HERE / "grow_armature.py"
+                spec_asset = {**common, "n_bones": int(anim_spec.get("n_bones", 6))}
+            else:
+                script = HERE / "grow.py"
+                spec_asset = {**common, "n_keys": int(anim_spec.get("n_keys", 8))}
+            gres = _run_blender(
+                script,
+                {"result_path": str(OUT / f"_{slug}_grow.json"), "export_usdz": True,
+                 "assets": [spec_asset]},
+                OUT / f"_{slug}_grow.json")
+            if gres.get("failed"):
+                raise RuntimeError(gres["failed"][0].get("error", "grow stage failed"))
+            gd = (gres.get("done") or [{}])[0]
+            g_glb = Path(gd.get("glb") or "")
+            if gd.get("clips") and g_glb.exists():
+                clips = gd["clips"]
+                ship_glb = g_glb
+                g_usdz = Path(gd.get("usdz") or "")
+                if g_usdz.exists():
+                    ship_usdz = g_usdz
+                grew = True
+                print(f"[asset] {slug}: grown via {rig} "
+                      f"({gd.get('bones') or gd.get('n_keys')} {'bones' if rig == 'armature' else 'keys'})")
+        except Exception as exc:  # noqa: BLE001
+            print(f"[asset] grow skipped ({exc}) — falling back to showcase animate")
+
+    # 4.5) ANIMATE — the fallback "artist bakes the motion" stage: whole-object filler
+    # clips (showcase spin) keyframed onto the optimized mesh. SKIPPED when the asset
+    # already grew. Non-fatal: a static asset still ships if this fails.
+    if not grew and os.environ.get("SPATAIL_MESHY_ANIMATE", "1").lower() not in ("0", "false", "no"):
         on_stage("animating (Blender)")
         try:
             motion = _motion_for(subject, desc)

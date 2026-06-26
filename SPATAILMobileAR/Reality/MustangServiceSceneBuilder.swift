@@ -13,6 +13,7 @@ import Foundation
 import RealityKit
 import UIKit
 
+@MainActor
 struct MustangServiceSceneBuilder {
     /// Drops the engine-bay base into the experience root. The base
     /// sits at y ≈ 0.74 (just under the target's y=0.8) so the part

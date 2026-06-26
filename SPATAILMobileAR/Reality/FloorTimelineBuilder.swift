@@ -9,6 +9,7 @@ import Foundation
 import RealityKit
 import UIKit
 
+@MainActor
 struct FloorTimelineBuilder {
     func build(for element: SpatialElement) -> Entity {
         let group = Entity()

@@ -8,6 +8,7 @@ import Foundation
 import RealityKit
 import UIKit
 
+@MainActor
 struct CorporateReviewSceneBuilder {
     func addScenery(to root: Entity) {
         let topW: Float = 1.5
@@ -26,14 +27,17 @@ struct CorporateReviewSceneBuilder {
         root.addChild(top)
 
         // Four short legs for a hint of structure.
-        let legMat = SimpleMaterial(
-            color: UIColor(red: 0.20, green: 0.16, blue: 0.13, alpha: 1.0),
-            roughness: 0.8, isMetallic: false,
-        )
         let legOffsetsX: [Float] = [-0.65, 0.65]
         let legOffsetsZ: [Float] = [-0.4, 0.4]
         for x in legOffsetsX {
             for z in legOffsetsZ {
+                // Fresh material per leg (Swift 6 region isolation: a
+                // single non-Sendable material can't be sent to every
+                // ModelEntity built in the loop).
+                let legMat = SimpleMaterial(
+                    color: UIColor(red: 0.20, green: 0.16, blue: 0.13, alpha: 1.0),
+                    roughness: 0.8, isMetallic: false,
+                )
                 let leg = ModelEntity(
                     mesh: .generateBox(size: SIMD3<Float>(0.05, 0.73, 0.05), cornerRadius: 0.005),
                     materials: [legMat],

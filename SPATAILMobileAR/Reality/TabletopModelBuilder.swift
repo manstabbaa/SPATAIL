@@ -8,6 +8,7 @@ import Foundation
 import RealityKit
 import UIKit
 
+@MainActor
 struct TabletopModelBuilder {
     func build(for element: SpatialElement) -> Entity {
         let group = Entity()
@@ -61,6 +62,7 @@ struct TabletopModelBuilder {
 
 // Shared 2D label entity — used by the tabletop title, exploded-view
 // part labels, and floor-timeline plate labels. Cheap UIImage -> texture.
+@MainActor
 enum LabelEntity {
     static func make(text: String, widthMeters: Float, heightMeters: Float,
                      textColor: UIColor = .white,

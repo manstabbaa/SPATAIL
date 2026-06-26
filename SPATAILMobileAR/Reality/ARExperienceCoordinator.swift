@@ -19,6 +19,7 @@ import Combine
 
 /// Observable state owned by the SwiftUI ARExperienceContainerView.
 /// Mutated by the AR side, read by the overlay.
+@MainActor
 final class ARSceneController: ObservableObject {
     @Published var isPlaced: Bool = false
     @Published var isExploded: Bool = false
@@ -27,10 +28,10 @@ final class ARSceneController: ObservableObject {
 
     // Callbacks bridge UI buttons -> AR scene mutations. Set by the
     // coordinator on view creation.
-    var onReset: () -> Void = {}
-    var onAdvanceAttention: () -> Void = {}
-    var onToggleExplode: () -> Void = {}
-    var onToggleHighlight: () -> Void = {}
+    var onReset: @MainActor () -> Void = {}
+    var onAdvanceAttention: @MainActor () -> Void = {}
+    var onToggleExplode: @MainActor () -> Void = {}
+    var onToggleHighlight: @MainActor () -> Void = {}
 
     func reset()              { onReset() }
     func advanceAttention()   { onAdvanceAttention() }
@@ -91,6 +92,7 @@ struct ARExperienceCoordinator: UIViewRepresentable {
 
     // ----------------------------------------------------------------
 
+    @MainActor
     final class Coordinator: NSObject {
         let contract: SpatialExperienceContract
         let controller: ARSceneController

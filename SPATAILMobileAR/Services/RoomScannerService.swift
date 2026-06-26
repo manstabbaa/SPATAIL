@@ -68,8 +68,11 @@ final class RoomScannerService: NSObject, ObservableObject {
 
     /// Snapshot whatever we've collected into a RoomContract and persist it.
     /// Returns the written URL on success.
+    ///
+    /// Named `finalizeScan()` rather than `finalize()` to avoid colliding with
+    /// `NSObject.finalize()`, which makes an unqualified call ambiguous.
     @discardableResult
-    func finalize() throws -> URL {
+    func finalizeScan() throws -> URL {
         let surfaces: [RoomSurface] = lidarAvailable
             ? surfacesFromMeshAnchors()
             : surfacesFromPlaneAnchors()

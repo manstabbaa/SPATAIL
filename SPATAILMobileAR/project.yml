@@ -36,6 +36,11 @@ targets:
       path: Info.plist
       properties:
         CFBundleDisplayName: SPATAIL
+        CFBundleShortVersionString: "0.1.0"
+        # iOS-only app (ARKit). XcodeGen regenerates this plist from the
+        # keys listed here, so LSRequiresIPhoneOS must live in project.yml
+        # or it gets dropped on every `xcodegen generate`.
+        LSRequiresIPhoneOS: true
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false

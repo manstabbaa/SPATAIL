@@ -14,15 +14,25 @@ import simd
 
 /// Protocol surfaced by ExplodableEntity and HighlightableEntity wrappers
 /// so the coordinator can flip them without knowing their concrete type.
+///
+/// `@MainActor`: every conformer subclasses RealityKit's `Entity`, which is
+/// main-actor-isolated, so the implementing methods are main-actor-isolated
+/// too. Isolating the protocol to the main actor lets those methods satisfy
+/// the requirements (a main-actor method cannot satisfy a nonisolated one)
+/// and matches reality — these are only ever flipped from the AR coordinator
+/// on the main thread.
+@MainActor
 protocol Highlightable: AnyObject {
     func setHighlighted(_ on: Bool)
 }
 
+@MainActor
 protocol Explodable: AnyObject {
     func explode()
     func collapse()
 }
 
+@MainActor
 final class ARSceneRenderer {
     struct RenderResult {
         let root: Entity

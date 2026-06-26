@@ -18,6 +18,7 @@ enum PanelStyle {
     case diagnostic     // diagnostic_overlay
 }
 
+@MainActor
 struct PanelTextureRenderer {
     /// Renders `element` into a TextureResource sized to `widthMeters x heightMeters`.
     /// Returns nil only if texture generation fails outright.

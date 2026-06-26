@@ -10,6 +10,7 @@
 import Foundation
 import RealityKit
 
+@MainActor
 struct WallPanelBuilder {
     func build(for element: SpatialElement) -> Entity {
         SpatialPanelBuilder().build(for: element, style: .wallDashboard)

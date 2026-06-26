@@ -17,6 +17,7 @@ import Foundation
 import RealityKit
 import UIKit
 
+@MainActor
 struct AirFilterAssemblyBuilder {
     func build(for element: SpatialElement) -> Entity {
         let wrapper = ExplodableAssemblyEntity()
@@ -74,13 +75,15 @@ struct AirFilterAssemblyBuilder {
         let dashLen: Float = 0.025
         let gap: Float = 0.02
         var y: Float = 0
-        let cylinderMat = SimpleMaterial(
-            color: UIColor(red: 0.43, green: 0.66, blue: 1.0, alpha: 0.85),
-            roughness: 0.3, isMetallic: false,
-        )
         while y > -guideHeight {
+            // Fresh material per dash (Swift 6 region isolation: one
+            // non-Sendable material can't be sent to many ModelEntities).
+            let cylinderMat = SimpleMaterial(
+                color: UIColor(red: 0.43, green: 0.66, blue: 1.0, alpha: 0.85),
+                roughness: 0.3, isMetallic: false,
+            )
             let dash = ModelEntity(
-                mesh: .generateCylinder(height: dashLen, radius: 0.003),
+                mesh: .spatailCylinder(height: dashLen, radius: 0.003),
                 materials: [cylinderMat],
             )
             dash.position = SIMD3<Float>(0, y - dashLen / 2, 0)

@@ -84,7 +84,7 @@ struct RoomScanView: View {
 
     private func continueTapped() {
         do {
-            _ = try scanner.finalize()
+            _ = try scanner.finalizeScan()
             navigateToDemoSelector = true
         } catch {
             // SPATAIL_NEEDS_MAC_BUILD_VERIFY: error path — for now we

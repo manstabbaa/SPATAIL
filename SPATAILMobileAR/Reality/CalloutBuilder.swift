@@ -8,6 +8,7 @@ import Foundation
 import RealityKit
 import UIKit
 
+@MainActor
 struct CalloutBuilder {
     func build(for element: SpatialElement) -> Entity {
         let group = Entity()
@@ -31,7 +32,7 @@ struct CalloutBuilder {
             roughness: 0.3, isMetallic: false,
         )
         let stem = ModelEntity(
-            mesh: .generateCylinder(height: 0.12, radius: 0.0035),
+            mesh: .spatailCylinder(height: 0.12, radius: 0.0035),
             materials: [stemMaterial],
         )
         stem.position = SIMD3<Float>(-panelW / 2 - 0.04, -panelH / 2, 0)

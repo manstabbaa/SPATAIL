@@ -8,6 +8,7 @@ import Foundation
 import RealityKit
 import UIKit
 
+@MainActor
 struct AnchoredObjectBuilder {
     func buildTarget(for element: SpatialElement) -> Entity {
         let wrapper = HighlightableTargetEntity()

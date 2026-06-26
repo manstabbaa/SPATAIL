@@ -8,6 +8,7 @@ import Foundation
 import RealityKit
 import UIKit
 
+@MainActor
 struct GuideLineBuilder {
     /// Builds a `guide_line` element from the contract. The planner
     /// resolves both endpoints into absolute world positions on the
@@ -49,14 +50,16 @@ struct GuideLineBuilder {
         let length = simd_length(diff)
         if length < 1e-4 { return group }
         let dir = diff / length
-        let mat = SimpleMaterial(color: color, roughness: 0.3, isMetallic: false)
-
         let stride = dashLength + gap
         var t: Float = 0
         while t + dashLength <= length {
             let center = from + dir * (t + dashLength / 2)
+            // Fresh material per dash: a single non-Sendable material
+            // can't be handed to more than one ModelEntity across the
+            // loop without tripping Swift 6 region isolation.
+            let mat = SimpleMaterial(color: color, roughness: 0.3, isMetallic: false)
             let dash = ModelEntity(
-                mesh: .generateCylinder(height: dashLength, radius: radius),
+                mesh: .spatailCylinder(height: dashLength, radius: radius),
                 materials: [mat],
             )
             dash.position = center

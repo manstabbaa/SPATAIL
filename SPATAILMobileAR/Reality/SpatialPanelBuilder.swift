@@ -12,6 +12,7 @@
 import Foundation
 import RealityKit
 
+@MainActor
 struct SpatialPanelBuilder {
     func build(for element: SpatialElement, style: PanelStyle = .standard) -> Entity {
         let group = Entity()

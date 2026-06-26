@@ -18,6 +18,11 @@ struct DemoSelectorView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     header
                     intro
+                    // Live perception → placement pipeline (camera-driven).
+                    NavigationLink(value: LivePerceptionRoute()) {
+                        LivePerceptionCard()
+                    }
+                    .buttonStyle(.plain)
                     ForEach(env.ingestion.availableContracts()) { ref in
                         NavigationLink(value: ref) {
                             DemoCard(ref: ref)
@@ -37,6 +42,9 @@ struct DemoSelectorView: View {
         }
         .navigationDestination(for: BundledContractRef.self) { ref in
             GeneratedExperienceView(contractRef: ref)
+        }
+        .navigationDestination(for: LivePerceptionRoute.self) { _ in
+            LivePerceptionView()
         }
         .navigationBarHidden(true)
     }
@@ -69,6 +77,40 @@ struct DemoSelectorView: View {
                 .font(.callout)
                 .foregroundColor(.spatailTextDim)
         }
+    }
+}
+
+/// Launcher for the live camera-driven perception → placement pipeline.
+private struct LivePerceptionCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("Live Perception", systemImage: "camera.viewfinder")
+                    .font(.title3).bold()
+                Spacer()
+                Image(systemName: "arrow.right.circle.fill")
+                    .foregroundColor(.spatailAccent2)
+            }
+            Text("beta · camera-driven")
+                .font(.caption)
+                .padding(.horizontal, 8).padding(.vertical, 2)
+                .background(Color.spatailAccent2.opacity(0.14))
+                .foregroundColor(.spatailAccent2)
+                .clipShape(Capsule())
+            Text("Vision detects the object, ARKit resolves where it is, SPATAIL " +
+                 "decides what should appear, RealityKit anchors it. Mock detection " +
+                 "drives the full pipeline; swap in a real model later.")
+                .font(.callout)
+                .foregroundColor(.spatailTextDim)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(colors: [Color.spatailBgElev, Color.spatailBgPanel],
+                           startPoint: .topLeading, endPoint: .bottomTrailing))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.spatailAccent2.opacity(0.4), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 

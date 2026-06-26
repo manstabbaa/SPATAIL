@@ -30,6 +30,7 @@ targets:
       - path: Services
       - path: Views
       - path: Reality
+      - path: Perception
     resources:
       - path: Resources
     info:

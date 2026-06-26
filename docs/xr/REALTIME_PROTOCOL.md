@@ -315,3 +315,47 @@ These all use the same envelope (type / seq / sentAt / payload). The closed voca
 - A WS connection is the same channel for input (room/pose) and output (experience updates) — simpler than HTTP + Server-Sent-Events.
 
 Bundle download is still HTTP because: cacheable, signed-URL revocation, CDN-friendly, parallel range requests. Only the **control plane** is WS.
+
+---
+
+## 10. Vision uplink + live identification (v0.2 — the TRACKED stream)
+
+v0.1 understands the world from a *typed prompt* + room geometry. v0.2 adds a **vision channel**: the phone streams camera frames to a **PC live intelligence engine** that runs a VLM (NVIDIA NIM / Ollama / vLLM via an OpenAI-compatible endpoint) and answers *"what is the user looking at?"*. Implemented by `pipeline/server/spatail_vision_engine.py`.
+
+**Why a separate channel (not the WS control plane):** camera frames are far larger than the 64 KB control-plane cap. They ride a **dedicated binary WebSocket**; only small identification results return on the control plane (or that same socket).
+
+**Latency split (the key design rule):** the VLM sets *what + roughly where* at ~1–3 Hz. **Continuous 6-DoF pose/anchoring stays on-device** (ARKit world tracking now; iOS 27 `ARObjectAnchor`+`isTracked` later). Never send per-frame pose over the network.
+
+### Endpoints (engine)
+
+| URL | Purpose |
+|---|---|
+| `ws://<pc>:8798/v1/vision` | Binary JPEG frames up; `vision.identification` JSON down |
+| `http://<pc>:8799/` | Browser **debug view** — live frame + boxes + latency (watch over Parsec) |
+| `http://<pc>:8799/frame.jpg`, `/state.json` | Raw latest frame + engine state (what the overlay polls) |
+
+### `vision.frame` (iOS → engine)
+Not a JSON envelope — a **raw binary WebSocket message** whose bytes are a downscaled JPEG (~640 px long edge, ~2–5 Hz). Keeping it binary avoids base64 bloat. Text messages on this socket are reserved (future: ROI / capability hints).
+
+### `vision.identification` (engine → iOS)
+```json
+{
+  "type": "vision.identification",
+  "sentAt": "2026-06-25T22:40:00.000Z",
+  "payload": {
+    "primary": "car engine air filter",
+    "detections": [
+      { "label": "car engine air filter", "confidence": 0.82, "box": [0.31, 0.28, 0.4, 0.35] },
+      { "label": "airbox", "confidence": 0.4, "box": null }
+    ],
+    "rawText": "{...}", "latencyMs": 940, "model": "qwen2.5vl:7b"
+  }
+}
+```
+`box` is normalized `[x, y, w, h]` (origin top-left) or `null` — treat it as a hint; chat VLMs are unreliable at precise boxes. iOS raycasts the box centre onto an ARKit-tracked anchor for placement.
+
+### Convergence with the PLACED stream
+A confident `vision.identification` can auto-fire the equivalent of a `user.prompt` (`"explain this <primary>"`) into the v0.1 prompt→Blender pipeline, so the explanation builds for whatever the camera is pointed at — no typing. That bridge lives in the engine, gated on a confidence threshold + dwell.
+
+### Observability (the "joint activity" surface)
+The engine renders an HTML overlay at `http://<pc>:8799/` (latest frame + detection boxes + labels + ingest fps + per-call latency + raw VLM text). Open it over Parsec to watch the pipeline end-to-end while you point the phone. `--test-dir <imgs>` feeds local images so the engine + VLM + overlay can be verified on the PC **before** the phone is wired.

@@ -22,8 +22,16 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>SPATAIL uses the camera to place spatial experiences in your environment. We do not record, store, or transmit camera frames.
+	<string>SPATAIL uses the camera to place spatial experiences in your environment, and in Live Vision to stream frames to your own PC vision engine for on-the-fly identification.
+</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>SPATAIL connects to your PC vision engine on the local network to stream camera frames and receive live identifications.
 </string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

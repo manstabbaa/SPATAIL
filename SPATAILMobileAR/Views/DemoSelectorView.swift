@@ -24,6 +24,8 @@ struct DemoSelectorView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                    NavigationLink { LiveVisionView() } label: { LiveVisionCard() }
+                        .buttonStyle(.plain)
                     if let err = loadError {
                         Text(err)
                             .font(.callout)
@@ -69,6 +71,37 @@ struct DemoSelectorView: View {
                 .font(.callout)
                 .foregroundColor(.spatailTextDim)
         }
+    }
+}
+
+private struct LiveVisionCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Live Vision")
+                    .font(.title3).bold()
+                Spacer()
+                Image(systemName: "camera.viewfinder")
+                    .foregroundColor(.spatailAccent2)
+            }
+            Text("tracked · beta")
+                .font(.caption)
+                .padding(.horizontal, 8).padding(.vertical, 2)
+                .background(Color.spatailAccent2.opacity(0.12))
+                .foregroundColor(.spatailAccent2)
+                .clipShape(Capsule())
+            Text("Point the camera at a real object; the PC vision engine " +
+                 "identifies it live and streams the label back. Set your PC's " +
+                 "IP on the next screen.")
+                .font(.callout)
+                .foregroundColor(.spatailTextDim)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.spatailBgElev)
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.spatailBorder, lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 

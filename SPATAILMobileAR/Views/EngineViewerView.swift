@@ -218,6 +218,13 @@ private struct BlockoutARView: UIViewRepresentable {
         Coordinator(scanner: scanner, model: model)
     }
 
+    // Timer teardown lives here, not in deinit: the Coordinator is @MainActor
+    // and Swift 6 forbids touching its non-Sendable Timer from a nonisolated
+    // deinit. dismantleUIView is guaranteed main-actor by UIViewRepresentable.
+    static func dismantleUIView(_ uiView: ARView, coordinator: Coordinator) {
+        coordinator.detach()
+    }
+
     @MainActor
     final class Coordinator {
         private let scanner: RoomScannerService
@@ -278,8 +285,10 @@ private struct BlockoutARView: UIViewRepresentable {
             }
         }
 
-        deinit {
+        func detach() {
             frameTimer?.invalidate()
+            frameTimer = nil
+            cancellables.removeAll()
         }
 
         private func rebuildBlockout(_ surfaces: [RoomSurface]) {

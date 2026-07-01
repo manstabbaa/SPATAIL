@@ -43,6 +43,11 @@ final class RoomScannerService: NSObject, ObservableObject {
     /// Set when the user taps Continue and we freeze the scan into a contract.
     @Published private(set) var finalContract: RoomContract?
 
+    /// Live classified surfaces, republished on every anchor update. The
+    /// Engine Viewer's blockout renderer consumes this to show, in real time,
+    /// what the scanner currently believes the room is made of.
+    @Published private(set) var liveSurfaces: [RoomSurface] = []
+
     private weak var session: ARSession?
     private var meshAnchors: [UUID: ARMeshAnchor] = [:]
     private var planeAnchors: [UUID: ARPlaneAnchor] = [:]
@@ -73,6 +78,16 @@ final class RoomScannerService: NSObject, ObservableObject {
     /// `NSObject.finalize()`, which makes an unqualified call ambiguous.
     @discardableResult
     func finalizeScan() throws -> URL {
+        let room = snapshotContract()
+        let url = try RoomContractIO.write(room)
+        self.finalContract = room
+        return url
+    }
+
+    /// Build a RoomContract from the current scan WITHOUT persisting it.
+    /// The Engine Viewer uses this to stream the room to the PC brain
+    /// mid-scan; finalizeScan() is the persisting wrapper.
+    func snapshotContract() -> RoomContract {
         let surfaces: [RoomSurface] = lidarAvailable
             ? surfacesFromMeshAnchors()
             : surfacesFromPlaneAnchors()
@@ -81,7 +96,7 @@ final class RoomScannerService: NSObject, ObservableObject {
         let roomId = "room_" + ISO8601DateFormatter().string(from: Date())
             .replacingOccurrences(of: ":", with: "-")
 
-        let room = RoomContract(
+        return RoomContract(
             schemaVersion: "0.4.0-spatail-room",
             roomId: roomId,
             capturedAt: ISO8601DateFormatter().string(from: Date()),
@@ -93,9 +108,6 @@ final class RoomScannerService: NSObject, ObservableObject {
             preferredWallId: preferredWall?.id,
             preferredTableId: preferredTable?.id,
         )
-        let url = try RoomContractIO.write(room)
-        self.finalContract = room
-        return url
     }
 
     // MARK: - Surface extraction
@@ -145,6 +157,7 @@ final class RoomScannerService: NSObject, ObservableObject {
         }
         self.areaByKind = areaCounters
         self.coverage = min(1.0, areaCounters.values.reduce(0, +) / coverageTargetSqM)
+        self.liveSurfaces = out
         return out
     }
 
@@ -184,6 +197,7 @@ final class RoomScannerService: NSObject, ObservableObject {
         }
         self.areaByKind = areaCounters
         self.coverage = min(1.0, areaCounters.values.reduce(0, +) / coverageTargetSqM)
+        self.liveSurfaces = out
         return out
     }
 

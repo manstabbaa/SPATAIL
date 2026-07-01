@@ -69,6 +69,12 @@ except ImportError as exc:  # pragma: no cover
 
 log = logging.getLogger("spatail.vision")
 
+# The fusion brain (fuse VLM label + room scan → placement contract) lives in
+# node — pipeline/spatail/plan_from_room.js. The engine shells out to it so
+# there is exactly ONE brain implementation shared by the CLI, the tests, and
+# this live path.
+BRAIN_SCRIPT = Path(__file__).resolve().parents[2] / "pipeline" / "spatail" / "plan_from_room.js"
+
 
 # ────────────────────────────────────────────────────────────────────────
 # Identification result
@@ -249,6 +255,16 @@ class VisionEngine:
         self._last_frame_at = 0.0
         self._ingest_fps = 0.0
 
+        # fusion state — the room scan the phone streamed up, the camera pose,
+        # and the brain's latest placement plan (see _replan()).
+        self._room: dict | None = None
+        self._pose: dict | None = None
+        self._debug_identification: dict | None = None
+        self._last_plan: dict | None = None
+        self._last_planned_label: str | None = None
+        self._plan_version = 0
+        self._plan_lock = asyncio.Lock()
+
     # -- frame ingest (called by the WS handler and the test feeder) -------
 
     def submit_frame(self, jpeg: bytes):
@@ -284,17 +300,26 @@ class VisionEngine:
                     f"primary={result.primary!r} "
                     f"({len(result.detections)} det, ingest {self._ingest_fps:.1f}fps)"
                 )
+                # Fusion: when the phone has given us a room and the VLM's
+                # answer changed, re-run the placement brain so the phone gets
+                # a fresh experience.delta for what it is NOW looking at.
+                if (self._room is not None and result.primary
+                        and result.primary != self._last_planned_label):
+                    await self._replan(trigger=f"identification:{result.primary}")
                 # throttle so we don't melt the GPU on a fast frame stream
                 await asyncio.sleep(self.min_interval_s)
 
     async def _broadcast(self, result: IdentifyResult):
-        if not self._clients:
-            return
-        msg = json.dumps({
+        await self._broadcast_json({
             "type": "vision.identification",
             "sentAt": datetime.now(timezone.utc).isoformat(),
             "payload": result.to_dict(),
         })
+
+    async def _broadcast_json(self, obj: dict):
+        if not self._clients:
+            return
+        msg = json.dumps(obj)
         dead = []
         for ws in self._clients:
             try:
@@ -303,6 +328,90 @@ class VisionEngine:
                 dead.append(ws)
         for ws in dead:
             self._clients.discard(ws)
+
+    # -- fusion: room ingest + brain replan ---------------------------------
+
+    async def _handle_control(self, text: str):
+        """Text messages on the frame WS are the phone's control channel.
+        `room.update` carries the device's RoomContract (or a brain-shaped
+        room) plus the camera pose; receiving one re-runs the brain."""
+        try:
+            msg = json.loads(text)
+        except json.JSONDecodeError:
+            log.debug(f"frame-ws text (not JSON): {text[:120]}")
+            return
+        if msg.get("type") != "room.update":
+            log.debug(f"frame-ws control ignored: {msg.get('type')!r}")
+            return
+        payload = msg.get("payload") or {}
+        # Accept {room, pose} or a bare RoomContract as the payload.
+        self._room = payload.get("room") or payload
+        self._pose = payload.get("pose") or payload.get("userPose")
+        # Dev hook: lets a test client (or the HUD) pin the identification
+        # without running a VLM — the brain path stays identical.
+        self._debug_identification = payload.get("debugIdentification")
+        n_surfaces = len((self._room or {}).get("surfaces") or [])
+        log.info(f"room.update: {n_surfaces} surfaces, pose={'yes' if self._pose else 'no'}")
+        await self._replan(trigger="room.update")
+
+    async def _replan(self, trigger: str):
+        """Run the node fusion brain against (room, pose, identification) and
+        broadcast the resulting contract as an experience.delta."""
+        if self._room is None:
+            return
+        ident = self._debug_identification
+        if ident is None and self._result and self._result.primary \
+                and not self._result.raw_text.startswith("<error"):
+            ident = {
+                "primary": self._result.primary,
+                "detections": [d.to_dict() for d in self._result.detections],
+            }
+        brain_input = json.dumps({
+            "room": self._room, "pose": self._pose, "identification": ident,
+        }).encode()
+
+        async with self._plan_lock:
+            try:
+                proc = await asyncio.create_subprocess_exec(
+                    "node", str(BRAIN_SCRIPT), "--stdin",
+                    stdin=asyncio.subprocess.PIPE,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+                out, err = await asyncio.wait_for(
+                    proc.communicate(brain_input), timeout=15)
+            except FileNotFoundError:
+                log.warning("replan skipped: `node` not on PATH")
+                return
+            except asyncio.TimeoutError:
+                proc.kill()
+                log.warning("replan: brain subprocess timed out")
+                return
+            if proc.returncode != 0:
+                log.warning(f"replan failed rc={proc.returncode}: "
+                            f"{err.decode(errors='replace')[:200]}")
+                return
+            try:
+                plan = json.loads(out.decode())
+            except json.JSONDecodeError as exc:
+                log.warning(f"replan: brain emitted bad JSON: {exc}")
+                return
+
+        self._plan_version += 1
+        self._last_plan = plan
+        self._last_planned_label = (ident or {}).get("primary")
+        shopping = (plan.get("summary") or {}).get("shoppingLine", "")
+        log.info(f"plan#{self._plan_version} [{trigger}] "
+                 f"mode={plan.get('mode')} — {shopping}")
+        await self._broadcast_json({
+            "type": "experience.delta",
+            "sentAt": datetime.now(timezone.utc).isoformat(),
+            "payload": {
+                "version": self._plan_version,
+                "kind": "full",
+                "experience": plan.get("contract"),
+            },
+        })
 
     # -- frame uplink WebSocket -------------------------------------------
 
@@ -315,8 +424,8 @@ class VisionEngine:
                 if isinstance(msg, bytes):
                     self.submit_frame(msg)          # binary = a JPEG frame
                 else:
-                    # text control messages reserved for future use (e.g. ROI)
-                    log.debug(f"frame-ws text: {msg[:120]}")
+                    # text = control channel (room.update → fusion replan)
+                    await self._handle_control(msg)
         except websockets.ConnectionClosed:
             pass
         finally:
@@ -332,6 +441,9 @@ class VisionEngine:
             "ingestFps": round(self._ingest_fps, 2),
             "clients": len(self._clients),
             "result": self._result.to_dict() if self._result else None,
+            "roomSurfaces": len((self._room or {}).get("surfaces") or []),
+            "planVersion": self._plan_version,
+            "planSummary": (self._last_plan or {}).get("summary"),
         }
 
     def build_http_app(self) -> web.Application:
@@ -350,9 +462,18 @@ class VisionEngine:
             return web.json_response(self.state_dict(),
                                      headers={"Cache-Control": "no-store"})
 
+        async def contract_json(_req):
+            # The brain's latest placement plan (mode + summary + contract) —
+            # the web mirror and curl-based checks read this.
+            if self._last_plan is None:
+                raise web.HTTPNotFound()
+            return web.json_response(self._last_plan,
+                                     headers={"Cache-Control": "no-store"})
+
         app.router.add_get("/", index)
         app.router.add_get("/frame.jpg", frame_jpg)
         app.router.add_get("/state.json", state_json)
+        app.router.add_get("/contract", contract_json)
         return app
 
 

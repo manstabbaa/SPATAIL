@@ -2,7 +2,7 @@
 //
 //  Source:    pipeline/spatail/experience_contract.js
 //  Generator: tools/sync/gen_swift_vocab.mjs
-//  Regenerated: 2026-05-22T21:15:48.243Z
+//  Regenerated: 2026-07-01T18:32:50.185Z
 //
 //  To update: edit the JS file, then run `npm run sync:swift-vocab`.
 
@@ -115,6 +115,8 @@ public enum Placement: String, Codable, CaseIterable, Sendable {
     case rightOfUser = "right_of_user"
     case inFrontOfUser = "in_front_of_user"
     case roomCenter = "room_center"
+    case surfaceEdge = "surface_edge"
+    case surfaceCorner = "surface_corner"
 }
 
 /// Mirrors `ANCHOR_STRATEGIES` from experience_contract.js.

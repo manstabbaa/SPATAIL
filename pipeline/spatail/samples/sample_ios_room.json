@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "0.4.0-spatail-room",
+  "roomId": "room_2026-07-01T12-00-00Z",
+  "capturedAt": "2026-07-01T12:00:00Z",
+  "device": "iPhone16,1",
+  "lidar": true,
+  "boundingBox": { "min": [-2.8, 0, -2.1], "max": [2.9, 2.4, 2.2] },
+  "surfaces": [
+    {
+      "id": "floor.a1b2c3d4",
+      "kind": "floor",
+      "polygon": [[-2.8, 0.0, -2.1], [2.9, 0.0, -2.1], [2.9, 0.0, 2.2], [-2.8, 0.0, 2.2]],
+      "normal": [0, 1, 0],
+      "area": 24.5,
+      "height": null,
+      "source": "lidar"
+    },
+    {
+      "id": "wall.b2c3d4e5",
+      "kind": "wall",
+      "polygon": [[-2.8, 0.0, -2.1], [2.9, 0.0, -2.1], [2.9, 2.4, -2.1], [-2.8, 2.4, -2.1]],
+      "normal": [0, 0, 1],
+      "area": 13.7,
+      "height": null,
+      "source": "lidar"
+    },
+    {
+      "id": "wall.c3d4e5f6",
+      "kind": "wall",
+      "polygon": [[-2.8, 0.0, -2.1], [-2.8, 0.0, 2.2], [-2.8, 2.4, 2.2], [-2.8, 2.4, -2.1]],
+      "normal": [1, 0, 0],
+      "area": 10.3,
+      "height": null,
+      "source": "lidar"
+    },
+    {
+      "id": "table.d4e5f6a7",
+      "kind": "table",
+      "polygon": [
+        [-0.72, 0.74, -0.31],
+        [0.05, 0.74, -0.46],
+        [0.68, 0.74, -0.12],
+        [0.55, 0.74, 0.38],
+        [-0.51, 0.74, 0.42]
+      ],
+      "normal": [0, 1, 0],
+      "area": 1.02,
+      "height": 0.74,
+      "source": "lidar"
+    },
+    {
+      "id": "seat.e5f6a7b8",
+      "kind": "seat",
+      "polygon": [[1.4, 0.45, 0.8], [1.9, 0.45, 0.8], [1.9, 0.45, 1.3], [1.4, 0.45, 1.3]],
+      "normal": [0, 1, 0],
+      "area": 0.25,
+      "height": null,
+      "source": "lidar"
+    }
+  ],
+  "anchorablePoints": [],
+  "preferredWallId": "wall.b2c3d4e5",
+  "preferredTableId": "table.d4e5f6a7"
+}

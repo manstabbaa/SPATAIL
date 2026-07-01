@@ -153,6 +153,14 @@ export const PLACEMENTS = [
   "right_of_user",
   "in_front_of_user",
   "room_center",
+  // v0.6 — surface-relative placement produced by the fusion brain. Content
+  // is snapped to the EDGE or CORNER of a real scanned surface (the labeled
+  // primitive from surface_fusion.js), not floated at a fixed offset. The
+  // placement carries `surfaceRef`, `from`/`to` (edge segment) or `position`
+  // (corner vertex), `insetMeters`, and `count` so the renderer can draw the
+  // strip / guard without re-deriving the geometry.
+  "surface_edge",
+  "surface_corner",
 ];
 
 export const ANCHOR_STRATEGIES = [

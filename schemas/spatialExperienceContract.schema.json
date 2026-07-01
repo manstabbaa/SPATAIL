@@ -123,7 +123,8 @@
             "wall", "table", "floor", "object_anchored",
             "above_target", "near_user", "near_presenter",
             "left_of_user", "right_of_user",
-            "in_front_of_user", "room_center"
+            "in_front_of_user", "room_center",
+            "surface_edge", "surface_corner"
           ]
         },
         "anchor":   { "type": "string" },

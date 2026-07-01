@@ -89,6 +89,12 @@ final class ARSceneRenderer {
 
     private func renderElement(_ el: SpatialElement,
                                allElements: [String: SpatialElement]) -> Entity {
+        // Fusion-brain surface padding reuses the generic three_d_model
+        // representation, so it routes by placement kind (edge / corner) to its
+        // own builder rather than the tabletop-model path.
+        if el.placementKindEnum == .surface_edge || el.placementKindEnum == .surface_corner {
+            return SurfacePaddingBuilder().build(for: el)
+        }
         switch el.representationModeEnum {
         case .two_d_panel:
             return SpatialPanelBuilder().build(for: el, style: .standard)

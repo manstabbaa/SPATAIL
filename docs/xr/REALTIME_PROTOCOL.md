@@ -359,3 +359,24 @@ A confident `vision.identification` can auto-fire the equivalent of a `user.prom
 
 ### Observability (the "joint activity" surface)
 The engine renders an HTML overlay at `http://<pc>:8799/` (latest frame + detection boxes + labels + ingest fps + per-call latency + raw VLM text). Open it over Parsec to watch the pipeline end-to-end while you point the phone. `--test-dir <imgs>` feeds local images so the engine + VLM + overlay can be verified on the PC **before** the phone is wired.
+
+### 10.1 Fusion loop (v0.3) — room up, placement down
+
+The text channel on the vision socket is no longer reserved: it carries the **fusion control plane**. The phone streams its room scan up; the engine fuses the latest VLM identification with the scanned geometry (via `pipeline/spatail/plan_from_room.js` → `surface_fusion.js` + `surface_placement.js`) and answers with a placement contract.
+
+**`room.update` (iOS → engine, text on `ws://<pc>:8798/v1/vision`):**
+```json
+{
+  "type": "room.update",
+  "payload": {
+    "room": { /* an iOS RoomContract (0.4.0-spatail-room) or brain-shaped room */ },
+    "pose": { "position": [0, 1.5, 1.6], "forward": [0, -0.45, -0.89] },
+    "debugIdentification": { "primary": "table", "detections": [] }
+  }
+}
+```
+`room` accepts the device's persisted RoomContract verbatim (`room_contract_adapter.js` normalizes it). `pose` is the camera at send time — the brain raycasts it through the scanned surfaces. `debugIdentification` is a dev hook that pins the VLM answer for tests; live traffic omits it and the engine uses its latest `vision.identification`.
+
+**`experience.delta` (engine → iOS, same socket):** same envelope as §4 — `payload.kind = "full"`, `payload.experience` = a SpatialExperienceContract whose elements use the v0.6 `surface_edge` / `surface_corner` placements (with `surfaceRef`, `from`/`to`, `count`, `spanMeters`). The engine replans on every `room.update` and whenever the VLM's `primary` changes while a room is held.
+
+**`GET http://<pc>:8799/contract`** serves the latest plan (`{mode, summary, fused, contract}`) for the web mirror and curl checks.

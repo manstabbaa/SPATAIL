@@ -139,6 +139,16 @@ struct SpatialPlacement: Codable, Hashable {
     let from: [Double]?
     let to: [Double]?
 
+    // v0.6 — surface-relative placement (kind == surface_edge / surface_corner).
+    // The fusion brain snaps content to a scanned surface's edge or corner and
+    // records the geometry it derived so the renderer draws the strip/guard
+    // without re-solving. `from`/`to` carry the edge segment (world metres) for
+    // surface_edge; `position` carries the corner vertex for surface_corner.
+    let surfaceRef: String?     // resolved surface id this rides on
+    let insetMeters: Double?    // how far in from the true edge (padding overhang)
+    let count: Int?             // how many discrete units (e.g. foam strips)
+    let spanMeters: Double?     // measured length of the edge (the "how much")
+
     // Convenience: position as SIMD3 with sensible defaults.
     var simdPosition: SIMD3<Float> {
         let p = position ?? []
@@ -167,6 +177,14 @@ struct SpatialPlacement: Codable, Hashable {
         let d = s.count > 2 ? Float(s[2]) : 0.4
         return (w, h, d)
     }
+
+    // Edge endpoints as SIMD3 (surface_edge). nil when not an edge placement.
+    private func simd(_ v: [Double]?) -> SIMD3<Float>? {
+        guard let v = v, v.count >= 3 else { return nil }
+        return SIMD3(Float(v[0]), Float(v[1]), Float(v[2]))
+    }
+    var simdFrom: SIMD3<Float>? { simd(from) }
+    var simdTo: SIMD3<Float>? { simd(to) }
 }
 
 struct ElementInteraction: Codable, Hashable, Identifiable {

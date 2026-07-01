@@ -26,6 +26,8 @@ struct DemoSelectorView: View {
                     }
                     NavigationLink { LiveVisionView() } label: { LiveVisionCard() }
                         .buttonStyle(.plain)
+                    NavigationLink { EngineViewerView() } label: { EngineViewerCard() }
+                        .buttonStyle(.plain)
                     if let err = loadError {
                         Text(err)
                             .font(.callout)
@@ -93,6 +95,37 @@ private struct LiveVisionCard: View {
             Text("Point the camera at a real object; the PC vision engine " +
                  "identifies it live and streams the label back. Set your PC's " +
                  "IP on the next screen.")
+                .font(.callout)
+                .foregroundColor(.spatailTextDim)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.spatailBgElev)
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.spatailBorder, lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private struct EngineViewerCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Engine Viewer")
+                    .font(.title3).bold()
+                Spacer()
+                Image(systemName: "cube.transparent")
+                    .foregroundColor(.spatailAccent)
+            }
+            Text("fusion · blockout")
+                .font(.caption)
+                .padding(.horizontal, 8).padding(.vertical, 2)
+                .background(Color.spatailAccent.opacity(0.12))
+                .foregroundColor(.spatailAccent)
+                .clipShape(Capsule())
+            Text("See the room the way SPATAIL sees it: every scanned surface " +
+                 "as a color-coded blockout slab (table, wall, floor…), plus " +
+                 "the fusion brain's live placement decision rendered in place.")
                 .font(.callout)
                 .foregroundColor(.spatailTextDim)
                 .fixedSize(horizontal: false, vertical: true)

@@ -1,0 +1,561 @@
+{
+  "schemaVersion": "0.5.0-spatail",
+  "createdAt": "2026-07-01T18:41:38.003Z",
+  "experienceId": "fusion_foam_padding",
+  "title": "Foam edge padding",
+  "sourcePrompt": "foam padding for my table edges — I have a newborn",
+  "sourceInputs": [],
+  "sourceFiles": [],
+  "detectedDomain": {
+    "name": "home_safety",
+    "confidence": "high",
+    "source": "fusion"
+  },
+  "environmentAssumptions": {
+    "kind": "real_room",
+    "source": "device_scan"
+  },
+  "spatialElements": [
+    {
+      "id": "foam_padding_edge_0",
+      "title": "Foam edge padding — edge 0",
+      "contentType": "physical_target",
+      "representationMode": "three_d_model",
+      "placement": {
+        "kind": "surface_edge",
+        "anchor": "edge:surf_table_1:0",
+        "position": [
+          0,
+          0.75,
+          -0.4
+        ],
+        "from": [
+          -0.6,
+          0.75,
+          -0.4
+        ],
+        "to": [
+          0.6,
+          0.75,
+          -0.4
+        ],
+        "surfaceRef": "surf_table_1",
+        "insetMeters": 0,
+        "count": 3,
+        "spanMeters": 1.2,
+        "sizeMeters": [
+          1.2,
+          0.04,
+          0.04
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 60,
+      "sourceContent": null,
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "ghost",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "Foam is a real 3-D object that hugs the real edge, so it renders 1:1 on the scanned surface — not a floating label.",
+      "whyThisPlacement": "Runs along the 1.2 m edge 0 of surf_table_1 (table) — 3 × 0.5 m foam strip(s). A newborn's head strikes the edge first, so the edge is the primary guard."
+    },
+    {
+      "id": "foam_padding_edge_1",
+      "title": "Foam edge padding — edge 1",
+      "contentType": "physical_target",
+      "representationMode": "three_d_model",
+      "placement": {
+        "kind": "surface_edge",
+        "anchor": "edge:surf_table_1:1",
+        "position": [
+          0.6,
+          0.75,
+          0
+        ],
+        "from": [
+          0.6,
+          0.75,
+          -0.4
+        ],
+        "to": [
+          0.6,
+          0.75,
+          0.4
+        ],
+        "surfaceRef": "surf_table_1",
+        "insetMeters": 0,
+        "count": 2,
+        "spanMeters": 0.8,
+        "sizeMeters": [
+          0.8,
+          0.04,
+          0.04
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 60,
+      "sourceContent": null,
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "ghost",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "Foam is a real 3-D object that hugs the real edge, so it renders 1:1 on the scanned surface — not a floating label.",
+      "whyThisPlacement": "Runs along the 0.8 m edge 1 of surf_table_1 (table) — 2 × 0.5 m foam strip(s). A newborn's head strikes the edge first, so the edge is the primary guard."
+    },
+    {
+      "id": "foam_padding_edge_2",
+      "title": "Foam edge padding — edge 2",
+      "contentType": "physical_target",
+      "representationMode": "three_d_model",
+      "placement": {
+        "kind": "surface_edge",
+        "anchor": "edge:surf_table_1:2",
+        "position": [
+          0,
+          0.75,
+          0.4
+        ],
+        "from": [
+          0.6,
+          0.75,
+          0.4
+        ],
+        "to": [
+          -0.6,
+          0.75,
+          0.4
+        ],
+        "surfaceRef": "surf_table_1",
+        "insetMeters": 0,
+        "count": 3,
+        "spanMeters": 1.2,
+        "sizeMeters": [
+          1.2,
+          0.04,
+          0.04
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 60,
+      "sourceContent": null,
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "ghost",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "Foam is a real 3-D object that hugs the real edge, so it renders 1:1 on the scanned surface — not a floating label.",
+      "whyThisPlacement": "Runs along the 1.2 m edge 2 of surf_table_1 (table) — 3 × 0.5 m foam strip(s). A newborn's head strikes the edge first, so the edge is the primary guard."
+    },
+    {
+      "id": "foam_padding_edge_3",
+      "title": "Foam edge padding — edge 3",
+      "contentType": "physical_target",
+      "representationMode": "three_d_model",
+      "placement": {
+        "kind": "surface_edge",
+        "anchor": "edge:surf_table_1:3",
+        "position": [
+          -0.6,
+          0.75,
+          0
+        ],
+        "from": [
+          -0.6,
+          0.75,
+          0.4
+        ],
+        "to": [
+          -0.6,
+          0.75,
+          -0.4
+        ],
+        "surfaceRef": "surf_table_1",
+        "insetMeters": 0,
+        "count": 2,
+        "spanMeters": 0.8,
+        "sizeMeters": [
+          0.8,
+          0.04,
+          0.04
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 60,
+      "sourceContent": null,
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "ghost",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "Foam is a real 3-D object that hugs the real edge, so it renders 1:1 on the scanned surface — not a floating label.",
+      "whyThisPlacement": "Runs along the 0.8 m edge 3 of surf_table_1 (table) — 2 × 0.5 m foam strip(s). A newborn's head strikes the edge first, so the edge is the primary guard."
+    },
+    {
+      "id": "foam_padding_corner_0",
+      "title": "Foam edge padding — corner 0",
+      "contentType": "physical_target",
+      "representationMode": "three_d_model",
+      "placement": {
+        "kind": "surface_corner",
+        "anchor": "corner:surf_table_1:0",
+        "position": [
+          -0.567,
+          0.75,
+          -0.378
+        ],
+        "surfaceRef": "surf_table_1",
+        "insetMeters": 0,
+        "count": 1,
+        "sizeMeters": [
+          0.08,
+          0.08,
+          0.08
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 70,
+      "sourceContent": null,
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "ghost",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "A corner guard is a small 3-D cap seated on the real corner vertex.",
+      "whyThisPlacement": "Seated on corner 0 of surf_table_1 (table) — corners are the sharpest impact point, so each gets a dedicated guard."
+    },
+    {
+      "id": "foam_padding_corner_1",
+      "title": "Foam edge padding — corner 1",
+      "contentType": "physical_target",
+      "representationMode": "three_d_model",
+      "placement": {
+        "kind": "surface_corner",
+        "anchor": "corner:surf_table_1:1",
+        "position": [
+          0.567,
+          0.75,
+          -0.378
+        ],
+        "surfaceRef": "surf_table_1",
+        "insetMeters": 0,
+        "count": 1,
+        "sizeMeters": [
+          0.08,
+          0.08,
+          0.08
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 70,
+      "sourceContent": null,
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "ghost",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "A corner guard is a small 3-D cap seated on the real corner vertex.",
+      "whyThisPlacement": "Seated on corner 1 of surf_table_1 (table) — corners are the sharpest impact point, so each gets a dedicated guard."
+    },
+    {
+      "id": "foam_padding_corner_2",
+      "title": "Foam edge padding — corner 2",
+      "contentType": "physical_target",
+      "representationMode": "three_d_model",
+      "placement": {
+        "kind": "surface_corner",
+        "anchor": "corner:surf_table_1:2",
+        "position": [
+          0.567,
+          0.75,
+          0.378
+        ],
+        "surfaceRef": "surf_table_1",
+        "insetMeters": 0,
+        "count": 1,
+        "sizeMeters": [
+          0.08,
+          0.08,
+          0.08
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 70,
+      "sourceContent": null,
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "ghost",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "A corner guard is a small 3-D cap seated on the real corner vertex.",
+      "whyThisPlacement": "Seated on corner 2 of surf_table_1 (table) — corners are the sharpest impact point, so each gets a dedicated guard."
+    },
+    {
+      "id": "foam_padding_corner_3",
+      "title": "Foam edge padding — corner 3",
+      "contentType": "physical_target",
+      "representationMode": "three_d_model",
+      "placement": {
+        "kind": "surface_corner",
+        "anchor": "corner:surf_table_1:3",
+        "position": [
+          -0.567,
+          0.75,
+          0.378
+        ],
+        "surfaceRef": "surf_table_1",
+        "insetMeters": 0,
+        "count": 1,
+        "sizeMeters": [
+          0.08,
+          0.08,
+          0.08
+        ]
+      },
+      "anchorStrategy": "plane_anchor",
+      "scaleMode": "real_scale",
+      "priority": 70,
+      "sourceContent": null,
+      "requiredAssets": [],
+      "fallbackGeometry": "panel",
+      "interactions": [],
+      "attentionBehavior": "active_focus",
+      "defaultAnimation": null,
+      "respondsTo": [],
+      "fidelity": "ghost",
+      "resolvedSurface": null,
+      "whyThisRepresentation": "A corner guard is a small 3-D cap seated on the real corner vertex.",
+      "whyThisPlacement": "Seated on corner 3 of surf_table_1 (table) — corners are the sharpest impact point, so each gets a dedicated guard."
+    }
+  ],
+  "relationships": [],
+  "interactionPlan": {
+    "interactions": []
+  },
+  "attentionPlan": [],
+  "assetRequirements": [],
+  "animations": [],
+  "interactions": [],
+  "sequences": [],
+  "defaultSequenceId": null,
+  "roomContract": {
+    "surfaces": [
+      {
+        "id": "surf_table_1",
+        "kind": "table",
+        "polygon": [
+          [
+            -0.6,
+            0.75,
+            -0.4
+          ],
+          [
+            0.6,
+            0.75,
+            -0.4
+          ],
+          [
+            0.6,
+            0.75,
+            0.4
+          ],
+          [
+            -0.6,
+            0.75,
+            0.4
+          ]
+        ],
+        "normal": [
+          0,
+          1,
+          0
+        ],
+        "centroid": [
+          0,
+          0.75,
+          0
+        ],
+        "area": 0.96,
+        "source": "lidar"
+      }
+    ],
+    "boundingBox": {
+      "min": [
+        -3,
+        0,
+        -2
+      ],
+      "max": [
+        3,
+        2.4,
+        2
+      ]
+    }
+  },
+  "explanation": {
+    "written": "~4 m of edge → 10 × 0.5 m foam strips + 4 corner guards",
+    "intentSummary": "Soft-guard the impact edges + corners of the table for a newborn."
+  },
+  "mechanics": [],
+  "presentation": null,
+  "reasoningSummary": "Fused VLM label \"table\" onto surf_table_1 (camera ray pierced surf_table_1 at 1.86m); ~4 m of edge → 10 × 0.5 m foam strips + 4 corner guards.",
+  "vocabularies": {
+    "contentTypes": [
+      "summary_panel",
+      "numeric_summary",
+      "list",
+      "step_sequence",
+      "timeline",
+      "decision_set",
+      "physical_target",
+      "assembly_explode",
+      "diagnostic_finding",
+      "anchored_marker",
+      "alignment_guide",
+      "airflow_streamlines",
+      "process_model",
+      "environment"
+    ],
+    "representationModes": [
+      "two_d_panel",
+      "wall_dashboard",
+      "three_d_model",
+      "tabletop_model",
+      "floor_timeline",
+      "floating_decision_card",
+      "highlighted_target",
+      "exploded_view",
+      "anchored_callout",
+      "guide_line",
+      "diagnostic_overlay",
+      "airflow_field"
+    ],
+    "placements": [
+      "wall",
+      "table",
+      "floor",
+      "object_anchored",
+      "above_target",
+      "near_user",
+      "near_presenter",
+      "left_of_user",
+      "right_of_user",
+      "in_front_of_user",
+      "room_center",
+      "surface_edge",
+      "surface_corner"
+    ],
+    "anchorStrategies": [
+      "world_anchor",
+      "plane_anchor",
+      "object_anchor",
+      "relative_to_target",
+      "user_relative",
+      "simulated_anchor"
+    ],
+    "scaleModes": [
+      "real_scale",
+      "tabletop_scale",
+      "enlarged_detail",
+      "compact_panel",
+      "room_scale"
+    ],
+    "attentionBehaviors": [
+      "ambient",
+      "persistent_context",
+      "active_focus",
+      "peripheral",
+      "on_demand",
+      "guiding"
+    ],
+    "animationPrimitives": [
+      "transform_keyframes",
+      "explode",
+      "assemble",
+      "highlight_pulse",
+      "fade",
+      "set_visible",
+      "attention_camera_hint"
+    ],
+    "interactionTriggers": [
+      "tap",
+      "hover",
+      "dwell",
+      "scene_event"
+    ],
+    "interactionActions": [
+      "play_animation",
+      "stop_animation",
+      "advance_step",
+      "previous_step",
+      "restart_sequence",
+      "set_visible"
+    ],
+    "fidelities": [
+      "ghost",
+      "draft",
+      "committed",
+      "authored"
+    ],
+    "mechanicKinds": [
+      "exploded_view",
+      "annotated_callouts",
+      "highlighted_region",
+      "timeline",
+      "cross_section",
+      "assembly_sequence",
+      "ghosted_internal",
+      "flow_diagram",
+      "process_animation",
+      "cutaway",
+      "disassembly_sequence",
+      "before_after",
+      "comparison_grid",
+      "metric_dashboard",
+      "cross_reference",
+      "scale_reference",
+      "color_coded_map",
+      "force_arrows",
+      "particle_flow",
+      "cutaway_orbit",
+      "xray_layer_stack",
+      "interactive_dissection",
+      "placeholder_mechanic"
+    ],
+    "presentationLayouts": [
+      "stage_in_front",
+      "flat_grid",
+      "scene_floor",
+      "wall_room"
+    ]
+  }
+}

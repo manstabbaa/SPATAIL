@@ -39,6 +39,24 @@ private struct VisionMessage: Decodable {
     let payload: VisionIdentification
 }
 
+/// Minimal envelope peek so the receive loop can branch on message type
+/// before committing to a payload shape.
+private struct Envelope: Decodable {
+    let type: String
+}
+
+/// The engine's fusion downlink: the brain's placement decision as a full
+/// SpatialExperienceContract (same Codable model the bundled demos use).
+private struct ExperienceDeltaMessage: Decodable {
+    struct Payload: Decodable {
+        let version: Int
+        let kind: String
+        let experience: SpatialExperienceContract?
+    }
+    let type: String
+    let payload: Payload
+}
+
 // MARK: - Frame sink
 
 /// One-way JPEG sink over a WebSocket. `URLSessionWebSocketTask.send` is safe to
@@ -143,7 +161,14 @@ final class LiveVisionModel: ObservableObject {
     @Published private(set) var lastIdentification: VisionIdentification?
     @Published private(set) var framesSent: Int = 0
 
+    /// The fusion brain's latest placement decision (experience.delta).
+    @Published private(set) var lastExperience: SpatialExperienceContract?
+    @Published private(set) var lastExperienceVersion: Int = 0
+
     let streamer = CameraFrameStreamer()
+    /// Thread-safe JPEG sink for callers that source frames outside the
+    /// AVCapture streamer (the Engine Viewer pushes ARKit frames through it).
+    private(set) var sender: FrameSender?
     private var task: URLSessionWebSocketTask?
     private let urlSession = URLSession(configuration: .default)
     private var frameCount = 0
@@ -167,6 +192,7 @@ final class LiveVisionModel: ObservableObject {
         task.resume()
 
         let sender = FrameSender(task: task) { _ in /* transient send errors are non-fatal */ }
+        self.sender = sender
         streamer.onFrame = { [weak self] jpeg in
             sender.send(jpeg)
             Task { @MainActor in self?.tickFrame() }
@@ -177,9 +203,37 @@ final class LiveVisionModel: ObservableObject {
 
     func disconnect() {
         streamer.onFrame = nil
+        sender = nil
         task?.cancel(with: .goingAway, reason: nil)
         task = nil
         state = .idle
+    }
+
+    // MARK: - Fusion control channel (room → brain)
+
+    /// Send the device's room scan (plus the current camera pose) to the PC
+    /// engine as a `room.update` text message — the brain replans and answers
+    /// with an `experience.delta`, which lands in `lastExperience`.
+    func sendRoom(_ room: RoomContract,
+                  posePosition: [Float]? = nil,
+                  poseForward: [Float]? = nil) {
+        guard let task else { return }
+        do {
+            let roomData = try JSONEncoder().encode(room)
+            let roomObj = try JSONSerialization.jsonObject(with: roomData)
+            var payload: [String: Any] = ["room": roomObj]
+            if let p = posePosition, let f = poseForward {
+                payload["pose"] = ["position": p, "forward": f]
+            }
+            let envelope: [String: Any] = ["type": "room.update", "payload": payload]
+            let data = try JSONSerialization.data(withJSONObject: envelope)
+            guard let text = String(data: data, encoding: .utf8) else { return }
+            task.send(.string(text)) { _ in /* transient send errors are non-fatal */ }
+        } catch {
+            // Encoding a contract we just built shouldn't fail; if it does,
+            // surface it as a state so the HUD shows something actionable.
+            state = .failed("room encode: \(error.localizedDescription)")
+        }
     }
 
     func stopAll() {
@@ -216,8 +270,21 @@ final class LiveVisionModel: ObservableObject {
 
     private func handle(_ text: String) {
         guard let data = text.data(using: .utf8),
-              let msg = try? JSONDecoder().decode(VisionMessage.self, from: data),
-              msg.type == "vision.identification" else { return }
-        lastIdentification = msg.payload
+              let envelope = try? JSONDecoder().decode(Envelope.self, from: data)
+        else { return }
+        switch envelope.type {
+        case "vision.identification":
+            if let msg = try? JSONDecoder().decode(VisionMessage.self, from: data) {
+                lastIdentification = msg.payload
+            }
+        case "experience.delta":
+            if let msg = try? JSONDecoder().decode(ExperienceDeltaMessage.self, from: data),
+               let exp = msg.payload.experience {
+                lastExperience = exp
+                lastExperienceVersion = msg.payload.version
+            }
+        default:
+            break
+        }
     }
 }

@@ -66,6 +66,10 @@ enum Placement: String, Codable, Hashable {
     case right_of_user
     case in_front_of_user
     case room_center
+    // v0.6 — surface-relative placement from the fusion brain: content snapped
+    // to the edge or corner of a real scanned surface (the labeled primitive).
+    case surface_edge
+    case surface_corner
 
     var displayName: String {
         rawValue.replacingOccurrences(of: "_", with: " ")

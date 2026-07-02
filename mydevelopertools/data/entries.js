@@ -28,6 +28,26 @@
  */
 window.SPATAIL_LOG = [
   {
+    "id": "2026-07-02-repo-consolidation",
+    "date": "2026-07-02",
+    "title": "One branch to rule them all — repo consolidated to main",
+    "category": "tooling",
+    "status": "shipped",
+    "area": "Repo / git",
+    "summary": "Merged every line of work (PC + Mac) into main and deleted all other branches and worktrees — clean slate.",
+    "details": [
+      "studio-pivot (81 commits + uncommitted PC tree: Spatail app rename, WebXR viewer, SpatailEngine, MF-pivot docs, CLAUDE.md) merged into main.",
+      "claude/interesting-goldwasser (vision engine, surface fusion, Engine Viewer, Brain Panel — 11 commits) and claude/inspiring-davinci (iOS perception pipeline) merged in.",
+      "Merge policy: studio-pivot's old 'retire off-direction modules' deletions were NOT allowed to kill the revived fusion-brain world — SPATAILMobileAR/, ios/SpatailPlayer/, pipeline/, viewer/ all survive as they stood on main.",
+      "mydevelopertools/ (this site) was never committed anywhere — landed on main; gitignored Meshy library bakes + .env preserved through the merge.",
+      "All merged branches deleted locally and on origin; origin now has exactly one branch: main."
+    ],
+    "why": "Work had spread across 7 branches and 5 worktrees on two machines; a single up-to-date main removes the where-is-what tax.",
+    "tags": ["git", "housekeeping", "merge"],
+    "files": [],
+    "commits": ["8546ba9", "4a39528", "e3398ea", "4996284"]
+  },
+  {
     "id": "2026-06-26-developer-log",
     "date": "2026-06-26",
     "title": "SPATAIL Developer Log",

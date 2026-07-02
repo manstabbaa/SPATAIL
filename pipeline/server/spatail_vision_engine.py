@@ -256,8 +256,12 @@ class VisionEngine:
         self._ingest_fps = 0.0
 
         # fusion state — the room scan the phone streamed up, the camera pose,
-        # and the brain's latest placement plan (see _replan()).
+        # and the brain's latest placement plan (see _replan()). The room is
+        # scoped to the connection that sent it (_room_owner): plans derived
+        # from it go to that socket alone and die with it, so a stale scan
+        # can never be replayed into a different phone's coordinate system.
         self._room: dict | None = None
+        self._room_owner: WebSocketServerProtocol | None = None
         self._pose: dict | None = None
         self._debug_identification: dict | None = None
         self._last_plan: dict | None = None
@@ -303,7 +307,11 @@ class VisionEngine:
                 # Fusion: when the phone has given us a room and the VLM's
                 # answer changed, re-run the placement brain so the phone gets
                 # a fresh experience.delta for what it is NOW looking at.
-                if (self._room is not None and result.primary
+                # Gated on the room's owner still being connected — a room
+                # with no live owner must never drive a replan.
+                if (self._room is not None
+                        and self._room_owner in self._clients
+                        and result.primary
                         and result.primary != self._last_planned_label):
                     await self._replan(trigger=f"identification:{result.primary}")
                 # throttle so we don't melt the GPU on a fast frame stream
@@ -331,10 +339,28 @@ class VisionEngine:
 
     # -- fusion: room ingest + brain replan ---------------------------------
 
-    async def _handle_control(self, text: str):
+    def _clear_room_state(self, reason: str):
+        """Forget the room and everything derived from it. The room belongs
+        to one connection; once that session is over, replanning against its
+        geometry would hand the next client placements in a coordinate system
+        that no longer exists (the live "stale sample room" incident)."""
+        if self._room is None and self._room_owner is None and self._last_plan is None:
+            return
+        self._room = None
+        self._room_owner = None
+        self._pose = None
+        self._debug_identification = None
+        self._last_plan = None
+        self._last_planned_label = None
+        self._plan_version = 0
+        log.info(f"room state cleared ({reason})")
+
+    async def _handle_control(self, ws: WebSocketServerProtocol, text: str):
         """Text messages on the frame WS are the phone's control channel.
         `room.update` carries the device's RoomContract (or a brain-shaped
-        room) plus the camera pose; receiving one re-runs the brain."""
+        room) plus the camera pose; receiving one re-runs the brain. The
+        sending socket becomes the room's owner — every plan derived from
+        this room is delivered to it alone."""
         try:
             msg = json.loads(text)
         except json.JSONDecodeError:
@@ -346,6 +372,7 @@ class VisionEngine:
         payload = msg.get("payload") or {}
         # Accept {room, pose} or a bare RoomContract as the payload.
         self._room = payload.get("room") or payload
+        self._room_owner = ws
         self._pose = payload.get("pose") or payload.get("userPose")
         # Dev hook: lets a test client (or the HUD) pin the identification
         # without running a VLM — the brain path stays identical.
@@ -356,8 +383,11 @@ class VisionEngine:
 
     async def _replan(self, trigger: str):
         """Run the node fusion brain against (room, pose, identification) and
-        broadcast the resulting contract as an experience.delta."""
-        if self._room is None:
+        send the resulting contract as an experience.delta to the room's
+        owner ONLY — never broadcast: the coordinates only mean something to
+        the client whose scan they came from."""
+        owner = self._room_owner
+        if self._room is None or owner is None:
             return
         ident = self._debug_identification
         if ident is None and self._result and self._result.primary \
@@ -397,13 +427,20 @@ class VisionEngine:
                 log.warning(f"replan: brain emitted bad JSON: {exc}")
                 return
 
+        # The brain ran against a snapshot owned by `owner`; if that session
+        # ended (or the room changed hands) while node was thinking, the plan
+        # describes a coordinate system nobody holds — drop it.
+        if owner is not self._room_owner or owner not in self._clients:
+            log.info(f"plan [{trigger}] dropped: room owner left mid-plan")
+            return
+
         self._plan_version += 1
         self._last_plan = plan
         self._last_planned_label = (ident or {}).get("primary")
         shopping = (plan.get("summary") or {}).get("shoppingLine", "")
         log.info(f"plan#{self._plan_version} [{trigger}] "
                  f"mode={plan.get('mode')} — {shopping}")
-        await self._broadcast_json({
+        delta = json.dumps({
             "type": "experience.delta",
             "sentAt": datetime.now(timezone.utc).isoformat(),
             "payload": {
@@ -412,12 +449,23 @@ class VisionEngine:
                 "experience": plan.get("contract"),
             },
         })
+        try:
+            await owner.send(delta)
+        except websockets.ConnectionClosed:
+            self._clients.discard(owner)
+            if owner is self._room_owner:
+                self._clear_room_state("room owner send failed")
 
     # -- frame uplink WebSocket -------------------------------------------
 
     async def handle_frame_ws(self, ws: WebSocketServerProtocol):
         peer = ws.remote_address
         self._clients.add(ws)
+        # A fresh client must never inherit a room whose owner is gone (a PC
+        # test client's sample room once poisoned a real phone session hours
+        # later). A room with a LIVE owner is left alone — the owner keeps it.
+        if self._room is not None and self._room_owner not in self._clients:
+            self._clear_room_state(f"ownerless room found at connect of {peer}")
         log.info(f"phone connected (frame uplink) from {peer}")
         try:
             async for msg in ws:
@@ -425,11 +473,13 @@ class VisionEngine:
                     self.submit_frame(msg)          # binary = a JPEG frame
                 else:
                     # text = control channel (room.update → fusion replan)
-                    await self._handle_control(msg)
+                    await self._handle_control(ws, msg)
         except websockets.ConnectionClosed:
             pass
         finally:
             self._clients.discard(ws)
+            if ws is self._room_owner:
+                self._clear_room_state(f"room owner {peer} disconnected")
             log.info(f"phone disconnected (frame uplink) {peer}")
 
     # -- observability HTTP (the "see what it sees" view for Parsec) -------

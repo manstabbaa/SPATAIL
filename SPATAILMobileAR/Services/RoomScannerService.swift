@@ -139,7 +139,7 @@ final class RoomScannerService: NSObject, ObservableObject {
             }
             for (kind, verts) in byKind {
                 if verts.count < 3 { continue }
-                let hull = convexHullXZ(verts)
+                let hull = convexHull(verts, key: hullKey(for: kind, verts: verts))
                 if hull.count < 3 { continue }
                 let normal = bestNormal(kind: kind, verts: verts)
                 let area = polygonArea(hull)
@@ -265,16 +265,43 @@ final class RoomScannerService: NSObject, ObservableObject {
         return String(uuid.uuidString.prefix(8)).lowercased()
     }
 
-    // MARK: - Convex hull (XZ projection) + polygon area
+    // MARK: - Convex hull (per-kind projection) + polygon area
     //
-    // Walls live in the XZ plane after we project (their world Y is the
-    // wall's vertical run); horizontal surfaces are XZ-natural. So a
-    // single 2D hull on the XZ plane works for both bucket types
-    // without losing the polygon's spatial sense.
+    // Horizontal surfaces are XZ-natural, but a vertical wall's vertices
+    // are (near-)collinear in XZ — an XZ hull degenerates to a sliver or
+    // collapses below 3 points and the wall silently drops out of the
+    // contract. So vertical kinds (wall/window/door) are hulled in their
+    // OWN plane: project onto (run-direction-in-XZ, Y), where the run
+    // direction is the principal axis of the vertex cluster's XZ spread.
 
-    private func convexHullXZ(_ pts: [SIMD3<Float>]) -> [SIMD3<Float>] {
+    private func isVerticalKind(_ kind: SurfaceKind) -> Bool {
+        kind == .wall || kind == .window || kind == .door
+    }
+
+    /// 2D projection key for hulling a bucket of vertices of a given kind.
+    private func hullKey(for kind: SurfaceKind,
+                         verts: [SIMD3<Float>]) -> (SIMD3<Float>) -> SIMD2<Float> {
+        guard isVerticalKind(kind), verts.count >= 2 else {
+            return { SIMD2($0.x, $0.z) }
+        }
+        // Principal axis of the XZ covariance = the wall's run direction.
+        let mean = verts.reduce(SIMD3<Float>(0, 0, 0), +) / Float(verts.count)
+        var sxx: Float = 0, sxz: Float = 0, szz: Float = 0
+        for v in verts {
+            let dx = v.x - mean.x, dz = v.z - mean.z
+            sxx += dx * dx; sxz += dx * dz; szz += dz * dz
+        }
+        let theta = 0.5 * atan2(2 * sxz, sxx - szz)
+        let u = SIMD2<Float>(cos(theta), sin(theta))
+        return { p in
+            SIMD2(simd_dot(SIMD2(p.x - mean.x, p.z - mean.z), u), p.y)
+        }
+    }
+
+    private func convexHull(_ pts: [SIMD3<Float>],
+                            key keyOf: (SIMD3<Float>) -> SIMD2<Float>) -> [SIMD3<Float>] {
         if pts.count <= 3 { return pts }
-        let projected = pts.map { (point: $0, key: SIMD2<Float>($0.x, $0.z)) }
+        let projected = pts.map { (point: $0, key: keyOf($0)) }
         // Andrew's monotone chain over the XZ projection.
         let sorted = projected.sorted { lhs, rhs in
             lhs.key.x != rhs.key.x ? lhs.key.x < rhs.key.x : lhs.key.y < rhs.key.y
@@ -300,17 +327,17 @@ final class RoomScannerService: NSObject, ObservableObject {
     }
 
     private func polygonArea(_ verts: [SIMD3<Float>]) -> Float {
-        // Shoelace in XZ — same projection as the hull, so wall areas
-        // come out as plan-footprint of the wall slab (small for a thin
-        // wall). Good enough to rank candidates.
+        // Newell's method: true area of a planar 3D polygon in any
+        // orientation. Matches the XZ shoelace for horizontal surfaces
+        // and gives walls their real face area (the XZ shoelace gave
+        // walls ~0, so both the phone's preferredWallId ranking and the
+        // brain's pickLargest drew from noise).
         guard verts.count >= 3 else { return 0 }
-        var sum: Float = 0
+        var n = SIMD3<Float>(0, 0, 0)
         for i in 0..<verts.count {
-            let a = verts[i]
-            let b = verts[(i + 1) % verts.count]
-            sum += a.x * b.z - b.x * a.z
+            n += simd_cross(verts[i], verts[(i + 1) % verts.count])
         }
-        return abs(sum) / 2
+        return simd_length(n) / 2
     }
 }
 

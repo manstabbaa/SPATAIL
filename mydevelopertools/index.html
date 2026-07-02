@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPATAIL · Developer Log</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">SPATAIL</span>
+      <span class="brand-sub">Developer Log</span>
+    </div>
+    <p class="tagline">What we changed, summarized — so progress stays legible.</p>
+  </header>
+
+  <section class="stats" id="stats" aria-label="Summary statistics"></section>
+
+  <section class="controls">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M21 21l-4.3-4.3m1.6-5.2a6.8 6.8 0 11-13.6 0 6.8 6.8 0 0113.6 0z"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input id="search" type="search" placeholder="Search the log…" autocomplete="off" />
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
+  </section>
+
+  <main class="timeline" id="timeline"></main>
+
+  <footer class="site-footer">
+    <span>SPATAIL — turning ideas into spatial experiences.</span>
+    <span class="footer-meta" id="footer-meta"></span>
+  </footer>
+
+  <script src="data/entries.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

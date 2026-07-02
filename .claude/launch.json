@@ -38,6 +38,18 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["engineexplainer/intelligence/server.py"],
       "port": 5175
+    },
+    {
+      "name": "spatail-viewer",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["viewer/server.js"],
+      "port": 5173
+    },
+    {
+      "name": "devlog",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "4137", "--directory", "mydevelopertools"],
+      "port": 4137
     }
   ]
 }

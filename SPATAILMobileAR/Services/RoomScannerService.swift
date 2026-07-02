@@ -55,6 +55,8 @@ final class RoomScannerService: NSObject, ObservableObject {
     private var planeAnchors: [UUID: ARPlaneAnchor] = [:]
     private let coverageTargetSqM: Float = 12.0
     private let device = UIDevice.current.modelName
+    /// Last full surface re-extraction (see ingest's debounce).
+    private var lastExtraction = Date.distantPast
 
     func attach(session: ARSession) {
         self.session = session
@@ -379,6 +381,15 @@ extension RoomScannerService: ARSessionDelegate {
             if let mesh = a as? ARMeshAnchor { meshAnchors[a.identifier] = mesh }
             if let plane = a as? ARPlaneAnchor { planeAnchors[a.identifier] = plane }
         }
+        // Debounce the recompute: didUpdate fires many times per second
+        // (plane anchors at high rate, each mesh anchor ~2 Hz) and the
+        // LiDAR path re-walks EVERY face of EVERY mesh anchor on the main
+        // actor — tens of ms per pass on a half-scanned room, which
+        // starves the render loop and the frame-uplink timer. Anchors are
+        // stored above regardless, so snapshotContract() stays fresh.
+        let now = Date()
+        guard now.timeIntervalSince(lastExtraction) >= 0.5 else { return }
+        lastExtraction = now
         // Cheap running coverage: project current buckets without writing.
         let snapshot = lidarAvailable
             ? surfacesFromMeshAnchors()

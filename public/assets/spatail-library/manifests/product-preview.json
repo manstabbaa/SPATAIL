@@ -1,0 +1,728 @@
+{
+  "category": "product-preview",
+  "count": 22,
+  "assets": [
+    {
+      "assetId": "phone",
+      "name": "Phone",
+      "category": "product-preview",
+      "semanticTags": [
+        "phone",
+        "smartphone",
+        "mobile"
+      ],
+      "path": "/assets/spatail-library/product-preview/phone.glb",
+      "scaleMeters": [
+        0.07,
+        0.15,
+        0.008
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "tablet",
+      "name": "Tablet",
+      "category": "product-preview",
+      "semanticTags": [
+        "tablet",
+        "ipad"
+      ],
+      "path": "/assets/spatail-library/product-preview/tablet.glb",
+      "scaleMeters": [
+        0.18,
+        0.25,
+        0.007
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "laptop",
+      "name": "Laptop",
+      "category": "product-preview",
+      "semanticTags": [
+        "laptop",
+        "notebook",
+        "computer"
+      ],
+      "path": "/assets/spatail-library/product-preview/laptop.glb",
+      "scaleMeters": [
+        0.33,
+        0.22,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "monitor",
+      "name": "Monitor",
+      "category": "product-preview",
+      "semanticTags": [
+        "monitor",
+        "display",
+        "screen"
+      ],
+      "path": "/assets/spatail-library/product-preview/monitor.glb",
+      "scaleMeters": [
+        0.6,
+        0.4,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "tv_55_inch",
+      "name": "TV 55\"",
+      "category": "product-preview",
+      "semanticTags": [
+        "tv",
+        "television",
+        "55"
+      ],
+      "path": "/assets/spatail-library/product-preview/tv_55_inch.glb",
+      "scaleMeters": [
+        1.23,
+        0.71,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "tv_65_inch",
+      "name": "TV 65\"",
+      "category": "product-preview",
+      "semanticTags": [
+        "tv",
+        "television",
+        "65"
+      ],
+      "path": "/assets/spatail-library/product-preview/tv_65_inch.glb",
+      "scaleMeters": [
+        1.45,
+        0.83,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "tv_75_inch",
+      "name": "TV 75\"",
+      "category": "product-preview",
+      "semanticTags": [
+        "tv",
+        "television",
+        "75"
+      ],
+      "path": "/assets/spatail-library/product-preview/tv_75_inch.glb",
+      "scaleMeters": [
+        1.67,
+        0.96,
+        0.06
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "speaker",
+      "name": "Speaker",
+      "category": "product-preview",
+      "semanticTags": [
+        "speaker",
+        "audio"
+      ],
+      "path": "/assets/spatail-library/product-preview/speaker.glb",
+      "scaleMeters": [
+        0.2,
+        0.3,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "headphones",
+      "name": "Headphones",
+      "category": "product-preview",
+      "semanticTags": [
+        "headphones",
+        "audio",
+        "headset"
+      ],
+      "path": "/assets/spatail-library/product-preview/headphones.glb",
+      "scaleMeters": [
+        0.18,
+        0.2,
+        0.08
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "watch",
+      "name": "Watch",
+      "category": "product-preview",
+      "semanticTags": [
+        "watch",
+        "smartwatch",
+        "wearable"
+      ],
+      "path": "/assets/spatail-library/product-preview/watch.glb",
+      "scaleMeters": [
+        0.04,
+        0.01,
+        0.04
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "shoe",
+      "name": "Shoe",
+      "category": "product-preview",
+      "semanticTags": [
+        "shoe",
+        "footwear"
+      ],
+      "path": "/assets/spatail-library/product-preview/shoe.glb",
+      "scaleMeters": [
+        0.1,
+        0.12,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "sneaker",
+      "name": "Sneaker",
+      "category": "product-preview",
+      "semanticTags": [
+        "sneaker",
+        "shoe",
+        "trainer"
+      ],
+      "path": "/assets/spatail-library/product-preview/sneaker.glb",
+      "scaleMeters": [
+        0.1,
+        0.12,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "backpack",
+      "name": "Backpack",
+      "category": "product-preview",
+      "semanticTags": [
+        "backpack",
+        "bag"
+      ],
+      "path": "/assets/spatail-library/product-preview/backpack.glb",
+      "scaleMeters": [
+        0.3,
+        0.45,
+        0.18
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bottle",
+      "name": "Bottle",
+      "category": "product-preview",
+      "semanticTags": [
+        "bottle",
+        "drink",
+        "container"
+      ],
+      "path": "/assets/spatail-library/product-preview/bottle.glb",
+      "scaleMeters": [
+        0.07,
+        0.22,
+        0.07
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "mug",
+      "name": "Mug",
+      "category": "product-preview",
+      "semanticTags": [
+        "mug",
+        "cup",
+        "coffee"
+      ],
+      "path": "/assets/spatail-library/product-preview/mug.glb",
+      "scaleMeters": [
+        0.09,
+        0.1,
+        0.09
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "chair_product_pedestal",
+      "name": "Product Chair",
+      "category": "product-preview",
+      "semanticTags": [
+        "chair",
+        "product",
+        "showroom"
+      ],
+      "path": "/assets/spatail-library/product-preview/chair_product_pedestal.glb",
+      "scaleMeters": [
+        0.5,
+        0.9,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "product_display_stand",
+      "name": "Display Stand",
+      "category": "product-preview",
+      "semanticTags": [
+        "stand",
+        "display",
+        "showroom"
+      ],
+      "path": "/assets/spatail-library/product-preview/product_display_stand.glb",
+      "scaleMeters": [
+        0.4,
+        0.1,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "comparison_pedestal",
+      "name": "Comparison Pedestal",
+      "category": "product-preview",
+      "semanticTags": [
+        "pedestal",
+        "compare",
+        "stand"
+      ],
+      "path": "/assets/spatail-library/product-preview/comparison_pedestal.glb",
+      "scaleMeters": [
+        0.3,
+        0.4,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "price_tag_card",
+      "name": "Price Tag Card",
+      "category": "product-preview",
+      "semanticTags": [
+        "price",
+        "tag",
+        "card"
+      ],
+      "path": "/assets/spatail-library/product-preview/price_tag_card.glb",
+      "scaleMeters": [
+        0.1,
+        0.06,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "feature_callout_card",
+      "name": "Feature Callout Card",
+      "category": "product-preview",
+      "semanticTags": [
+        "feature",
+        "callout",
+        "card"
+      ],
+      "path": "/assets/spatail-library/product-preview/feature_callout_card.glb",
+      "scaleMeters": [
+        0.18,
+        0.1,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "dimensions_overlay",
+      "name": "Dimensions Overlay",
+      "category": "product-preview",
+      "semanticTags": [
+        "dimensions",
+        "measure",
+        "overlay"
+      ],
+      "path": "/assets/spatail-library/product-preview/dimensions_overlay.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "material_swatch_card",
+      "name": "Material Swatch Card",
+      "category": "product-preview",
+      "semanticTags": [
+        "material",
+        "swatch",
+        "finish"
+      ],
+      "path": "/assets/spatail-library/product-preview/material_swatch_card.glb",
+      "scaleMeters": [
+        0.08,
+        0.08,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": false,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

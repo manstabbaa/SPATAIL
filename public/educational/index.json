@@ -1,0 +1,142 @@
+{
+  "mode": "educational_wrapper",
+  "book": "SPATAIL General Science & Technology Reader",
+  "count": 15,
+  "experiences": [
+    {
+      "conceptId": "photosynthesis",
+      "title": "Photosynthesis",
+      "selectedText": "photosynthesis",
+      "preferredRepresentation": "animated_process",
+      "strategy": "animated_simulation",
+      "domain": "biological",
+      "path": "/educational/experiences/photosynthesis.json"
+    },
+    {
+      "conceptId": "cell_division",
+      "title": "Cell Division",
+      "selectedText": "cell division",
+      "preferredRepresentation": "timeline",
+      "strategy": "timeline",
+      "domain": "biological",
+      "path": "/educational/experiences/cell_division.json"
+    },
+    {
+      "conceptId": "gravity",
+      "title": "Gravity",
+      "selectedText": "gravity pulls objects toward Earth",
+      "preferredRepresentation": "cause_effect_visualization",
+      "strategy": "cause_and_effect",
+      "domain": "scientific",
+      "path": "/educational/experiences/gravity.json"
+    },
+    {
+      "conceptId": "v8_engine",
+      "title": "V8 Engine",
+      "selectedText": "V8 engine",
+      "preferredRepresentation": "cutaway_view",
+      "strategy": "cutaway_view",
+      "domain": "mechanical",
+      "path": "/educational/experiences/v8_engine.json"
+    },
+    {
+      "conceptId": "solar_system",
+      "title": "Solar System",
+      "selectedText": "solar system",
+      "preferredRepresentation": "scale_compression",
+      "strategy": "real_scale_placement",
+      "domain": "scientific",
+      "path": "/educational/experiences/solar_system.json"
+    },
+    {
+      "conceptId": "roman_colosseum",
+      "title": "Roman Colosseum",
+      "selectedText": "Roman Colosseum",
+      "preferredRepresentation": "guided_tour",
+      "strategy": "guided_narrative",
+      "domain": "architectural",
+      "path": "/educational/experiences/roman_colosseum.json"
+    },
+    {
+      "conceptId": "bridge_construction",
+      "title": "Bridge Construction",
+      "selectedText": "bridge construction",
+      "preferredRepresentation": "assembly_sequence",
+      "strategy": "assembly_sequence",
+      "domain": "architectural",
+      "path": "/educational/experiences/bridge_construction.json"
+    },
+    {
+      "conceptId": "human_heart",
+      "title": "The Human Heart",
+      "selectedText": "the human heart",
+      "preferredRepresentation": "animated_process",
+      "strategy": "animated_simulation",
+      "domain": "biological",
+      "path": "/educational/experiences/human_heart.json"
+    },
+    {
+      "conceptId": "dna",
+      "title": "DNA",
+      "selectedText": "DNA",
+      "preferredRepresentation": "layered_breakdown",
+      "strategy": "layered_breakdown",
+      "domain": "biological",
+      "path": "/educational/experiences/dna.json"
+    },
+    {
+      "conceptId": "atom",
+      "title": "The Atom",
+      "selectedText": "the atom",
+      "preferredRepresentation": "animated_process",
+      "strategy": "animated_simulation",
+      "domain": "scientific",
+      "path": "/educational/experiences/atom.json"
+    },
+    {
+      "conceptId": "lever",
+      "title": "The Lever",
+      "selectedText": "the lever",
+      "preferredRepresentation": "cause_effect_visualization",
+      "strategy": "cause_and_effect",
+      "domain": "general_knowledge",
+      "path": "/educational/experiences/lever.json"
+    },
+    {
+      "conceptId": "gears",
+      "title": "Gears",
+      "selectedText": "gears",
+      "preferredRepresentation": "animated_process",
+      "strategy": "animated_simulation",
+      "domain": "general_knowledge",
+      "path": "/educational/experiences/gears.json"
+    },
+    {
+      "conceptId": "pendulum",
+      "title": "The Pendulum",
+      "selectedText": "the pendulum",
+      "preferredRepresentation": "animated_process",
+      "strategy": "animated_simulation",
+      "domain": "general_knowledge",
+      "path": "/educational/experiences/pendulum.json"
+    },
+    {
+      "conceptId": "moon_phases",
+      "title": "Moon Phases",
+      "selectedText": "moon phases",
+      "preferredRepresentation": "animated_process",
+      "strategy": "animated_simulation",
+      "domain": "general_knowledge",
+      "path": "/educational/experiences/moon_phases.json"
+    },
+    {
+      "conceptId": "skyscraper",
+      "title": "Skyscrapers",
+      "selectedText": "skyscraper",
+      "preferredRepresentation": "assembly_sequence",
+      "strategy": "assembly_sequence",
+      "domain": "general_knowledge",
+      "path": "/educational/experiences/skyscraper.json"
+    }
+  ]
+}

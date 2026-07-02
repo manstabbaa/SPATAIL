@@ -1,0 +1,1018 @@
+{
+  "category": "primitives",
+  "count": 29,
+  "assets": [
+    {
+      "assetId": "cube",
+      "name": "Cube",
+      "category": "primitives",
+      "semanticTags": [
+        "box",
+        "cube",
+        "block"
+      ],
+      "path": "/assets/spatail-library/primitives/cube.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "rounded_cube",
+      "name": "Rounded Cube",
+      "category": "primitives",
+      "semanticTags": [
+        "box",
+        "rounded",
+        "cube"
+      ],
+      "path": "/assets/spatail-library/primitives/rounded_cube.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "rounded_cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "sphere",
+      "name": "Sphere",
+      "category": "primitives",
+      "semanticTags": [
+        "ball",
+        "sphere",
+        "orb"
+      ],
+      "path": "/assets/spatail-library/primitives/sphere.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "half_sphere",
+      "name": "Half Sphere",
+      "category": "primitives",
+      "semanticTags": [
+        "dome",
+        "hemisphere"
+      ],
+      "path": "/assets/spatail-library/primitives/half_sphere.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "half_sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "cylinder",
+      "name": "Cylinder",
+      "category": "primitives",
+      "semanticTags": [
+        "tube",
+        "cylinder",
+        "rod"
+      ],
+      "path": "/assets/spatail-library/primitives/cylinder.glb",
+      "scaleMeters": [
+        0.08,
+        0.16,
+        0.08
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "cone",
+      "name": "Cone",
+      "category": "primitives",
+      "semanticTags": [
+        "cone",
+        "tip"
+      ],
+      "path": "/assets/spatail-library/primitives/cone.glb",
+      "scaleMeters": [
+        0.1,
+        0.16,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "capsule",
+      "name": "Capsule",
+      "category": "primitives",
+      "semanticTags": [
+        "pill",
+        "capsule"
+      ],
+      "path": "/assets/spatail-library/primitives/capsule.glb",
+      "scaleMeters": [
+        0.06,
+        0.16,
+        0.06
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "torus",
+      "name": "Torus",
+      "category": "primitives",
+      "semanticTags": [
+        "ring",
+        "donut",
+        "torus"
+      ],
+      "path": "/assets/spatail-library/primitives/torus.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "plane",
+      "name": "Plane",
+      "category": "primitives",
+      "semanticTags": [
+        "plane",
+        "quad",
+        "surface"
+      ],
+      "path": "/assets/spatail-library/primitives/plane.glb",
+      "scaleMeters": [
+        0.4,
+        0.01,
+        0.4
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "curved_plane",
+      "name": "Curved Plane",
+      "category": "primitives",
+      "semanticTags": [
+        "curved",
+        "panel",
+        "screen"
+      ],
+      "path": "/assets/spatail-library/primitives/curved_plane.glb",
+      "scaleMeters": [
+        0.6,
+        0.01,
+        0.3
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "ring",
+      "name": "Ring",
+      "category": "primitives",
+      "semanticTags": [
+        "ring",
+        "circle",
+        "annulus"
+      ],
+      "path": "/assets/spatail-library/primitives/ring.glb",
+      "scaleMeters": [
+        0.2,
+        0.01,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "arrow_straight",
+      "name": "Straight Arrow",
+      "category": "primitives",
+      "semanticTags": [
+        "arrow",
+        "pointer",
+        "direction"
+      ],
+      "path": "/assets/spatail-library/primitives/arrow_straight.glb",
+      "scaleMeters": [
+        0.04,
+        0.04,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "arrow",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "arrow_curved",
+      "name": "Curved Arrow",
+      "category": "primitives",
+      "semanticTags": [
+        "arrow",
+        "curved",
+        "rotate"
+      ],
+      "path": "/assets/spatail-library/primitives/arrow_curved.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "arrow",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "arrow_circular",
+      "name": "Circular Arrow",
+      "category": "primitives",
+      "semanticTags": [
+        "arrow",
+        "loop",
+        "cycle"
+      ],
+      "path": "/assets/spatail-library/primitives/arrow_circular.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "line_segment",
+      "name": "Line Segment",
+      "category": "primitives",
+      "semanticTags": [
+        "line",
+        "edge",
+        "connector"
+      ],
+      "path": "/assets/spatail-library/primitives/line_segment.glb",
+      "scaleMeters": [
+        0.005,
+        0.005,
+        0.3
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "dotted_line",
+      "name": "Dotted Line",
+      "category": "primitives",
+      "semanticTags": [
+        "dotted",
+        "line",
+        "guide"
+      ],
+      "path": "/assets/spatail-library/primitives/dotted_line.glb",
+      "scaleMeters": [
+        0.005,
+        0.005,
+        0.3
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "arc_line",
+      "name": "Arc Line",
+      "category": "primitives",
+      "semanticTags": [
+        "arc",
+        "curve",
+        "line"
+      ],
+      "path": "/assets/spatail-library/primitives/arc_line.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "axis_tripod",
+      "name": "Axis Tripod",
+      "category": "primitives",
+      "semanticTags": [
+        "axis",
+        "xyz",
+        "gizmo",
+        "orientation"
+      ],
+      "path": "/assets/spatail-library/primitives/axis_tripod.glb",
+      "scaleMeters": [
+        0.15,
+        0.15,
+        0.15
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "arrow",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "grid_plane",
+      "name": "Grid Plane",
+      "category": "primitives",
+      "semanticTags": [
+        "grid",
+        "floor",
+        "guide"
+      ],
+      "path": "/assets/spatail-library/primitives/grid_plane.glb",
+      "scaleMeters": [
+        1.0,
+        0.01,
+        1.0
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "measuring_ruler",
+      "name": "Measuring Ruler",
+      "category": "primitives",
+      "semanticTags": [
+        "ruler",
+        "measure",
+        "scale"
+      ],
+      "path": "/assets/spatail-library/primitives/measuring_ruler.glb",
+      "scaleMeters": [
+        0.3,
+        0.01,
+        0.03
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "scale_marker",
+      "name": "Scale Marker",
+      "category": "primitives",
+      "semanticTags": [
+        "scale",
+        "marker",
+        "tick"
+      ],
+      "path": "/assets/spatail-library/primitives/scale_marker.glb",
+      "scaleMeters": [
+        0.02,
+        0.1,
+        0.02
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bounding_box_frame",
+      "name": "Bounding Box Frame",
+      "category": "primitives",
+      "semanticTags": [
+        "bbox",
+        "frame",
+        "bounds"
+      ],
+      "path": "/assets/spatail-library/primitives/bounding_box_frame.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "transparent_box_volume",
+      "name": "Transparent Box Volume",
+      "category": "primitives",
+      "semanticTags": [
+        "volume",
+        "glass",
+        "region"
+      ],
+      "path": "/assets/spatail-library/primitives/transparent_box_volume.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "platform_circular",
+      "name": "Circular Platform",
+      "category": "primitives",
+      "semanticTags": [
+        "platform",
+        "base",
+        "stage"
+      ],
+      "path": "/assets/spatail-library/primitives/platform_circular.glb",
+      "scaleMeters": [
+        0.4,
+        0.03,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "platform_rectangular",
+      "name": "Rectangular Platform",
+      "category": "primitives",
+      "semanticTags": [
+        "platform",
+        "base",
+        "stage"
+      ],
+      "path": "/assets/spatail-library/primitives/platform_rectangular.glb",
+      "scaleMeters": [
+        0.5,
+        0.03,
+        0.35
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pedestal",
+      "name": "Pedestal",
+      "category": "primitives",
+      "semanticTags": [
+        "pedestal",
+        "stand",
+        "plinth"
+      ],
+      "path": "/assets/spatail-library/primitives/pedestal.glb",
+      "scaleMeters": [
+        0.25,
+        0.4,
+        0.25
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "floor_shadow_disk",
+      "name": "Floor Shadow Disk",
+      "category": "primitives",
+      "semanticTags": [
+        "shadow",
+        "ground",
+        "contact"
+      ],
+      "path": "/assets/spatail-library/primitives/floor_shadow_disk.glb",
+      "scaleMeters": [
+        0.3,
+        0.01,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "glow_ring",
+      "name": "Glow Ring",
+      "category": "primitives",
+      "semanticTags": [
+        "glow",
+        "ring",
+        "highlight"
+      ],
+      "path": "/assets/spatail-library/primitives/glow_ring.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "anchor_reticle",
+      "name": "Anchor Reticle",
+      "category": "primitives",
+      "semanticTags": [
+        "anchor",
+        "reticle",
+        "target"
+      ],
+      "path": "/assets/spatail-library/primitives/anchor_reticle.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

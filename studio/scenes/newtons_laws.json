@@ -1,0 +1,37 @@
+{
+  "sceneId": "newtons_laws",
+  "title": "Newton's Three Laws of Motion",
+  "subject": "physics",
+  "narrationTone": "warm, curious, classroom",
+  "summary": "Three short physical demos, one per law, laid out left-to-right on the studio stage so a learner can compare them at a glance.",
+  "beats": [
+    {
+      "id": "law1_inertia",
+      "law": "First Law",
+      "subtitle": "Inertia",
+      "title": "An object in motion stays in motion",
+      "narration": "With nothing to slow it down, the puck keeps gliding at the same speed forever. That tendency to keep doing what it's already doing is inertia.",
+      "demo": "constant_velocity_puck",
+      "params": { "velocity_mps": 0.22, "surface_len_m": 0.9 }
+    },
+    {
+      "id": "law2_fma",
+      "law": "Second Law",
+      "subtitle": "F = ma",
+      "title": "Force equals mass times acceleration",
+      "narration": "Gravity pulls the ball down the ramp. The steeper the slope, the larger the force, and the faster the ball speeds up. Watch the gaps grow as it accelerates.",
+      "demo": "inclined_plane",
+      "params": { "angle_deg": 22, "ramp_len_m": 0.9, "ball_radius_m": 0.05 }
+    },
+    {
+      "id": "law3_action_reaction",
+      "law": "Third Law",
+      "subtitle": "Action & Reaction",
+      "title": "Every action has an equal and opposite reaction",
+      "narration": "Release the spring and both carts shove off each other. The push is equal both ways, so the lighter cart leaves faster than the heavy one.",
+      "demo": "spring_carts",
+      "params": { "mass_ratio": 2.0, "separation_speed_mps": 0.28 }
+    }
+  ],
+  "_note": "Declarative storyboard. Director owns narration/order; Artist owns `demo` + `params` (the physics it builds in Blender); Developer owns nothing here — it stages by rule via xr_design."
+}

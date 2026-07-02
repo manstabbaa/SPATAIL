@@ -1,0 +1,69 @@
+AXICOOL 60 — AXIAL COOLING FAN
+User Manual & Quick-Start Guide
+Model AC-60X · 60 × 60 × 10 mm · 12 V DC
+
+------------------------------------------------------------
+IN THE BOX
+------------------------------------------------------------
+- 1 × AxiCool 60 axial fan (frame + 7-blade rotor)
+- 4 × M3 mounting screws
+- 1 × 2-pin power lead
+
+------------------------------------------------------------
+KNOW YOUR FAN
+------------------------------------------------------------
+The fan has two main parts. The square FRAME holds the fan in
+place and protects the moving parts. The ROTOR is the spinning
+hub with seven curved BLADES that move the air. The blades are
+angled like shallow ramps so that, as the rotor turns, they
+scoop air and push it through the frame.
+
+------------------------------------------------------------
+STEP 1 — IDENTIFY THE AIRFLOW DIRECTION
+------------------------------------------------------------
+Look at the curve of the blades. Air is pulled in on the intake
+side and pushed out the exhaust side. Mount the fan so the
+exhaust faces the component you want to cool.
+
+------------------------------------------------------------
+STEP 2 — MOUNT THE FRAME
+------------------------------------------------------------
+Align the four corner holes of the frame with the mounting
+points. Insert an M3 screw into each corner and tighten gently.
+Do not overtighten — the frame is plastic and can crack.
+
+------------------------------------------------------------
+STEP 3 — CONNECT POWER
+------------------------------------------------------------
+Plug the 2-pin lead into a 12 V DC header. Red is positive,
+black is ground. The motor inside the hub drives the rotor.
+
+------------------------------------------------------------
+STEP 4 — POWER ON AND SPIN UP
+------------------------------------------------------------
+Apply power. The hub begins to turn, carrying all seven blades
+as a single rigid assembly. Within one second the rotor reaches
+full speed and a steady stream of air flows through the frame.
+
+------------------------------------------------------------
+STEP 5 — VERIFY AIRFLOW
+------------------------------------------------------------
+Hold a slip of paper near the exhaust side. It should flutter
+steadily, confirming continuous airflow. The faster the blades
+spin, the more air is moved per second.
+
+------------------------------------------------------------
+STEP 6 — MAINTENANCE
+------------------------------------------------------------
+Every few months, power down and let the rotor stop completely.
+Gently clear dust from the blades with a soft brush. Never insert
+objects into the spinning rotor.
+
+------------------------------------------------------------
+SPECIFICATIONS
+------------------------------------------------------------
+Voltage:        12 V DC
+Airflow:        ~12 CFM
+Noise:          22 dBA
+Bearing:        sleeve
+Blade count:    7

@@ -1,0 +1,13 @@
+{
+  "target_bounds_m": {
+    "x": 1.0,
+    "y": 1.0,
+    "z": 1.0
+  },
+  "bounds_mode": "fit_longest_axis",
+  "origin_mode": "bottom_center",
+  "unit_system": "meters",
+  "generate_preview": true,
+  "generate_collision_proxy": false,
+  "generate_lods": false
+}

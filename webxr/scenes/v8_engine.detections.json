@@ -1,0 +1,11 @@
+{
+  "_comment": "SAMPLE live-detection stream for the 'Live feed' overlay. In production this is emitted in real time by the video-intelligence path (studio/director/vision.py + studio/vision/ → Gemini open-vocabulary detect) as the user looks at a REAL engine. Each detection renders through the SAME identify/hitbox overlay as authored elements, closing the loop to placement-recognition (MF p28/p40). Boxes are in metres in the viewer's world frame; a real feed supplies these from camera→world projection.",
+  "frameId": "demo-0001",
+  "source": "webcam",
+  "detections": [
+    { "label": "Intake manifold", "confidence": 0.93, "source": "gemini-vision", "position": [-0.55, 1.05, 0.6], "sizeMeters": [0.34, 0.16, 0.22] },
+    { "label": "Oil filler cap", "confidence": 0.81, "source": "gemini-vision", "position": [-0.2, 1.18, 0.7], "sizeMeters": [0.08, 0.08, 0.08] },
+    { "label": "Battery terminal (+)", "confidence": 0.76, "source": "gemini-vision", "position": [0.5, 1.0, 0.62], "sizeMeters": [0.1, 0.08, 0.1] },
+    { "label": "Dipstick", "confidence": 0.68, "source": "on-device-tracker", "position": [0.15, 1.0, 0.78], "sizeMeters": [0.04, 0.22, 0.04] }
+  ]
+}

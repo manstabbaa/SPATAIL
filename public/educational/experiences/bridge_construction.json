@@ -1,0 +1,878 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "bridge construction",
+  "surroundingContext": "Bridge construction is a sequence of structural steps. Builders must create stable foundations, raise supports, connect load-bearing members, and add the deck. Different bridge types use different strategies, but all must transfer loads safely to the ground.\n\nThe best SPATAIL representation is an assembly sequence. Instead of showing a completed bridge only, the app should build the bridge in stages and show how forces travel through the structure.",
+  "learningGoal": "Explain how a bridge is assembled from foundations to deck and cables.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "assembly_sequence",
+  "conceptId": "bridge_construction",
+  "spatailPrompt": "Create an educational spatial explanation of \"bridge construction\". Learning goal: Explain how a bridge is assembled from foundations to deck and cables. Prefer a assembly sequence with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"Bridge construction is a sequence of structural steps. Builders must create stable foundations, raise supports, connect load-bearing members, and add the deck. Different bridge types use different strategies, but all must transfer loads safely to the ground.\n\nThe best SPATAIL representation is an assembly sequence. Instead of showing a completed bridge only, the app should build the bridge in stag\".",
+  "experienceBeats": [
+    "Start with foundations and piers",
+    "Add towers or supports",
+    "Connect cables or trusses",
+    "Place deck sections step by step",
+    "Highlight load paths through the structure"
+  ],
+  "interactions": [
+    "step_through_explanation",
+    "tap_to_highlight",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_bridge_construction",
+    "domain": "architectural",
+    "intent": "explain",
+    "strategy": "assembly_sequence",
+    "subject": "Bridge Construction",
+    "placement": {
+      "anchor": "floor",
+      "layout": "line",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.95,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> assembly_sequence. Build the subject up step by step in space so order and fit are felt — best for how-it-goes-together tasks.",
+    "experienceBeats": [
+      {
+        "id": "start_with_foundations_and_piers",
+        "title": "Start with foundations and piers",
+        "narration": "Start with foundations and piers",
+        "focus": "bridge_construction",
+        "reveal": "auto"
+      },
+      {
+        "id": "add_towers_or_supports",
+        "title": "Add towers or supports",
+        "narration": "Add towers or supports",
+        "focus": "bridge_construction",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "connect_cables_or_trusses",
+        "title": "Connect cables or trusses",
+        "narration": "Connect cables or trusses",
+        "focus": "bridge_construction",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "place_deck_sections_step_by_step",
+        "title": "Place deck sections step by step",
+        "narration": "Place deck sections step by step",
+        "focus": "bridge_construction",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "highlight_load_paths_through_the_structu",
+        "title": "Highlight load paths through the structure",
+        "narration": "Highlight load paths through the structure",
+        "focus": "bridge_construction",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "bridge_construction",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "bridge_construction_base",
+        "type": "part",
+        "priority": 1
+      },
+      {
+        "id": "bridge_construction_mid",
+        "type": "part",
+        "priority": 1
+      },
+      {
+        "id": "bridge_construction_top",
+        "type": "part",
+        "priority": 2
+      }
+    ],
+    "requiredAnimations": [
+      {
+        "id": "bridge_construction_assemble",
+        "targetAsset": "bridge_construction",
+        "motion": "assemble",
+        "note": "per-step seat-into-place tween"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "step_through",
+        "type": "play_baked",
+        "label": "Step through assembly",
+        "params": {
+          "loop": false
+        }
+      },
+      {
+        "id": "highlight_part",
+        "type": "tap_reveal",
+        "label": "Tap the active part",
+        "params": {}
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_bridge_construction",
+    "subject": "Bridge Construction",
+    "strategy": "assembly_sequence",
+    "assetRequests": [
+      {
+        "assetId": "bridge_construction",
+        "description": "complete Bridge Construction, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "complete",
+          "staged"
+        ],
+        "requiredAnimations": [
+          "assemble"
+        ]
+      },
+      {
+        "assetId": "bridge_construction_base",
+        "description": "the bridge construction base component of the Bridge Construction",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "highlightable",
+          "staged"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "bridge_construction_mid",
+        "description": "the bridge construction mid component of the Bridge Construction",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "highlightable",
+          "staged"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "bridge_construction_top",
+        "description": "the bridge construction top component of the Bridge Construction",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "highlightable",
+          "staged"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T20:30:00.340922+00:00",
+    "sceneId": "edu_bridge_construction",
+    "title": "Bridge Construction",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"bridge construction\". Learning goal: Explain how a bridge is assembled from foundations to deck and cables. Prefer a assembly sequence with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"Bridge construction is a sequence of structural steps. Builders must create stable foundations, raise supports, connect load-bearing members, and add the deck. Different bridge types use different strategies, but all must transfer loads safely to the ground.\n\nThe best SPATAIL representation is an assembly sequence. Instead of showing a completed bridge only, the app should build the bridge in stag\".",
+      "subject": "Bridge Construction",
+      "domain": "architectural",
+      "intent": "explain",
+      "strategy": "assembly_sequence"
+    },
+    "domain": {
+      "name": "architectural",
+      "confidence": "high",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "architectural",
+      "intent": "explain",
+      "strategy": "assembly_sequence",
+      "subject": "Bridge Construction",
+      "reasoning": "caller override -> assembly_sequence. Build the subject up step by step in space so order and fit are felt — best for how-it-goes-together tasks.",
+      "domainConfidence": 0.95,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "floor",
+      "layout": "line",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "/assets/spatail-library/architecture/truss_segment.glb",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": "bridge_construction_assemble",
+        "fps": 30,
+        "loop": true,
+        "count": 1
+      },
+      "bbox": {
+        "min": [
+          -0.3,
+          0.0,
+          -0.15
+        ],
+        "max": [
+          0.3,
+          0.1,
+          0.15
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 2.5,
+      "baseline_z_m": 0.9186
+    },
+    "staging": {
+      "distance_m": 2.5,
+      "spread_deg": 30.0,
+      "reasoning": "4 exhibit(s) on a line at 2.5 m, dropped 12.0 deg along the natural gaze; anchor=floor."
+    },
+    "beats": [
+      {
+        "id": "start_with_foundations_and_piers",
+        "title": "Start with foundations and piers",
+        "narration": "Start with foundations and piers",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "add_towers_or_supports",
+        "title": "Add towers or supports",
+        "narration": "Add towers or supports",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "connect_cables_or_trusses",
+        "title": "Connect cables or trusses",
+        "narration": "Connect cables or trusses",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "place_deck_sections_step_by_step",
+        "title": "Place deck sections step by step",
+        "narration": "Place deck sections step by step",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "highlight_load_paths_through_the_structu",
+        "title": "Highlight load paths through the structure",
+        "narration": "Highlight load paths through the structure",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "start_with_foundations_and_piers",
+        "title": "Start with foundations and piers",
+        "description": "Start with foundations and piers",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "add_towers_or_supports",
+        "title": "Add towers or supports",
+        "description": "Add towers or supports",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "connect_cables_or_trusses",
+        "title": "Connect cables or trusses",
+        "description": "Connect cables or trusses",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "place_deck_sections_step_by_step",
+        "title": "Place deck sections step by step",
+        "description": "Place deck sections step by step",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "highlight_load_paths_through_the_structu",
+        "title": "Highlight load paths through the structure",
+        "description": "Highlight load paths through the structure",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "step_through",
+        "type": "play_baked",
+        "label": "Step through assembly",
+        "params": {
+          "loop": false
+        },
+        "trigger": "on_tap"
+      },
+      {
+        "id": "highlight_part",
+        "type": "tap_reveal",
+        "label": "Tap the active part",
+        "params": {},
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "bridge_construction",
+        "role": "primary_object",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/architecture/truss_segment.glb",
+        "footprint": {
+          "w": 0.6,
+          "h": 0.1,
+          "d": 0.3
+        },
+        "position_yup": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/truss_segment.usdz",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "bridge_construction_base",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/architecture/foundation_block.glb",
+        "footprint": {
+          "w": 0.5,
+          "h": 0.5,
+          "d": 0.2
+        },
+        "position_yup": [
+          -0.2179,
+          0.9186,
+          -2.4905
+        ],
+        "yaw_rad": 0.0873,
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/foundation_block.usdz",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "bridge_construction_mid",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/architecture/bridge_deck.glb",
+        "footprint": {
+          "w": 1.5,
+          "h": 0.4,
+          "d": 0.1
+        },
+        "position_yup": [
+          0.2179,
+          0.9186,
+          -2.4905
+        ],
+        "yaw_rad": -0.0873,
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/bridge_deck.usdz",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "bridge_construction_top",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/architecture/bridge_deck.glb",
+        "footprint": {
+          "w": 1.5,
+          "h": 0.4,
+          "d": 0.1
+        },
+        "position_yup": [
+          0.647,
+          0.9186,
+          -2.4148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/bridge_deck.usdz",
+        "fallbackPrimitive": "cube"
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "bridge construction",
+      "surroundingContext": "Bridge construction is a sequence of structural steps. Builders must create stable foundations, raise supports, connect load-bearing members, and add the deck. Different bridge types use different strategies, but all must transfer loads safely to the ground.\n\nThe best SPATAIL representation is an assembly sequence. Instead of showing a completed bridge only, the app should build the bridge in stages and show how forces travel through the structure.",
+      "learningGoal": "Explain how a bridge is assembled from foundations to deck and cables.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "assembly_sequence",
+      "conceptId": "bridge_construction",
+      "spatailPrompt": "Create an educational spatial explanation of \"bridge construction\". Learning goal: Explain how a bridge is assembled from foundations to deck and cables. Prefer a assembly sequence with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"Bridge construction is a sequence of structural steps. Builders must create stable foundations, raise supports, connect load-bearing members, and add the deck. Different bridge types use different strategies, but all must transfer loads safely to the ground.\n\nThe best SPATAIL representation is an assembly sequence. Instead of showing a completed bridge only, the app should build the bridge in stag\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_bridge_construction",
+    "assets": [
+      {
+        "assetId": "bridge_construction",
+        "path": "/assets/spatail-library/architecture/truss_segment.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/architecture/truss_segment.glb",
+          "staged": "/assets/spatail-library/architecture/truss_segment_staged.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.3,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.3,
+              0.15,
+              0.1
+            ],
+            "size": [
+              0.6,
+              0.3,
+              0.1
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.05
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "line"
+          },
+          "realWorldScale": [
+            0.6,
+            0.3,
+            0.1
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "truss_segment",
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/truss_segment.usdz"
+      },
+      {
+        "assetId": "bridge_construction_base",
+        "path": "/assets/spatail-library/architecture/foundation_block.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/architecture/foundation_block.glb",
+          "highlightable": "/assets/spatail-library/architecture/foundation_block_highlightable.glb",
+          "staged": "/assets/spatail-library/architecture/foundation_block_staged.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.25,
+              -0.1,
+              0.0
+            ],
+            "max": [
+              0.25,
+              0.1,
+              0.5
+            ],
+            "size": [
+              0.5,
+              0.2,
+              0.5
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.25
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "line"
+          },
+          "realWorldScale": [
+            0.5,
+            0.2,
+            0.5
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "foundation_block",
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/foundation_block.usdz"
+      },
+      {
+        "assetId": "bridge_construction_mid",
+        "path": "/assets/spatail-library/architecture/bridge_deck.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/architecture/bridge_deck.glb",
+          "highlightable": "/assets/spatail-library/architecture/bridge_deck_highlightable.glb",
+          "staged": "/assets/spatail-library/architecture/bridge_deck_staged.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.75,
+              -0.05,
+              0.0
+            ],
+            "max": [
+              0.75,
+              0.05,
+              0.4
+            ],
+            "size": [
+              1.5,
+              0.1,
+              0.4
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.2
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "line"
+          },
+          "realWorldScale": [
+            1.5,
+            0.1,
+            0.4
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "bridge_deck",
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/bridge_deck.usdz"
+      },
+      {
+        "assetId": "bridge_construction_top",
+        "path": "/assets/spatail-library/architecture/bridge_deck.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/architecture/bridge_deck.glb",
+          "highlightable": "/assets/spatail-library/architecture/bridge_deck_highlightable.glb",
+          "staged": "/assets/spatail-library/architecture/bridge_deck_staged.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.75,
+              -0.05,
+              0.0
+            ],
+            "max": [
+              0.75,
+              0.05,
+              0.4
+            ],
+            "size": [
+              1.5,
+              0.1,
+              0.4
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.2
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "line"
+          },
+          "realWorldScale": [
+            1.5,
+            0.1,
+            0.4
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "bridge_deck",
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/bridge_deck.usdz"
+      }
+    ],
+    "animations": [
+      {
+        "animationId": "bridge_construction_assemble",
+        "targetAssets": [
+          "bridge_construction"
+        ],
+        "type": "assemble",
+        "path": ""
+      }
+    ]
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "bridge_construction"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream bridge_construction",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "bridge_construction"
+          ],
+          "unlocks": [
+            "swap_placeholder:bridge_construction"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream bridge_construction_base",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "bridge_construction_base"
+          ],
+          "unlocks": [
+            "swap_placeholder:bridge_construction_base"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "stream bridge_construction_mid",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "bridge_construction_mid"
+          ],
+          "unlocks": [
+            "swap_placeholder:bridge_construction_mid"
+          ]
+        },
+        {
+          "phase": 4,
+          "label": "stream bridge_construction_top",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "bridge_construction_top"
+          ],
+          "unlocks": [
+            "swap_placeholder:bridge_construction_top"
+          ]
+        },
+        {
+          "phase": 5,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "animation:bridge_construction_assemble",
+            "interaction:step_through",
+            "interaction:highlight_part"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "floor",
+      "title": "Bridge Construction",
+      "firstBeat": "Start with foundations and piers",
+      "placeholders": [
+        {
+          "assetId": "bridge_construction",
+          "primitive": "box",
+          "position_yup": [
+            -0.647,
+            0.9186,
+            -2.4148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "bridge construction"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "step_through": {
+        "enabledAfterPhase": 5,
+        "type": "play_baked",
+        "targetAssets": [
+          "bridge_construction",
+          "bridge_construction_base",
+          "bridge_construction_mid",
+          "bridge_construction_top"
+        ]
+      },
+      "highlight_part": {
+        "enabledAfterPhase": 5,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "bridge_construction",
+          "bridge_construction_base",
+          "bridge_construction_mid",
+          "bridge_construction_top"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "step_through",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "highlight_part",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

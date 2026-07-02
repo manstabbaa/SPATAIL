@@ -1,0 +1,7 @@
+{
+  "name": "spatail-asset-factory",
+  "version": "0.1.0",
+  "description": "Create XR-ready SPATAIL 3D assets: ingest a raw AI-generated model (Meshy/Tripo/Rodin/Luma), clean and normalize it to fixed bounds, and export a GLB + USDZ + preview you can view live.",
+  "author": { "name": "SPATAIL" },
+  "keywords": ["spatail", "3d", "asset", "usdz", "glb", "blender", "xr", "normalize", "asset-factory"]
+}

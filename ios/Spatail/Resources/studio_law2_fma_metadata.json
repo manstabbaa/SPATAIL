@@ -1,0 +1,75 @@
+{
+  "sceneId": "newtons_laws",
+  "title": "Newton's Three Laws of Motion",
+  "glb": "studio/out/studio_law2_fma.glb",
+  "usdz": "studio/out/studio_law2_fma.usdz",
+  "frame": "y_up_m",
+  "mode": "ar_single",
+  "animation": {
+    "clip": "studio_demo",
+    "fps": 30,
+    "frames": 120,
+    "seconds": 4.0,
+    "loop": true
+  },
+  "room": {
+    "w": 6.0,
+    "d": 6.0,
+    "h": 3.0
+  },
+  "user": {
+    "eye_height_m": 1.45
+  },
+  "bbox_yup_m": {
+    "min": [
+      -0.4438,
+      -0.0116,
+      0.1
+    ],
+    "max": [
+      0.4372,
+      0.4451,
+      -0.1
+    ]
+  },
+  "staging": {
+    "distance_m": null,
+    "spread_deg": 0.0,
+    "reasoning": "Single exhibit centred for AR; device places it via SPATAIL ANALYSIS."
+  },
+  "beats": [
+    {
+      "id": "law2_fma",
+      "law": "Second Law",
+      "subtitle": "F = ma",
+      "title": "Force equals mass times acceleration",
+      "narration": "Gravity pulls the ball down the ramp. The steeper the slope, the larger the force, and the faster the ball speeds up. Watch the gaps grow as it accelerates.",
+      "demo": "inclined_plane",
+      "motion": [
+        {
+          "module": "accelerate_down_slope",
+          "a_mps2": 3.675,
+          "length_m": 0.9,
+          "angle_deg": 22.0
+        }
+      ],
+      "footprint_m": {
+        "w": 0.8945,
+        "d": 0.3578,
+        "h": 0.6137
+      },
+      "anchor_yup_m": [
+        0,
+        0,
+        0
+      ],
+      "label_anchor_yup_m": [
+        0,
+        0,
+        -0.5451
+      ],
+      "distance_m": null,
+      "in_comfort_cone": true
+    }
+  ]
+}

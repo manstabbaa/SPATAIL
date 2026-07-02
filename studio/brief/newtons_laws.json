@@ -1,0 +1,10 @@
+{
+  "briefId": "newtons_laws",
+  "prompt": "Explain Newton's three laws of motion with a hands-on spatial demo",
+  "image": null,
+  "audience": "high-school physics student",
+  "learningGoal": "Build intuition for inertia, F = ma, and action-reaction by watching real motion at human scale",
+  "subject": "physics",
+  "scene": "newtons_laws",
+  "_note": "Input to the pipeline. The Director turns this into a storyboard; the Artist builds + animates each beat; the Developer stages them in the studio."
+}

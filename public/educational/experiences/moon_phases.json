@@ -1,0 +1,663 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "moon phases",
+  "surroundingContext": "The Moon does not make its own light; we see the half lit by the Sun. As the Moon orbits Earth, we view that lit half from changing angles, so it appears to grow and shrink through its phases.\n\nA spatial scene should place the Sun, Earth, and Moon and animate the orbit to show why the lit fraction changes.",
+  "learningGoal": "Explain why the Moon shows different phases from Earth.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "animated_process",
+  "conceptId": "moon_phases",
+  "spatailPrompt": "Create an educational spatial explanation of \"moon phases\". Learning goal: Explain why the Moon shows different phases from Earth. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"The Moon does not make its own light; we see the half lit by the Sun. As the Moon orbits Earth, we view that lit half from changing angles, so it appears to grow and shrink through its phases.\n\nA spatial scene should place the Sun, Earth, and Moon and animate the orbit to show why the lit fraction changes.\".",
+  "experienceBeats": [
+    "Place Earth with the Moon in orbit",
+    "Light the Moon from the Sun's side",
+    "Animate the Moon around Earth",
+    "Show the phase seen from Earth at each step",
+    "Label new, quarter, and full moon"
+  ],
+  "interactions": [
+    "scrub_timeline",
+    "tap_to_highlight",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_moon_phases",
+    "domain": "general_knowledge",
+    "intent": "explain",
+    "strategy": "animated_simulation",
+    "subject": "Moon Phases",
+    "placement": {
+      "anchor": "table",
+      "layout": "arc",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.0,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> animated_simulation. Show the process in motion as a seamless loop — best when the concept is a behaviour over time, not a static object.",
+    "experienceBeats": [
+      {
+        "id": "place_earth_with_the_moon_in_orbit",
+        "title": "Place Earth with the Moon in orbit",
+        "narration": "Place Earth with the Moon in orbit",
+        "focus": "moon_phases",
+        "reveal": "auto"
+      },
+      {
+        "id": "light_the_moon_from_the_sun_s_side",
+        "title": "Light the Moon from the Sun's side",
+        "narration": "Light the Moon from the Sun's side",
+        "focus": "moon_phases",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_the_moon_around_earth",
+        "title": "Animate the Moon around Earth",
+        "narration": "Animate the Moon around Earth",
+        "focus": "moon_phases",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_the_phase_seen_from_earth_at_each_s",
+        "title": "Show the phase seen from Earth at each step",
+        "narration": "Show the phase seen from Earth at each step",
+        "focus": "moon_phases",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "label_new_quarter_and_full_moon",
+        "title": "Label new, quarter, and full moon",
+        "narration": "Label new, quarter, and full moon",
+        "focus": "moon_phases",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "moon_phases",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "moon_phases_mover",
+        "type": "part",
+        "priority": 1
+      }
+    ],
+    "requiredAnimations": [
+      {
+        "id": "moon_phases_sim",
+        "targetAsset": "moon_phases",
+        "motion": "spin",
+        "note": "seamless looping process"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        }
+      },
+      {
+        "id": "highlight_phase",
+        "type": "tap_reveal",
+        "label": "Tap to highlight this phase",
+        "params": {}
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_moon_phases",
+    "subject": "Moon Phases",
+    "strategy": "animated_simulation",
+    "assetRequests": [
+      {
+        "assetId": "moon_phases",
+        "description": "complete Moon Phases, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "default"
+        ],
+        "requiredAnimations": [
+          "spin"
+        ]
+      },
+      {
+        "assetId": "moon_phases_mover",
+        "description": "the moon phases mover component of the Moon Phases",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "default",
+          "highlightable"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T20:30:00.365636+00:00",
+    "sceneId": "edu_moon_phases",
+    "title": "Moon Phases",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"moon phases\". Learning goal: Explain why the Moon shows different phases from Earth. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"The Moon does not make its own light; we see the half lit by the Sun. As the Moon orbits Earth, we view that lit half from changing angles, so it appears to grow and shrink through its phases.\n\nA spatial scene should place the Sun, Earth, and Moon and animate the orbit to show why the lit fraction changes.\".",
+      "subject": "Moon Phases",
+      "domain": "general_knowledge",
+      "intent": "explain",
+      "strategy": "animated_simulation"
+    },
+    "domain": {
+      "name": "general_knowledge",
+      "confidence": "low",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "general_knowledge",
+      "intent": "explain",
+      "strategy": "animated_simulation",
+      "subject": "Moon Phases",
+      "reasoning": "caller override -> animated_simulation. Show the process in motion as a seamless loop — best when the concept is a behaviour over time, not a static object.",
+      "domainConfidence": 0.0,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "table",
+      "layout": "arc",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": "moon_phases_spin",
+        "fps": 30,
+        "loop": true,
+        "count": 1
+      },
+      "bbox": {
+        "min": [
+          -0.15,
+          0.0,
+          -0.15
+        ],
+        "max": [
+          0.15,
+          0.3,
+          0.15
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 0.74,
+      "baseline_z_m": 1.2927
+    },
+    "staging": {
+      "distance_m": 0.74,
+      "spread_deg": 30.0,
+      "reasoning": "2 exhibit(s) on a arc at 0.74 m, dropped 12.0 deg along the natural gaze; anchor=table."
+    },
+    "beats": [
+      {
+        "id": "place_earth_with_the_moon_in_orbit",
+        "title": "Place Earth with the Moon in orbit",
+        "narration": "Place Earth with the Moon in orbit",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "light_the_moon_from_the_sun_s_side",
+        "title": "Light the Moon from the Sun's side",
+        "narration": "Light the Moon from the Sun's side",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_the_moon_around_earth",
+        "title": "Animate the Moon around Earth",
+        "narration": "Animate the Moon around Earth",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_the_phase_seen_from_earth_at_each_s",
+        "title": "Show the phase seen from Earth at each step",
+        "narration": "Show the phase seen from Earth at each step",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "label_new_quarter_and_full_moon",
+        "title": "Label new, quarter, and full moon",
+        "narration": "Label new, quarter, and full moon",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "place_earth_with_the_moon_in_orbit",
+        "title": "Place Earth with the Moon in orbit",
+        "description": "Place Earth with the Moon in orbit",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "light_the_moon_from_the_sun_s_side",
+        "title": "Light the Moon from the Sun's side",
+        "description": "Light the Moon from the Sun's side",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "animate_the_moon_around_earth",
+        "title": "Animate the Moon around Earth",
+        "description": "Animate the Moon around Earth",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "show_the_phase_seen_from_earth_at_each_s",
+        "title": "Show the phase seen from Earth at each step",
+        "description": "Show the phase seen from Earth at each step",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "label_new_quarter_and_full_moon",
+        "title": "Label new, quarter, and full moon",
+        "description": "Label new, quarter, and full moon",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        },
+        "trigger": "on_tap"
+      },
+      {
+        "id": "highlight_phase",
+        "type": "tap_reveal",
+        "label": "Tap to highlight this phase",
+        "params": {},
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "moon_phases",
+        "role": "primary_object",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "moon_phases_mover",
+        "role": "part",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "cube"
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "moon phases",
+      "surroundingContext": "The Moon does not make its own light; we see the half lit by the Sun. As the Moon orbits Earth, we view that lit half from changing angles, so it appears to grow and shrink through its phases.\n\nA spatial scene should place the Sun, Earth, and Moon and animate the orbit to show why the lit fraction changes.",
+      "learningGoal": "Explain why the Moon shows different phases from Earth.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "animated_process",
+      "conceptId": "moon_phases",
+      "spatailPrompt": "Create an educational spatial explanation of \"moon phases\". Learning goal: Explain why the Moon shows different phases from Earth. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"The Moon does not make its own light; we see the half lit by the Sun. As the Moon orbits Earth, we view that lit half from changing angles, so it appears to grow and shrink through its phases.\n\nA spatial scene should place the Sun, Earth, and Moon and animate the orbit to show why the lit fraction changes.\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_moon_phases",
+    "assets": [
+      {
+        "assetId": "moon_phases",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "arc"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "generic_object_placeholder",
+        "fallbackPrimitive": "cube",
+        "usdzPath": ""
+      },
+      {
+        "assetId": "moon_phases_mover",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "arc"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "generic_object_placeholder",
+        "fallbackPrimitive": "cube",
+        "usdzPath": ""
+      }
+    ],
+    "animations": [
+      {
+        "animationId": "moon_phases_spin",
+        "targetAssets": [
+          "moon_phases"
+        ],
+        "type": "looping",
+        "path": ""
+      }
+    ]
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "moon_phases"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream moon_phases",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "moon_phases"
+          ],
+          "unlocks": [
+            "swap_placeholder:moon_phases"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream moon_phases_mover",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "moon_phases_mover"
+          ],
+          "unlocks": [
+            "swap_placeholder:moon_phases_mover"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "animation:moon_phases_spin",
+            "interaction:play_pause",
+            "interaction:highlight_phase"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "table",
+      "title": "Moon Phases",
+      "firstBeat": "Place Earth with the Moon in orbit",
+      "placeholders": [
+        {
+          "assetId": "moon_phases",
+          "primitive": "box",
+          "position_yup": [
+            -0.1915,
+            1.2927,
+            -0.7148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "moon phases"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "play_pause": {
+        "enabledAfterPhase": 3,
+        "type": "play_baked",
+        "targetAssets": [
+          "moon_phases",
+          "moon_phases_mover"
+        ]
+      },
+      "highlight_phase": {
+        "enabledAfterPhase": 3,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "moon_phases",
+          "moon_phases_mover"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "play_pause",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "highlight_phase",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

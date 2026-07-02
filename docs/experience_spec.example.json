@@ -1,0 +1,145 @@
+{
+  "id": "exp_demo01",
+  "title": "Newton's Three Laws of Motion",
+  "stations": [
+    {
+      "id": "st1",
+      "order": 1,
+      "title": "An object in motion stays in motion",
+      "hero": {
+        "usdz": "exp_demo01_st1.usdz",
+        "footprint_m": {
+          "w": 0.6,
+          "d": 0.3,
+          "h": 0.25
+        },
+        "animation": "baked",
+        "scale_mode": "dynamic"
+      },
+      "subtitle": "First Law \u2014 Inertia",
+      "narration": "With nothing to slow it down, the puck keeps gliding.",
+      "panels": [
+        {
+          "id": "p1",
+          "kind": "fact",
+          "body": "The tendency to keep doing what it's doing.",
+          "title": "Inertia",
+          "anchor": "above_hero",
+          "billboard": true,
+          "reveal": "on_focus"
+        }
+      ],
+      "mechanics": [
+        {
+          "type": "play_baked",
+          "params": {
+            "trigger": "on_focus",
+            "loop": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "st2",
+      "order": 2,
+      "title": "Force equals mass times acceleration",
+      "hero": {
+        "usdz": "exp_demo01_st2.usdz",
+        "footprint_m": {
+          "w": 0.6,
+          "d": 0.4,
+          "h": 0.3
+        },
+        "animation": "baked",
+        "scale_mode": "dynamic"
+      },
+      "subtitle": "Second Law \u2014 F = ma",
+      "narration": "",
+      "panels": [
+        {
+          "id": "p2",
+          "kind": "data",
+          "body": "Steeper slope \u2192 bigger force \u2192 faster.",
+          "title": "F = ma",
+          "anchor": "above_hero",
+          "billboard": true,
+          "reveal": "on_focus"
+        }
+      ],
+      "mechanics": [
+        {
+          "type": "grab_physics",
+          "params": {
+            "body": "rigid",
+            "restitution": 0.4,
+            "friction": 0.7,
+            "mass_kg": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "st3",
+      "order": 3,
+      "title": "Every action has an equal and opposite reaction",
+      "hero": {
+        "usdz": "exp_demo01_st3.usdz",
+        "footprint_m": {
+          "w": 0.7,
+          "d": 0.3,
+          "h": 0.2
+        },
+        "animation": "baked",
+        "scale_mode": "dynamic"
+      },
+      "subtitle": "Third Law",
+      "narration": "",
+      "panels": [
+        {
+          "id": "pq",
+          "kind": "quiz",
+          "body": "",
+          "title": "Check",
+          "anchor": "above_hero",
+          "billboard": true,
+          "reveal": "on_focus",
+          "question": "Which law explains rocket thrust?",
+          "options": [
+            "First",
+            "Second",
+            "Third"
+          ],
+          "answer_index": 2
+        }
+      ],
+      "mechanics": [
+        {
+          "type": "quiz_panel",
+          "params": {
+            "question": "Which law explains rocket thrust?",
+            "options": [
+              "First",
+              "Second",
+              "Third"
+            ],
+            "answer_index": 2,
+            "on_correct": "celebrate"
+          }
+        }
+      ]
+    }
+  ],
+  "prompt": "teach me newton's laws",
+  "subject": "physics",
+  "summary": "Three short demos, one per law.",
+  "narration_tone": "warm, curious, classroom",
+  "placement": {
+    "anchor": "table",
+    "layout": "arc",
+    "comfort_radius_m": 1.4,
+    "facing": "user",
+    "spacing_min_m": 0.18,
+    "guided": true
+  },
+  "spec_version": "0.1"
+}

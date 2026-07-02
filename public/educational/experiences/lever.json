@@ -1,0 +1,643 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "the lever",
+  "surroundingContext": "A lever is a stiff bar that pivots on a fulcrum. Pushing down on one end lifts a load on the other, and moving the fulcrum changes how much force is needed.\n\nA spatial scene should let the learner move the fulcrum and feel how effort and load trade off.",
+  "learningGoal": "Show how a lever multiplies force around a fulcrum.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "cause_effect_visualization",
+  "conceptId": "lever",
+  "spatailPrompt": "Create an educational spatial explanation of \"the lever\". Learning goal: Show how a lever multiplies force around a fulcrum. Prefer a cause effect visualization with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A lever is a stiff bar that pivots on a fulcrum. Pushing down on one end lifts a load on the other, and moving the fulcrum changes how much force is needed.\n\nA spatial scene should let the learner move the fulcrum and feel how effort and load trade off.\".",
+  "experienceBeats": [
+    "Place a bar on a fulcrum",
+    "Add a load on one end",
+    "Push the other end to lift it",
+    "Move the fulcrum and compare effort",
+    "Show the force arrows"
+  ],
+  "interactions": [
+    "step_through_explanation",
+    "tap_to_highlight",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_lever",
+    "domain": "general_knowledge",
+    "intent": "explain",
+    "strategy": "cause_and_effect",
+    "subject": "Lever",
+    "placement": {
+      "anchor": "table",
+      "layout": "arc",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.0,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> cause_and_effect. Stage a trigger and its consequence so the link is seen, not told — best for mechanisms of influence.",
+    "experienceBeats": [
+      {
+        "id": "place_a_bar_on_a_fulcrum",
+        "title": "Place a bar on a fulcrum",
+        "narration": "Place a bar on a fulcrum",
+        "focus": "lever",
+        "reveal": "auto"
+      },
+      {
+        "id": "add_a_load_on_one_end",
+        "title": "Add a load on one end",
+        "narration": "Add a load on one end",
+        "focus": "lever",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "push_the_other_end_to_lift_it",
+        "title": "Push the other end to lift it",
+        "narration": "Push the other end to lift it",
+        "focus": "lever",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "move_the_fulcrum_and_compare_effort",
+        "title": "Move the fulcrum and compare effort",
+        "narration": "Move the fulcrum and compare effort",
+        "focus": "lever",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_the_force_arrows",
+        "title": "Show the force arrows",
+        "narration": "Show the force arrows",
+        "focus": "lever",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "lever",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "lever_context",
+        "type": "environment",
+        "priority": 2
+      }
+    ],
+    "requiredAnimations": [],
+    "interactions": [
+      {
+        "id": "reveal",
+        "type": "tap_reveal",
+        "label": "Tap to reveal more",
+        "params": {}
+      },
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        }
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_lever",
+    "subject": "Lever",
+    "strategy": "cause_and_effect",
+    "assetRequests": [
+      {
+        "assetId": "lever",
+        "description": "complete Lever, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "default"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "lever_context",
+        "description": "contextual environment / staging for the Lever",
+        "semanticRole": "context_environment",
+        "requiredVariants": [
+          "default"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T20:30:00.356110+00:00",
+    "sceneId": "edu_lever",
+    "title": "Lever",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"the lever\". Learning goal: Show how a lever multiplies force around a fulcrum. Prefer a cause effect visualization with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A lever is a stiff bar that pivots on a fulcrum. Pushing down on one end lifts a load on the other, and moving the fulcrum changes how much force is needed.\n\nA spatial scene should let the learner move the fulcrum and feel how effort and load trade off.\".",
+      "subject": "Lever",
+      "domain": "general_knowledge",
+      "intent": "explain",
+      "strategy": "cause_and_effect"
+    },
+    "domain": {
+      "name": "general_knowledge",
+      "confidence": "low",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "general_knowledge",
+      "intent": "explain",
+      "strategy": "cause_and_effect",
+      "subject": "Lever",
+      "reasoning": "caller override -> cause_and_effect. Stage a trigger and its consequence so the link is seen, not told — best for mechanisms of influence.",
+      "domainConfidence": 0.0,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "table",
+      "layout": "arc",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": null,
+        "fps": 30,
+        "loop": true,
+        "count": 0
+      },
+      "bbox": {
+        "min": [
+          -0.15,
+          0.0,
+          -0.15
+        ],
+        "max": [
+          0.15,
+          0.3,
+          0.15
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 0.74,
+      "baseline_z_m": 1.2927
+    },
+    "staging": {
+      "distance_m": 0.74,
+      "spread_deg": 30.0,
+      "reasoning": "2 exhibit(s) on a arc at 0.74 m, dropped 12.0 deg along the natural gaze; anchor=table."
+    },
+    "beats": [
+      {
+        "id": "place_a_bar_on_a_fulcrum",
+        "title": "Place a bar on a fulcrum",
+        "narration": "Place a bar on a fulcrum",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "add_a_load_on_one_end",
+        "title": "Add a load on one end",
+        "narration": "Add a load on one end",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "push_the_other_end_to_lift_it",
+        "title": "Push the other end to lift it",
+        "narration": "Push the other end to lift it",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "move_the_fulcrum_and_compare_effort",
+        "title": "Move the fulcrum and compare effort",
+        "narration": "Move the fulcrum and compare effort",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_the_force_arrows",
+        "title": "Show the force arrows",
+        "narration": "Show the force arrows",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "place_a_bar_on_a_fulcrum",
+        "title": "Place a bar on a fulcrum",
+        "description": "Place a bar on a fulcrum",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "add_a_load_on_one_end",
+        "title": "Add a load on one end",
+        "description": "Add a load on one end",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "push_the_other_end_to_lift_it",
+        "title": "Push the other end to lift it",
+        "description": "Push the other end to lift it",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "move_the_fulcrum_and_compare_effort",
+        "title": "Move the fulcrum and compare effort",
+        "description": "Move the fulcrum and compare effort",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "show_the_force_arrows",
+        "title": "Show the force arrows",
+        "description": "Show the force arrows",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "reveal",
+        "type": "tap_reveal",
+        "label": "Tap to reveal more",
+        "params": {},
+        "trigger": "on_tap"
+      },
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        },
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "lever",
+        "role": "primary_object",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "lever_context",
+        "role": "environment",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "cube"
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "the lever",
+      "surroundingContext": "A lever is a stiff bar that pivots on a fulcrum. Pushing down on one end lifts a load on the other, and moving the fulcrum changes how much force is needed.\n\nA spatial scene should let the learner move the fulcrum and feel how effort and load trade off.",
+      "learningGoal": "Show how a lever multiplies force around a fulcrum.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "cause_effect_visualization",
+      "conceptId": "lever",
+      "spatailPrompt": "Create an educational spatial explanation of \"the lever\". Learning goal: Show how a lever multiplies force around a fulcrum. Prefer a cause effect visualization with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A lever is a stiff bar that pivots on a fulcrum. Pushing down on one end lifts a load on the other, and moving the fulcrum changes how much force is needed.\n\nA spatial scene should let the learner move the fulcrum and feel how effort and load trade off.\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_lever",
+    "assets": [
+      {
+        "assetId": "lever",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "arc"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "generic_object_placeholder",
+        "fallbackPrimitive": "cube",
+        "usdzPath": ""
+      },
+      {
+        "assetId": "lever_context",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "context_environment",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "arc"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "generic_object_placeholder",
+        "fallbackPrimitive": "cube",
+        "usdzPath": ""
+      }
+    ],
+    "animations": []
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "lever"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream lever",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "lever"
+          ],
+          "unlocks": [
+            "swap_placeholder:lever"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream lever_context",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "lever_context"
+          ],
+          "unlocks": [
+            "swap_placeholder:lever_context"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "interaction:reveal",
+            "interaction:play_pause"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "table",
+      "title": "Lever",
+      "firstBeat": "Place a bar on a fulcrum",
+      "placeholders": [
+        {
+          "assetId": "lever",
+          "primitive": "box",
+          "position_yup": [
+            -0.1915,
+            1.2927,
+            -0.7148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "lever"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "reveal": {
+        "enabledAfterPhase": 3,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "lever",
+          "lever_context"
+        ]
+      },
+      "play_pause": {
+        "enabledAfterPhase": 3,
+        "type": "play_baked",
+        "targetAssets": [
+          "lever",
+          "lever_context"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "reveal",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "play_pause",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

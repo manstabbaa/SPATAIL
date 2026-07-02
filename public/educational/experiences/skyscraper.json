@@ -1,0 +1,870 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "skyscraper",
+  "surroundingContext": "A skyscraper stands on a steel (or concrete) frame of columns and beams that carries its weight down to deep foundations. The frame also resists wind, which pushes harder the higher you go.\n\nA spatial scene should build the frame floor by floor and show how loads travel down the columns.",
+  "learningGoal": "Explain how a steel frame lets a tall building stand and carry loads.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "assembly_sequence",
+  "conceptId": "skyscraper",
+  "spatailPrompt": "Create an educational spatial explanation of \"skyscraper\". Learning goal: Explain how a steel frame lets a tall building stand and carry loads. Prefer a assembly sequence with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A skyscraper stands on a steel (or concrete) frame of columns and beams that carries its weight down to deep foundations. The frame also resists wind, which pushes harder the higher you go.\n\nA spatial scene should build the frame floor by floor and show how loads travel down the columns.\".",
+  "experienceBeats": [
+    "Lay the foundation",
+    "Raise the steel columns",
+    "Add floor beams and slabs",
+    "Stack floors upward",
+    "Show loads traveling down to the ground"
+  ],
+  "interactions": [
+    "step_through_explanation",
+    "tap_to_highlight",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_skyscraper",
+    "domain": "general_knowledge",
+    "intent": "explain",
+    "strategy": "assembly_sequence",
+    "subject": "Skyscrapers",
+    "placement": {
+      "anchor": "table",
+      "layout": "arc",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.0,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> assembly_sequence. Build the subject up step by step in space so order and fit are felt — best for how-it-goes-together tasks.",
+    "experienceBeats": [
+      {
+        "id": "lay_the_foundation",
+        "title": "Lay the foundation",
+        "narration": "Lay the foundation",
+        "focus": "skyscrapers",
+        "reveal": "auto"
+      },
+      {
+        "id": "raise_the_steel_columns",
+        "title": "Raise the steel columns",
+        "narration": "Raise the steel columns",
+        "focus": "skyscrapers",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "add_floor_beams_and_slabs",
+        "title": "Add floor beams and slabs",
+        "narration": "Add floor beams and slabs",
+        "focus": "skyscrapers",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "stack_floors_upward",
+        "title": "Stack floors upward",
+        "narration": "Stack floors upward",
+        "focus": "skyscrapers",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_loads_traveling_down_to_the_ground",
+        "title": "Show loads traveling down to the ground",
+        "narration": "Show loads traveling down to the ground",
+        "focus": "skyscrapers",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "skyscrapers",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "skyscrapers_base",
+        "type": "part",
+        "priority": 1
+      },
+      {
+        "id": "skyscrapers_mid",
+        "type": "part",
+        "priority": 1
+      },
+      {
+        "id": "skyscrapers_top",
+        "type": "part",
+        "priority": 2
+      }
+    ],
+    "requiredAnimations": [
+      {
+        "id": "skyscrapers_assemble",
+        "targetAsset": "skyscrapers",
+        "motion": "assemble",
+        "note": "per-step seat-into-place tween"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "step_through",
+        "type": "play_baked",
+        "label": "Step through assembly",
+        "params": {
+          "loop": false
+        }
+      },
+      {
+        "id": "highlight_part",
+        "type": "tap_reveal",
+        "label": "Tap the active part",
+        "params": {}
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_skyscraper",
+    "subject": "Skyscrapers",
+    "strategy": "assembly_sequence",
+    "assetRequests": [
+      {
+        "assetId": "skyscrapers",
+        "description": "complete Skyscrapers, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "complete",
+          "staged"
+        ],
+        "requiredAnimations": [
+          "assemble"
+        ]
+      },
+      {
+        "assetId": "skyscrapers_base",
+        "description": "the skyscrapers base component of the Skyscrapers",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "highlightable",
+          "staged"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "skyscrapers_mid",
+        "description": "the skyscrapers mid component of the Skyscrapers",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "highlightable",
+          "staged"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "skyscrapers_top",
+        "description": "the skyscrapers top component of the Skyscrapers",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "highlightable",
+          "staged"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T20:30:00.371034+00:00",
+    "sceneId": "edu_skyscraper",
+    "title": "Skyscrapers",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"skyscraper\". Learning goal: Explain how a steel frame lets a tall building stand and carry loads. Prefer a assembly sequence with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A skyscraper stands on a steel (or concrete) frame of columns and beams that carries its weight down to deep foundations. The frame also resists wind, which pushes harder the higher you go.\n\nA spatial scene should build the frame floor by floor and show how loads travel down the columns.\".",
+      "subject": "Skyscrapers",
+      "domain": "general_knowledge",
+      "intent": "explain",
+      "strategy": "assembly_sequence"
+    },
+    "domain": {
+      "name": "general_knowledge",
+      "confidence": "low",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "general_knowledge",
+      "intent": "explain",
+      "strategy": "assembly_sequence",
+      "subject": "Skyscrapers",
+      "reasoning": "caller override -> assembly_sequence. Build the subject up step by step in space so order and fit are felt — best for how-it-goes-together tasks.",
+      "domainConfidence": 0.0,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "table",
+      "layout": "arc",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "/assets/spatail-library/architecture/truss_segment.glb",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": "skyscrapers_assemble",
+        "fps": 30,
+        "loop": true,
+        "count": 1
+      },
+      "bbox": {
+        "min": [
+          -0.3,
+          0.0,
+          -0.15
+        ],
+        "max": [
+          0.3,
+          0.1,
+          0.15
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 0.74,
+      "baseline_z_m": 1.2927
+    },
+    "staging": {
+      "distance_m": 0.74,
+      "spread_deg": 30.0,
+      "reasoning": "4 exhibit(s) on a arc at 0.74 m, dropped 12.0 deg along the natural gaze; anchor=table."
+    },
+    "beats": [
+      {
+        "id": "lay_the_foundation",
+        "title": "Lay the foundation",
+        "narration": "Lay the foundation",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "raise_the_steel_columns",
+        "title": "Raise the steel columns",
+        "narration": "Raise the steel columns",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "add_floor_beams_and_slabs",
+        "title": "Add floor beams and slabs",
+        "narration": "Add floor beams and slabs",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "stack_floors_upward",
+        "title": "Stack floors upward",
+        "narration": "Stack floors upward",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_loads_traveling_down_to_the_ground",
+        "title": "Show loads traveling down to the ground",
+        "narration": "Show loads traveling down to the ground",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "lay_the_foundation",
+        "title": "Lay the foundation",
+        "description": "Lay the foundation",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "raise_the_steel_columns",
+        "title": "Raise the steel columns",
+        "description": "Raise the steel columns",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "add_floor_beams_and_slabs",
+        "title": "Add floor beams and slabs",
+        "description": "Add floor beams and slabs",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "stack_floors_upward",
+        "title": "Stack floors upward",
+        "description": "Stack floors upward",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "show_loads_traveling_down_to_the_ground",
+        "title": "Show loads traveling down to the ground",
+        "description": "Show loads traveling down to the ground",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "step_through",
+        "type": "play_baked",
+        "label": "Step through assembly",
+        "params": {
+          "loop": false
+        },
+        "trigger": "on_tap"
+      },
+      {
+        "id": "highlight_part",
+        "type": "tap_reveal",
+        "label": "Tap the active part",
+        "params": {},
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "skyscrapers",
+        "role": "primary_object",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/architecture/truss_segment.glb",
+        "footprint": {
+          "w": 0.6,
+          "h": 0.1,
+          "d": 0.3
+        },
+        "position_yup": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/truss_segment.usdz",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "skyscrapers_base",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/architecture/foundation_block.glb",
+        "footprint": {
+          "w": 0.5,
+          "h": 0.5,
+          "d": 0.2
+        },
+        "position_yup": [
+          -0.0645,
+          1.2927,
+          -0.7372
+        ],
+        "yaw_rad": 0.0873,
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/architecture/foundation_block.usdz",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "skyscrapers_mid",
+        "role": "part",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          0.0645,
+          1.2927,
+          -0.7372
+        ],
+        "yaw_rad": -0.0873,
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "skyscrapers_top",
+        "role": "part",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "cube"
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "skyscraper",
+      "surroundingContext": "A skyscraper stands on a steel (or concrete) frame of columns and beams that carries its weight down to deep foundations. The frame also resists wind, which pushes harder the higher you go.\n\nA spatial scene should build the frame floor by floor and show how loads travel down the columns.",
+      "learningGoal": "Explain how a steel frame lets a tall building stand and carry loads.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "assembly_sequence",
+      "conceptId": "skyscraper",
+      "spatailPrompt": "Create an educational spatial explanation of \"skyscraper\". Learning goal: Explain how a steel frame lets a tall building stand and carry loads. Prefer a assembly sequence with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A skyscraper stands on a steel (or concrete) frame of columns and beams that carries its weight down to deep foundations. The frame also resists wind, which pushes harder the higher you go.\n\nA spatial scene should build the frame floor by floor and show how loads travel down the columns.\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_skyscraper",
+    "assets": [
+      {
+        "assetId": "skyscrapers",
+        "path": "/assets/spatail-library/architecture/truss_segment.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/architecture/truss_segment.glb",
+          "staged": "/assets/spatail-library/architecture/truss_segment_staged.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.3,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.3,
+              0.15,
+              0.1
+            ],
+            "size": [
+              0.6,
+              0.3,
+              0.1
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.05
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "arc"
+          },
+          "realWorldScale": [
+            0.6,
+            0.3,
+            0.1
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "truss_segment",
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/truss_segment.usdz"
+      },
+      {
+        "assetId": "skyscrapers_base",
+        "path": "/assets/spatail-library/architecture/foundation_block.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/architecture/foundation_block.glb",
+          "highlightable": "/assets/spatail-library/architecture/foundation_block_highlightable.glb",
+          "staged": "/assets/spatail-library/architecture/foundation_block_staged.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.25,
+              -0.1,
+              0.0
+            ],
+            "max": [
+              0.25,
+              0.1,
+              0.5
+            ],
+            "size": [
+              0.5,
+              0.2,
+              0.5
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.25
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "arc"
+          },
+          "realWorldScale": [
+            0.5,
+            0.2,
+            0.5
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "foundation_block",
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/architecture/foundation_block.usdz"
+      },
+      {
+        "assetId": "skyscrapers_mid",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "arc"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "generic_object_placeholder",
+        "fallbackPrimitive": "cube",
+        "usdzPath": ""
+      },
+      {
+        "assetId": "skyscrapers_top",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "arc"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "generic_object_placeholder",
+        "fallbackPrimitive": "cube",
+        "usdzPath": ""
+      }
+    ],
+    "animations": [
+      {
+        "animationId": "skyscrapers_assemble",
+        "targetAssets": [
+          "skyscrapers"
+        ],
+        "type": "assemble",
+        "path": ""
+      }
+    ]
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "skyscrapers"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream skyscrapers",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "skyscrapers"
+          ],
+          "unlocks": [
+            "swap_placeholder:skyscrapers"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream skyscrapers_base",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "skyscrapers_base"
+          ],
+          "unlocks": [
+            "swap_placeholder:skyscrapers_base"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "stream skyscrapers_mid",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "skyscrapers_mid"
+          ],
+          "unlocks": [
+            "swap_placeholder:skyscrapers_mid"
+          ]
+        },
+        {
+          "phase": 4,
+          "label": "stream skyscrapers_top",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "skyscrapers_top"
+          ],
+          "unlocks": [
+            "swap_placeholder:skyscrapers_top"
+          ]
+        },
+        {
+          "phase": 5,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "animation:skyscrapers_assemble",
+            "interaction:step_through",
+            "interaction:highlight_part"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "table",
+      "title": "Skyscrapers",
+      "firstBeat": "Lay the foundation",
+      "placeholders": [
+        {
+          "assetId": "skyscrapers",
+          "primitive": "box",
+          "position_yup": [
+            -0.1915,
+            1.2927,
+            -0.7148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "skyscrapers"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "step_through": {
+        "enabledAfterPhase": 5,
+        "type": "play_baked",
+        "targetAssets": [
+          "skyscrapers",
+          "skyscrapers_base",
+          "skyscrapers_mid",
+          "skyscrapers_top"
+        ]
+      },
+      "highlight_part": {
+        "enabledAfterPhase": 5,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "skyscrapers",
+          "skyscrapers_base",
+          "skyscrapers_mid",
+          "skyscrapers_top"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "step_through",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "highlight_part",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

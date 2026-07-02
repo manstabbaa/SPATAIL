@@ -1,0 +1,867 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "V8 engine",
+  "surroundingContext": "A V8 engine has eight cylinders arranged in two banks, often forming a V shape. Inside the cylinders, pistons move up and down. Connecting rods transfer this motion to the crankshaft, which rotates and sends mechanical power to the drivetrain.\n\nThe educational goal is not to create a perfect engine model. The goal is to show hidden internal relationships. A cutaway or exploded view helps the learner understand parts that are normally hidden by the engine block.",
+  "learningGoal": "Explain how pistons, connecting rods, and crankshaft motion work together.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "cutaway_view",
+  "conceptId": "v8_engine",
+  "spatailPrompt": "Create an educational spatial explanation of \"V8 engine\". Learning goal: Explain how pistons, connecting rods, and crankshaft motion work together. Prefer a cutaway view with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A V8 engine has eight cylinders arranged in two banks, often forming a V shape. Inside the cylinders, pistons move up and down. Connecting rods transfer this motion to the crankshaft, which rotates and sends mechanical power to the drivetrain.\n\nThe educational goal is not to create a perfect engine model. The goal is to show hidden internal relationships. A cutaway or exploded view helps the learn\".",
+  "experienceBeats": [
+    "Show the complete engine shape first",
+    "Fade the outer shell into a cutaway",
+    "Highlight pistons in the cylinder banks",
+    "Animate reciprocating piston motion",
+    "Show crankshaft rotation and firing sequence"
+  ],
+  "interactions": [
+    "tap_to_highlight",
+    "step_through_explanation",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_v8_engine",
+    "domain": "mechanical",
+    "intent": "explain",
+    "strategy": "cutaway_view",
+    "subject": "V8 Engine",
+    "placement": {
+      "anchor": "table",
+      "layout": "cluster",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.95,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> cutaway_view. Slice the outer shell away to expose interior anatomy in situ — best when the inside matters but the parts shouldn't leave home.",
+    "experienceBeats": [
+      {
+        "id": "show_the_complete_engine_shape_first",
+        "title": "Show the complete engine shape first",
+        "narration": "Show the complete engine shape first",
+        "focus": "v8_engine",
+        "reveal": "auto"
+      },
+      {
+        "id": "fade_the_outer_shell_into_a_cutaway",
+        "title": "Fade the outer shell into a cutaway",
+        "narration": "Fade the outer shell into a cutaway",
+        "focus": "v8_engine",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "highlight_pistons_in_the_cylinder_banks",
+        "title": "Highlight pistons in the cylinder banks",
+        "narration": "Highlight pistons in the cylinder banks",
+        "focus": "v8_engine",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_reciprocating_piston_motion",
+        "title": "Animate reciprocating piston motion",
+        "narration": "Animate reciprocating piston motion",
+        "focus": "v8_engine",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_crankshaft_rotation_and_firing_sequ",
+        "title": "Show crankshaft rotation and firing sequence",
+        "narration": "Show crankshaft rotation and firing sequence",
+        "focus": "v8_engine",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "v8_engine",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "v8_engine_part_a",
+        "type": "part",
+        "priority": 1
+      },
+      {
+        "id": "v8_engine_part_b",
+        "type": "part",
+        "priority": 1
+      },
+      {
+        "id": "v8_engine_core",
+        "type": "part",
+        "priority": 2
+      }
+    ],
+    "requiredAnimations": [],
+    "interactions": [
+      {
+        "id": "cut_toggle",
+        "type": "play_baked",
+        "label": "Open / close the cutaway",
+        "params": {
+          "loop": false
+        }
+      },
+      {
+        "id": "label_interior",
+        "type": "tap_reveal",
+        "label": "Tap to label an interior part",
+        "params": {}
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_v8_engine",
+    "subject": "V8 Engine",
+    "strategy": "cutaway_view",
+    "assetRequests": [
+      {
+        "assetId": "v8_engine",
+        "description": "complete V8 Engine, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "complete",
+          "cutaway",
+          "transparent"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "v8_engine_part_a",
+        "description": "the v8 engine part a component of the V8 Engine",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "cutaway",
+          "highlightable",
+          "transparent"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "v8_engine_part_b",
+        "description": "the v8 engine part b component of the V8 Engine",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "cutaway",
+          "highlightable",
+          "transparent"
+        ],
+        "requiredAnimations": []
+      },
+      {
+        "assetId": "v8_engine_core",
+        "description": "the v8 engine core component of the V8 Engine",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "complete",
+          "cutaway",
+          "highlightable",
+          "transparent"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T20:30:00.327382+00:00",
+    "sceneId": "edu_v8_engine",
+    "title": "V8 Engine",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"V8 engine\". Learning goal: Explain how pistons, connecting rods, and crankshaft motion work together. Prefer a cutaway view with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A V8 engine has eight cylinders arranged in two banks, often forming a V shape. Inside the cylinders, pistons move up and down. Connecting rods transfer this motion to the crankshaft, which rotates and sends mechanical power to the drivetrain.\n\nThe educational goal is not to create a perfect engine model. The goal is to show hidden internal relationships. A cutaway or exploded view helps the learn\".",
+      "subject": "V8 Engine",
+      "domain": "mechanical",
+      "intent": "explain",
+      "strategy": "cutaway_view"
+    },
+    "domain": {
+      "name": "mechanical",
+      "confidence": "high",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "mechanical",
+      "intent": "explain",
+      "strategy": "cutaway_view",
+      "subject": "V8 Engine",
+      "reasoning": "caller override -> cutaway_view. Slice the outer shell away to expose interior anatomy in situ — best when the inside matters but the parts shouldn't leave home.",
+      "domainConfidence": 0.95,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "table",
+      "layout": "cluster",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": null,
+        "fps": 30,
+        "loop": true,
+        "count": 0
+      },
+      "bbox": {
+        "min": [
+          -0.25,
+          0.0,
+          -0.2
+        ],
+        "max": [
+          0.25,
+          0.5,
+          0.2
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 0.74,
+      "baseline_z_m": 1.2927
+    },
+    "staging": {
+      "distance_m": 0.74,
+      "spread_deg": 30.0,
+      "reasoning": "4 exhibit(s) on a cluster at 0.74 m, dropped 12.0 deg along the natural gaze; anchor=table."
+    },
+    "beats": [
+      {
+        "id": "show_the_complete_engine_shape_first",
+        "title": "Show the complete engine shape first",
+        "narration": "Show the complete engine shape first",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "fade_the_outer_shell_into_a_cutaway",
+        "title": "Fade the outer shell into a cutaway",
+        "narration": "Fade the outer shell into a cutaway",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "highlight_pistons_in_the_cylinder_banks",
+        "title": "Highlight pistons in the cylinder banks",
+        "narration": "Highlight pistons in the cylinder banks",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_reciprocating_piston_motion",
+        "title": "Animate reciprocating piston motion",
+        "narration": "Animate reciprocating piston motion",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_crankshaft_rotation_and_firing_sequ",
+        "title": "Show crankshaft rotation and firing sequence",
+        "narration": "Show crankshaft rotation and firing sequence",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "show_the_complete_engine_shape_first",
+        "title": "Show the complete engine shape first",
+        "description": "Show the complete engine shape first",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "fade_the_outer_shell_into_a_cutaway",
+        "title": "Fade the outer shell into a cutaway",
+        "description": "Fade the outer shell into a cutaway",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "highlight_pistons_in_the_cylinder_banks",
+        "title": "Highlight pistons in the cylinder banks",
+        "description": "Highlight pistons in the cylinder banks",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "animate_reciprocating_piston_motion",
+        "title": "Animate reciprocating piston motion",
+        "description": "Animate reciprocating piston motion",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "show_crankshaft_rotation_and_firing_sequ",
+        "title": "Show crankshaft rotation and firing sequence",
+        "description": "Show crankshaft rotation and firing sequence",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "cut_toggle",
+        "type": "play_baked",
+        "label": "Open / close the cutaway",
+        "params": {
+          "loop": false
+        },
+        "trigger": "on_tap"
+      },
+      {
+        "id": "label_interior",
+        "type": "tap_reveal",
+        "label": "Tap to label an interior part",
+        "params": {},
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "v8_engine",
+        "role": "primary_object",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "footprint": {
+          "w": 0.5,
+          "h": 0.5,
+          "d": 0.4
+        },
+        "position_yup": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/mechanical/engine_block_simplified.usdz",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "v8_engine_part_a",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "footprint": {
+          "w": 0.5,
+          "h": 0.5,
+          "d": 0.4
+        },
+        "position_yup": [
+          -0.0645,
+          1.2927,
+          -0.7372
+        ],
+        "yaw_rad": 0.0873,
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/mechanical/engine_block_simplified.usdz",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "v8_engine_part_b",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "footprint": {
+          "w": 0.5,
+          "h": 0.5,
+          "d": 0.4
+        },
+        "position_yup": [
+          0.0645,
+          1.2927,
+          -0.7372
+        ],
+        "yaw_rad": -0.0873,
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/mechanical/engine_block_simplified.usdz",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "v8_engine_core",
+        "role": "part",
+        "status": "processed",
+        "processedPath": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "footprint": {
+          "w": 0.5,
+          "h": 0.5,
+          "d": 0.4
+        },
+        "position_yup": [
+          0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "/assets/spatail-library/mechanical/engine_block_simplified.usdz",
+        "fallbackPrimitive": "cube"
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "V8 engine",
+      "surroundingContext": "A V8 engine has eight cylinders arranged in two banks, often forming a V shape. Inside the cylinders, pistons move up and down. Connecting rods transfer this motion to the crankshaft, which rotates and sends mechanical power to the drivetrain.\n\nThe educational goal is not to create a perfect engine model. The goal is to show hidden internal relationships. A cutaway or exploded view helps the learner understand parts that are normally hidden by the engine block.",
+      "learningGoal": "Explain how pistons, connecting rods, and crankshaft motion work together.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "cutaway_view",
+      "conceptId": "v8_engine",
+      "spatailPrompt": "Create an educational spatial explanation of \"V8 engine\". Learning goal: Explain how pistons, connecting rods, and crankshaft motion work together. Prefer a cutaway view with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A V8 engine has eight cylinders arranged in two banks, often forming a V shape. Inside the cylinders, pistons move up and down. Connecting rods transfer this motion to the crankshaft, which rotates and sends mechanical power to the drivetrain.\n\nThe educational goal is not to create a perfect engine model. The goal is to show hidden internal relationships. A cutaway or exploded view helps the learn\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_v8_engine",
+    "assets": [
+      {
+        "assetId": "v8_engine",
+        "path": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+          "cutaway": "/assets/spatail-library/mechanical/engine_block_simplified_cutaway.glb",
+          "transparent": "/assets/spatail-library/mechanical/engine_block_simplified_transparent.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.25,
+              -0.2,
+              0.0
+            ],
+            "max": [
+              0.25,
+              0.2,
+              0.5
+            ],
+            "size": [
+              0.5,
+              0.4,
+              0.5
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.25
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.5,
+            0.4,
+            0.5
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "engine_block_simplified",
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/mechanical/engine_block_simplified.usdz"
+      },
+      {
+        "assetId": "v8_engine_part_a",
+        "path": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+          "cutaway": "/assets/spatail-library/mechanical/engine_block_simplified_cutaway.glb",
+          "highlightable": "/assets/spatail-library/mechanical/engine_block_simplified_highlightable.glb",
+          "transparent": "/assets/spatail-library/mechanical/engine_block_simplified_transparent.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.25,
+              -0.2,
+              0.0
+            ],
+            "max": [
+              0.25,
+              0.2,
+              0.5
+            ],
+            "size": [
+              0.5,
+              0.4,
+              0.5
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.25
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.5,
+            0.4,
+            0.5
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "engine_block_simplified",
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/mechanical/engine_block_simplified.usdz"
+      },
+      {
+        "assetId": "v8_engine_part_b",
+        "path": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+          "cutaway": "/assets/spatail-library/mechanical/engine_block_simplified_cutaway.glb",
+          "highlightable": "/assets/spatail-library/mechanical/engine_block_simplified_highlightable.glb",
+          "transparent": "/assets/spatail-library/mechanical/engine_block_simplified_transparent.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.25,
+              -0.2,
+              0.0
+            ],
+            "max": [
+              0.25,
+              0.2,
+              0.5
+            ],
+            "size": [
+              0.5,
+              0.4,
+              0.5
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.25
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.5,
+            0.4,
+            0.5
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "engine_block_simplified",
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/mechanical/engine_block_simplified.usdz"
+      },
+      {
+        "assetId": "v8_engine_core",
+        "path": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+        "variants": {
+          "complete": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+          "cutaway": "/assets/spatail-library/mechanical/engine_block_simplified_cutaway.glb",
+          "highlightable": "/assets/spatail-library/mechanical/engine_block_simplified_highlightable.glb",
+          "transparent": "/assets/spatail-library/mechanical/engine_block_simplified_transparent.glb"
+        },
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.25,
+              -0.2,
+              0.0
+            ],
+            "max": [
+              0.25,
+              0.2,
+              0.5
+            ],
+            "size": [
+              0.5,
+              0.4,
+              0.5
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.25
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.5,
+            0.4,
+            0.5
+          ]
+        },
+        "status": "library",
+        "source": "library",
+        "libraryAssetId": "engine_block_simplified",
+        "fallbackPrimitive": "cube",
+        "usdzPath": "/assets/spatail-library/mechanical/engine_block_simplified.usdz"
+      }
+    ],
+    "animations": []
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "v8_engine"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream v8_engine",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "v8_engine"
+          ],
+          "unlocks": [
+            "swap_placeholder:v8_engine"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream v8_engine_part_a",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "v8_engine_part_a"
+          ],
+          "unlocks": [
+            "swap_placeholder:v8_engine_part_a"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "stream v8_engine_part_b",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "v8_engine_part_b"
+          ],
+          "unlocks": [
+            "swap_placeholder:v8_engine_part_b"
+          ]
+        },
+        {
+          "phase": 4,
+          "label": "stream v8_engine_core",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "v8_engine_core"
+          ],
+          "unlocks": [
+            "swap_placeholder:v8_engine_core"
+          ]
+        },
+        {
+          "phase": 5,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "interaction:cut_toggle",
+            "interaction:label_interior"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "table",
+      "title": "V8 Engine",
+      "firstBeat": "Show the complete engine shape first",
+      "placeholders": [
+        {
+          "assetId": "v8_engine",
+          "primitive": "box",
+          "position_yup": [
+            -0.1915,
+            1.2927,
+            -0.7148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "v8 engine"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "cut_toggle": {
+        "enabledAfterPhase": 5,
+        "type": "play_baked",
+        "targetAssets": [
+          "v8_engine",
+          "v8_engine_part_a",
+          "v8_engine_part_b",
+          "v8_engine_core"
+        ]
+      },
+      "label_interior": {
+        "enabledAfterPhase": 5,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "v8_engine",
+          "v8_engine_part_a",
+          "v8_engine_part_b",
+          "v8_engine_core"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "cut_toggle",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "label_interior",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

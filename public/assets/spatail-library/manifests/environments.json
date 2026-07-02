@@ -1,0 +1,534 @@
+{
+  "category": "environments",
+  "count": 16,
+  "assets": [
+    {
+      "assetId": "table_surface_proxy",
+      "name": "Table Surface Proxy",
+      "category": "environments",
+      "semanticTags": [
+        "table",
+        "surface",
+        "proxy"
+      ],
+      "path": "/assets/spatail-library/environments/table_surface_proxy.glb",
+      "scaleMeters": [
+        1.0,
+        0.01,
+        0.6
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "wall_surface_proxy",
+      "name": "Wall Surface Proxy",
+      "category": "environments",
+      "semanticTags": [
+        "wall",
+        "surface",
+        "proxy"
+      ],
+      "path": "/assets/spatail-library/environments/wall_surface_proxy.glb",
+      "scaleMeters": [
+        2.0,
+        2.0,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "floor_surface_proxy",
+      "name": "Floor Surface Proxy",
+      "category": "environments",
+      "semanticTags": [
+        "floor",
+        "surface",
+        "proxy"
+      ],
+      "path": "/assets/spatail-library/environments/floor_surface_proxy.glb",
+      "scaleMeters": [
+        3.0,
+        0.01,
+        3.0
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "room_corner_proxy",
+      "name": "Room Corner Proxy",
+      "category": "environments",
+      "semanticTags": [
+        "room",
+        "corner",
+        "proxy"
+      ],
+      "path": "/assets/spatail-library/environments/room_corner_proxy.glb",
+      "scaleMeters": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "window_light_proxy",
+      "name": "Window Light Proxy",
+      "category": "environments",
+      "semanticTags": [
+        "window",
+        "light",
+        "proxy"
+      ],
+      "path": "/assets/spatail-library/environments/window_light_proxy.glb",
+      "scaleMeters": [
+        0.8,
+        1.2,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "soft_shadow_plane",
+      "name": "Soft Shadow Plane",
+      "category": "environments",
+      "semanticTags": [
+        "shadow",
+        "soft",
+        "ground"
+      ],
+      "path": "/assets/spatail-library/environments/soft_shadow_plane.glb",
+      "scaleMeters": [
+        0.5,
+        0.01,
+        0.5
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "contact_shadow_decal",
+      "name": "Contact Shadow Decal",
+      "category": "environments",
+      "semanticTags": [
+        "shadow",
+        "contact",
+        "decal"
+      ],
+      "path": "/assets/spatail-library/environments/contact_shadow_decal.glb",
+      "scaleMeters": [
+        0.3,
+        0.01,
+        0.3
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "placement_grid",
+      "name": "Placement Grid",
+      "category": "environments",
+      "semanticTags": [
+        "grid",
+        "placement",
+        "guide"
+      ],
+      "path": "/assets/spatail-library/environments/placement_grid.glb",
+      "scaleMeters": [
+        1.0,
+        0.01,
+        1.0
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "measurement_tape",
+      "name": "Measurement Tape",
+      "category": "environments",
+      "semanticTags": [
+        "measure",
+        "tape",
+        "ruler"
+      ],
+      "path": "/assets/spatail-library/environments/measurement_tape.glb",
+      "scaleMeters": [
+        1.0,
+        0.01,
+        0.02
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "world_origin_marker",
+      "name": "World Origin Marker",
+      "category": "environments",
+      "semanticTags": [
+        "origin",
+        "marker",
+        "axis"
+      ],
+      "path": "/assets/spatail-library/environments/world_origin_marker.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "arrow",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "spatial_anchor_marker",
+      "name": "Spatial Anchor Marker",
+      "category": "environments",
+      "semanticTags": [
+        "anchor",
+        "marker",
+        "spatial"
+      ],
+      "path": "/assets/spatail-library/environments/spatial_anchor_marker.glb",
+      "scaleMeters": [
+        0.2,
+        0.01,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "calibration_cube",
+      "name": "Calibration Cube",
+      "category": "environments",
+      "semanticTags": [
+        "calibration",
+        "cube",
+        "test"
+      ],
+      "path": "/assets/spatail-library/environments/calibration_cube.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "scale_human_silhouette",
+      "name": "Human Scale Silhouette",
+      "category": "environments",
+      "semanticTags": [
+        "human",
+        "scale",
+        "silhouette"
+      ],
+      "path": "/assets/spatail-library/environments/scale_human_silhouette.glb",
+      "scaleMeters": [
+        0.5,
+        1.75,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "capsule",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "scale_hand_silhouette",
+      "name": "Hand Scale Silhouette",
+      "category": "environments",
+      "semanticTags": [
+        "hand",
+        "scale",
+        "silhouette"
+      ],
+      "path": "/assets/spatail-library/environments/scale_hand_silhouette.glb",
+      "scaleMeters": [
+        0.1,
+        0.2,
+        0.01
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "scale_ruler_1m",
+      "name": "1m Scale Ruler",
+      "category": "environments",
+      "semanticTags": [
+        "ruler",
+        "1m",
+        "scale"
+      ],
+      "path": "/assets/spatail-library/environments/scale_ruler_1m.glb",
+      "scaleMeters": [
+        1.0,
+        0.02,
+        0.04
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "scale_ruler_10cm",
+      "name": "10cm Scale Ruler",
+      "category": "environments",
+      "semanticTags": [
+        "ruler",
+        "10cm",
+        "scale"
+      ],
+      "path": "/assets/spatail-library/environments/scale_ruler_10cm.glb",
+      "scaleMeters": [
+        0.1,
+        0.01,
+        0.02
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table",
+        "floating"
+      ],
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

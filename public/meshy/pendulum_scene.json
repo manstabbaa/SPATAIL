@@ -1,0 +1,370 @@
+{
+  "schemaVersion": "0.4.0-studio-runtime",
+  "createdAt": "2026-06-04T01:41:44.179568+00:00",
+  "sceneId": "meshy_pendulum_demo",
+  "title": "The Simple Pendulum",
+  "sourceBrief": {
+    "prompt": "Pendulums are in common usage. Some have crucial uses, such as in clocks; some are for fun, such as a child's swing; and some are just there, such as the sinker on a fishing line. For small displacements, a pendulum is a simple harmonic oscillator. A simple pendulum is defined to have an object that has a small mass, also known as the pendulum bob, which is suspended from a light wire or string.",
+    "subject": "the simple pendulum",
+    "domain": "general_knowledge",
+    "intent": "explain",
+    "strategy": "part_to_whole_explanation"
+  },
+  "domain": {
+    "name": "general_knowledge",
+    "confidence": "low",
+    "source": "rule"
+  },
+  "representation": {
+    "domain": "general_knowledge",
+    "intent": "explain",
+    "strategy": "part_to_whole_explanation",
+    "subject": "the simple pendulum",
+    "reasoning": "caller override -> part_to_whole_explanation. Move between a part and the whole it belongs to.",
+    "domainConfidence": 0.0,
+    "intentConfidence": 0.95
+  },
+  "placement": {
+    "anchor": "table",
+    "layout": "arc",
+    "facing": "user",
+    "scaleMode": "dynamic"
+  },
+  "studio": {
+    "glb": "/assets/spatail-library/meshy/simple_pendulum.glb",
+    "frame": "y_up_m",
+    "room": {
+      "w": 6.0,
+      "d": 6.0,
+      "h": 3.0
+    },
+    "user": {
+      "eye_height_m": 1.45
+    },
+    "animation": {
+      "clip": null,
+      "fps": 30,
+      "loop": true,
+      "count": 0
+    },
+    "bbox": {
+      "min": [
+        0,
+        0,
+        0
+      ],
+      "max": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "comfortGuides": {
+    "eye_height_m": 1.45,
+    "cone_deg": 30.0,
+    "gaze_down_deg": 12.0,
+    "near_clip_m": 0.37,
+    "focal_plane_m": 0.74,
+    "read_band_m": [
+      1.0,
+      1.5
+    ],
+    "far_max_m": 10.0,
+    "focal_point_yup": [
+      0.0,
+      1.2927,
+      -0.74
+    ],
+    "stage_distance_m": 0.74,
+    "baseline_z_m": 1.2927
+  },
+  "staging": {
+    "distance_m": 0.74,
+    "spread_deg": 30.0,
+    "reasoning": "4 exhibit(s) on a arc at 0.74 m, dropped 12.0 deg along the natural gaze; anchor=table."
+  },
+  "beats": [
+    {
+      "id": "the_pendulum",
+      "title": "A simple pendulum",
+      "narration": "A small mass \u2014 the bob \u2014 on a light string, free to swing. For small displacements it is a simple harmonic oscillator.",
+      "focusTarget": [
+        -0.1915,
+        1.2927,
+        -0.7148
+      ],
+      "labelAnchor": [
+        -0.1915,
+        1.4427,
+        -0.7148
+      ],
+      "distanceM": 0.74,
+      "inComfortCone": true,
+      "reveal": "auto"
+    },
+    {
+      "id": "in_a_clock",
+      "title": "Crucial uses: the clock",
+      "narration": "A swinging pendulum keeps a clock's time \u2014 its period depends only on length and gravity, not on how hard it swings.",
+      "focusTarget": [
+        -0.0645,
+        1.2927,
+        -0.7372
+      ],
+      "labelAnchor": [
+        -0.0645,
+        1.4427,
+        -0.7372
+      ],
+      "distanceM": 0.74,
+      "inComfortCone": true,
+      "reveal": "on_tap"
+    },
+    {
+      "id": "for_fun",
+      "title": "For fun: the swing",
+      "narration": "A child's swing is a pendulum you can ride \u2014 same physics, human scale.",
+      "focusTarget": [
+        0.0645,
+        1.2927,
+        -0.7372
+      ],
+      "labelAnchor": [
+        0.0645,
+        1.4427,
+        -0.7372
+      ],
+      "distanceM": 0.74,
+      "inComfortCone": true,
+      "reveal": "on_tap"
+    },
+    {
+      "id": "just_there",
+      "title": "Just there: the sinker",
+      "narration": "Even a fishing sinker hanging on a line is a pendulum.",
+      "focusTarget": [
+        0.1915,
+        1.2927,
+        -0.7148
+      ],
+      "labelAnchor": [
+        0.1915,
+        1.4427,
+        -0.7148
+      ],
+      "distanceM": 0.74,
+      "inComfortCone": true,
+      "reveal": "on_tap"
+    },
+    {
+      "id": "all_pendulums",
+      "title": "All the same idea",
+      "narration": "Clock, swing, sinker \u2014 all pendulums, all swinging to the same simple law.",
+      "focusTarget": [
+        -0.1915,
+        1.2927,
+        -0.7148
+      ],
+      "labelAnchor": [
+        -0.1915,
+        1.4427,
+        -0.7148
+      ],
+      "distanceM": 0.74,
+      "inComfortCone": true,
+      "reveal": "on_tap"
+    }
+  ],
+  "storySequence": [
+    {
+      "id": "the_pendulum",
+      "title": "A simple pendulum",
+      "description": "A small mass \u2014 the bob \u2014 on a light string, free to swing. For small displacements it is a simple harmonic oscillator.",
+      "suggestedAction": "next_beat"
+    },
+    {
+      "id": "in_a_clock",
+      "title": "Crucial uses: the clock",
+      "description": "A swinging pendulum keeps a clock's time \u2014 its period depends only on length and gravity, not on how hard it swings.",
+      "suggestedAction": "next_beat"
+    },
+    {
+      "id": "for_fun",
+      "title": "For fun: the swing",
+      "description": "A child's swing is a pendulum you can ride \u2014 same physics, human scale.",
+      "suggestedAction": "next_beat"
+    },
+    {
+      "id": "just_there",
+      "title": "Just there: the sinker",
+      "description": "Even a fishing sinker hanging on a line is a pendulum.",
+      "suggestedAction": "next_beat"
+    },
+    {
+      "id": "all_pendulums",
+      "title": "All the same idea",
+      "description": "Clock, swing, sinker \u2014 all pendulums, all swinging to the same simple law.",
+      "suggestedAction": "next_beat"
+    }
+  ],
+  "interactions": [
+    {
+      "id": "reveal_simple_pendulum",
+      "type": "tap_reveal",
+      "label": "Simple Pendulum",
+      "params": {
+        "target": "simple_pendulum"
+      },
+      "trigger": "on_tap"
+    },
+    {
+      "id": "reveal_pendulum_clock",
+      "type": "tap_reveal",
+      "label": "Pendulum Clock",
+      "params": {
+        "target": "pendulum_clock"
+      },
+      "trigger": "on_tap"
+    },
+    {
+      "id": "reveal_childs_swing",
+      "type": "tap_reveal",
+      "label": "Child's Swing",
+      "params": {
+        "target": "childs_swing"
+      },
+      "trigger": "on_tap"
+    },
+    {
+      "id": "reveal_fishing_sinker",
+      "type": "tap_reveal",
+      "label": "Fishing Sinker",
+      "params": {
+        "target": "fishing_sinker"
+      },
+      "trigger": "on_tap"
+    }
+  ],
+  "assets": [
+    {
+      "id": "simple_pendulum",
+      "role": "primary_object",
+      "status": "processed",
+      "processedPath": "/assets/spatail-library/meshy/simple_pendulum.glb",
+      "footprint": {
+        "w": 0.25,
+        "h": 0.25,
+        "d": 0.5
+      },
+      "position_yup": [
+        -0.1915,
+        1.2927,
+        -0.7148
+      ],
+      "yaw_rad": 0.2618,
+      "inComfortCone": true,
+      "usdzUrl": "/assets/spatail-library/meshy/simple_pendulum.usdz",
+      "fallbackPrimitive": "cube"
+    },
+    {
+      "id": "pendulum_clock",
+      "role": "comparison_object",
+      "status": "processed",
+      "processedPath": "/assets/spatail-library/meshy/pendulum_clock.glb",
+      "footprint": {
+        "w": 0.5,
+        "h": 0.3,
+        "d": 1.8
+      },
+      "position_yup": [
+        -0.0645,
+        1.2927,
+        -0.7372
+      ],
+      "yaw_rad": 0.0873,
+      "inComfortCone": true,
+      "usdzUrl": "/assets/spatail-library/meshy/pendulum_clock.usdz",
+      "fallbackPrimitive": "cube"
+    },
+    {
+      "id": "childs_swing",
+      "role": "comparison_object",
+      "status": "processed",
+      "processedPath": "/assets/spatail-library/meshy/childs_swing.glb",
+      "footprint": {
+        "w": 1.2,
+        "h": 1.2,
+        "d": 1.6
+      },
+      "position_yup": [
+        0.0645,
+        1.2927,
+        -0.7372
+      ],
+      "yaw_rad": -0.0873,
+      "inComfortCone": true,
+      "usdzUrl": "/assets/spatail-library/meshy/childs_swing.usdz",
+      "fallbackPrimitive": "cube"
+    },
+    {
+      "id": "fishing_sinker",
+      "role": "comparison_object",
+      "status": "processed",
+      "processedPath": "/assets/spatail-library/meshy/fishing_sinker.glb",
+      "footprint": {
+        "w": 0.03,
+        "h": 0.03,
+        "d": 0.06
+      },
+      "position_yup": [
+        0.1915,
+        1.2927,
+        -0.7148
+      ],
+      "yaw_rad": -0.2618,
+      "inComfortCone": true,
+      "usdzUrl": "/assets/spatail-library/meshy/fishing_sinker.usdz",
+      "fallbackPrimitive": "cube"
+    }
+  ],
+  "xrDesignCitations": {
+    "NEAR_CLIP_M": "Magic Leap \u2014 Display Zone / Vergence-Accommodation Conflict",
+    "FOCAL_PLANE_M": "Magic Leap \u2014 Display Zone (comfort focal plane)",
+    "READ_NEAR_M": "Apple visionOS HIG \u2014 text beyond arm's reach reads best",
+    "OCPA_CONE_DEG": "Magic Leap \u2014 Optimal Content Placement Area (30 deg cone)",
+    "GAZE_DOWN_DEG": "Magic Leap \u2014 natural line of sight 10-15 deg below horizon",
+    "MIN_TARGET_DEG": "Apple visionOS HIG \u2014 60 pt minimum interactive target",
+    "TARGET_FPS": "Magic Leap \u2014 90-120 fps for comfort"
+  },
+  "mode": "meshy_image_to_3d",
+  "source": {
+    "pipeline": "gemini_multiview -> meshy_multi_image_to_3d -> blender_normalize -> library",
+    "book": {
+      "book": "College Physics 2e",
+      "publisher": "OpenStax",
+      "section": "16.4 The Simple Pendulum",
+      "url": "https://openstax.org/books/college-physics-2e/pages/16-4-the-simple-pendulum",
+      "license": "CC BY 4.0"
+    },
+    "segmentText": "Pendulums are in common usage. Some have crucial uses, such as in clocks; some are for fun, such as a child's swing; and some are just there, such as the sinker on a fishing line. For small displacements, a pendulum is a simple harmonic oscillator. A simple pendulum is defined to have an object that has a small mass, also known as the pendulum bob, which is suspended from a light wire or string.",
+    "assets": {
+      "simple_pendulum": {
+        "name": "Simple Pendulum",
+        "complexity": "simple"
+      },
+      "pendulum_clock": {
+        "name": "Pendulum Clock",
+        "complexity": "complex"
+      },
+      "childs_swing": {
+        "name": "Child's Swing",
+        "complexity": "medium"
+      },
+      "fishing_sinker": {
+        "name": "Fishing Sinker",
+        "complexity": "small"
+      }
+    }
+  }
+}

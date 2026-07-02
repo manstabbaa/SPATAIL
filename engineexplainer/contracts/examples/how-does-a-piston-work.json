@@ -1,0 +1,88 @@
+{
+  "meta": {
+    "id": "how-does-a-piston-work",
+    "prompt": "How does a piston work?",
+    "schemaVersion": "0.1.0",
+    "generatedAt": "2026-05-26T00:00:00Z",
+    "generatedBy": "hand-authored-reference-v0.2",
+    "asset": "engine/v8_engine.glb",
+    "estimatedDurationSec": 24
+  },
+
+  "explanation": {
+    "title": "How a piston turns combustion into rotation",
+    "summary": "Burning fuel above the piston pushes it down. The connecting rod converts that linear push into rotation of the crankshaft below. Eight of those cycles, staggered, are what makes a V8."
+  },
+
+  "scene": {
+    "camera": { "preset": "hero_threequarter" },
+    "environment": { "background": "#0F1118" }
+  },
+
+  "beats": [
+    {
+      "id": "establish_engine",
+      "narration": "This is the V8. Before we open it up — get oriented.",
+      "duration": 4,
+      "actions": [
+        { "type": "move_camera", "to": { "preset": "hero_threequarter" }, "duration": 0.8 }
+      ]
+    },
+
+    {
+      "id": "focus_one_cylinder",
+      "narration": "Of its eight cylinders, we'll follow just one — the front-most, on the left bank.",
+      "duration": 5,
+      "actions": [
+        { "type": "dim_others", "except": ["V8_Engine-173"], "factor": 0.18 },
+        { "type": "highlight", "target": "V8_Engine-173", "color": "#5046E5" },
+        { "type": "label", "target": "V8_Engine-173", "kicker": "FOCUS",
+          "text": "Cylinder 1 region", "anchor": "above" },
+        { "type": "move_camera",
+          "to": { "preset": "cylinder_close", "fov": 30 },
+          "duration": 0.9 }
+      ]
+    },
+
+    {
+      "id": "highlight_top_assembly",
+      "narration": "Above the piston: the cylinder head, valves, and the spark plug that fires the mix.",
+      "duration": 5,
+      "actions": [
+        { "type": "show", "target": "V8_Engine-350" },
+        { "type": "highlight", "target": "V8_Engine-350", "color": "#8B82FF", "intensity": 0.85 },
+        { "type": "label", "target": "V8_Engine-350", "kicker": "COMBUSTION CHAMBER",
+          "text": "Cylinder head", "anchor": "above" }
+      ]
+    },
+
+    {
+      "id": "show_block_motion",
+      "narration": "Below it, the crankshaft turns. The piston's linear push becomes rotation here.",
+      "duration": 6,
+      "actions": [
+        { "type": "show", "target": "V8_Engine-176" },
+        { "type": "highlight", "target": "V8_Engine-176", "color": "#5046E5", "intensity": 0.9 },
+        { "type": "label", "target": "V8_Engine-176", "kicker": "OUTPUT",
+          "text": "Engine block & crank", "anchor": "below" },
+        { "type": "show_panel", "component": "ExplanationCard", "anchor": "screen-top-right",
+          "props": {
+            "kicker": "POWER STROKE",
+            "title": "Combustion → rotation",
+            "body": "Pressure above the piston can exceed 80 bar. That force, multiplied across 8 pistons firing in sequence, is what spins the crank."
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "summary_wide",
+      "narration": "Multiply that by eight, time them carefully, and you have a V8 making power.",
+      "duration": 4,
+      "actions": [
+        { "type": "reset", "scope": "all" },
+        { "type": "move_camera", "to": { "preset": "hero_threequarter" }, "duration": 0.9 }
+      ]
+    }
+  ]
+}

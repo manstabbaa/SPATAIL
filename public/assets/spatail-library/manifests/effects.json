@@ -1,0 +1,992 @@
+{
+  "category": "effects",
+  "count": 29,
+  "assets": [
+    {
+      "assetId": "highlight_outline",
+      "name": "Highlight Outline",
+      "category": "effects",
+      "semanticTags": [
+        "highlight",
+        "outline",
+        "select"
+      ],
+      "path": "/assets/spatail-library/effects/highlight_outline.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "pulse_glow",
+      "name": "Pulse Glow",
+      "category": "effects",
+      "semanticTags": [
+        "pulse",
+        "glow",
+        "attention"
+      ],
+      "path": "/assets/spatail-library/effects/pulse_glow.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "selection_ring",
+      "name": "Selection Ring",
+      "category": "effects",
+      "semanticTags": [
+        "selection",
+        "ring",
+        "select"
+      ],
+      "path": "/assets/spatail-library/effects/selection_ring.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "scanline_effect",
+      "name": "Scanline Effect",
+      "category": "effects",
+      "semanticTags": [
+        "scan",
+        "scanline",
+        "reveal"
+      ],
+      "path": "/assets/spatail-library/effects/scanline_effect.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "xray_material",
+      "name": "X-Ray Material",
+      "category": "effects",
+      "semanticTags": [
+        "xray",
+        "transparent",
+        "material"
+      ],
+      "path": "/assets/spatail-library/effects/xray_material.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "transparent_glass_material",
+      "name": "Glass Material",
+      "category": "effects",
+      "semanticTags": [
+        "glass",
+        "transparent",
+        "material"
+      ],
+      "path": "/assets/spatail-library/effects/transparent_glass_material.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "ghost_material",
+      "name": "Ghost Material",
+      "category": "effects",
+      "semanticTags": [
+        "ghost",
+        "faded",
+        "material"
+      ],
+      "path": "/assets/spatail-library/effects/ghost_material.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "hologram_material",
+      "name": "Hologram Material",
+      "category": "effects",
+      "semanticTags": [
+        "hologram",
+        "holo",
+        "material"
+      ],
+      "path": "/assets/spatail-library/effects/hologram_material.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "heat_glow",
+      "name": "Heat Glow",
+      "category": "effects",
+      "semanticTags": [
+        "heat",
+        "hot",
+        "thermal"
+      ],
+      "path": "/assets/spatail-library/effects/heat_glow.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "cold_glow",
+      "name": "Cold Glow",
+      "category": "effects",
+      "semanticTags": [
+        "cold",
+        "cool",
+        "frost"
+      ],
+      "path": "/assets/spatail-library/effects/cold_glow.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "sphere",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "energy_beam",
+      "name": "Energy Beam",
+      "category": "effects",
+      "semanticTags": [
+        "energy",
+        "beam",
+        "laser"
+      ],
+      "path": "/assets/spatail-library/effects/energy_beam.glb",
+      "scaleMeters": [
+        0.02,
+        0.02,
+        0.5
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "airflow_particles",
+      "name": "Airflow Particles",
+      "category": "effects",
+      "semanticTags": [
+        "airflow",
+        "wind",
+        "particles"
+      ],
+      "path": "/assets/spatail-library/effects/airflow_particles.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "water_flow_particles",
+      "name": "Water Flow Particles",
+      "category": "effects",
+      "semanticTags": [
+        "water",
+        "flow",
+        "particles"
+      ],
+      "path": "/assets/spatail-library/effects/water_flow_particles.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "smoke_particles",
+      "name": "Smoke Particles",
+      "category": "effects",
+      "semanticTags": [
+        "smoke",
+        "fog",
+        "particles"
+      ],
+      "path": "/assets/spatail-library/effects/smoke_particles.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "spark_particles",
+      "name": "Spark Particles",
+      "category": "effects",
+      "semanticTags": [
+        "spark",
+        "electric",
+        "particles"
+      ],
+      "path": "/assets/spatail-library/effects/spark_particles.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "explosion_particles",
+      "name": "Explosion Particles",
+      "category": "effects",
+      "semanticTags": [
+        "explosion",
+        "burst",
+        "particles"
+      ],
+      "path": "/assets/spatail-library/effects/explosion_particles.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "magnetic_field_lines",
+      "name": "Magnetic Field Lines",
+      "category": "effects",
+      "semanticTags": [
+        "magnetic",
+        "field",
+        "lines"
+      ],
+      "path": "/assets/spatail-library/effects/magnetic_field_lines.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "gravity_field_lines",
+      "name": "Gravity Field Lines",
+      "category": "effects",
+      "semanticTags": [
+        "gravity",
+        "field",
+        "lines"
+      ],
+      "path": "/assets/spatail-library/effects/gravity_field_lines.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "orbit_trail",
+      "name": "Orbit Trail",
+      "category": "effects",
+      "semanticTags": [
+        "orbit",
+        "trail",
+        "path"
+      ],
+      "path": "/assets/spatail-library/effects/orbit_trail.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "motion_trail",
+      "name": "Motion Trail",
+      "category": "effects",
+      "semanticTags": [
+        "motion",
+        "trail",
+        "path"
+      ],
+      "path": "/assets/spatail-library/effects/motion_trail.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "assembly_snap_effect",
+      "name": "Assembly Snap",
+      "category": "effects",
+      "semanticTags": [
+        "assembly",
+        "snap",
+        "effect"
+      ],
+      "path": "/assets/spatail-library/effects/assembly_snap_effect.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "disassembly_spread_effect",
+      "name": "Disassembly Spread",
+      "category": "effects",
+      "semanticTags": [
+        "disassembly",
+        "spread",
+        "effect"
+      ],
+      "path": "/assets/spatail-library/effects/disassembly_spread_effect.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "reveal_wipe",
+      "name": "Reveal Wipe",
+      "category": "effects",
+      "semanticTags": [
+        "reveal",
+        "wipe",
+        "transition"
+      ],
+      "path": "/assets/spatail-library/effects/reveal_wipe.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "dissolve_effect",
+      "name": "Dissolve Effect",
+      "category": "effects",
+      "semanticTags": [
+        "dissolve",
+        "fade",
+        "transition"
+      ],
+      "path": "/assets/spatail-library/effects/dissolve_effect.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "focus_spotlight",
+      "name": "Focus Spotlight",
+      "category": "effects",
+      "semanticTags": [
+        "spotlight",
+        "focus",
+        "light"
+      ],
+      "path": "/assets/spatail-library/effects/focus_spotlight.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "dim_background_overlay",
+      "name": "Dim Background Overlay",
+      "category": "effects",
+      "semanticTags": [
+        "dim",
+        "background",
+        "overlay"
+      ],
+      "path": "/assets/spatail-library/effects/dim_background_overlay.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "depth_fade",
+      "name": "Depth Fade",
+      "category": "effects",
+      "semanticTags": [
+        "depth",
+        "fade",
+        "fog"
+      ],
+      "path": "/assets/spatail-library/effects/depth_fade.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "object_shadow_blob",
+      "name": "Object Shadow Blob",
+      "category": "effects",
+      "semanticTags": [
+        "shadow",
+        "blob",
+        "ground"
+      ],
+      "path": "/assets/spatail-library/effects/object_shadow_blob.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "impact_ripple",
+      "name": "Impact Ripple",
+      "category": "effects",
+      "semanticTags": [
+        "impact",
+        "ripple",
+        "shockwave"
+      ],
+      "path": "/assets/spatail-library/effects/impact_ripple.glb",
+      "scaleMeters": [
+        0.2,
+        0.2,
+        0.2
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floating",
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "ring",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

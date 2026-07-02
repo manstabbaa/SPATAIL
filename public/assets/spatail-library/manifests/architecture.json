@@ -1,0 +1,1158 @@
+{
+  "category": "architecture",
+  "count": 34,
+  "assets": [
+    {
+      "assetId": "wall_segment",
+      "name": "Wall Segment",
+      "category": "architecture",
+      "semanticTags": [
+        "wall",
+        "partition"
+      ],
+      "path": "/assets/spatail-library/architecture/wall_segment.glb",
+      "scaleMeters": [
+        1.0,
+        1.0,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "floor_slab",
+      "name": "Floor Slab",
+      "category": "architecture",
+      "semanticTags": [
+        "floor",
+        "slab",
+        "deck"
+      ],
+      "path": "/assets/spatail-library/architecture/floor_slab.glb",
+      "scaleMeters": [
+        1.0,
+        0.1,
+        1.0
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "ceiling_slab",
+      "name": "Ceiling Slab",
+      "category": "architecture",
+      "semanticTags": [
+        "ceiling",
+        "slab"
+      ],
+      "path": "/assets/spatail-library/architecture/ceiling_slab.glb",
+      "scaleMeters": [
+        1.0,
+        0.1,
+        1.0
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "column",
+      "name": "Column",
+      "category": "architecture",
+      "semanticTags": [
+        "column",
+        "pillar",
+        "support"
+      ],
+      "path": "/assets/spatail-library/architecture/column.glb",
+      "scaleMeters": [
+        0.15,
+        1.0,
+        0.15
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "beam",
+      "name": "Beam",
+      "category": "architecture",
+      "semanticTags": [
+        "beam",
+        "girder",
+        "support"
+      ],
+      "path": "/assets/spatail-library/architecture/beam.glb",
+      "scaleMeters": [
+        1.0,
+        0.12,
+        0.12
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "truss_segment",
+      "name": "Truss Segment",
+      "category": "architecture",
+      "semanticTags": [
+        "truss",
+        "frame",
+        "structure"
+      ],
+      "path": "/assets/spatail-library/architecture/truss_segment.glb",
+      "scaleMeters": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "arch",
+      "name": "Arch",
+      "category": "architecture",
+      "semanticTags": [
+        "arch",
+        "span"
+      ],
+      "path": "/assets/spatail-library/architecture/arch.glb",
+      "scaleMeters": [
+        0.6,
+        0.3,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "torus",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "foundation_block",
+      "name": "Foundation Block",
+      "category": "architecture",
+      "semanticTags": [
+        "foundation",
+        "footing",
+        "base"
+      ],
+      "path": "/assets/spatail-library/architecture/foundation_block.glb",
+      "scaleMeters": [
+        0.5,
+        0.2,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "stair_segment",
+      "name": "Stair Segment",
+      "category": "architecture",
+      "semanticTags": [
+        "stair",
+        "steps"
+      ],
+      "path": "/assets/spatail-library/architecture/stair_segment.glb",
+      "scaleMeters": [
+        0.3,
+        0.3,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "window",
+      "name": "Window",
+      "category": "architecture",
+      "semanticTags": [
+        "window",
+        "glazing"
+      ],
+      "path": "/assets/spatail-library/architecture/window.glb",
+      "scaleMeters": [
+        0.6,
+        0.8,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "door",
+      "name": "Door",
+      "category": "architecture",
+      "semanticTags": [
+        "door",
+        "entrance"
+      ],
+      "path": "/assets/spatail-library/architecture/door.glb",
+      "scaleMeters": [
+        0.8,
+        2.0,
+        0.05
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "roof_gable",
+      "name": "Gable Roof",
+      "category": "architecture",
+      "semanticTags": [
+        "roof",
+        "gable",
+        "pitched"
+      ],
+      "path": "/assets/spatail-library/architecture/roof_gable.glb",
+      "scaleMeters": [
+        1.0,
+        0.4,
+        1.0
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "roof_flat",
+      "name": "Flat Roof",
+      "category": "architecture",
+      "semanticTags": [
+        "roof",
+        "flat"
+      ],
+      "path": "/assets/spatail-library/architecture/roof_flat.glb",
+      "scaleMeters": [
+        1.0,
+        0.08,
+        1.0
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bridge_deck",
+      "name": "Bridge Deck",
+      "category": "architecture",
+      "semanticTags": [
+        "bridge",
+        "deck",
+        "roadway"
+      ],
+      "path": "/assets/spatail-library/architecture/bridge_deck.glb",
+      "scaleMeters": [
+        1.5,
+        0.1,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bridge_pillar",
+      "name": "Bridge Pillar",
+      "category": "architecture",
+      "semanticTags": [
+        "bridge",
+        "pillar",
+        "pier"
+      ],
+      "path": "/assets/spatail-library/architecture/bridge_pillar.glb",
+      "scaleMeters": [
+        0.2,
+        1.0,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "suspension_cable",
+      "name": "Suspension Cable",
+      "category": "architecture",
+      "semanticTags": [
+        "bridge",
+        "cable",
+        "suspension"
+      ],
+      "path": "/assets/spatail-library/architecture/suspension_cable.glb",
+      "scaleMeters": [
+        0.02,
+        1.0,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cylinder",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "cable_stayed_tower",
+      "name": "Cable-Stayed Tower",
+      "category": "architecture",
+      "semanticTags": [
+        "bridge",
+        "tower",
+        "pylon"
+      ],
+      "path": "/assets/spatail-library/architecture/cable_stayed_tower.glb",
+      "scaleMeters": [
+        0.2,
+        1.5,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "colosseum",
+      "name": "Roman Colosseum",
+      "category": "architecture",
+      "semanticTags": [
+        "colosseum",
+        "amphitheater",
+        "arena",
+        "roman",
+        "stadium",
+        "ruins"
+      ],
+      "path": "/assets/spatail-library/architecture/colosseum.glb",
+      "scaleMeters": [
+        0.6,
+        0.28,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "skyscraper",
+      "name": "Skyscraper",
+      "category": "architecture",
+      "semanticTags": [
+        "skyscraper",
+        "tower",
+        "highrise",
+        "building",
+        "office"
+      ],
+      "path": "/assets/spatail-library/architecture/skyscraper.glb",
+      "scaleMeters": [
+        0.32,
+        1.2,
+        0.32
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bridge_truss",
+      "name": "Bridge Truss",
+      "category": "architecture",
+      "semanticTags": [
+        "bridge",
+        "truss",
+        "frame"
+      ],
+      "path": "/assets/spatail-library/architecture/bridge_truss.glb",
+      "scaleMeters": [
+        1.0,
+        0.4,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "road_segment",
+      "name": "Road Segment",
+      "category": "architecture",
+      "semanticTags": [
+        "road",
+        "asphalt",
+        "lane"
+      ],
+      "path": "/assets/spatail-library/architecture/road_segment.glb",
+      "scaleMeters": [
+        1.0,
+        0.02,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "sidewalk_segment",
+      "name": "Sidewalk Segment",
+      "category": "architecture",
+      "semanticTags": [
+        "sidewalk",
+        "pavement"
+      ],
+      "path": "/assets/spatail-library/architecture/sidewalk_segment.glb",
+      "scaleMeters": [
+        1.0,
+        0.05,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "traffic_cone",
+      "name": "Traffic Cone",
+      "category": "architecture",
+      "semanticTags": [
+        "cone",
+        "traffic",
+        "safety"
+      ],
+      "path": "/assets/spatail-library/architecture/traffic_cone.glb",
+      "scaleMeters": [
+        0.1,
+        0.3,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cone",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "construction_crane_simplified",
+      "name": "Construction Crane",
+      "category": "architecture",
+      "semanticTags": [
+        "crane",
+        "construction",
+        "lift"
+      ],
+      "path": "/assets/spatail-library/architecture/construction_crane_simplified.glb",
+      "scaleMeters": [
+        0.3,
+        1.5,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "excavator_simplified",
+      "name": "Excavator",
+      "category": "architecture",
+      "semanticTags": [
+        "excavator",
+        "digger",
+        "construction"
+      ],
+      "path": "/assets/spatail-library/architecture/excavator_simplified.glb",
+      "scaleMeters": [
+        0.4,
+        0.3,
+        0.6
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "bulldozer_simplified",
+      "name": "Bulldozer",
+      "category": "architecture",
+      "semanticTags": [
+        "bulldozer",
+        "dozer",
+        "construction"
+      ],
+      "path": "/assets/spatail-library/architecture/bulldozer_simplified.glb",
+      "scaleMeters": [
+        0.4,
+        0.3,
+        0.6
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "rebar_cage",
+      "name": "Rebar Cage",
+      "category": "architecture",
+      "semanticTags": [
+        "rebar",
+        "steel",
+        "reinforce"
+      ],
+      "path": "/assets/spatail-library/architecture/rebar_cage.glb",
+      "scaleMeters": [
+        0.2,
+        0.6,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "concrete_block",
+      "name": "Concrete Block",
+      "category": "architecture",
+      "semanticTags": [
+        "concrete",
+        "block",
+        "cmu"
+      ],
+      "path": "/assets/spatail-library/architecture/concrete_block.glb",
+      "scaleMeters": [
+        0.4,
+        0.2,
+        0.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "brick",
+      "name": "Brick",
+      "category": "architecture",
+      "semanticTags": [
+        "brick",
+        "masonry"
+      ],
+      "path": "/assets/spatail-library/architecture/brick.glb",
+      "scaleMeters": [
+        0.2,
+        0.065,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "steel_i_beam",
+      "name": "Steel I-Beam",
+      "category": "architecture",
+      "semanticTags": [
+        "steel",
+        "ibeam",
+        "girder"
+      ],
+      "path": "/assets/spatail-library/architecture/steel_i_beam.glb",
+      "scaleMeters": [
+        0.15,
+        1.0,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "blueprint_plane",
+      "name": "Blueprint Plane",
+      "category": "architecture",
+      "semanticTags": [
+        "blueprint",
+        "plan",
+        "drawing"
+      ],
+      "path": "/assets/spatail-library/architecture/blueprint_plane.glb",
+      "scaleMeters": [
+        0.6,
+        0.01,
+        0.4
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "section_cut_plane",
+      "name": "Section Cut Plane",
+      "category": "architecture",
+      "semanticTags": [
+        "section",
+        "cut",
+        "slice"
+      ],
+      "path": "/assets/spatail-library/architecture/section_cut_plane.glb",
+      "scaleMeters": [
+        0.6,
+        0.6,
+        0.01
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "floor_plan_marker",
+      "name": "Floor Plan Marker",
+      "category": "architecture",
+      "semanticTags": [
+        "floorplan",
+        "marker",
+        "plan"
+      ],
+      "path": "/assets/spatail-library/architecture/floor_plan_marker.glb",
+      "scaleMeters": [
+        0.1,
+        0.01,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "plane",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "room_boundary_line",
+      "name": "Room Boundary Line",
+      "category": "architecture",
+      "semanticTags": [
+        "room",
+        "boundary",
+        "line"
+      ],
+      "path": "/assets/spatail-library/architecture/room_boundary_line.glb",
+      "scaleMeters": [
+        1.0,
+        0.02,
+        0.02
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "floor",
+        "table"
+      ],
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": false,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

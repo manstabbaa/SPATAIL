@@ -1,0 +1,663 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "the atom",
+  "surroundingContext": "An atom is the smallest unit of an element. It has a tiny, dense nucleus of protons and neutrons, surrounded by far lighter electrons that occupy regions around it.\n\nBecause atoms are invisibly small, scaling one up to room size lets a learner see the nucleus and the electron regions in proportion.",
+  "learningGoal": "Explain that atoms have a dense nucleus surrounded by electrons.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "animated_process",
+  "conceptId": "atom",
+  "spatailPrompt": "Create an educational spatial explanation of \"the atom\". Learning goal: Explain that atoms have a dense nucleus surrounded by electrons. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"An atom is the smallest unit of an element. It has a tiny, dense nucleus of protons and neutrons, surrounded by far lighter electrons that occupy regions around it.\n\nBecause atoms are invisibly small, scaling one up to room size lets a learner see the nucleus and the electron regions in proportion.\".",
+  "experienceBeats": [
+    "Place the nucleus at the center",
+    "Add electrons in shells around it",
+    "Animate electrons moving",
+    "Compare the tiny nucleus to the whole atom",
+    "Label protons, neutrons, and electrons"
+  ],
+  "interactions": [
+    "tap_to_highlight",
+    "step_through_explanation",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_atom",
+    "domain": "scientific",
+    "intent": "explain",
+    "strategy": "animated_simulation",
+    "subject": "Atom",
+    "placement": {
+      "anchor": "floor",
+      "layout": "cluster",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.95,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> animated_simulation. Show the process in motion as a seamless loop — best when the concept is a behaviour over time, not a static object.",
+    "experienceBeats": [
+      {
+        "id": "place_the_nucleus_at_the_center",
+        "title": "Place the nucleus at the center",
+        "narration": "Place the nucleus at the center",
+        "focus": "atom",
+        "reveal": "auto"
+      },
+      {
+        "id": "add_electrons_in_shells_around_it",
+        "title": "Add electrons in shells around it",
+        "narration": "Add electrons in shells around it",
+        "focus": "atom",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_electrons_moving",
+        "title": "Animate electrons moving",
+        "narration": "Animate electrons moving",
+        "focus": "atom",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "compare_the_tiny_nucleus_to_the_whole_at",
+        "title": "Compare the tiny nucleus to the whole atom",
+        "narration": "Compare the tiny nucleus to the whole atom",
+        "focus": "atom",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "label_protons_neutrons_and_electrons",
+        "title": "Label protons, neutrons, and electrons",
+        "narration": "Label protons, neutrons, and electrons",
+        "focus": "atom",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "atom",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "atom_mover",
+        "type": "part",
+        "priority": 1
+      }
+    ],
+    "requiredAnimations": [
+      {
+        "id": "atom_sim",
+        "targetAsset": "atom",
+        "motion": "spin",
+        "note": "seamless looping process"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        }
+      },
+      {
+        "id": "highlight_phase",
+        "type": "tap_reveal",
+        "label": "Tap to highlight this phase",
+        "params": {}
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_atom",
+    "subject": "Atom",
+    "strategy": "animated_simulation",
+    "assetRequests": [
+      {
+        "assetId": "atom",
+        "description": "complete Atom, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "default"
+        ],
+        "requiredAnimations": [
+          "spin"
+        ]
+      },
+      {
+        "assetId": "atom_mover",
+        "description": "the atom mover component of the Atom",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "default",
+          "highlightable"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T20:30:00.352805+00:00",
+    "sceneId": "edu_atom",
+    "title": "Atom",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"the atom\". Learning goal: Explain that atoms have a dense nucleus surrounded by electrons. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"An atom is the smallest unit of an element. It has a tiny, dense nucleus of protons and neutrons, surrounded by far lighter electrons that occupy regions around it.\n\nBecause atoms are invisibly small, scaling one up to room size lets a learner see the nucleus and the electron regions in proportion.\".",
+      "subject": "Atom",
+      "domain": "scientific",
+      "intent": "explain",
+      "strategy": "animated_simulation"
+    },
+    "domain": {
+      "name": "scientific",
+      "confidence": "high",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "scientific",
+      "intent": "explain",
+      "strategy": "animated_simulation",
+      "subject": "Atom",
+      "reasoning": "caller override -> animated_simulation. Show the process in motion as a seamless loop — best when the concept is a behaviour over time, not a static object.",
+      "domainConfidence": 0.95,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "floor",
+      "layout": "cluster",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": "atom_spin",
+        "fps": 30,
+        "loop": true,
+        "count": 1
+      },
+      "bbox": {
+        "min": [
+          -0.15,
+          0.0,
+          -0.15
+        ],
+        "max": [
+          0.15,
+          0.3,
+          0.15
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 2.5,
+      "baseline_z_m": 0.9186
+    },
+    "staging": {
+      "distance_m": 2.5,
+      "spread_deg": 30.0,
+      "reasoning": "2 exhibit(s) on a cluster at 2.5 m, dropped 12.0 deg along the natural gaze; anchor=floor."
+    },
+    "beats": [
+      {
+        "id": "place_the_nucleus_at_the_center",
+        "title": "Place the nucleus at the center",
+        "narration": "Place the nucleus at the center",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "add_electrons_in_shells_around_it",
+        "title": "Add electrons in shells around it",
+        "narration": "Add electrons in shells around it",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "animate_electrons_moving",
+        "title": "Animate electrons moving",
+        "narration": "Animate electrons moving",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "compare_the_tiny_nucleus_to_the_whole_at",
+        "title": "Compare the tiny nucleus to the whole atom",
+        "narration": "Compare the tiny nucleus to the whole atom",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "label_protons_neutrons_and_electrons",
+        "title": "Label protons, neutrons, and electrons",
+        "narration": "Label protons, neutrons, and electrons",
+        "focusTarget": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "labelAnchor": [
+          -0.647,
+          1.0686,
+          -2.4148
+        ],
+        "distanceM": 2.5,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "place_the_nucleus_at_the_center",
+        "title": "Place the nucleus at the center",
+        "description": "Place the nucleus at the center",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "add_electrons_in_shells_around_it",
+        "title": "Add electrons in shells around it",
+        "description": "Add electrons in shells around it",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "animate_electrons_moving",
+        "title": "Animate electrons moving",
+        "description": "Animate electrons moving",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "compare_the_tiny_nucleus_to_the_whole_at",
+        "title": "Compare the tiny nucleus to the whole atom",
+        "description": "Compare the tiny nucleus to the whole atom",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "label_protons_neutrons_and_electrons",
+        "title": "Label protons, neutrons, and electrons",
+        "description": "Label protons, neutrons, and electrons",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        },
+        "trigger": "on_tap"
+      },
+      {
+        "id": "highlight_phase",
+        "type": "tap_reveal",
+        "label": "Tap to highlight this phase",
+        "params": {},
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "atom",
+        "role": "primary_object",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          -0.647,
+          0.9186,
+          -2.4148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "sphere"
+      },
+      {
+        "id": "atom_mover",
+        "role": "part",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          0.647,
+          0.9186,
+          -2.4148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "sphere"
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "the atom",
+      "surroundingContext": "An atom is the smallest unit of an element. It has a tiny, dense nucleus of protons and neutrons, surrounded by far lighter electrons that occupy regions around it.\n\nBecause atoms are invisibly small, scaling one up to room size lets a learner see the nucleus and the electron regions in proportion.",
+      "learningGoal": "Explain that atoms have a dense nucleus surrounded by electrons.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "animated_process",
+      "conceptId": "atom",
+      "spatailPrompt": "Create an educational spatial explanation of \"the atom\". Learning goal: Explain that atoms have a dense nucleus surrounded by electrons. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"An atom is the smallest unit of an element. It has a tiny, dense nucleus of protons and neutrons, surrounded by far lighter electrons that occupy regions around it.\n\nBecause atoms are invisibly small, scaling one up to room size lets a learner see the nucleus and the electron regions in proportion.\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_atom",
+    "assets": [
+      {
+        "assetId": "atom",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "planet_placeholder",
+        "fallbackPrimitive": "sphere",
+        "usdzPath": ""
+      },
+      {
+        "assetId": "atom_mover",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "floor",
+            "layout": "cluster"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "planet_placeholder",
+        "fallbackPrimitive": "sphere",
+        "usdzPath": ""
+      }
+    ],
+    "animations": [
+      {
+        "animationId": "atom_spin",
+        "targetAssets": [
+          "atom"
+        ],
+        "type": "looping",
+        "path": ""
+      }
+    ]
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "atom"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream atom",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "atom"
+          ],
+          "unlocks": [
+            "swap_placeholder:atom"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream atom_mover",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "atom_mover"
+          ],
+          "unlocks": [
+            "swap_placeholder:atom_mover"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "animation:atom_spin",
+            "interaction:play_pause",
+            "interaction:highlight_phase"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "floor",
+      "title": "Atom",
+      "firstBeat": "Place the nucleus at the center",
+      "placeholders": [
+        {
+          "assetId": "atom",
+          "primitive": "box",
+          "position_yup": [
+            -0.647,
+            0.9186,
+            -2.4148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "atom"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "play_pause": {
+        "enabledAfterPhase": 3,
+        "type": "play_baked",
+        "targetAssets": [
+          "atom",
+          "atom_mover"
+        ]
+      },
+      "highlight_phase": {
+        "enabledAfterPhase": 3,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "atom",
+          "atom_mover"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "play_pause",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "highlight_phase",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

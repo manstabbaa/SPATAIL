@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "0.2.0-spatail-web",
+  "experienceId": "exp_solar_system",
+  "title": "The planets — relative size",
+  "sourcePrompt": "Compare the planets by size",
+  "detectedDomain": { "name": "astronomy", "confidence": "high", "source": "intent-classifier" },
+  "experienceType": "Comparison",
+  "room": { "sizeMeters": [5, 3, 4], "anchor": "table" },
+  "spatialElements": [
+    { "id": "sun", "title": "Sun", "intent": "compare", "representationMode": "three_d_model", "scaleMode": "tabletop_scale", "anchorStrategy": "world_anchor", "attentionBehavior": "active_focus", "priority": 1,
+      "asset": { "glbUrl": "/public/assets/spatail-library/astronomy/sun.glb" },
+      "placement": { "kind": "table", "position": [-0.85, 1.05, 0], "rotationDeg": [0,0,0], "sizeMeters": [0.45, 0.45, 0.45] },
+      "affordances": ["rotate", "isolate", "label"],
+      "whyThisRepresentation": "Shown as a 3D body so its size can be compared directly against the planets.",
+      "whyThisPlacement": "Anchored at the left of the table as the origin of the comparison row." },
+    { "id": "mercury", "title": "Mercury", "intent": "compare", "representationMode": "three_d_model", "scaleMode": "tabletop_scale", "anchorStrategy": "world_anchor", "attentionBehavior": "peripheral", "priority": 5,
+      "asset": { "glbUrl": "/public/assets/spatail-library/astronomy/mercury.glb" },
+      "placement": { "kind": "table", "position": [-0.25, 1.0, 0], "rotationDeg": [0,0,0], "sizeMeters": [0.07, 0.07, 0.07] },
+      "affordances": ["label"], "whyThisRepresentation": "Small sphere placed in line for size comparison.", "whyThisPlacement": "Ordered by distance from the Sun along the comparison row." },
+    { "id": "earth", "title": "Earth", "intent": "compare", "representationMode": "three_d_model", "scaleMode": "tabletop_scale", "anchorStrategy": "world_anchor", "attentionBehavior": "active_focus", "priority": 2,
+      "asset": { "glbUrl": "/public/assets/spatail-library/astronomy/earth.glb" },
+      "placement": { "kind": "table", "position": [0.12, 1.0, 0], "rotationDeg": [0,0,0], "sizeMeters": [0.13, 0.13, 0.13] },
+      "affordances": ["rotate", "isolate", "label"], "whyThisRepresentation": "Reference body the user knows, for grounding the comparison.", "whyThisPlacement": "Centered in the row as the familiar anchor." },
+    { "id": "mars", "title": "Mars", "intent": "compare", "representationMode": "three_d_model", "scaleMode": "tabletop_scale", "anchorStrategy": "world_anchor", "attentionBehavior": "peripheral", "priority": 6,
+      "asset": { "glbUrl": "/public/assets/spatail-library/astronomy/mars.glb" },
+      "placement": { "kind": "table", "position": [0.4, 1.0, 0], "rotationDeg": [0,0,0], "sizeMeters": [0.1, 0.1, 0.1] },
+      "affordances": ["label"], "whyThisRepresentation": "Sphere sized relative to Earth.", "whyThisPlacement": "Next in distance order." },
+    { "id": "jupiter", "title": "Jupiter", "intent": "compare", "representationMode": "three_d_model", "scaleMode": "tabletop_scale", "anchorStrategy": "world_anchor", "attentionBehavior": "active_focus", "priority": 3,
+      "asset": { "glbUrl": "/public/assets/spatail-library/astronomy/jupiter.glb" },
+      "placement": { "kind": "table", "position": [0.85, 1.05, 0], "rotationDeg": [0,0,0], "sizeMeters": [0.3, 0.3, 0.3] },
+      "affordances": ["rotate", "isolate", "label"], "whyThisRepresentation": "Largest planet, shown big to make the size jump obvious.", "whyThisPlacement": "Right of Earth so the size contrast is immediate." },
+    { "id": "saturn", "title": "Saturn", "intent": "compare", "representationMode": "three_d_model", "scaleMode": "tabletop_scale", "anchorStrategy": "world_anchor", "attentionBehavior": "peripheral", "priority": 4,
+      "asset": { "glbUrl": "/public/assets/spatail-library/astronomy/saturn.glb" },
+      "placement": { "kind": "table", "position": [1.3, 1.05, 0], "rotationDeg": [0,8,0], "sizeMeters": [0.34, 0.18, 0.34] },
+      "affordances": ["rotate", "label"], "whyThisRepresentation": "Shown with rings for recognizability.", "whyThisPlacement": "End of the comparison row." }
+  ],
+  "attentionPlan": [
+    { "step": 1, "focusElementId": "sun", "narration": "The Sun dwarfs everything — this is the reference for scale." },
+    { "step": 2, "focusElementId": "earth", "narration": "Earth, the body you know best, for grounding the comparison." },
+    { "step": 3, "focusElementId": "jupiter", "narration": "Jupiter is over 11 times Earth's diameter — the size jump is huge." }
+  ]
+}

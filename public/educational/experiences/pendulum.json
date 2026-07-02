@@ -1,0 +1,663 @@
+{
+  "mode": "educational_wrapper",
+  "selectedText": "the pendulum",
+  "surroundingContext": "A pendulum is a weight hung so it can swing freely. Gravity pulls it back toward the center, so it swings past and returns, keeping a steady rhythm set mostly by its length.\n\nA spatial scene should animate the swing and show the restoring pull at each point.",
+  "learningGoal": "Show why a pendulum swings back and forth at a steady period.",
+  "targetAudience": "general learner",
+  "preferredRepresentation": "animated_process",
+  "conceptId": "pendulum",
+  "spatailPrompt": "Create an educational spatial explanation of \"the pendulum\". Learning goal: Show why a pendulum swings back and forth at a steady period. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A pendulum is a weight hung so it can swing freely. Gravity pulls it back toward the center, so it swings past and returns, keeping a steady rhythm set mostly by its length.\n\nA spatial scene should animate the swing and show the restoring pull at each point.\".",
+  "experienceBeats": [
+    "Hang the weight at rest",
+    "Lift it to one side",
+    "Release and animate the swing",
+    "Show the restoring force",
+    "Compare a short and a long pendulum"
+  ],
+  "interactions": [
+    "step_through_explanation",
+    "tap_to_highlight",
+    "isolate_important_parts",
+    "reset_view"
+  ],
+  "experiencePlan": {
+    "experienceId": "edu_pendulum",
+    "domain": "general_knowledge",
+    "intent": "explain",
+    "strategy": "animated_simulation",
+    "subject": "Pendulum",
+    "placement": {
+      "anchor": "table",
+      "layout": "arc",
+      "facing": "user",
+      "scale_mode": "dynamic"
+    },
+    "domainConfidence": 0.0,
+    "intentConfidence": 0.95,
+    "source": "rule",
+    "reasoning": "caller override -> animated_simulation. Show the process in motion as a seamless loop — best when the concept is a behaviour over time, not a static object.",
+    "experienceBeats": [
+      {
+        "id": "hang_the_weight_at_rest",
+        "title": "Hang the weight at rest",
+        "narration": "Hang the weight at rest",
+        "focus": "pendulum",
+        "reveal": "auto"
+      },
+      {
+        "id": "lift_it_to_one_side",
+        "title": "Lift it to one side",
+        "narration": "Lift it to one side",
+        "focus": "pendulum",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "release_and_animate_the_swing",
+        "title": "Release and animate the swing",
+        "narration": "Release and animate the swing",
+        "focus": "pendulum",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_the_restoring_force",
+        "title": "Show the restoring force",
+        "narration": "Show the restoring force",
+        "focus": "pendulum",
+        "reveal": "on_tap"
+      },
+      {
+        "id": "compare_a_short_and_a_long_pendulum",
+        "title": "Compare a short and a long pendulum",
+        "narration": "Compare a short and a long pendulum",
+        "focus": "pendulum",
+        "reveal": "on_tap"
+      }
+    ],
+    "requiredAssets": [
+      {
+        "id": "pendulum",
+        "type": "hero",
+        "priority": 0
+      },
+      {
+        "id": "pendulum_mover",
+        "type": "part",
+        "priority": 1
+      }
+    ],
+    "requiredAnimations": [
+      {
+        "id": "pendulum_sim",
+        "targetAsset": "pendulum",
+        "motion": "spin",
+        "note": "seamless looping process"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        }
+      },
+      {
+        "id": "highlight_phase",
+        "type": "tap_reveal",
+        "label": "Tap to highlight this phase",
+        "params": {}
+      }
+    ]
+  },
+  "assetRequestManifest": {
+    "experienceId": "edu_pendulum",
+    "subject": "Pendulum",
+    "strategy": "animated_simulation",
+    "assetRequests": [
+      {
+        "assetId": "pendulum",
+        "description": "complete Pendulum, modelled with educational detail and named parts",
+        "semanticRole": "core_structure",
+        "requiredVariants": [
+          "default"
+        ],
+        "requiredAnimations": [
+          "spin"
+        ]
+      },
+      {
+        "assetId": "pendulum_mover",
+        "description": "the pendulum mover component of the Pendulum",
+        "semanticRole": "component",
+        "requiredVariants": [
+          "default",
+          "highlightable"
+        ],
+        "requiredAnimations": []
+      }
+    ],
+    "exportRequirements": {
+      "format": "glb",
+      "modularExports": true,
+      "includeMetadata": true,
+      "includeBoundingBoxes": true,
+      "includePivots": true,
+      "includeNamedParts": true
+    }
+  },
+  "runtimeContract": {
+    "schemaVersion": "0.4.0-studio-runtime",
+    "createdAt": "2026-06-03T20:30:00.362615+00:00",
+    "sceneId": "edu_pendulum",
+    "title": "Pendulum",
+    "sourceBrief": {
+      "prompt": "Create an educational spatial explanation of \"the pendulum\". Learning goal: Show why a pendulum swings back and forth at a steady period. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A pendulum is a weight hung so it can swing freely. Gravity pulls it back toward the center, so it swings past and returns, keeping a steady rhythm set mostly by its length.\n\nA spatial scene should animate the swing and show the restoring pull at each point.\".",
+      "subject": "Pendulum",
+      "domain": "general_knowledge",
+      "intent": "explain",
+      "strategy": "animated_simulation"
+    },
+    "domain": {
+      "name": "general_knowledge",
+      "confidence": "low",
+      "source": "rule"
+    },
+    "representation": {
+      "domain": "general_knowledge",
+      "intent": "explain",
+      "strategy": "animated_simulation",
+      "subject": "Pendulum",
+      "reasoning": "caller override -> animated_simulation. Show the process in motion as a seamless loop — best when the concept is a behaviour over time, not a static object.",
+      "domainConfidence": 0.0,
+      "intentConfidence": 0.95
+    },
+    "placement": {
+      "anchor": "table",
+      "layout": "arc",
+      "facing": "user",
+      "scaleMode": "dynamic"
+    },
+    "studio": {
+      "glb": "",
+      "frame": "y_up_m",
+      "room": {
+        "w": 6.0,
+        "d": 6.0,
+        "h": 3.0
+      },
+      "user": {
+        "eye_height_m": 1.45
+      },
+      "animation": {
+        "clip": "pendulum_spin",
+        "fps": 30,
+        "loop": true,
+        "count": 1
+      },
+      "bbox": {
+        "min": [
+          -0.15,
+          0.0,
+          -0.15
+        ],
+        "max": [
+          0.15,
+          0.3,
+          0.15
+        ]
+      }
+    },
+    "comfortGuides": {
+      "eye_height_m": 1.45,
+      "cone_deg": 30.0,
+      "gaze_down_deg": 12.0,
+      "near_clip_m": 0.37,
+      "focal_plane_m": 0.74,
+      "read_band_m": [
+        1.0,
+        1.5
+      ],
+      "far_max_m": 10.0,
+      "focal_point_yup": [
+        0.0,
+        1.2927,
+        -0.74
+      ],
+      "stage_distance_m": 0.74,
+      "baseline_z_m": 1.2927
+    },
+    "staging": {
+      "distance_m": 0.74,
+      "spread_deg": 30.0,
+      "reasoning": "2 exhibit(s) on a arc at 0.74 m, dropped 12.0 deg along the natural gaze; anchor=table."
+    },
+    "beats": [
+      {
+        "id": "hang_the_weight_at_rest",
+        "title": "Hang the weight at rest",
+        "narration": "Hang the weight at rest",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "auto"
+      },
+      {
+        "id": "lift_it_to_one_side",
+        "title": "Lift it to one side",
+        "narration": "Lift it to one side",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "release_and_animate_the_swing",
+        "title": "Release and animate the swing",
+        "narration": "Release and animate the swing",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "show_the_restoring_force",
+        "title": "Show the restoring force",
+        "narration": "Show the restoring force",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      },
+      {
+        "id": "compare_a_short_and_a_long_pendulum",
+        "title": "Compare a short and a long pendulum",
+        "narration": "Compare a short and a long pendulum",
+        "focusTarget": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "labelAnchor": [
+          -0.1915,
+          1.4427,
+          -0.7148
+        ],
+        "distanceM": 0.74,
+        "inComfortCone": true,
+        "reveal": "on_tap"
+      }
+    ],
+    "storySequence": [
+      {
+        "id": "hang_the_weight_at_rest",
+        "title": "Hang the weight at rest",
+        "description": "Hang the weight at rest",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "lift_it_to_one_side",
+        "title": "Lift it to one side",
+        "description": "Lift it to one side",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "release_and_animate_the_swing",
+        "title": "Release and animate the swing",
+        "description": "Release and animate the swing",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "show_the_restoring_force",
+        "title": "Show the restoring force",
+        "description": "Show the restoring force",
+        "suggestedAction": "next_beat"
+      },
+      {
+        "id": "compare_a_short_and_a_long_pendulum",
+        "title": "Compare a short and a long pendulum",
+        "description": "Compare a short and a long pendulum",
+        "suggestedAction": "next_beat"
+      }
+    ],
+    "interactions": [
+      {
+        "id": "play_pause",
+        "type": "play_baked",
+        "label": "Play / pause",
+        "params": {
+          "loop": true
+        },
+        "trigger": "on_tap"
+      },
+      {
+        "id": "highlight_phase",
+        "type": "tap_reveal",
+        "label": "Tap to highlight this phase",
+        "params": {},
+        "trigger": "on_tap"
+      }
+    ],
+    "assets": [
+      {
+        "id": "pendulum",
+        "role": "primary_object",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          -0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": 0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "cube"
+      },
+      {
+        "id": "pendulum_mover",
+        "role": "part",
+        "status": "placeholder",
+        "processedPath": "",
+        "footprint": {
+          "w": 0.3,
+          "h": 0.3,
+          "d": 0.3
+        },
+        "position_yup": [
+          0.1915,
+          1.2927,
+          -0.7148
+        ],
+        "yaw_rad": -0.2618,
+        "inComfortCone": true,
+        "usdzUrl": "",
+        "fallbackPrimitive": "cube"
+      }
+    ],
+    "xrDesignCitations": {
+      "NEAR_CLIP_M": "Magic Leap — Display Zone / Vergence-Accommodation Conflict",
+      "FOCAL_PLANE_M": "Magic Leap — Display Zone (comfort focal plane)",
+      "READ_NEAR_M": "Apple visionOS HIG — text beyond arm's reach reads best",
+      "OCPA_CONE_DEG": "Magic Leap — Optimal Content Placement Area (30 deg cone)",
+      "GAZE_DOWN_DEG": "Magic Leap — natural line of sight 10-15 deg below horizon",
+      "MIN_TARGET_DEG": "Apple visionOS HIG — 60 pt minimum interactive target",
+      "TARGET_FPS": "Magic Leap — 90-120 fps for comfort"
+    },
+    "mode": "educational_wrapper",
+    "educational": {
+      "selectedText": "the pendulum",
+      "surroundingContext": "A pendulum is a weight hung so it can swing freely. Gravity pulls it back toward the center, so it swings past and returns, keeping a steady rhythm set mostly by its length.\n\nA spatial scene should animate the swing and show the restoring pull at each point.",
+      "learningGoal": "Show why a pendulum swings back and forth at a steady period.",
+      "targetAudience": "general learner",
+      "preferredRepresentation": "animated_process",
+      "conceptId": "pendulum",
+      "spatailPrompt": "Create an educational spatial explanation of \"the pendulum\". Learning goal: Show why a pendulum swings back and forth at a steady period. Prefer a animated process with labeled phases, progressive reveal, and interactive controls (step through, tap to highlight, isolate parts, reset). Use this surrounding context to identify the key stages: \"A pendulum is a weight hung so it can swing freely. Gravity pulls it back toward the center, so it swings past and returns, keeping a steady rhythm set mostly by its length.\n\nA spatial scene should animate the swing and show the restoring pull at each point.\"."
+    }
+  },
+  "deliveryPackage": {
+    "experienceId": "edu_pendulum",
+    "assets": [
+      {
+        "assetId": "pendulum",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "core_structure",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "arc"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "generic_object_placeholder",
+        "fallbackPrimitive": "cube",
+        "usdzPath": ""
+      },
+      {
+        "assetId": "pendulum_mover",
+        "path": "",
+        "variants": {},
+        "metadata": {
+          "boundingBoxMeters": {
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ],
+            "max": [
+              0.15,
+              0.15,
+              0.3
+            ],
+            "size": [
+              0.3,
+              0.3,
+              0.3
+            ],
+            "center": [
+              0.0,
+              0.0,
+              0.15
+            ]
+          },
+          "pivot": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "semanticRole": "component",
+          "recommendedPlacement": {
+            "anchor": "table",
+            "layout": "arc"
+          },
+          "realWorldScale": [
+            0.3,
+            0.3,
+            0.3
+          ]
+        },
+        "status": "placeholder",
+        "source": "placeholder",
+        "libraryAssetId": "generic_object_placeholder",
+        "fallbackPrimitive": "cube",
+        "usdzPath": ""
+      }
+    ],
+    "animations": [
+      {
+        "animationId": "pendulum_spin",
+        "targetAssets": [
+          "pendulum"
+        ],
+        "type": "looping",
+        "path": ""
+      }
+    ]
+  },
+  "progressive": {
+    "loadPlan": {
+      "firstInteractiveMs_budget": 1000,
+      "phases": [
+        {
+          "phase": 0,
+          "label": "anchor + placeholder + title + first beat",
+          "blocking": true,
+          "needsBlender": false,
+          "assets": [
+            "pendulum"
+          ],
+          "unlocks": [
+            "anchor",
+            "placeholder",
+            "title",
+            "first_beat"
+          ]
+        },
+        {
+          "phase": 1,
+          "label": "stream pendulum",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "pendulum"
+          ],
+          "unlocks": [
+            "swap_placeholder:pendulum"
+          ]
+        },
+        {
+          "phase": 2,
+          "label": "stream pendulum_mover",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [
+            "pendulum_mover"
+          ],
+          "unlocks": [
+            "swap_placeholder:pendulum_mover"
+          ]
+        },
+        {
+          "phase": 3,
+          "label": "unlock animations + interactions",
+          "blocking": false,
+          "needsBlender": false,
+          "assets": [],
+          "unlocks": [
+            "animation:pendulum_spin",
+            "interaction:play_pause",
+            "interaction:highlight_phase"
+          ]
+        }
+      ]
+    },
+    "placeholderScene": {
+      "anchor": "table",
+      "title": "Pendulum",
+      "firstBeat": "Hang the weight at rest",
+      "placeholders": [
+        {
+          "assetId": "pendulum",
+          "primitive": "box",
+          "position_yup": [
+            -0.1915,
+            1.2927,
+            -0.7148
+          ],
+          "footprint_m": {
+            "w": 0.3,
+            "h": 0.3,
+            "d": 0.3
+          },
+          "label": "pendulum"
+        }
+      ],
+      "needsBlender": false
+    },
+    "interactionGating": {
+      "play_pause": {
+        "enabledAfterPhase": 3,
+        "type": "play_baked",
+        "targetAssets": [
+          "pendulum",
+          "pendulum_mover"
+        ]
+      },
+      "highlight_phase": {
+        "enabledAfterPhase": 3,
+        "type": "tap_reveal",
+        "targetAssets": [
+          "pendulum",
+          "pendulum_mover"
+        ]
+      }
+    },
+    "interactionTriggers": [
+      {
+        "interactionId": "play_pause",
+        "type": "play_baked",
+        "trigger": "on_tap"
+      },
+      {
+        "interactionId": "highlight_phase",
+        "type": "tap_reveal",
+        "trigger": "on_tap"
+      }
+    ]
+  }
+}

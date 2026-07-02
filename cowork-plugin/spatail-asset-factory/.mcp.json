@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "spatail-asset-factory": {
+      "command": "python",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/server/spatail_factory_mcp.py"],
+      "env": {
+        "SPATAIL_REPO": "C:\\SPATAIL_MAX",
+        "BLENDER_EXE": "C:\\Program Files\\Blender Foundation\\Blender 5.1\\blender.exe"
+      }
+    }
+  }
+}

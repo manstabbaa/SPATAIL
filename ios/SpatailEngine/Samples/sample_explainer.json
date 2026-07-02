@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "0.8-spatail-engine",
+  "id": "newton_first_law",
+  "title": "Newton's First Law",
+  "genre": "explainer",
+  "kit": "explainer",
+
+  "anchoring": { "mode": "world" },
+  "placement": { "anchorType": "table", "scaleMode": "fit_to_surface", "maxSurfaceCoverage": 0.6 },
+
+  "assets": [
+    {
+      "id": "cart",
+      "name": "Cart",
+      "role": "hero",
+      "usdzUrl": "/artifacts/studio_law1_inertia.usdz",
+      "realScaleBaked": true,
+      "clips": ["roll", "stop"],
+      "regions": ["wheel", "body"]
+    }
+  ],
+
+  "entities": [
+    { "id": "cart", "asset": "cart", "tags": ["hero"], "transform": { "position": [0, 0, -0.6] } }
+  ],
+
+  "steps": [
+    { "id": "s0", "title": "At rest",   "narration": "An object at rest stays at rest.",  "focus": "cart", "clip": "stop", "effect": "highlight" },
+    { "id": "s1", "title": "In motion", "narration": "...unless acted on by a force.",     "focus": "cart", "clip": "roll", "effect": "emissive", "region": "wheel" },
+    { "id": "s2", "title": "Inertia",   "narration": "That tendency is called inertia.",   "focus": "cart", "effect": "tint:#378ADD", "region": "body" }
+  ],
+
+  "objectives": [
+    {
+      "id": "finish",
+      "title": "Watch all three steps",
+      "success": [ { "lhs": "blackboard.sequence.atEnd", "op": "eq", "rhs": true } ]
+    }
+  ]
+}

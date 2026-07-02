@@ -1,0 +1,204 @@
+{
+  "category": "animation-rigs",
+  "count": 6,
+  "assets": [
+    {
+      "assetId": "transform_rig",
+      "name": "Transform Rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "transform",
+        "move"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/transform_rig.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "parented_group_rig",
+      "name": "Parented Group Rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "group",
+        "parent"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/parented_group_rig.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "hinged_panel_rig",
+      "name": "Hinged Panel Rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "hinge",
+        "door"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/hinged_panel_rig.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "exploded_assembly_rig",
+      "name": "Exploded Assembly Rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "explode",
+        "assembly"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/exploded_assembly_rig.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "orbit_rig",
+      "name": "Orbit Rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "orbit",
+        "rotate"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/orbit_rig.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    },
+    {
+      "assetId": "reciprocate_rig",
+      "name": "Reciprocate Rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "reciprocate",
+        "piston"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/reciprocate_rig.glb",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ],
+      "supportsHighlight": false,
+      "supportsTransparency": false,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "none",
+      "qualityLevel": "starter",
+      "license": "internal_generated",
+      "assetState": "metadata"
+    }
+  ]
+}

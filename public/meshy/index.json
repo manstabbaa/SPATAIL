@@ -1,0 +1,19 @@
+{
+  "mode": "meshy_image_to_3d",
+  "book": {
+    "book": "College Physics 2e",
+    "publisher": "OpenStax",
+    "section": "16.4 The Simple Pendulum",
+    "url": "https://openstax.org/books/college-physics-2e/pages/16-4-the-simple-pendulum",
+    "license": "CC BY 4.0"
+  },
+  "scenes": [
+    {
+      "id": "meshy_pendulum_demo",
+      "title": "The Simple Pendulum",
+      "url": "/meshy/pendulum_scene.json",
+      "assetCount": 4,
+      "strategy": "part_to_whole_explanation"
+    }
+  ]
+}

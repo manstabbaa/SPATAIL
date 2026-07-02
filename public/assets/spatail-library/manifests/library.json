@@ -1,0 +1,6847 @@
+{
+  "library": "spatail-starter",
+  "rootUrl": "/assets/spatail-library",
+  "categories": {
+    "primitives": 29,
+    "spatial-ui": 38,
+    "labels-and-callouts": 10,
+    "education": 10,
+    "effects": 29,
+    "mechanical": 59,
+    "biology": 36,
+    "physics": 33,
+    "astronomy": 23,
+    "architecture": 34,
+    "furniture": 28,
+    "product-preview": 22,
+    "data-visualization": 24,
+    "environments": 16,
+    "placeholders": 15,
+    "animation-rigs": 6
+  },
+  "assets": [
+    {
+      "assetId": "cube",
+      "category": "primitives",
+      "semanticTags": [
+        "box",
+        "cube",
+        "block"
+      ],
+      "path": "/assets/spatail-library/primitives/cube.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "rounded_cube",
+      "category": "primitives",
+      "semanticTags": [
+        "box",
+        "rounded",
+        "cube"
+      ],
+      "path": "/assets/spatail-library/primitives/rounded_cube.glb",
+      "fallbackPrimitive": "rounded_cube",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "sphere",
+      "category": "primitives",
+      "semanticTags": [
+        "ball",
+        "sphere",
+        "orb"
+      ],
+      "path": "/assets/spatail-library/primitives/sphere.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "half_sphere",
+      "category": "primitives",
+      "semanticTags": [
+        "dome",
+        "hemisphere"
+      ],
+      "path": "/assets/spatail-library/primitives/half_sphere.glb",
+      "fallbackPrimitive": "half_sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "cylinder",
+      "category": "primitives",
+      "semanticTags": [
+        "tube",
+        "cylinder",
+        "rod"
+      ],
+      "path": "/assets/spatail-library/primitives/cylinder.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "cone",
+      "category": "primitives",
+      "semanticTags": [
+        "cone",
+        "tip"
+      ],
+      "path": "/assets/spatail-library/primitives/cone.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "capsule",
+      "category": "primitives",
+      "semanticTags": [
+        "pill",
+        "capsule"
+      ],
+      "path": "/assets/spatail-library/primitives/capsule.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "torus",
+      "category": "primitives",
+      "semanticTags": [
+        "ring",
+        "donut",
+        "torus"
+      ],
+      "path": "/assets/spatail-library/primitives/torus.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "plane",
+      "category": "primitives",
+      "semanticTags": [
+        "plane",
+        "quad",
+        "surface"
+      ],
+      "path": "/assets/spatail-library/primitives/plane.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "curved_plane",
+      "category": "primitives",
+      "semanticTags": [
+        "curved",
+        "panel",
+        "screen"
+      ],
+      "path": "/assets/spatail-library/primitives/curved_plane.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "ring",
+      "category": "primitives",
+      "semanticTags": [
+        "ring",
+        "circle",
+        "annulus"
+      ],
+      "path": "/assets/spatail-library/primitives/ring.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "arrow_straight",
+      "category": "primitives",
+      "semanticTags": [
+        "arrow",
+        "pointer",
+        "direction"
+      ],
+      "path": "/assets/spatail-library/primitives/arrow_straight.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "arrow_curved",
+      "category": "primitives",
+      "semanticTags": [
+        "arrow",
+        "curved",
+        "rotate"
+      ],
+      "path": "/assets/spatail-library/primitives/arrow_curved.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "arrow_circular",
+      "category": "primitives",
+      "semanticTags": [
+        "arrow",
+        "loop",
+        "cycle"
+      ],
+      "path": "/assets/spatail-library/primitives/arrow_circular.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "line_segment",
+      "category": "primitives",
+      "semanticTags": [
+        "line",
+        "edge",
+        "connector"
+      ],
+      "path": "/assets/spatail-library/primitives/line_segment.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "dotted_line",
+      "category": "primitives",
+      "semanticTags": [
+        "dotted",
+        "line",
+        "guide"
+      ],
+      "path": "/assets/spatail-library/primitives/dotted_line.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "arc_line",
+      "category": "primitives",
+      "semanticTags": [
+        "arc",
+        "curve",
+        "line"
+      ],
+      "path": "/assets/spatail-library/primitives/arc_line.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "axis_tripod",
+      "category": "primitives",
+      "semanticTags": [
+        "axis",
+        "xyz",
+        "gizmo",
+        "orientation"
+      ],
+      "path": "/assets/spatail-library/primitives/axis_tripod.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "grid_plane",
+      "category": "primitives",
+      "semanticTags": [
+        "grid",
+        "floor",
+        "guide"
+      ],
+      "path": "/assets/spatail-library/primitives/grid_plane.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "measuring_ruler",
+      "category": "primitives",
+      "semanticTags": [
+        "ruler",
+        "measure",
+        "scale"
+      ],
+      "path": "/assets/spatail-library/primitives/measuring_ruler.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "scale_marker",
+      "category": "primitives",
+      "semanticTags": [
+        "scale",
+        "marker",
+        "tick"
+      ],
+      "path": "/assets/spatail-library/primitives/scale_marker.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "bounding_box_frame",
+      "category": "primitives",
+      "semanticTags": [
+        "bbox",
+        "frame",
+        "bounds"
+      ],
+      "path": "/assets/spatail-library/primitives/bounding_box_frame.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "transparent_box_volume",
+      "category": "primitives",
+      "semanticTags": [
+        "volume",
+        "glass",
+        "region"
+      ],
+      "path": "/assets/spatail-library/primitives/transparent_box_volume.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "platform_circular",
+      "category": "primitives",
+      "semanticTags": [
+        "platform",
+        "base",
+        "stage"
+      ],
+      "path": "/assets/spatail-library/primitives/platform_circular.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "platform_rectangular",
+      "category": "primitives",
+      "semanticTags": [
+        "platform",
+        "base",
+        "stage"
+      ],
+      "path": "/assets/spatail-library/primitives/platform_rectangular.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "pedestal",
+      "category": "primitives",
+      "semanticTags": [
+        "pedestal",
+        "stand",
+        "plinth"
+      ],
+      "path": "/assets/spatail-library/primitives/pedestal.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "floor_shadow_disk",
+      "category": "primitives",
+      "semanticTags": [
+        "shadow",
+        "ground",
+        "contact"
+      ],
+      "path": "/assets/spatail-library/primitives/floor_shadow_disk.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "glow_ring",
+      "category": "primitives",
+      "semanticTags": [
+        "glow",
+        "ring",
+        "highlight"
+      ],
+      "path": "/assets/spatail-library/primitives/glow_ring.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "anchor_reticle",
+      "category": "primitives",
+      "semanticTags": [
+        "anchor",
+        "reticle",
+        "target"
+      ],
+      "path": "/assets/spatail-library/primitives/anchor_reticle.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "real_scale_preview",
+        "exploded_view",
+        "assembly_sequence",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "floating_title_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "title",
+        "card",
+        "header"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/floating_title_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "floating_subtitle_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "subtitle",
+        "card"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/floating_subtitle_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "annotation_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "annotation",
+        "note",
+        "card"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/annotation_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "step_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "step",
+        "instruction",
+        "card"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/step_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "warning_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "warning",
+        "caution",
+        "card"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/warning_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "comparison_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "comparison",
+        "versus",
+        "card"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/comparison_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "progress_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "progress",
+        "status",
+        "card"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/progress_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "timeline_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "timeline",
+        "card"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/timeline_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "large_number_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "number",
+        "metric",
+        "card"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/large_number_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "metric_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "metric",
+        "kpi",
+        "card"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/metric_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "object_label",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "label",
+        "name",
+        "tag"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/object_label.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "part_label",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "label",
+        "part",
+        "tag"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/part_label.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "phase_label",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "label",
+        "phase",
+        "stage"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/phase_label.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "tap_indicator",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "tap",
+        "gesture",
+        "hint"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/tap_indicator.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "drag_indicator",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "drag",
+        "gesture",
+        "hint"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/drag_indicator.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "rotate_indicator",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "rotate",
+        "gesture",
+        "hint"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/rotate_indicator.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "pinch_indicator",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "pinch",
+        "zoom",
+        "gesture"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/pinch_indicator.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "play_button",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "play",
+        "button",
+        "control"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/play_button.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "pause_button",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "pause",
+        "button",
+        "control"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/pause_button.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "reset_button",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "reset",
+        "button",
+        "control"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/reset_button.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "explode_toggle",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "explode",
+        "toggle",
+        "control"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/explode_toggle.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "isolate_toggle",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "isolate",
+        "toggle",
+        "control"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/isolate_toggle.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "xray_toggle",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "xray",
+        "toggle",
+        "control"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/xray_toggle.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "timeline_scrubber",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "timeline",
+        "scrubber",
+        "control"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/timeline_scrubber.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "step_forward_button",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "next",
+        "forward",
+        "button"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/step_forward_button.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "step_back_button",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "prev",
+        "back",
+        "button"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/step_back_button.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "mini_map_panel",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "minimap",
+        "overview",
+        "panel"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/mini_map_panel.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "scene_controls_panel",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "controls",
+        "panel",
+        "hud"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/scene_controls_panel.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "anchor_placement_ring",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "anchor",
+        "placement",
+        "ring"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/anchor_placement_ring.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "table_placement_reticle",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "table",
+        "placement",
+        "reticle"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/table_placement_reticle.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "wall_placement_reticle",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "wall",
+        "placement",
+        "reticle"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/wall_placement_reticle.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "floor_placement_reticle",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "floor",
+        "placement",
+        "reticle"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/floor_placement_reticle.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "grab_handle",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "grab",
+        "handle",
+        "manipulate"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/grab_handle.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "rotation_handle",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "rotate",
+        "handle",
+        "manipulate"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/rotation_handle.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "slider_rail",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "slider",
+        "rail",
+        "control"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/slider_rail.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "button_panel",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "buttons",
+        "panel",
+        "control"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/button_panel.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "floating_card",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "card",
+        "panel",
+        "info"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/floating_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "info_panel",
+      "category": "spatial-ui",
+      "semanticTags": [
+        "info",
+        "panel",
+        "detail"
+      ],
+      "path": "/assets/spatail-library/spatial-ui/info_panel.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "callout_line",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "callout",
+        "line",
+        "leader"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/callout_line.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "label_tag",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "label",
+        "tag",
+        "name"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/label_tag.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "hotspot_dot",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "hotspot",
+        "dot",
+        "marker"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/hotspot_dot.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "object_label_pin",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "label",
+        "pin",
+        "object"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/object_label_pin.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "part_label_pin",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "label",
+        "pin",
+        "part"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/part_label_pin.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "phase_label_pin",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "label",
+        "pin",
+        "phase"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/phase_label_pin.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "leader_line",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "leader",
+        "line",
+        "callout"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/leader_line.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "number_badge",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "number",
+        "badge",
+        "step"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/number_badge.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "dimension_label",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "dimension",
+        "measure",
+        "label"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/dimension_label.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "annotation_arrow",
+      "category": "labels-and-callouts",
+      "semanticTags": [
+        "arrow",
+        "annotation",
+        "point"
+      ],
+      "path": "/assets/spatail-library/labels-and-callouts/annotation_arrow.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "guided_tour",
+        "timeline_story",
+        "side_by_side_comparison"
+      ]
+    },
+    {
+      "assetId": "chalkboard",
+      "category": "education",
+      "semanticTags": [
+        "board",
+        "chalk",
+        "teach"
+      ],
+      "path": "/assets/spatail-library/education/chalkboard.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ]
+    },
+    {
+      "assetId": "number_block",
+      "category": "education",
+      "semanticTags": [
+        "number",
+        "block",
+        "count"
+      ],
+      "path": "/assets/spatail-library/education/number_block.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ]
+    },
+    {
+      "assetId": "letter_block",
+      "category": "education",
+      "semanticTags": [
+        "letter",
+        "block",
+        "alphabet"
+      ],
+      "path": "/assets/spatail-library/education/letter_block.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ]
+    },
+    {
+      "assetId": "diagram_plane",
+      "category": "education",
+      "semanticTags": [
+        "diagram",
+        "plane",
+        "chart"
+      ],
+      "path": "/assets/spatail-library/education/diagram_plane.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ]
+    },
+    {
+      "assetId": "pointer_stick",
+      "category": "education",
+      "semanticTags": [
+        "pointer",
+        "stick",
+        "indicate"
+      ],
+      "path": "/assets/spatail-library/education/pointer_stick.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ]
+    },
+    {
+      "assetId": "abacus_bead",
+      "category": "education",
+      "semanticTags": [
+        "abacus",
+        "bead",
+        "count"
+      ],
+      "path": "/assets/spatail-library/education/abacus_bead.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ]
+    },
+    {
+      "assetId": "flashcard",
+      "category": "education",
+      "semanticTags": [
+        "flashcard",
+        "card",
+        "quiz"
+      ],
+      "path": "/assets/spatail-library/education/flashcard.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ]
+    },
+    {
+      "assetId": "globe_stand",
+      "category": "education",
+      "semanticTags": [
+        "globe",
+        "earth",
+        "geography"
+      ],
+      "path": "/assets/spatail-library/education/globe_stand.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ]
+    },
+    {
+      "assetId": "magnifier",
+      "category": "education",
+      "semanticTags": [
+        "magnify",
+        "lens",
+        "zoom"
+      ],
+      "path": "/assets/spatail-library/education/magnifier.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ]
+    },
+    {
+      "assetId": "clipboard",
+      "category": "education",
+      "semanticTags": [
+        "clipboard",
+        "notes",
+        "checklist"
+      ],
+      "path": "/assets/spatail-library/education/clipboard.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "guided_tour",
+        "part_to_whole_explanation",
+        "timeline_story"
+      ]
+    },
+    {
+      "assetId": "highlight_outline",
+      "category": "effects",
+      "semanticTags": [
+        "highlight",
+        "outline",
+        "select"
+      ],
+      "path": "/assets/spatail-library/effects/highlight_outline.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "pulse_glow",
+      "category": "effects",
+      "semanticTags": [
+        "pulse",
+        "glow",
+        "attention"
+      ],
+      "path": "/assets/spatail-library/effects/pulse_glow.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "selection_ring",
+      "category": "effects",
+      "semanticTags": [
+        "selection",
+        "ring",
+        "select"
+      ],
+      "path": "/assets/spatail-library/effects/selection_ring.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "scanline_effect",
+      "category": "effects",
+      "semanticTags": [
+        "scan",
+        "scanline",
+        "reveal"
+      ],
+      "path": "/assets/spatail-library/effects/scanline_effect.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "xray_material",
+      "category": "effects",
+      "semanticTags": [
+        "xray",
+        "transparent",
+        "material"
+      ],
+      "path": "/assets/spatail-library/effects/xray_material.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "transparent_glass_material",
+      "category": "effects",
+      "semanticTags": [
+        "glass",
+        "transparent",
+        "material"
+      ],
+      "path": "/assets/spatail-library/effects/transparent_glass_material.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "ghost_material",
+      "category": "effects",
+      "semanticTags": [
+        "ghost",
+        "faded",
+        "material"
+      ],
+      "path": "/assets/spatail-library/effects/ghost_material.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "hologram_material",
+      "category": "effects",
+      "semanticTags": [
+        "hologram",
+        "holo",
+        "material"
+      ],
+      "path": "/assets/spatail-library/effects/hologram_material.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "heat_glow",
+      "category": "effects",
+      "semanticTags": [
+        "heat",
+        "hot",
+        "thermal"
+      ],
+      "path": "/assets/spatail-library/effects/heat_glow.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "cold_glow",
+      "category": "effects",
+      "semanticTags": [
+        "cold",
+        "cool",
+        "frost"
+      ],
+      "path": "/assets/spatail-library/effects/cold_glow.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "energy_beam",
+      "category": "effects",
+      "semanticTags": [
+        "energy",
+        "beam",
+        "laser"
+      ],
+      "path": "/assets/spatail-library/effects/energy_beam.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "airflow_particles",
+      "category": "effects",
+      "semanticTags": [
+        "airflow",
+        "wind",
+        "particles"
+      ],
+      "path": "/assets/spatail-library/effects/airflow_particles.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "water_flow_particles",
+      "category": "effects",
+      "semanticTags": [
+        "water",
+        "flow",
+        "particles"
+      ],
+      "path": "/assets/spatail-library/effects/water_flow_particles.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "smoke_particles",
+      "category": "effects",
+      "semanticTags": [
+        "smoke",
+        "fog",
+        "particles"
+      ],
+      "path": "/assets/spatail-library/effects/smoke_particles.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "spark_particles",
+      "category": "effects",
+      "semanticTags": [
+        "spark",
+        "electric",
+        "particles"
+      ],
+      "path": "/assets/spatail-library/effects/spark_particles.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "explosion_particles",
+      "category": "effects",
+      "semanticTags": [
+        "explosion",
+        "burst",
+        "particles"
+      ],
+      "path": "/assets/spatail-library/effects/explosion_particles.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "magnetic_field_lines",
+      "category": "effects",
+      "semanticTags": [
+        "magnetic",
+        "field",
+        "lines"
+      ],
+      "path": "/assets/spatail-library/effects/magnetic_field_lines.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "gravity_field_lines",
+      "category": "effects",
+      "semanticTags": [
+        "gravity",
+        "field",
+        "lines"
+      ],
+      "path": "/assets/spatail-library/effects/gravity_field_lines.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "orbit_trail",
+      "category": "effects",
+      "semanticTags": [
+        "orbit",
+        "trail",
+        "path"
+      ],
+      "path": "/assets/spatail-library/effects/orbit_trail.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "motion_trail",
+      "category": "effects",
+      "semanticTags": [
+        "motion",
+        "trail",
+        "path"
+      ],
+      "path": "/assets/spatail-library/effects/motion_trail.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "assembly_snap_effect",
+      "category": "effects",
+      "semanticTags": [
+        "assembly",
+        "snap",
+        "effect"
+      ],
+      "path": "/assets/spatail-library/effects/assembly_snap_effect.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "disassembly_spread_effect",
+      "category": "effects",
+      "semanticTags": [
+        "disassembly",
+        "spread",
+        "effect"
+      ],
+      "path": "/assets/spatail-library/effects/disassembly_spread_effect.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "reveal_wipe",
+      "category": "effects",
+      "semanticTags": [
+        "reveal",
+        "wipe",
+        "transition"
+      ],
+      "path": "/assets/spatail-library/effects/reveal_wipe.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "dissolve_effect",
+      "category": "effects",
+      "semanticTags": [
+        "dissolve",
+        "fade",
+        "transition"
+      ],
+      "path": "/assets/spatail-library/effects/dissolve_effect.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "focus_spotlight",
+      "category": "effects",
+      "semanticTags": [
+        "spotlight",
+        "focus",
+        "light"
+      ],
+      "path": "/assets/spatail-library/effects/focus_spotlight.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "dim_background_overlay",
+      "category": "effects",
+      "semanticTags": [
+        "dim",
+        "background",
+        "overlay"
+      ],
+      "path": "/assets/spatail-library/effects/dim_background_overlay.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "depth_fade",
+      "category": "effects",
+      "semanticTags": [
+        "depth",
+        "fade",
+        "fog"
+      ],
+      "path": "/assets/spatail-library/effects/depth_fade.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "object_shadow_blob",
+      "category": "effects",
+      "semanticTags": [
+        "shadow",
+        "blob",
+        "ground"
+      ],
+      "path": "/assets/spatail-library/effects/object_shadow_blob.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "impact_ripple",
+      "category": "effects",
+      "semanticTags": [
+        "impact",
+        "ripple",
+        "shockwave"
+      ],
+      "path": "/assets/spatail-library/effects/impact_ripple.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "piston",
+      "category": "mechanical",
+      "semanticTags": [
+        "piston",
+        "engine",
+        "reciprocating"
+      ],
+      "path": "/assets/spatail-library/mechanical/piston.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "piston_ring",
+      "category": "mechanical",
+      "semanticTags": [
+        "piston",
+        "ring",
+        "seal"
+      ],
+      "path": "/assets/spatail-library/mechanical/piston_ring.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "connecting_rod",
+      "category": "mechanical",
+      "semanticTags": [
+        "conrod",
+        "rod",
+        "engine"
+      ],
+      "path": "/assets/spatail-library/mechanical/connecting_rod.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "crankshaft",
+      "category": "mechanical",
+      "semanticTags": [
+        "crankshaft",
+        "crank",
+        "engine",
+        "rotating"
+      ],
+      "path": "/assets/spatail-library/mechanical/crankshaft.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "camshaft",
+      "category": "mechanical",
+      "semanticTags": [
+        "camshaft",
+        "cam",
+        "valvetrain"
+      ],
+      "path": "/assets/spatail-library/mechanical/camshaft.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "valve",
+      "category": "mechanical",
+      "semanticTags": [
+        "valve",
+        "intake",
+        "exhaust"
+      ],
+      "path": "/assets/spatail-library/mechanical/valve.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "valve_spring",
+      "category": "mechanical",
+      "semanticTags": [
+        "valve",
+        "spring",
+        "coil"
+      ],
+      "path": "/assets/spatail-library/mechanical/valve_spring.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "cylinder_sleeve",
+      "category": "mechanical",
+      "semanticTags": [
+        "cylinder",
+        "sleeve",
+        "bore"
+      ],
+      "path": "/assets/spatail-library/mechanical/cylinder_sleeve.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "cylinder_block_simplified",
+      "category": "mechanical",
+      "semanticTags": [
+        "cylinder",
+        "block",
+        "engine"
+      ],
+      "path": "/assets/spatail-library/mechanical/cylinder_block_simplified.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "engine_block_simplified",
+      "category": "mechanical",
+      "semanticTags": [
+        "engine",
+        "block",
+        "v8",
+        "motor"
+      ],
+      "path": "/assets/spatail-library/mechanical/engine_block_simplified.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "spark_plug",
+      "category": "mechanical",
+      "semanticTags": [
+        "spark",
+        "plug",
+        "ignition"
+      ],
+      "path": "/assets/spatail-library/mechanical/spark_plug.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "fuel_injector",
+      "category": "mechanical",
+      "semanticTags": [
+        "fuel",
+        "injector",
+        "nozzle"
+      ],
+      "path": "/assets/spatail-library/mechanical/fuel_injector.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "intake_manifold_simplified",
+      "category": "mechanical",
+      "semanticTags": [
+        "intake",
+        "manifold",
+        "air"
+      ],
+      "path": "/assets/spatail-library/mechanical/intake_manifold_simplified.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "exhaust_manifold_simplified",
+      "category": "mechanical",
+      "semanticTags": [
+        "exhaust",
+        "manifold"
+      ],
+      "path": "/assets/spatail-library/mechanical/exhaust_manifold_simplified.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "turbocharger_simplified",
+      "category": "mechanical",
+      "semanticTags": [
+        "turbo",
+        "charger",
+        "boost"
+      ],
+      "path": "/assets/spatail-library/mechanical/turbocharger_simplified.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "turbine_wheel",
+      "category": "mechanical",
+      "semanticTags": [
+        "turbine",
+        "wheel",
+        "blade"
+      ],
+      "path": "/assets/spatail-library/mechanical/turbine_wheel.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "compressor_wheel",
+      "category": "mechanical",
+      "semanticTags": [
+        "compressor",
+        "wheel",
+        "blade"
+      ],
+      "path": "/assets/spatail-library/mechanical/compressor_wheel.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "gear_small",
+      "category": "mechanical",
+      "semanticTags": [
+        "gear",
+        "cog",
+        "small"
+      ],
+      "path": "/assets/spatail-library/mechanical/gear_small.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "gear_medium",
+      "category": "mechanical",
+      "semanticTags": [
+        "gear",
+        "cog",
+        "medium"
+      ],
+      "path": "/assets/spatail-library/mechanical/gear_medium.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "gear_large",
+      "category": "mechanical",
+      "semanticTags": [
+        "gear",
+        "cog",
+        "large"
+      ],
+      "path": "/assets/spatail-library/mechanical/gear_large.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "gear_pair",
+      "category": "mechanical",
+      "semanticTags": [
+        "gear",
+        "mesh",
+        "pair"
+      ],
+      "path": "/assets/spatail-library/mechanical/gear_pair.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "gearbox_housing_simplified",
+      "category": "mechanical",
+      "semanticTags": [
+        "gearbox",
+        "housing",
+        "transmission"
+      ],
+      "path": "/assets/spatail-library/mechanical/gearbox_housing_simplified.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "chain_link",
+      "category": "mechanical",
+      "semanticTags": [
+        "chain",
+        "link"
+      ],
+      "path": "/assets/spatail-library/mechanical/chain_link.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "belt_loop",
+      "category": "mechanical",
+      "semanticTags": [
+        "belt",
+        "loop",
+        "drive"
+      ],
+      "path": "/assets/spatail-library/mechanical/belt_loop.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "pulley",
+      "category": "mechanical",
+      "semanticTags": [
+        "pulley",
+        "wheel",
+        "belt"
+      ],
+      "path": "/assets/spatail-library/mechanical/pulley.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "bearing",
+      "category": "mechanical",
+      "semanticTags": [
+        "bearing",
+        "roller",
+        "ball"
+      ],
+      "path": "/assets/spatail-library/mechanical/bearing.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "axle",
+      "category": "mechanical",
+      "semanticTags": [
+        "axle",
+        "shaft",
+        "rotating"
+      ],
+      "path": "/assets/spatail-library/mechanical/axle.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "shaft",
+      "category": "mechanical",
+      "semanticTags": [
+        "shaft",
+        "rod",
+        "drive"
+      ],
+      "path": "/assets/spatail-library/mechanical/shaft.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "bolt",
+      "category": "mechanical",
+      "semanticTags": [
+        "bolt",
+        "fastener"
+      ],
+      "path": "/assets/spatail-library/mechanical/bolt.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "screw",
+      "category": "mechanical",
+      "semanticTags": [
+        "screw",
+        "fastener"
+      ],
+      "path": "/assets/spatail-library/mechanical/screw.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "nut",
+      "category": "mechanical",
+      "semanticTags": [
+        "nut",
+        "fastener"
+      ],
+      "path": "/assets/spatail-library/mechanical/nut.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "washer",
+      "category": "mechanical",
+      "semanticTags": [
+        "washer",
+        "fastener"
+      ],
+      "path": "/assets/spatail-library/mechanical/washer.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "bracket",
+      "category": "mechanical",
+      "semanticTags": [
+        "bracket",
+        "mount"
+      ],
+      "path": "/assets/spatail-library/mechanical/bracket.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "hinge",
+      "category": "mechanical",
+      "semanticTags": [
+        "hinge",
+        "pivot",
+        "joint"
+      ],
+      "path": "/assets/spatail-library/mechanical/hinge.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "spring",
+      "category": "mechanical",
+      "semanticTags": [
+        "spring",
+        "coil"
+      ],
+      "path": "/assets/spatail-library/mechanical/spring.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "damper",
+      "category": "mechanical",
+      "semanticTags": [
+        "damper",
+        "shock"
+      ],
+      "path": "/assets/spatail-library/mechanical/damper.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "shock_absorber",
+      "category": "mechanical",
+      "semanticTags": [
+        "shock",
+        "absorber",
+        "suspension"
+      ],
+      "path": "/assets/spatail-library/mechanical/shock_absorber.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "brake_disc",
+      "category": "mechanical",
+      "semanticTags": [
+        "brake",
+        "disc",
+        "rotor"
+      ],
+      "path": "/assets/spatail-library/mechanical/brake_disc.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "brake_caliper",
+      "category": "mechanical",
+      "semanticTags": [
+        "brake",
+        "caliper"
+      ],
+      "path": "/assets/spatail-library/mechanical/brake_caliper.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "wheel_hub",
+      "category": "mechanical",
+      "semanticTags": [
+        "wheel",
+        "hub"
+      ],
+      "path": "/assets/spatail-library/mechanical/wheel_hub.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "differential_simplified",
+      "category": "mechanical",
+      "semanticTags": [
+        "differential",
+        "diff",
+        "axle"
+      ],
+      "path": "/assets/spatail-library/mechanical/differential_simplified.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "driveshaft",
+      "category": "mechanical",
+      "semanticTags": [
+        "driveshaft",
+        "prop",
+        "shaft"
+      ],
+      "path": "/assets/spatail-library/mechanical/driveshaft.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "rack_and_pinion",
+      "category": "mechanical",
+      "semanticTags": [
+        "rack",
+        "pinion",
+        "steering"
+      ],
+      "path": "/assets/spatail-library/mechanical/rack_and_pinion.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "steering_wheel_simplified",
+      "category": "mechanical",
+      "semanticTags": [
+        "steering",
+        "wheel"
+      ],
+      "path": "/assets/spatail-library/mechanical/steering_wheel_simplified.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "suspension_arm",
+      "category": "mechanical",
+      "semanticTags": [
+        "suspension",
+        "arm",
+        "control"
+      ],
+      "path": "/assets/spatail-library/mechanical/suspension_arm.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "coilover",
+      "category": "mechanical",
+      "semanticTags": [
+        "coilover",
+        "suspension",
+        "spring"
+      ],
+      "path": "/assets/spatail-library/mechanical/coilover.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "radiator",
+      "category": "mechanical",
+      "semanticTags": [
+        "radiator",
+        "cooling"
+      ],
+      "path": "/assets/spatail-library/mechanical/radiator.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "fan_blade",
+      "category": "mechanical",
+      "semanticTags": [
+        "fan",
+        "blade",
+        "cooling"
+      ],
+      "path": "/assets/spatail-library/mechanical/fan_blade.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "battery_block",
+      "category": "mechanical",
+      "semanticTags": [
+        "battery",
+        "cell",
+        "power"
+      ],
+      "path": "/assets/spatail-library/mechanical/battery_block.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "electric_motor_simplified",
+      "category": "mechanical",
+      "semanticTags": [
+        "motor",
+        "electric",
+        "ev"
+      ],
+      "path": "/assets/spatail-library/mechanical/electric_motor_simplified.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "rotor",
+      "category": "mechanical",
+      "semanticTags": [
+        "rotor",
+        "motor",
+        "rotating"
+      ],
+      "path": "/assets/spatail-library/mechanical/rotor.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "stator",
+      "category": "mechanical",
+      "semanticTags": [
+        "stator",
+        "motor",
+        "winding"
+      ],
+      "path": "/assets/spatail-library/mechanical/stator.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "hydraulic_cylinder",
+      "category": "mechanical",
+      "semanticTags": [
+        "hydraulic",
+        "cylinder",
+        "actuator"
+      ],
+      "path": "/assets/spatail-library/mechanical/hydraulic_cylinder.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "pump_simplified",
+      "category": "mechanical",
+      "semanticTags": [
+        "pump",
+        "fluid"
+      ],
+      "path": "/assets/spatail-library/mechanical/pump_simplified.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "pipe_straight",
+      "category": "mechanical",
+      "semanticTags": [
+        "pipe",
+        "tube",
+        "straight"
+      ],
+      "path": "/assets/spatail-library/mechanical/pipe_straight.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "pipe_elbow",
+      "category": "mechanical",
+      "semanticTags": [
+        "pipe",
+        "elbow",
+        "bend"
+      ],
+      "path": "/assets/spatail-library/mechanical/pipe_elbow.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "pipe_tee",
+      "category": "mechanical",
+      "semanticTags": [
+        "pipe",
+        "tee",
+        "junction"
+      ],
+      "path": "/assets/spatail-library/mechanical/pipe_tee.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "flange",
+      "category": "mechanical",
+      "semanticTags": [
+        "flange",
+        "pipe",
+        "connector"
+      ],
+      "path": "/assets/spatail-library/mechanical/flange.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "pressure_gauge",
+      "category": "mechanical",
+      "semanticTags": [
+        "gauge",
+        "pressure",
+        "meter"
+      ],
+      "path": "/assets/spatail-library/mechanical/pressure_gauge.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "exploded_view",
+        "cutaway_view",
+        "assembly_sequence",
+        "animated_process",
+        "part_to_whole_explanation"
+      ]
+    },
+    {
+      "assetId": "generic_cell",
+      "category": "biology",
+      "semanticTags": [
+        "cell",
+        "biology",
+        "division"
+      ],
+      "path": "/assets/spatail-library/biology/generic_cell.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "cell_membrane",
+      "category": "biology",
+      "semanticTags": [
+        "membrane",
+        "cell",
+        "wall"
+      ],
+      "path": "/assets/spatail-library/biology/cell_membrane.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "nucleus",
+      "category": "biology",
+      "semanticTags": [
+        "nucleus",
+        "cell",
+        "dna"
+      ],
+      "path": "/assets/spatail-library/biology/nucleus.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "mitochondria",
+      "category": "biology",
+      "semanticTags": [
+        "mitochondria",
+        "organelle",
+        "energy"
+      ],
+      "path": "/assets/spatail-library/biology/mitochondria.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "ribosome_dots",
+      "category": "biology",
+      "semanticTags": [
+        "ribosome",
+        "organelle",
+        "protein"
+      ],
+      "path": "/assets/spatail-library/biology/ribosome_dots.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "dna_double_helix",
+      "category": "biology",
+      "semanticTags": [
+        "dna",
+        "helix",
+        "genetic"
+      ],
+      "path": "/assets/spatail-library/biology/dna_double_helix.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "chromosome",
+      "category": "biology",
+      "semanticTags": [
+        "chromosome",
+        "dna",
+        "genetic"
+      ],
+      "path": "/assets/spatail-library/biology/chromosome.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "protein_chain",
+      "category": "biology",
+      "semanticTags": [
+        "protein",
+        "chain",
+        "amino"
+      ],
+      "path": "/assets/spatail-library/biology/protein_chain.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "red_blood_cell",
+      "category": "biology",
+      "semanticTags": [
+        "rbc",
+        "blood",
+        "cell"
+      ],
+      "path": "/assets/spatail-library/biology/red_blood_cell.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "white_blood_cell",
+      "category": "biology",
+      "semanticTags": [
+        "wbc",
+        "blood",
+        "immune"
+      ],
+      "path": "/assets/spatail-library/biology/white_blood_cell.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "neuron",
+      "category": "biology",
+      "semanticTags": [
+        "neuron",
+        "brain",
+        "nerve"
+      ],
+      "path": "/assets/spatail-library/biology/neuron.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "synapse",
+      "category": "biology",
+      "semanticTags": [
+        "synapse",
+        "neuron",
+        "connection"
+      ],
+      "path": "/assets/spatail-library/biology/synapse.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "bone_segment",
+      "category": "biology",
+      "semanticTags": [
+        "bone",
+        "skeleton"
+      ],
+      "path": "/assets/spatail-library/biology/bone_segment.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "vertebra",
+      "category": "biology",
+      "semanticTags": [
+        "vertebra",
+        "spine",
+        "bone"
+      ],
+      "path": "/assets/spatail-library/biology/vertebra.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "simplified_spine",
+      "category": "biology",
+      "semanticTags": [
+        "spine",
+        "vertebrae",
+        "back"
+      ],
+      "path": "/assets/spatail-library/biology/simplified_spine.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "heart_simplified",
+      "category": "biology",
+      "semanticTags": [
+        "heart",
+        "cardiac",
+        "organ"
+      ],
+      "path": "/assets/spatail-library/biology/heart_simplified.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "lung_pair_simplified",
+      "category": "biology",
+      "semanticTags": [
+        "lung",
+        "respiratory",
+        "organ"
+      ],
+      "path": "/assets/spatail-library/biology/lung_pair_simplified.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "stomach_simplified",
+      "category": "biology",
+      "semanticTags": [
+        "stomach",
+        "digestive",
+        "organ"
+      ],
+      "path": "/assets/spatail-library/biology/stomach_simplified.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "kidney_simplified",
+      "category": "biology",
+      "semanticTags": [
+        "kidney",
+        "organ"
+      ],
+      "path": "/assets/spatail-library/biology/kidney_simplified.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "brain_simplified",
+      "category": "biology",
+      "semanticTags": [
+        "brain",
+        "neural",
+        "organ"
+      ],
+      "path": "/assets/spatail-library/biology/brain_simplified.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "muscle_fiber",
+      "category": "biology",
+      "semanticTags": [
+        "muscle",
+        "fiber",
+        "tissue"
+      ],
+      "path": "/assets/spatail-library/biology/muscle_fiber.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "tendon_strip",
+      "category": "biology",
+      "semanticTags": [
+        "tendon",
+        "connective",
+        "tissue"
+      ],
+      "path": "/assets/spatail-library/biology/tendon_strip.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "joint_ball_socket",
+      "category": "biology",
+      "semanticTags": [
+        "joint",
+        "ball",
+        "socket"
+      ],
+      "path": "/assets/spatail-library/biology/joint_ball_socket.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "virus_particle",
+      "category": "biology",
+      "semanticTags": [
+        "virus",
+        "pathogen"
+      ],
+      "path": "/assets/spatail-library/biology/virus_particle.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "bacteria_rod",
+      "category": "biology",
+      "semanticTags": [
+        "bacteria",
+        "rod",
+        "microbe"
+      ],
+      "path": "/assets/spatail-library/biology/bacteria_rod.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "bacteria_sphere",
+      "category": "biology",
+      "semanticTags": [
+        "bacteria",
+        "coccus",
+        "microbe"
+      ],
+      "path": "/assets/spatail-library/biology/bacteria_sphere.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "petri_dish",
+      "category": "biology",
+      "semanticTags": [
+        "petri",
+        "dish",
+        "lab"
+      ],
+      "path": "/assets/spatail-library/biology/petri_dish.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "microscope",
+      "category": "biology",
+      "semanticTags": [
+        "microscope",
+        "lab",
+        "magnify"
+      ],
+      "path": "/assets/spatail-library/biology/microscope.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "molecule_ball",
+      "category": "biology",
+      "semanticTags": [
+        "molecule",
+        "atom",
+        "ball"
+      ],
+      "path": "/assets/spatail-library/biology/molecule_ball.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "molecule_bond",
+      "category": "biology",
+      "semanticTags": [
+        "molecule",
+        "bond",
+        "stick"
+      ],
+      "path": "/assets/spatail-library/biology/molecule_bond.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "atom_nucleus",
+      "category": "biology",
+      "semanticTags": [
+        "atom",
+        "nucleus",
+        "proton"
+      ],
+      "path": "/assets/spatail-library/biology/atom_nucleus.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "electron_orbit",
+      "category": "biology",
+      "semanticTags": [
+        "electron",
+        "orbit",
+        "shell"
+      ],
+      "path": "/assets/spatail-library/biology/electron_orbit.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "water_molecule",
+      "category": "biology",
+      "semanticTags": [
+        "water",
+        "h2o",
+        "molecule"
+      ],
+      "path": "/assets/spatail-library/biology/water_molecule.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "carbon_atom",
+      "category": "biology",
+      "semanticTags": [
+        "carbon",
+        "atom",
+        "element"
+      ],
+      "path": "/assets/spatail-library/biology/carbon_atom.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "oxygen_atom",
+      "category": "biology",
+      "semanticTags": [
+        "oxygen",
+        "atom",
+        "element"
+      ],
+      "path": "/assets/spatail-library/biology/oxygen_atom.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "hydrogen_atom",
+      "category": "biology",
+      "semanticTags": [
+        "hydrogen",
+        "atom",
+        "element"
+      ],
+      "path": "/assets/spatail-library/biology/hydrogen_atom.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "cutaway_view",
+        "xray_view",
+        "animated_process",
+        "layered_breakdown",
+        "scale_expansion"
+      ]
+    },
+    {
+      "assetId": "apple",
+      "category": "physics",
+      "semanticTags": [
+        "apple",
+        "fruit",
+        "fall",
+        "gravity"
+      ],
+      "path": "/assets/spatail-library/physics/apple.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "tree_simplified",
+      "category": "physics",
+      "semanticTags": [
+        "tree",
+        "plant",
+        "nature"
+      ],
+      "path": "/assets/spatail-library/physics/tree_simplified.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "falling_object",
+      "category": "physics",
+      "semanticTags": [
+        "falling",
+        "drop",
+        "gravity"
+      ],
+      "path": "/assets/spatail-library/physics/falling_object.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "ramp",
+      "category": "physics",
+      "semanticTags": [
+        "ramp",
+        "incline",
+        "slope"
+      ],
+      "path": "/assets/spatail-library/physics/ramp.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "pendulum",
+      "category": "physics",
+      "semanticTags": [
+        "pendulum",
+        "swing",
+        "oscillate"
+      ],
+      "path": "/assets/spatail-library/physics/pendulum.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "spring_mass_system",
+      "category": "physics",
+      "semanticTags": [
+        "spring",
+        "mass",
+        "oscillate"
+      ],
+      "path": "/assets/spatail-library/physics/spring_mass_system.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "weight_block",
+      "category": "physics",
+      "semanticTags": [
+        "weight",
+        "mass",
+        "block"
+      ],
+      "path": "/assets/spatail-library/physics/weight_block.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "force_arrow",
+      "category": "physics",
+      "semanticTags": [
+        "force",
+        "arrow",
+        "vector"
+      ],
+      "path": "/assets/spatail-library/physics/force_arrow.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "velocity_arrow",
+      "category": "physics",
+      "semanticTags": [
+        "velocity",
+        "arrow",
+        "vector"
+      ],
+      "path": "/assets/spatail-library/physics/velocity_arrow.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "acceleration_arrow",
+      "category": "physics",
+      "semanticTags": [
+        "acceleration",
+        "arrow",
+        "vector"
+      ],
+      "path": "/assets/spatail-library/physics/acceleration_arrow.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "gravity_arrow",
+      "category": "physics",
+      "semanticTags": [
+        "gravity",
+        "arrow",
+        "down"
+      ],
+      "path": "/assets/spatail-library/physics/gravity_arrow.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "magnetic_bar",
+      "category": "physics",
+      "semanticTags": [
+        "magnet",
+        "bar",
+        "magnetic"
+      ],
+      "path": "/assets/spatail-library/physics/magnetic_bar.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "magnet_horseshoe",
+      "category": "physics",
+      "semanticTags": [
+        "magnet",
+        "horseshoe",
+        "magnetic"
+      ],
+      "path": "/assets/spatail-library/physics/magnet_horseshoe.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "electric_field_source",
+      "category": "physics",
+      "semanticTags": [
+        "electric",
+        "charge",
+        "field"
+      ],
+      "path": "/assets/spatail-library/physics/electric_field_source.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "light_ray",
+      "category": "physics",
+      "semanticTags": [
+        "light",
+        "ray",
+        "beam"
+      ],
+      "path": "/assets/spatail-library/physics/light_ray.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "prism",
+      "category": "physics",
+      "semanticTags": [
+        "prism",
+        "light",
+        "refraction"
+      ],
+      "path": "/assets/spatail-library/physics/prism.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "lens_convex",
+      "category": "physics",
+      "semanticTags": [
+        "lens",
+        "convex",
+        "optics"
+      ],
+      "path": "/assets/spatail-library/physics/lens_convex.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "lens_concave",
+      "category": "physics",
+      "semanticTags": [
+        "lens",
+        "concave",
+        "optics"
+      ],
+      "path": "/assets/spatail-library/physics/lens_concave.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "mirror",
+      "category": "physics",
+      "semanticTags": [
+        "mirror",
+        "reflect",
+        "optics"
+      ],
+      "path": "/assets/spatail-library/physics/mirror.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "wave_surface",
+      "category": "physics",
+      "semanticTags": [
+        "wave",
+        "surface",
+        "ripple"
+      ],
+      "path": "/assets/spatail-library/physics/wave_surface.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "sine_wave_ribbon",
+      "category": "physics",
+      "semanticTags": [
+        "sine",
+        "wave",
+        "ribbon"
+      ],
+      "path": "/assets/spatail-library/physics/sine_wave_ribbon.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "sound_wave_rings",
+      "category": "physics",
+      "semanticTags": [
+        "sound",
+        "wave",
+        "rings"
+      ],
+      "path": "/assets/spatail-library/physics/sound_wave_rings.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "water_wave_ripple",
+      "category": "physics",
+      "semanticTags": [
+        "water",
+        "ripple",
+        "wave"
+      ],
+      "path": "/assets/spatail-library/physics/water_wave_ripple.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "thermometer",
+      "category": "physics",
+      "semanticTags": [
+        "thermometer",
+        "temperature",
+        "heat"
+      ],
+      "path": "/assets/spatail-library/physics/thermometer.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "beaker",
+      "category": "physics",
+      "semanticTags": [
+        "beaker",
+        "lab",
+        "chemistry"
+      ],
+      "path": "/assets/spatail-library/physics/beaker.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "flask",
+      "category": "physics",
+      "semanticTags": [
+        "flask",
+        "lab",
+        "chemistry"
+      ],
+      "path": "/assets/spatail-library/physics/flask.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "test_tube",
+      "category": "physics",
+      "semanticTags": [
+        "test",
+        "tube",
+        "lab"
+      ],
+      "path": "/assets/spatail-library/physics/test_tube.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "burner",
+      "category": "physics",
+      "semanticTags": [
+        "burner",
+        "flame",
+        "lab"
+      ],
+      "path": "/assets/spatail-library/physics/burner.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "balance_scale",
+      "category": "physics",
+      "semanticTags": [
+        "balance",
+        "scale",
+        "weigh"
+      ],
+      "path": "/assets/spatail-library/physics/balance_scale.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "pulley_system",
+      "category": "physics",
+      "semanticTags": [
+        "pulley",
+        "system",
+        "lift"
+      ],
+      "path": "/assets/spatail-library/physics/pulley_system.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "lever",
+      "category": "physics",
+      "semanticTags": [
+        "lever",
+        "simple",
+        "machine"
+      ],
+      "path": "/assets/spatail-library/physics/lever.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "fulcrum",
+      "category": "physics",
+      "semanticTags": [
+        "fulcrum",
+        "pivot",
+        "lever"
+      ],
+      "path": "/assets/spatail-library/physics/fulcrum.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "inclined_plane",
+      "category": "physics",
+      "semanticTags": [
+        "incline",
+        "plane",
+        "ramp"
+      ],
+      "path": "/assets/spatail-library/physics/inclined_plane.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "animated_process",
+        "cause_effect_visualization",
+        "real_scale_preview",
+        "interactive_sandbox"
+      ]
+    },
+    {
+      "assetId": "sun",
+      "category": "astronomy",
+      "semanticTags": [
+        "sun",
+        "star",
+        "solar"
+      ],
+      "path": "/assets/spatail-library/astronomy/sun.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "mercury",
+      "category": "astronomy",
+      "semanticTags": [
+        "mercury",
+        "planet"
+      ],
+      "path": "/assets/spatail-library/astronomy/mercury.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "venus",
+      "category": "astronomy",
+      "semanticTags": [
+        "venus",
+        "planet"
+      ],
+      "path": "/assets/spatail-library/astronomy/venus.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "earth",
+      "category": "astronomy",
+      "semanticTags": [
+        "earth",
+        "planet",
+        "globe"
+      ],
+      "path": "/assets/spatail-library/astronomy/earth.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "moon",
+      "category": "astronomy",
+      "semanticTags": [
+        "moon",
+        "satellite",
+        "lunar"
+      ],
+      "path": "/assets/spatail-library/astronomy/moon.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "mars",
+      "category": "astronomy",
+      "semanticTags": [
+        "mars",
+        "planet",
+        "red"
+      ],
+      "path": "/assets/spatail-library/astronomy/mars.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "jupiter",
+      "category": "astronomy",
+      "semanticTags": [
+        "jupiter",
+        "planet",
+        "gas giant"
+      ],
+      "path": "/assets/spatail-library/astronomy/jupiter.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "saturn",
+      "category": "astronomy",
+      "semanticTags": [
+        "saturn",
+        "planet",
+        "rings"
+      ],
+      "path": "/assets/spatail-library/astronomy/saturn.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "uranus",
+      "category": "astronomy",
+      "semanticTags": [
+        "uranus",
+        "planet",
+        "ice giant"
+      ],
+      "path": "/assets/spatail-library/astronomy/uranus.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "neptune",
+      "category": "astronomy",
+      "semanticTags": [
+        "neptune",
+        "planet",
+        "ice giant"
+      ],
+      "path": "/assets/spatail-library/astronomy/neptune.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "asteroid",
+      "category": "astronomy",
+      "semanticTags": [
+        "asteroid",
+        "rock",
+        "space"
+      ],
+      "path": "/assets/spatail-library/astronomy/asteroid.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "comet",
+      "category": "astronomy",
+      "semanticTags": [
+        "comet",
+        "ice",
+        "tail"
+      ],
+      "path": "/assets/spatail-library/astronomy/comet.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "orbit_ring",
+      "category": "astronomy",
+      "semanticTags": [
+        "orbit",
+        "ring",
+        "path"
+      ],
+      "path": "/assets/spatail-library/astronomy/orbit_ring.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "orbit_path_trail",
+      "category": "astronomy",
+      "semanticTags": [
+        "orbit",
+        "trail",
+        "path"
+      ],
+      "path": "/assets/spatail-library/astronomy/orbit_path_trail.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "star_field_dome",
+      "category": "astronomy",
+      "semanticTags": [
+        "stars",
+        "sky",
+        "dome"
+      ],
+      "path": "/assets/spatail-library/astronomy/star_field_dome.glb",
+      "fallbackPrimitive": "half_sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "galaxy_disk",
+      "category": "astronomy",
+      "semanticTags": [
+        "galaxy",
+        "disk",
+        "spiral"
+      ],
+      "path": "/assets/spatail-library/astronomy/galaxy_disk.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "rocket_simplified",
+      "category": "astronomy",
+      "semanticTags": [
+        "rocket",
+        "launch",
+        "space"
+      ],
+      "path": "/assets/spatail-library/astronomy/rocket_simplified.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "satellite",
+      "category": "astronomy",
+      "semanticTags": [
+        "satellite",
+        "orbit",
+        "space"
+      ],
+      "path": "/assets/spatail-library/astronomy/satellite.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "space_probe",
+      "category": "astronomy",
+      "semanticTags": [
+        "probe",
+        "space",
+        "explore"
+      ],
+      "path": "/assets/spatail-library/astronomy/space_probe.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "astronaut_simplified",
+      "category": "astronomy",
+      "semanticTags": [
+        "astronaut",
+        "space",
+        "suit"
+      ],
+      "path": "/assets/spatail-library/astronomy/astronaut_simplified.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "lunar_lander",
+      "category": "astronomy",
+      "semanticTags": [
+        "lander",
+        "moon",
+        "spacecraft"
+      ],
+      "path": "/assets/spatail-library/astronomy/lunar_lander.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "earth_atmosphere_shell",
+      "category": "astronomy",
+      "semanticTags": [
+        "atmosphere",
+        "earth",
+        "shell"
+      ],
+      "path": "/assets/spatail-library/astronomy/earth_atmosphere_shell.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "day_night_terminator_overlay",
+      "category": "astronomy",
+      "semanticTags": [
+        "day",
+        "night",
+        "terminator"
+      ],
+      "path": "/assets/spatail-library/astronomy/day_night_terminator_overlay.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "scale_compression",
+        "animated_process",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "wall_segment",
+      "category": "architecture",
+      "semanticTags": [
+        "wall",
+        "partition"
+      ],
+      "path": "/assets/spatail-library/architecture/wall_segment.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "floor_slab",
+      "category": "architecture",
+      "semanticTags": [
+        "floor",
+        "slab",
+        "deck"
+      ],
+      "path": "/assets/spatail-library/architecture/floor_slab.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "ceiling_slab",
+      "category": "architecture",
+      "semanticTags": [
+        "ceiling",
+        "slab"
+      ],
+      "path": "/assets/spatail-library/architecture/ceiling_slab.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "column",
+      "category": "architecture",
+      "semanticTags": [
+        "column",
+        "pillar",
+        "support"
+      ],
+      "path": "/assets/spatail-library/architecture/column.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "beam",
+      "category": "architecture",
+      "semanticTags": [
+        "beam",
+        "girder",
+        "support"
+      ],
+      "path": "/assets/spatail-library/architecture/beam.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "truss_segment",
+      "category": "architecture",
+      "semanticTags": [
+        "truss",
+        "frame",
+        "structure"
+      ],
+      "path": "/assets/spatail-library/architecture/truss_segment.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "arch",
+      "category": "architecture",
+      "semanticTags": [
+        "arch",
+        "span"
+      ],
+      "path": "/assets/spatail-library/architecture/arch.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "foundation_block",
+      "category": "architecture",
+      "semanticTags": [
+        "foundation",
+        "footing",
+        "base"
+      ],
+      "path": "/assets/spatail-library/architecture/foundation_block.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "stair_segment",
+      "category": "architecture",
+      "semanticTags": [
+        "stair",
+        "steps"
+      ],
+      "path": "/assets/spatail-library/architecture/stair_segment.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "window",
+      "category": "architecture",
+      "semanticTags": [
+        "window",
+        "glazing"
+      ],
+      "path": "/assets/spatail-library/architecture/window.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "door",
+      "category": "architecture",
+      "semanticTags": [
+        "door",
+        "entrance"
+      ],
+      "path": "/assets/spatail-library/architecture/door.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "roof_gable",
+      "category": "architecture",
+      "semanticTags": [
+        "roof",
+        "gable",
+        "pitched"
+      ],
+      "path": "/assets/spatail-library/architecture/roof_gable.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "roof_flat",
+      "category": "architecture",
+      "semanticTags": [
+        "roof",
+        "flat"
+      ],
+      "path": "/assets/spatail-library/architecture/roof_flat.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "bridge_deck",
+      "category": "architecture",
+      "semanticTags": [
+        "bridge",
+        "deck",
+        "roadway"
+      ],
+      "path": "/assets/spatail-library/architecture/bridge_deck.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "bridge_pillar",
+      "category": "architecture",
+      "semanticTags": [
+        "bridge",
+        "pillar",
+        "pier"
+      ],
+      "path": "/assets/spatail-library/architecture/bridge_pillar.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "suspension_cable",
+      "category": "architecture",
+      "semanticTags": [
+        "bridge",
+        "cable",
+        "suspension"
+      ],
+      "path": "/assets/spatail-library/architecture/suspension_cable.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "cable_stayed_tower",
+      "category": "architecture",
+      "semanticTags": [
+        "bridge",
+        "tower",
+        "pylon"
+      ],
+      "path": "/assets/spatail-library/architecture/cable_stayed_tower.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "colosseum",
+      "category": "architecture",
+      "semanticTags": [
+        "colosseum",
+        "amphitheater",
+        "arena",
+        "roman",
+        "stadium",
+        "ruins"
+      ],
+      "path": "/assets/spatail-library/architecture/colosseum.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "skyscraper",
+      "category": "architecture",
+      "semanticTags": [
+        "skyscraper",
+        "tower",
+        "highrise",
+        "building",
+        "office"
+      ],
+      "path": "/assets/spatail-library/architecture/skyscraper.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "bridge_truss",
+      "category": "architecture",
+      "semanticTags": [
+        "bridge",
+        "truss",
+        "frame"
+      ],
+      "path": "/assets/spatail-library/architecture/bridge_truss.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "road_segment",
+      "category": "architecture",
+      "semanticTags": [
+        "road",
+        "asphalt",
+        "lane"
+      ],
+      "path": "/assets/spatail-library/architecture/road_segment.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "sidewalk_segment",
+      "category": "architecture",
+      "semanticTags": [
+        "sidewalk",
+        "pavement"
+      ],
+      "path": "/assets/spatail-library/architecture/sidewalk_segment.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "traffic_cone",
+      "category": "architecture",
+      "semanticTags": [
+        "cone",
+        "traffic",
+        "safety"
+      ],
+      "path": "/assets/spatail-library/architecture/traffic_cone.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "construction_crane_simplified",
+      "category": "architecture",
+      "semanticTags": [
+        "crane",
+        "construction",
+        "lift"
+      ],
+      "path": "/assets/spatail-library/architecture/construction_crane_simplified.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "excavator_simplified",
+      "category": "architecture",
+      "semanticTags": [
+        "excavator",
+        "digger",
+        "construction"
+      ],
+      "path": "/assets/spatail-library/architecture/excavator_simplified.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "bulldozer_simplified",
+      "category": "architecture",
+      "semanticTags": [
+        "bulldozer",
+        "dozer",
+        "construction"
+      ],
+      "path": "/assets/spatail-library/architecture/bulldozer_simplified.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "rebar_cage",
+      "category": "architecture",
+      "semanticTags": [
+        "rebar",
+        "steel",
+        "reinforce"
+      ],
+      "path": "/assets/spatail-library/architecture/rebar_cage.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "concrete_block",
+      "category": "architecture",
+      "semanticTags": [
+        "concrete",
+        "block",
+        "cmu"
+      ],
+      "path": "/assets/spatail-library/architecture/concrete_block.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "brick",
+      "category": "architecture",
+      "semanticTags": [
+        "brick",
+        "masonry"
+      ],
+      "path": "/assets/spatail-library/architecture/brick.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "steel_i_beam",
+      "category": "architecture",
+      "semanticTags": [
+        "steel",
+        "ibeam",
+        "girder"
+      ],
+      "path": "/assets/spatail-library/architecture/steel_i_beam.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "blueprint_plane",
+      "category": "architecture",
+      "semanticTags": [
+        "blueprint",
+        "plan",
+        "drawing"
+      ],
+      "path": "/assets/spatail-library/architecture/blueprint_plane.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "section_cut_plane",
+      "category": "architecture",
+      "semanticTags": [
+        "section",
+        "cut",
+        "slice"
+      ],
+      "path": "/assets/spatail-library/architecture/section_cut_plane.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "floor_plan_marker",
+      "category": "architecture",
+      "semanticTags": [
+        "floorplan",
+        "marker",
+        "plan"
+      ],
+      "path": "/assets/spatail-library/architecture/floor_plan_marker.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "room_boundary_line",
+      "category": "architecture",
+      "semanticTags": [
+        "room",
+        "boundary",
+        "line"
+      ],
+      "path": "/assets/spatail-library/architecture/room_boundary_line.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "assembly_sequence",
+        "cutaway_view",
+        "real_scale_preview",
+        "tabletop_miniature"
+      ]
+    },
+    {
+      "assetId": "chair",
+      "category": "furniture",
+      "semanticTags": [
+        "chair",
+        "seat"
+      ],
+      "path": "/assets/spatail-library/furniture/chair.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "sofa",
+      "category": "furniture",
+      "semanticTags": [
+        "sofa",
+        "couch"
+      ],
+      "path": "/assets/spatail-library/furniture/sofa.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "armchair",
+      "category": "furniture",
+      "semanticTags": [
+        "armchair",
+        "chair"
+      ],
+      "path": "/assets/spatail-library/furniture/armchair.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "coffee_table",
+      "category": "furniture",
+      "semanticTags": [
+        "coffee",
+        "table"
+      ],
+      "path": "/assets/spatail-library/furniture/coffee_table.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "dining_table",
+      "category": "furniture",
+      "semanticTags": [
+        "dining",
+        "table"
+      ],
+      "path": "/assets/spatail-library/furniture/dining_table.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "desk",
+      "category": "furniture",
+      "semanticTags": [
+        "desk",
+        "workstation"
+      ],
+      "path": "/assets/spatail-library/furniture/desk.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "bed_twin",
+      "category": "furniture",
+      "semanticTags": [
+        "bed",
+        "twin",
+        "single"
+      ],
+      "path": "/assets/spatail-library/furniture/bed_twin.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "bed_queen",
+      "category": "furniture",
+      "semanticTags": [
+        "bed",
+        "queen"
+      ],
+      "path": "/assets/spatail-library/furniture/bed_queen.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "bed_king",
+      "category": "furniture",
+      "semanticTags": [
+        "bed",
+        "king"
+      ],
+      "path": "/assets/spatail-library/furniture/bed_king.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "nightstand",
+      "category": "furniture",
+      "semanticTags": [
+        "nightstand",
+        "bedside"
+      ],
+      "path": "/assets/spatail-library/furniture/nightstand.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "dresser",
+      "category": "furniture",
+      "semanticTags": [
+        "dresser",
+        "drawers"
+      ],
+      "path": "/assets/spatail-library/furniture/dresser.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "bookshelf",
+      "category": "furniture",
+      "semanticTags": [
+        "bookshelf",
+        "shelving",
+        "shelf"
+      ],
+      "path": "/assets/spatail-library/furniture/bookshelf.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "cabinet",
+      "category": "furniture",
+      "semanticTags": [
+        "cabinet",
+        "storage"
+      ],
+      "path": "/assets/spatail-library/furniture/cabinet.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "tv_stand",
+      "category": "furniture",
+      "semanticTags": [
+        "tv",
+        "stand",
+        "media"
+      ],
+      "path": "/assets/spatail-library/furniture/tv_stand.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "rug",
+      "category": "furniture",
+      "semanticTags": [
+        "rug",
+        "carpet"
+      ],
+      "path": "/assets/spatail-library/furniture/rug.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "lamp_floor",
+      "category": "furniture",
+      "semanticTags": [
+        "lamp",
+        "floor",
+        "light"
+      ],
+      "path": "/assets/spatail-library/furniture/lamp_floor.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "lamp_table",
+      "category": "furniture",
+      "semanticTags": [
+        "lamp",
+        "table",
+        "light"
+      ],
+      "path": "/assets/spatail-library/furniture/lamp_table.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "mirror_furniture",
+      "category": "furniture",
+      "semanticTags": [
+        "mirror",
+        "wall"
+      ],
+      "path": "/assets/spatail-library/furniture/mirror_furniture.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "framed_art_24x36",
+      "category": "furniture",
+      "semanticTags": [
+        "art",
+        "frame",
+        "picture"
+      ],
+      "path": "/assets/spatail-library/furniture/framed_art_24x36.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "framed_art_36x48",
+      "category": "furniture",
+      "semanticTags": [
+        "art",
+        "frame",
+        "picture"
+      ],
+      "path": "/assets/spatail-library/furniture/framed_art_36x48.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "plant_pot",
+      "category": "furniture",
+      "semanticTags": [
+        "plant",
+        "pot",
+        "decor"
+      ],
+      "path": "/assets/spatail-library/furniture/plant_pot.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "kitchen_island",
+      "category": "furniture",
+      "semanticTags": [
+        "kitchen",
+        "island",
+        "counter"
+      ],
+      "path": "/assets/spatail-library/furniture/kitchen_island.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "refrigerator_blockout",
+      "category": "furniture",
+      "semanticTags": [
+        "fridge",
+        "refrigerator",
+        "appliance"
+      ],
+      "path": "/assets/spatail-library/furniture/refrigerator_blockout.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "washer_blockout",
+      "category": "furniture",
+      "semanticTags": [
+        "washer",
+        "laundry",
+        "appliance"
+      ],
+      "path": "/assets/spatail-library/furniture/washer_blockout.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "dryer_blockout",
+      "category": "furniture",
+      "semanticTags": [
+        "dryer",
+        "laundry",
+        "appliance"
+      ],
+      "path": "/assets/spatail-library/furniture/dryer_blockout.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "bathtub_blockout",
+      "category": "furniture",
+      "semanticTags": [
+        "bathtub",
+        "tub",
+        "bathroom"
+      ],
+      "path": "/assets/spatail-library/furniture/bathtub_blockout.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "sink_blockout",
+      "category": "furniture",
+      "semanticTags": [
+        "sink",
+        "basin",
+        "bathroom"
+      ],
+      "path": "/assets/spatail-library/furniture/sink_blockout.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "toilet_blockout",
+      "category": "furniture",
+      "semanticTags": [
+        "toilet",
+        "bathroom"
+      ],
+      "path": "/assets/spatail-library/furniture/toilet_blockout.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "side_by_side_comparison",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "phone",
+      "category": "product-preview",
+      "semanticTags": [
+        "phone",
+        "smartphone",
+        "mobile"
+      ],
+      "path": "/assets/spatail-library/product-preview/phone.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "tablet",
+      "category": "product-preview",
+      "semanticTags": [
+        "tablet",
+        "ipad"
+      ],
+      "path": "/assets/spatail-library/product-preview/tablet.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "laptop",
+      "category": "product-preview",
+      "semanticTags": [
+        "laptop",
+        "notebook",
+        "computer"
+      ],
+      "path": "/assets/spatail-library/product-preview/laptop.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "monitor",
+      "category": "product-preview",
+      "semanticTags": [
+        "monitor",
+        "display",
+        "screen"
+      ],
+      "path": "/assets/spatail-library/product-preview/monitor.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "tv_55_inch",
+      "category": "product-preview",
+      "semanticTags": [
+        "tv",
+        "television",
+        "55"
+      ],
+      "path": "/assets/spatail-library/product-preview/tv_55_inch.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "tv_65_inch",
+      "category": "product-preview",
+      "semanticTags": [
+        "tv",
+        "television",
+        "65"
+      ],
+      "path": "/assets/spatail-library/product-preview/tv_65_inch.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "tv_75_inch",
+      "category": "product-preview",
+      "semanticTags": [
+        "tv",
+        "television",
+        "75"
+      ],
+      "path": "/assets/spatail-library/product-preview/tv_75_inch.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "speaker",
+      "category": "product-preview",
+      "semanticTags": [
+        "speaker",
+        "audio"
+      ],
+      "path": "/assets/spatail-library/product-preview/speaker.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "headphones",
+      "category": "product-preview",
+      "semanticTags": [
+        "headphones",
+        "audio",
+        "headset"
+      ],
+      "path": "/assets/spatail-library/product-preview/headphones.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "watch",
+      "category": "product-preview",
+      "semanticTags": [
+        "watch",
+        "smartwatch",
+        "wearable"
+      ],
+      "path": "/assets/spatail-library/product-preview/watch.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "shoe",
+      "category": "product-preview",
+      "semanticTags": [
+        "shoe",
+        "footwear"
+      ],
+      "path": "/assets/spatail-library/product-preview/shoe.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "sneaker",
+      "category": "product-preview",
+      "semanticTags": [
+        "sneaker",
+        "shoe",
+        "trainer"
+      ],
+      "path": "/assets/spatail-library/product-preview/sneaker.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "backpack",
+      "category": "product-preview",
+      "semanticTags": [
+        "backpack",
+        "bag"
+      ],
+      "path": "/assets/spatail-library/product-preview/backpack.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "bottle",
+      "category": "product-preview",
+      "semanticTags": [
+        "bottle",
+        "drink",
+        "container"
+      ],
+      "path": "/assets/spatail-library/product-preview/bottle.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "mug",
+      "category": "product-preview",
+      "semanticTags": [
+        "mug",
+        "cup",
+        "coffee"
+      ],
+      "path": "/assets/spatail-library/product-preview/mug.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "chair_product_pedestal",
+      "category": "product-preview",
+      "semanticTags": [
+        "chair",
+        "product",
+        "showroom"
+      ],
+      "path": "/assets/spatail-library/product-preview/chair_product_pedestal.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "product_display_stand",
+      "category": "product-preview",
+      "semanticTags": [
+        "stand",
+        "display",
+        "showroom"
+      ],
+      "path": "/assets/spatail-library/product-preview/product_display_stand.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "comparison_pedestal",
+      "category": "product-preview",
+      "semanticTags": [
+        "pedestal",
+        "compare",
+        "stand"
+      ],
+      "path": "/assets/spatail-library/product-preview/comparison_pedestal.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "price_tag_card",
+      "category": "product-preview",
+      "semanticTags": [
+        "price",
+        "tag",
+        "card"
+      ],
+      "path": "/assets/spatail-library/product-preview/price_tag_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "feature_callout_card",
+      "category": "product-preview",
+      "semanticTags": [
+        "feature",
+        "callout",
+        "card"
+      ],
+      "path": "/assets/spatail-library/product-preview/feature_callout_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "dimensions_overlay",
+      "category": "product-preview",
+      "semanticTags": [
+        "dimensions",
+        "measure",
+        "overlay"
+      ],
+      "path": "/assets/spatail-library/product-preview/dimensions_overlay.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "material_swatch_card",
+      "category": "product-preview",
+      "semanticTags": [
+        "material",
+        "swatch",
+        "finish"
+      ],
+      "path": "/assets/spatail-library/product-preview/material_swatch_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "side_by_side_comparison",
+        "real_scale_preview",
+        "before_after_comparison"
+      ]
+    },
+    {
+      "assetId": "bar_chart_bar",
+      "category": "data-visualization",
+      "semanticTags": [
+        "bar",
+        "chart",
+        "column"
+      ],
+      "path": "/assets/spatail-library/data-visualization/bar_chart_bar.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "stacked_bar_segment",
+      "category": "data-visualization",
+      "semanticTags": [
+        "stacked",
+        "bar",
+        "segment"
+      ],
+      "path": "/assets/spatail-library/data-visualization/stacked_bar_segment.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "line_chart_point",
+      "category": "data-visualization",
+      "semanticTags": [
+        "line",
+        "point",
+        "marker"
+      ],
+      "path": "/assets/spatail-library/data-visualization/line_chart_point.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "line_chart_segment",
+      "category": "data-visualization",
+      "semanticTags": [
+        "line",
+        "segment",
+        "trend"
+      ],
+      "path": "/assets/spatail-library/data-visualization/line_chart_segment.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "pie_chart_slice",
+      "category": "data-visualization",
+      "semanticTags": [
+        "pie",
+        "slice",
+        "share"
+      ],
+      "path": "/assets/spatail-library/data-visualization/pie_chart_slice.glb",
+      "fallbackPrimitive": "cone",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "donut_chart_slice",
+      "category": "data-visualization",
+      "semanticTags": [
+        "donut",
+        "slice",
+        "ring"
+      ],
+      "path": "/assets/spatail-library/data-visualization/donut_chart_slice.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "scatter_point",
+      "category": "data-visualization",
+      "semanticTags": [
+        "scatter",
+        "point",
+        "dot"
+      ],
+      "path": "/assets/spatail-library/data-visualization/scatter_point.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "axis_line",
+      "category": "data-visualization",
+      "semanticTags": [
+        "axis",
+        "line",
+        "scale"
+      ],
+      "path": "/assets/spatail-library/data-visualization/axis_line.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "axis_label",
+      "category": "data-visualization",
+      "semanticTags": [
+        "axis",
+        "label",
+        "text"
+      ],
+      "path": "/assets/spatail-library/data-visualization/axis_label.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "tick_mark",
+      "category": "data-visualization",
+      "semanticTags": [
+        "tick",
+        "mark",
+        "scale"
+      ],
+      "path": "/assets/spatail-library/data-visualization/tick_mark.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "legend_card",
+      "category": "data-visualization",
+      "semanticTags": [
+        "legend",
+        "key",
+        "card"
+      ],
+      "path": "/assets/spatail-library/data-visualization/legend_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "numeric_value_card",
+      "category": "data-visualization",
+      "semanticTags": [
+        "number",
+        "value",
+        "card"
+      ],
+      "path": "/assets/spatail-library/data-visualization/numeric_value_card.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "percentage_ring",
+      "category": "data-visualization",
+      "semanticTags": [
+        "percent",
+        "ring",
+        "gauge"
+      ],
+      "path": "/assets/spatail-library/data-visualization/percentage_ring.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "progress_ring",
+      "category": "data-visualization",
+      "semanticTags": [
+        "progress",
+        "ring",
+        "loading"
+      ],
+      "path": "/assets/spatail-library/data-visualization/progress_ring.glb",
+      "fallbackPrimitive": "torus",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "timeline_line",
+      "category": "data-visualization",
+      "semanticTags": [
+        "timeline",
+        "line",
+        "axis"
+      ],
+      "path": "/assets/spatail-library/data-visualization/timeline_line.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "timeline_event_dot",
+      "category": "data-visualization",
+      "semanticTags": [
+        "timeline",
+        "event",
+        "dot"
+      ],
+      "path": "/assets/spatail-library/data-visualization/timeline_event_dot.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "heatmap_tile",
+      "category": "data-visualization",
+      "semanticTags": [
+        "heatmap",
+        "tile",
+        "grid"
+      ],
+      "path": "/assets/spatail-library/data-visualization/heatmap_tile.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "column_3d",
+      "category": "data-visualization",
+      "semanticTags": [
+        "column",
+        "3d",
+        "bar"
+      ],
+      "path": "/assets/spatail-library/data-visualization/column_3d.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "data_surface_grid",
+      "category": "data-visualization",
+      "semanticTags": [
+        "surface",
+        "grid",
+        "mesh"
+      ],
+      "path": "/assets/spatail-library/data-visualization/data_surface_grid.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "flow_node",
+      "category": "data-visualization",
+      "semanticTags": [
+        "flow",
+        "node",
+        "process"
+      ],
+      "path": "/assets/spatail-library/data-visualization/flow_node.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "flow_edge",
+      "category": "data-visualization",
+      "semanticTags": [
+        "flow",
+        "edge",
+        "arrow"
+      ],
+      "path": "/assets/spatail-library/data-visualization/flow_edge.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "hierarchy_node",
+      "category": "data-visualization",
+      "semanticTags": [
+        "hierarchy",
+        "node",
+        "tree"
+      ],
+      "path": "/assets/spatail-library/data-visualization/hierarchy_node.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "network_node",
+      "category": "data-visualization",
+      "semanticTags": [
+        "network",
+        "node",
+        "graph"
+      ],
+      "path": "/assets/spatail-library/data-visualization/network_node.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "network_link",
+      "category": "data-visualization",
+      "semanticTags": [
+        "network",
+        "link",
+        "edge"
+      ],
+      "path": "/assets/spatail-library/data-visualization/network_link.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "flow_visualization",
+        "side_by_side_comparison",
+        "system_map"
+      ]
+    },
+    {
+      "assetId": "table_surface_proxy",
+      "category": "environments",
+      "semanticTags": [
+        "table",
+        "surface",
+        "proxy"
+      ],
+      "path": "/assets/spatail-library/environments/table_surface_proxy.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "wall_surface_proxy",
+      "category": "environments",
+      "semanticTags": [
+        "wall",
+        "surface",
+        "proxy"
+      ],
+      "path": "/assets/spatail-library/environments/wall_surface_proxy.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "floor_surface_proxy",
+      "category": "environments",
+      "semanticTags": [
+        "floor",
+        "surface",
+        "proxy"
+      ],
+      "path": "/assets/spatail-library/environments/floor_surface_proxy.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "room_corner_proxy",
+      "category": "environments",
+      "semanticTags": [
+        "room",
+        "corner",
+        "proxy"
+      ],
+      "path": "/assets/spatail-library/environments/room_corner_proxy.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "window_light_proxy",
+      "category": "environments",
+      "semanticTags": [
+        "window",
+        "light",
+        "proxy"
+      ],
+      "path": "/assets/spatail-library/environments/window_light_proxy.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "soft_shadow_plane",
+      "category": "environments",
+      "semanticTags": [
+        "shadow",
+        "soft",
+        "ground"
+      ],
+      "path": "/assets/spatail-library/environments/soft_shadow_plane.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "contact_shadow_decal",
+      "category": "environments",
+      "semanticTags": [
+        "shadow",
+        "contact",
+        "decal"
+      ],
+      "path": "/assets/spatail-library/environments/contact_shadow_decal.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "placement_grid",
+      "category": "environments",
+      "semanticTags": [
+        "grid",
+        "placement",
+        "guide"
+      ],
+      "path": "/assets/spatail-library/environments/placement_grid.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "measurement_tape",
+      "category": "environments",
+      "semanticTags": [
+        "measure",
+        "tape",
+        "ruler"
+      ],
+      "path": "/assets/spatail-library/environments/measurement_tape.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "world_origin_marker",
+      "category": "environments",
+      "semanticTags": [
+        "origin",
+        "marker",
+        "axis"
+      ],
+      "path": "/assets/spatail-library/environments/world_origin_marker.glb",
+      "fallbackPrimitive": "arrow",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "spatial_anchor_marker",
+      "category": "environments",
+      "semanticTags": [
+        "anchor",
+        "marker",
+        "spatial"
+      ],
+      "path": "/assets/spatail-library/environments/spatial_anchor_marker.glb",
+      "fallbackPrimitive": "ring",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "calibration_cube",
+      "category": "environments",
+      "semanticTags": [
+        "calibration",
+        "cube",
+        "test"
+      ],
+      "path": "/assets/spatail-library/environments/calibration_cube.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "scale_human_silhouette",
+      "category": "environments",
+      "semanticTags": [
+        "human",
+        "scale",
+        "silhouette"
+      ],
+      "path": "/assets/spatail-library/environments/scale_human_silhouette.glb",
+      "fallbackPrimitive": "capsule",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "scale_hand_silhouette",
+      "category": "environments",
+      "semanticTags": [
+        "hand",
+        "scale",
+        "silhouette"
+      ],
+      "path": "/assets/spatail-library/environments/scale_hand_silhouette.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "scale_ruler_1m",
+      "category": "environments",
+      "semanticTags": [
+        "ruler",
+        "1m",
+        "scale"
+      ],
+      "path": "/assets/spatail-library/environments/scale_ruler_1m.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "scale_ruler_10cm",
+      "category": "environments",
+      "semanticTags": [
+        "ruler",
+        "10cm",
+        "scale"
+      ],
+      "path": "/assets/spatail-library/environments/scale_ruler_10cm.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "generic_object_placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "generic",
+        "loading"
+      ],
+      "path": "/assets/spatail-library/placeholders/generic_object_placeholder.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "mechanical_placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "mechanical"
+      ],
+      "path": "/assets/spatail-library/placeholders/mechanical_placeholder.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "biological_placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "biology"
+      ],
+      "path": "/assets/spatail-library/placeholders/biological_placeholder.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "architecture_placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "architecture"
+      ],
+      "path": "/assets/spatail-library/placeholders/architecture_placeholder.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "product_placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "product"
+      ],
+      "path": "/assets/spatail-library/placeholders/product_placeholder.glb",
+      "fallbackPrimitive": "rounded_cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "vehicle_placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "vehicle"
+      ],
+      "path": "/assets/spatail-library/placeholders/vehicle_placeholder.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "furniture_placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "furniture"
+      ],
+      "path": "/assets/spatail-library/placeholders/furniture_placeholder.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "planet_placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "planet",
+        "astronomy"
+      ],
+      "path": "/assets/spatail-library/placeholders/planet_placeholder.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "process_placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "process",
+        "flow"
+      ],
+      "path": "/assets/spatail-library/placeholders/process_placeholder.glb",
+      "fallbackPrimitive": "cylinder",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "data_placeholder",
+      "category": "placeholders",
+      "semanticTags": [
+        "placeholder",
+        "data",
+        "chart"
+      ],
+      "path": "/assets/spatail-library/placeholders/data_placeholder.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "loading_skeleton_mesh",
+      "category": "placeholders",
+      "semanticTags": [
+        "loading",
+        "skeleton",
+        "wireframe"
+      ],
+      "path": "/assets/spatail-library/placeholders/loading_skeleton_mesh.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "low_poly_proxy_mesh",
+      "category": "placeholders",
+      "semanticTags": [
+        "lowpoly",
+        "proxy",
+        "lod"
+      ],
+      "path": "/assets/spatail-library/placeholders/low_poly_proxy_mesh.glb",
+      "fallbackPrimitive": "sphere",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "transparent_bounding_box",
+      "category": "placeholders",
+      "semanticTags": [
+        "bbox",
+        "bounds",
+        "transparent"
+      ],
+      "path": "/assets/spatail-library/placeholders/transparent_bounding_box.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "semantic_icon_marker",
+      "category": "placeholders",
+      "semanticTags": [
+        "icon",
+        "semantic",
+        "marker"
+      ],
+      "path": "/assets/spatail-library/placeholders/semantic_icon_marker.glb",
+      "fallbackPrimitive": "plane",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "asset_generating_hologram",
+      "category": "placeholders",
+      "semanticTags": [
+        "generating",
+        "hologram",
+        "loading"
+      ],
+      "path": "/assets/spatail-library/placeholders/asset_generating_hologram.glb",
+      "fallbackPrimitive": "cube",
+      "representationUses": [
+        "real_scale_preview",
+        "guided_tour"
+      ]
+    },
+    {
+      "assetId": "transform_rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "transform",
+        "move"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/transform_rig.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ]
+    },
+    {
+      "assetId": "parented_group_rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "group",
+        "parent"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/parented_group_rig.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ]
+    },
+    {
+      "assetId": "hinged_panel_rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "hinge",
+        "door"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/hinged_panel_rig.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ]
+    },
+    {
+      "assetId": "exploded_assembly_rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "explode",
+        "assembly"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/exploded_assembly_rig.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ]
+    },
+    {
+      "assetId": "orbit_rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "orbit",
+        "rotate"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/orbit_rig.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ]
+    },
+    {
+      "assetId": "reciprocate_rig",
+      "category": "animation-rigs",
+      "semanticTags": [
+        "rig",
+        "reciprocate",
+        "piston"
+      ],
+      "path": "/assets/spatail-library/animation-rigs/reciprocate_rig.glb",
+      "fallbackPrimitive": "none",
+      "representationUses": [
+        "animated_process",
+        "exploded_view",
+        "assembly_sequence"
+      ]
+    }
+  ],
+  "total": 412
+}

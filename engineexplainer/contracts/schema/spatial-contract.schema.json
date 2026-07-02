@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spatail.local/schema/spatial-contract.json",
+  "title": "SpatialContract",
+  "description": "Wire format between the EngineExplainer intelligence layer (writes contracts) and the runtime layer (plays contracts). One contract = one explanation = one playable sequence.",
+  "type": "object",
+  "required": ["meta", "explanation", "scene", "beats"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["id", "prompt", "schemaVersion"],
+      "properties": {
+        "id": { "type": "string", "description": "Stable id for the contract (slugified prompt or hash)" },
+        "prompt": { "type": "string", "description": "The user's original question, verbatim" },
+        "schemaVersion": { "type": "string", "const": "0.1.0" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "generatedBy": { "type": "string", "description": "Identifier of the agent stack that produced this (e.g. director-v1)" },
+        "asset": { "type": "string", "description": "Path or id of the GLB this contract is bound to", "default": "engine/v8_engine.glb" },
+        "estimatedDurationSec": { "type": "number", "minimum": 0 }
+      }
+    },
+
+    "explanation": {
+      "type": "object",
+      "required": ["title", "summary"],
+      "properties": {
+        "title": { "type": "string", "description": "Short headline (≤ 60 chars)" },
+        "summary": { "type": "string", "description": "1–3 sentence prose answer. The mechanic's voice." },
+        "transcript": {
+          "type": "string",
+          "description": "Optional full voiceover script. Beats reference sentences from this; if absent, narration comes from per-beat .narration fields."
+        }
+      }
+    },
+
+    "scene": {
+      "type": "object",
+      "description": "Initial state of the 3D scene BEFORE any beats play.",
+      "properties": {
+        "visibility": {
+          "type": "object",
+          "properties": {
+            "show": { "type": "array", "items": { "$ref": "#/$defs/PartRef" } },
+            "hide": { "type": "array", "items": { "$ref": "#/$defs/PartRef" } }
+          },
+          "description": "If neither show nor hide is given, every part is visible. Patterns use glob (*) over part IDs."
+        },
+        "exploded": {
+          "type": "object",
+          "properties": {
+            "amount": { "type": "number", "minimum": 0, "maximum": 1, "description": "0 = fully assembled, 1 = fully exploded" },
+            "axis": { "type": "string", "enum": ["radial", "vertical", "longitudinal"], "default": "radial" }
+          }
+        },
+        "camera": { "$ref": "#/$defs/CameraPose" },
+        "environment": {
+          "type": "object",
+          "properties": {
+            "preset": { "type": "string", "enum": ["studio", "workshop", "explainer"], "default": "explainer" },
+            "background": { "type": "string", "description": "CSS hex or 'transparent'" }
+          }
+        }
+      }
+    },
+
+    "beats": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Beat" },
+      "description": "Ordered list of explanatory steps. Played sequentially; each beat completes before the next."
+    }
+  },
+
+  "$defs": {
+
+    "PartRef": {
+      "type": "string",
+      "description": "A part id from part_registry.json, or a glob pattern over part ids. Examples: 'piston_1A', 'piston_*', 'cylinder_head_*', 'crank_throw_3'."
+    },
+
+    "AnimationRef": {
+      "type": "string",
+      "description": "A named action from animation_library.json. Examples: 'crank_rotation', 'piston_1A_stroke', 'valve_intake_1A_lift'."
+    },
+
+    "CameraPose": {
+      "type": "object",
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3, "description": "World-space camera position" },
+        "to":   { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3, "description": "World-space look-at point" },
+        "fov":  { "type": "number", "minimum": 10, "maximum": 120, "default": 35, "description": "Vertical FOV in degrees" },
+        "preset": { "type": "string", "enum": ["hero_front", "hero_threequarter", "topdown", "section_side", "cylinder_close"], "description": "If set, runtime may use a curated framing instead of from/to." }
+      }
+    },
+
+    "Beat": {
+      "type": "object",
+      "required": ["id", "actions"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "narration": { "type": "string", "description": "Voiceover line for this beat (also a UI subtitle when text-only mode)" },
+        "duration": { "type": "number", "minimum": 0.1, "description": "Total beat duration in seconds (governs when next beat starts)" },
+        "actions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Action" },
+          "description": "Actions run in parallel within the beat unless action.startAt offsets them."
+        }
+      }
+    },
+
+    "Action": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "enum": [
+          "highlight",
+          "dim_others",
+          "hide",
+          "show",
+          "play_animation",
+          "move_camera",
+          "label",
+          "show_panel",
+          "hide_panel",
+          "arrow",
+          "pulse",
+          "explode",
+          "reset"
+        ]},
+        "startAt": { "type": "number", "default": 0, "description": "Offset within the beat (sec) before this action fires" },
+        "duration": { "type": "number", "description": "Action-specific duration; if absent, runtime picks a sensible default" }
+      },
+
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "highlight" } } },
+          "then": {
+            "required": ["target"],
+            "properties": {
+              "target": { "oneOf": [{ "$ref": "#/$defs/PartRef" }, { "type": "array", "items": { "$ref": "#/$defs/PartRef" } }] },
+              "color": { "type": "string", "default": "#5046E5", "description": "CSS hex; default indigo" },
+              "intensity": { "type": "number", "default": 1.0 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "dim_others" } } },
+          "then": {
+            "properties": {
+              "except": { "type": "array", "items": { "$ref": "#/$defs/PartRef" } },
+              "factor": { "type": "number", "default": 0.25, "description": "Brightness multiplier for non-excepted parts" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "enum": ["hide", "show"] } } },
+          "then": {
+            "required": ["target"],
+            "properties": {
+              "target": { "oneOf": [{ "$ref": "#/$defs/PartRef" }, { "type": "array", "items": { "$ref": "#/$defs/PartRef" } }] }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "play_animation" } } },
+          "then": {
+            "required": ["animation"],
+            "properties": {
+              "animation": { "$ref": "#/$defs/AnimationRef" },
+              "from": { "type": "number", "default": 0, "description": "Normalised start phase 0..1 (or absolute seconds if > 1)" },
+              "to":   { "type": "number", "default": 1, "description": "Normalised end phase 0..1" },
+              "loop": { "type": "boolean", "default": false },
+              "rate": { "type": "number", "default": 1.0 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "move_camera" } } },
+          "then": {
+            "required": ["to"],
+            "properties": {
+              "to": { "$ref": "#/$defs/CameraPose" },
+              "ease": { "type": "string", "enum": ["linear", "easeInOut", "easeOut"], "default": "easeInOut" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "label" } } },
+          "then": {
+            "required": ["target", "text"],
+            "properties": {
+              "target": { "$ref": "#/$defs/PartRef", "description": "Part the label is anchored to" },
+              "text": { "type": "string", "maxLength": 80 },
+              "anchor": { "type": "string", "enum": ["above", "below", "left", "right", "auto"], "default": "auto" },
+              "kicker": { "type": "string", "description": "Small all-caps line above the main text (e.g., 'COMPONENT')" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "show_panel" } } },
+          "then": {
+            "required": ["component"],
+            "properties": {
+              "component": { "type": "string", "enum": ["ExplanationCard", "Glossary", "MetricsCard"] },
+              "anchor": { "type": "string", "enum": ["screen-top-left", "screen-top-right", "screen-bottom"], "default": "screen-top-right" },
+              "props": { "type": "object", "description": "Component-specific props (title, body, metrics, etc.)" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "hide_panel" } } },
+          "then": {
+            "properties": {
+              "component": { "type": "string", "description": "If absent, hides all panels" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "arrow" } } },
+          "then": {
+            "required": ["from", "to"],
+            "properties": {
+              "from": { "oneOf": [
+                { "$ref": "#/$defs/PartRef" },
+                { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }
+              ]},
+              "to": { "oneOf": [
+                { "$ref": "#/$defs/PartRef" },
+                { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 }
+              ]},
+              "color": { "type": "string", "default": "#5046E5" },
+              "style": { "type": "string", "enum": ["solid", "dashed"], "default": "solid" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "pulse" } } },
+          "then": {
+            "required": ["target"],
+            "properties": {
+              "target": { "$ref": "#/$defs/PartRef" },
+              "cycles": { "type": "integer", "default": 1, "minimum": 1, "maximum": 5 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "explode" } } },
+          "then": {
+            "properties": {
+              "amount": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.6 },
+              "axis": { "type": "string", "enum": ["radial", "vertical", "longitudinal"], "default": "radial" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "reset" } } },
+          "then": {
+            "properties": {
+              "scope": { "type": "string", "enum": ["highlights", "visibility", "camera", "all"], "default": "highlights" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

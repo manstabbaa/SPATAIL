@@ -1,0 +1,130 @@
+# SPATAIL · WebXR Content Viewer (PC dev surface)
+
+The client/dev surface for SPATAIL per the 2026 Master File pivot
+(`docs/spatail_2026_mf_pivot.md`): a visionOS-style spatial viewer built on
+**Three.js + WebXR** that renders a SPATAIL scene contract + its GLB assets.
+
+- **Runs flat-3D on a PC browser** — the dev tool.
+- **Goes immersive on a headset browser** (Quest / Vision Pro / Android XR) via the
+  `Enter XR` button — same code, no rebuild.
+- Consumes the **same contract** the PC brain emits
+  (`schemas/spatialExperienceContract.schema.json`).
+- Keeps rendering when the tab/preview panel is backgrounded (rAF-pause fallback).
+
+## Controls
+
+| Button / key | What it does |
+|---|---|
+| `Identify / Hitboxes` · **I** | Per-element AABB hitbox (colored by intent) + label (declared size + anchor) + side panel of intent / representation / scale / affordances, with the planner's **"Why this / Why here"** on click. |
+| `Controls` · **O** | **Object-local control panels** pinned to each object (MF p29/p35) — affordance buttons that drive real behaviors: **rotate**, **isolate** (dims the rest), **explode** (parts fly out from the centroid), **scale** (cycle), **animate** (plays a GLB clip if present), **reset**. |
+| `Detections` · **L** | The sample 3D detection overlay (the detection data shape, offline). |
+| `Live cam` · **C** | **Webcam → Gemini detector → boxes over the camera feed** (MF p28/p40). |
+| `Story step` · **Space** | Walks the scene's attention track (MF p13), narrating each beat. |
+| `✦ Generate` (prompt box) | **Live from the brain** — sends the prompt to `job_server /modular`, adapts the returned contract, and renders it (see below). |
+| click an object | Selects it (raycast) and shows its object-local control panel. |
+| `Enter XR` | Starts an immersive WebXR session on a headset browser. |
+
+Assets **spawn in** with a voxel/particle materialization (MF p18/p19) as they load.
+
+## Run it
+
+```bash
+# 1) serve the repo root (so /public GLBs and /webxr both resolve):
+python -m http.server 8765
+#    → http://localhost:8765/webxr/index.html
+
+# 2) for the Live cam, run the perception server (Gemini key in ~/.spatail/secrets.env):
+python webxr/live/detector_server.py            # listens on :8766
+#    self-test without a browser:
+python webxr/live/detector_server.py --self-test path/to/image.png
+```
+
+In Claude Code the registered preview servers are `spatail-webxr` (viewer) and
+`spatail-detector` (perception) in `.claude/launch.json`. Point the viewer at a
+different detector with `?detector=http://host:port`.
+
+## Scene format
+
+A scene is a thin projection of `schemas/spatialExperienceContract.schema.json`,
+in `webxr/scenes/` and listed in `scenes/index.json`. Each `spatialElement`:
+
+```jsonc
+{
+  "id": "engine_block",
+  "title": "V8 engine block",
+  "intent": "inspect",                 // explain|compare|simulate|guide|place|transform|recognize  (MF p41)
+  "representationMode": "three_d_model",
+  "scaleMode": "tabletop_scale",
+  "anchorStrategy": "world_anchor",
+  "asset": { "glbUrl": "/public/assets/spatail-library/mechanical/engine_block_simplified.glb" },
+  "placement": { "kind": "table", "position": [0,1.0,0], "rotationDeg": [0,25,0], "sizeMeters": [0.5,0.42,0.5] },
+  "affordances": ["rotate","explode","isolate","label","animate"],   // the interaction contract (MF p35)
+  "whyThisRepresentation": "…",        // surfaced in the identify overlay (MF p12 "why it appears")
+  "whyThisPlacement": "…"
+}
+```
+
+> `placement.position` is the *resolved* preview transform. In production the
+> contract carries placement **intent** (anchor/scale/relationship) and the
+> Placement solver (`studio/spatail/placement_solver.py`) resolves it against the
+> live RoomModel; the viewer just needs a transform to draw.
+
+## Live video-intelligence (built)
+
+`webxr/live/detector_server.py` is the live perception layer. The browser captures
+a webcam frame, POSTs it to `/detect`, and Gemini (`gemini-2.5-flash`, reusing the
+REST + strict-JSON pattern from `studio/director/vision.py`) returns labeled 2D
+boxes. The viewer draws them over the camera feed; a coarse 3D projection is also
+returned so detections can populate the spatial hitbox overlay. A confirmed
+detection is a placement-recognition target (MF p28/p40) — the same overlay the
+authored scene uses. Detector response shape:
+
+```jsonc
+{ "detections": [
+  { "label": "intake manifold", "confidence": 0.93, "intent_hint": "explain",
+    "source": "gemini:gemini-2.5-flash",
+    "bbox": [x,y,w,h],                 // 2D, normalized 0..1 (over the video)
+    "position": [x,y,z], "sizeMeters": [..] } ] }  // coarse 3D (assumed depth)
+```
+
+## How it maps to the Master File
+
+| MF pillar / page | In the viewer |
+|---|---|
+| MATTER · Purpose Layer (p12) / intent (p41) | per-element `intent` + "why" in the identify overlay |
+| MATTER · taxonomy (p15) | `experienceType` in the top bar; `representationMode` per element |
+| MATTER · matter appearing / spawning in (p18/p19) | the spawn-in particle materialization on load |
+| SPACE · placement (p26–29) | `anchorStrategy` / `placement.kind` shown on each hitbox |
+| SPACE · recognition (p28) / Overlay type / RECOGNIZE (p40) | the **Live cam** Gemini detection overlay |
+| IDENTITY · locus of control (p29) | object-local control panels pinned to objects |
+| INTERACTION · affordances (p35) / behavior contract (p42) / adaptive runtime (p43) | `affordances` tags + the working **Controls** behaviors |
+| INTERACTION · directors story (p13) | the **Story step** attention track |
+
+## Live from the brain (built)
+
+`✦ Generate` POSTs the prompt to `studio/server/job_server.py` `/modular` (the same
+endpoint the phone uses) and renders the returned experience. The brain emits the
+**v0.5 modular contract + v0.6 sceneContract**, where placement is *intent*
+(anchor / layout / footprints), not coordinates. The viewer's adapter
+(`brainToWebScene` in `viewer.js`) projects it into the web scene and **resolves
+positions with a layout solver** (`arc` / `row` / `cluster` / `grid` / `stack`,
+anchored to floor / table / wall) — the same job the on-device Placement solver does
+against a real RoomModel. It maps:
+
+- `understanding.intent` → element intent; `stage.layout`/`anchor` → layout + anchor strategy
+- `sceneContract.placement.designSystem.interaction.semanticActions` → affordances
+  (`isolate_part`→isolate, `highlight_part`→label)
+- `assets[].glbUrl` (e.g. `/assets/spatail-library/astronomy/earth.glb`) → loaded
+  cross-origin from the brain (`_send` already sets `Access-Control-Allow-Origin: *`)
+- `sequence` → the Story attention track
+
+A subject the LLM composer resolves to a library asset renders the **real GLB**
+immediately (verified: "the planet earth" → `earth.glb`, 2,488 tris); a subject with
+no model yet renders a **placeholder box** and the brain queues an asset build
+(`generationJobId`) — poll `/jobs/{id}` and re-generate to pick up the finished GLB.
+
+Run the brain (or use the `spatail-server` preview config):
+```bash
+python studio/server/job_server.py --port 8788 --no-watchdog --no-keep-awake
+```
+Point the viewer at a different brain with `?brain=http://host:port`.

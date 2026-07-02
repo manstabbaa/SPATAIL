@@ -2,6 +2,20 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "spatail-webxr",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8765"],
+      "port": 8765,
+      "autoPort": false
+    },
+    {
+      "name": "spatail-detector",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["webxr/live/detector_server.py", "--port", "8766"],
+      "port": 8766,
+      "autoPort": false
+    },
+    {
       "name": "spatail-server",
       "runtimeExecutable": "python",
       "runtimeArgs": ["studio/server/job_server.py", "--port", "8788", "--no-watchdog", "--no-keep-awake"],

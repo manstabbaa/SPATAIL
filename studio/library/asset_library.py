@@ -72,6 +72,12 @@ class Resolution:
     usdzPath: str = ""          # web path to the cached USDZ (for the iOS runtime)
     fallbackPrimitive: str = "cube"
     scaleMeters: list = field(default_factory=lambda: [0.1, 0.1, 0.1])
+    # Real-world scale contract (the vision pipeline + object_size estimator). The
+    # placer/runtime branches on these: realScaleBaked → the GLB is already metric,
+    # render at scale 1.0; else fit the longest dim to realSizeMeters; else fall back
+    # to the tabletop footprint. (asset_service.produce + studio/vision baked them.)
+    realSizeMeters: list | None = None
+    realScaleBaked: bool = False
     pivot: str = "center"
     reason: str = ""
 
@@ -184,6 +190,8 @@ class AssetLibrary:
                                   glbPath=a.get("path", ""), usdzPath=a.get("usdzPath", ""),
                                   fallbackPrimitive=a.get("fallbackPrimitive", "cube"),
                                   scaleMeters=a.get("scaleMeters", [0.1, 0.1, 0.1]),
+                                  realSizeMeters=a.get("realSizeMeters"),
+                                  realScaleBaked=bool(a.get("realScaleBaked", False)),
                                   pivot=a.get("pivot", "center"),
                                   reason=f"library GLB {a['assetId']} ({m.reason})")
             return Resolution(source="primitive", libraryAssetId=a["assetId"],
@@ -203,10 +211,13 @@ class AssetLibrary:
                            semantic_tags=(), scale_meters=None, pivot: str = "center_bottom",
                            representation_uses=(), usdz_path: str = "", bbox_m=None,
                            fallback_primitive: str = "cube",
-                           placement_types=("table", "floor"), asset_state: str = "generated") -> dict:
+                           placement_types=("table", "floor"), asset_state: str = "generated",
+                           real_size_meters=None, real_scale_baked: bool = False) -> dict:
         """Persist a freshly generated/baked asset to manifests/generated.json and index
         it, so the next resolve() returns it as a `library` (real GLB) hit. usdz_path lets
-        the iOS runtime load the cached USDZ."""
+        the iOS runtime load the cached USDZ. real_size_meters/real_scale_baked carry the
+        real-world scale contract through to the modular contract (the runtime branches on
+        them so a 0.08 m frog and a 0.55 m extinguisher render at their true sizes)."""
         meta = {
             "assetId": asset_id, "name": name or asset_id.replace("_", " ").title(),
             "category": category, "semanticTags": list(semantic_tags) or _tokens(asset_id),
@@ -219,6 +230,10 @@ class AssetLibrary:
             "license": "internal_generated", "assetState": asset_state,
             "boundingBoxMeters": bbox_m or {},
         }
+        if real_size_meters:
+            meta["realSizeMeters"] = [float(x) for x in real_size_meters]
+        if real_scale_baked:
+            meta["realScaleBaked"] = True
         gen_path = self.manifests / "generated.json"
         try:
             existing = json.loads(gen_path.read_text(encoding="utf-8")).get("assets", []) \

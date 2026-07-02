@@ -9,6 +9,13 @@ struct SpatailMetadata: Decodable {
     let usdz: String?
     let glb: String
     let mode: String
+    // Real-world scale contract (studio asset_service + vision pipeline). Optional so a
+    // legacy metadata.json without them still decodes. realScaleBaked → the GLB/USDZ is
+    // already metric (render at 1.0); realSizeMeters → the size to fit the longest dim
+    // to when it isn't baked. Mirrors ModularExperience.Asset's fields for the bundled
+    // (pre-built) demo path.
+    let realSizeMeters: [Double]?
+    let realScaleBaked: Bool?
     let animation: Animation
     let beats: [Beat]
 

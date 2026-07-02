@@ -184,6 +184,116 @@ def _build_mesh(part):
     raise ValueError(f"Unknown primitive {prim!r} for part {name!r}")
 
 
+# ─────────────────────────────────────────────────────────────────────────
+# Role/name-aware shaping — turn a bare primitive into believable geometry.
+# This is the "model the asset IN BLENDER" stage: a flat-pack cushion should
+# read as a cushion (plump, rounded), a leg should taper, a panel just needs
+# its razor edges knocked off. Everything is deterministic bmesh — no operators,
+# no active-scene dependency — so it is safe in the dedicated build scene.
+# ─────────────────────────────────────────────────────────────────────────
+
+# profile: bevel (fraction of the smallest dimension), seg (bevel segments),
+#          smooth (shade-smooth the result), taper (0..1 inward scale of the
+#          bottom face — for legs/feet), dome (0..1 push the top face up — soft tops).
+_SHAPE_PROFILES = (
+    # (keywords, profile) — first match wins; check specific before generic.
+    (("seat cushion", "seat_cushion", "back cushion", "back_cushion", "cushion",
+      "pillow", "bolster", "headrest", "pouffe", "pouf"),
+     dict(bevel=0.45, seg=6, smooth=True, taper=0.0, dome=0.18)),
+    (("mattress", "topper", "futon", "pad", "padding"),
+     dict(bevel=0.30, seg=5, smooth=True, taper=0.0, dome=0.10)),
+    (("armrest", "arm rest", "arm_", "armpanel"),
+     dict(bevel=0.28, seg=4, smooth=True, taper=0.0, dome=0.0)),
+    (("seat", "backrest", "headboard", "footboard", "sofa", "couch"),
+     dict(bevel=0.22, seg=4, smooth=True, taper=0.0, dome=0.0)),
+    (("leg", "foot", "post", "spindle"),
+     dict(bevel=0.14, seg=3, smooth=False, taper=0.42, dome=0.0)),
+    (("frame", "rail", "apron", "stretcher", "slat", "spar", "beam", "stile",
+      "bracket", "support", "crossbar", "cross bar", "base"),
+     dict(bevel=0.07, seg=2, smooth=False, taper=0.0, dome=0.0)),
+    (("panel", "side", "top", "bottom", "shelf", "door", "back", "board",
+      "cover", "worktop", "tabletop", "table top", "lid", "drawer", "wall"),
+     dict(bevel=0.05, seg=2, smooth=False, taper=0.0, dome=0.0)),
+)
+# Mild chamfer so nothing exported is a perfectly razor-edged box.
+_SHAPE_DEFAULT = dict(bevel=0.05, seg=2, smooth=False, taper=0.0, dome=0.0)
+
+
+def _shape_profile(role, name):
+    text = f"{role or ''} {name or ''}".lower()
+    for keywords, profile in _SHAPE_PROFILES:
+        if any(k in text for k in keywords):
+            return profile
+    return _SHAPE_DEFAULT
+
+
+def _bevel(bm, geom, offset, segments):
+    """Round edges; tolerate bmesh.ops.bevel signature drift across Blender
+    versions (affect= in 4.x/5.x, vertex_only= in 3.x). Never raises."""
+    for kw in (dict(affect="EDGES"), dict(vertex_only=False), {}):
+        try:
+            bmesh.ops.bevel(bm, geom=geom, offset=offset, offset_type="OFFSET",
+                            segments=segments, profile=0.5, clamp_overlap=True, **kw)
+            return True
+        except TypeError:
+            continue
+        except Exception as e:  # noqa: BLE001
+            print(f"[spatail_model_from_primitives] bevel failed: {e}")
+            return False
+    return False
+
+
+def _shape_mesh(me, profile):
+    """Apply a shape profile to a freshly-built primitive mesh, in place."""
+    if not profile:
+        return
+    try:
+        bm = bmesh.new()
+        bm.from_mesh(me)
+        xs = [v.co.x for v in bm.verts]
+        ys = [v.co.y for v in bm.verts]
+        zs = [v.co.z for v in bm.verts]
+        if not xs:
+            bm.free()
+            return
+        dx, dy, dz = max(xs) - min(xs), max(ys) - min(ys), max(zs) - min(zs)
+        smallest = min(d for d in (dx, dy, dz) if d > 1e-9) if any(
+            d > 1e-9 for d in (dx, dy, dz)) else 0.0
+        zmin, zmax = min(zs), max(zs)
+
+        taper = float(profile.get("taper", 0.0))
+        if taper > 0 and dz > 1e-9:
+            for v in bm.verts:
+                f = (v.co.z - zmin) / dz            # 0 at bottom, 1 at top
+                s = (1.0 - taper) + taper * f        # bottom→(1-taper), top→1
+                v.co.x *= s
+                v.co.y *= s
+
+        dome = float(profile.get("dome", 0.0))
+        if dome > 0 and dz > 1e-9:
+            top_band = zmax - 0.18 * dz
+            for v in bm.verts:
+                if v.co.z >= top_band:
+                    v.co.z += dome * dz
+
+        bevel = float(profile.get("bevel", 0.0))
+        seg = int(profile.get("seg", 1))
+        if bevel > 0 and smallest > 0:
+            off = min(bevel * smallest, 0.49 * smallest)
+            geom = list(bm.verts) + list(bm.edges)
+            _bevel(bm, geom, off, seg)
+
+        bm.normal_update()
+        bm.to_mesh(me)
+        bm.free()
+        if profile.get("smooth"):
+            for poly in me.polygons:
+                poly.use_smooth = True
+        me.update()
+    except Exception as e:  # noqa: BLE001
+        print(f"[spatail_model_from_primitives] shaping skipped: {e}")
+
+
 def _mesh_from_cad_payload(name, mesh_path):
     """Build a mesh datablock from a baked CAD payload (.npz: verts Nx3 + faces).
 
@@ -241,7 +351,7 @@ def _load_cad_manifest(cad_manifest):
 
 
 def build_from_plan(plan, scene_name=None, clear=True, make_active=False,
-                    cad_manifest=None):
+                    cad_manifest=None, shape=True):
     """Construct every part of a build plan into a dedicated scene.
 
     make_active : if True, switch Blender's active scene to the new one (needed
@@ -292,13 +402,22 @@ def build_from_plan(plan, scene_name=None, clear=True, make_active=False,
         role = part.get("role", "part")
         cad_entry = cad_parts.get(name) or {}
         cad_mesh_path = cad_entry.get("mesh")
+        is_hardware = bool(part.get("_hardware"))
+        prim = part.get("primitive", "box")
+        # Non-hardware box/cylinder parts are MODELLED IN BLENDER (role-aware
+        # shaping) instead of imported as uniform CAD panels — that is what makes
+        # a cushion read as a cushion and a leg taper. Hardware keeps its real
+        # CAD template geometry (screws, hinges, cam-locks, dowels).
+        want_blender_shape = shape and not is_hardware and prim in ("box", "cylinder")
         me = None
         is_cad = False
-        if cad_mesh_path and os.path.exists(cad_mesh_path):
+        if cad_mesh_path and os.path.exists(cad_mesh_path) and not want_blender_shape:
             me = _mesh_from_cad_payload(name, cad_mesh_path)
             is_cad = me is not None
         if me is None:
-            me = _build_mesh(part)        # primitive fallback
+            me = _build_mesh(part)        # primitive
+            if want_blender_shape:
+                _shape_mesh(me, _shape_profile(role, name))
         if is_cad:
             n_cad += 1
         me.materials.append(_role_material(role))

@@ -4,9 +4,16 @@ Implements docs/generative_ar_contract.md exactly:
 
     POST /jobs            {prompt, client}      -> {id, status}
     GET  /jobs/{id}                              -> {id, status, stage, message,
-                                                     usdz_url?, metadata_url?}
-    GET  /artifacts/{file}                       -> USDZ / metadata bytes
+                                                     usdz_url?, glb_url?,
+                                                     manifest_url?, metadata_url?}
+    GET  /artifacts/{file}                       -> USDZ / GLB / metadata bytes
     GET  /health                                 -> liveness + Blender bridge status
+
+The model field returned by GET /jobs/{id} is shaped by the client platform
+(see _client_platform): Android XR clients ({"client":{"platform":"android"}})
+get glb_url + manifest_url as the primary (and only) model fields; iOS/default
+clients get usdz_url primary with glb_url/manifest_url additive. This is the
+Master File 2026 pivot — Android consumes glTF/GLB, Apple consumes USDZ.
 
 A single background worker serialises jobs (Blender is single-threaded): it drives
 the LIVE Blender MCP bridge (localhost:9876) via generator.generate() to model +
@@ -162,6 +169,20 @@ def _snapshot(job_id: str) -> dict | None:
     with _LOCK:
         job = _JOBS.get(job_id)
         return dict(job) if job else None
+
+
+def _client_platform(job: dict) -> str:
+    """Best-effort client platform, used only to shape the wire contract (which
+    model field is primary). The POST /jobs body may carry `client` as a dict
+    ({"platform":"android", ...}) or a bare string ("android"); anything else
+    yields "" → the default iOS/USDZ-first behaviour. Added for the Android XR
+    pivot (Master File 2026): Android consumes glTF/GLB, never USDZ."""
+    c = job.get("client")
+    if isinstance(c, dict):
+        return str(c.get("platform") or "").strip().lower()
+    if isinstance(c, str):
+        return c.strip().lower()
+    return ""
 
 
 def _uses_isolated(job: dict) -> bool:
@@ -597,16 +618,33 @@ class Handler(BaseHTTPRequestHandler):
                     out["stations"] = job.get("stations")
                     out["title"] = job.get("title")
                 else:
-                    out["usdz_url"] = f"/artifacts/{job['usdz']}"
-                    if job.get("metadata"):
-                        out["metadata_url"] = f"/artifacts/{job['metadata']}"
-                    # GLB twin (the Meshy artist writes one) — the web viewer's format
-                    if (ARTIFACTS / f"{job['id']}.glb").exists():
+                    glb_exists = (ARTIFACTS / f"{job['id']}.glb").exists()
+                    manifest_exists = (ARTIFACTS / f"{job['id']}_manifest.json").exists()
+                    # Android XR consumes glTF/GLB natively; iOS/RealityKit consumes
+                    # USDZ. For android clients GLB + manifest are the primary (and only)
+                    # model fields — USDZ is intentionally omitted (Master File pivot
+                    # 2026-06). Until every builder guarantees a GLB twin (the Meshy
+                    # artist already does), an android build with no GLB falls back to
+                    # the USDZ fields rather than returning a broken /artifacts/None.
+                    if _client_platform(job) == "android" and glb_exists:
                         out["glb_url"] = f"/artifacts/{job['id']}.glb"
-                    # component manifest (parts/roles/motion) if the build emitted one —
-                    # lets the runtime bind named parts (explode/tap a part, motion).
-                    if (ARTIFACTS / f"{job['id']}_manifest.json").exists():
-                        out["manifest_url"] = f"/artifacts/{job['id']}_manifest.json"
+                        if manifest_exists:
+                            out["manifest_url"] = f"/artifacts/{job['id']}_manifest.json"
+                        if job.get("metadata"):
+                            out["metadata_url"] = f"/artifacts/{job['metadata']}"
+                    else:
+                        # iOS / default: USDZ primary, GLB twin + manifest additive.
+                        if job.get("usdz"):
+                            out["usdz_url"] = f"/artifacts/{job['usdz']}"
+                        if job.get("metadata"):
+                            out["metadata_url"] = f"/artifacts/{job['metadata']}"
+                        # GLB twin (the Meshy artist writes one) — the web viewer's format
+                        if glb_exists:
+                            out["glb_url"] = f"/artifacts/{job['id']}.glb"
+                        # component manifest (parts/roles/motion) if the build emitted one —
+                        # lets the runtime bind named parts (explode/tap a part, motion).
+                        if manifest_exists:
+                            out["manifest_url"] = f"/artifacts/{job['id']}_manifest.json"
             return self._send(200, obj=out)
 
         if path.startswith("/artifacts/"):

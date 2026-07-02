@@ -1,7 +1,7 @@
 """publish_to_spatail.py — bring a normalized factory asset into the SPATAIL app.
 
 The asset factory produces a fixed-bounds GLB. iOS can't render GLB, so to TEST a
-processed asset in the SpatailEducator app (no Xcode rebuild needed) we:
+processed asset in the Spatail app (no Xcode rebuild needed) we:
 
   1. ensure the asset has a RealityKit USDZ (rebuild with --export-usdz if absent),
   2. copy GLB+USDZ into public/assets/spatail-library/<category>/ (what the

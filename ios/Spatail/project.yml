@@ -1,4 +1,4 @@
-name: SpatailEducator
+name: Spatail
 options:
   bundleIdPrefix: dev.spatail
   deploymentTarget:
@@ -19,18 +19,28 @@ settings:
     # generate`); until then tracked requests degrade to the placed stream.
     # SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SPATAIL_IOS27_TRACKING"
 
+packages:
+  # Platform-agnostic engine: pure core + RealityKit adapter. See ios/SpatailEngine.
+  SpatailEngine:
+    path: ../SpatailEngine
+
 targets:
-  SpatailEducator:
+  Spatail:
     type: application
     platform: [iOS, visionOS]
     sources:
       - path: Sources
       - path: Resources
         buildPhase: resources
+    dependencies:
+      - package: SpatailEngine
+        product: SpatailEngineCore
+      - package: SpatailEngine
+        product: SpatailEngineRealityKit
     info:
       path: Sources/Info.plist
       properties:
-        CFBundleDisplayName: SPATAIL Educator
+        CFBundleDisplayName: SPATAIL
         UILaunchScreen: {}
         NSCameraUsageDescription: "SPATAIL uses the camera to scan your space and place 3D demos in augmented reality."
         NSPhotoLibraryUsageDescription: "SPATAIL can use a photo of what you want explained to build a 3D lesson."
@@ -51,5 +61,5 @@ targets:
           - UIInterfaceOrientationLandscapeRight
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.spatail.educator
+        PRODUCT_BUNDLE_IDENTIFIER: dev.spatail.app
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES

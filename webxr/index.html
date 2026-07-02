@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SPATAIL · WebXR Content Viewer</title>
+<style>
+  :root {
+    --bg: #0d0d12;
+    --panel: rgba(20, 20, 28, 0.82);
+    --panel-solid: #14141c;
+    --line: rgba(255, 255, 255, 0.10);
+    --ink: #f4f4f8;
+    --ink-dim: #a0a0b0;
+    --accent: #5b4be6;     /* SPATAIL indigo */
+    --accent-2: #19c3a6;
+    --warn: #e6a23c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg);
+    color: var(--ink); font-family: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+
+  /* top bar */
+  #topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+    display: flex; align-items: center; gap: 14px; padding: 10px 16px;
+    background: linear-gradient(180deg, rgba(8,8,12,0.92), rgba(8,8,12,0.0)); pointer-events: none; }
+  #topbar > * { pointer-events: auto; }
+  .brand { font-weight: 700; letter-spacing: 0.5px; font-size: 16px; }
+  .brand .ai { color: var(--accent); }
+  .meta { font-size: 12px; color: var(--ink-dim); line-height: 1.35; max-width: 46ch; }
+  .meta b { color: var(--ink); font-weight: 600; }
+  .spacer { flex: 1; }
+
+  button.btn, select.btn { font: inherit; font-size: 13px; color: var(--ink);
+    background: var(--panel-solid); border: 1px solid var(--line); border-radius: 9px;
+    padding: 8px 12px; cursor: pointer; transition: background .15s, border-color .15s; }
+  button.btn:hover, select.btn:hover { border-color: rgba(255,255,255,0.28); }
+  button.btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  input.btn { width: 248px; cursor: text; }
+  input.btn::placeholder { color: var(--ink-dim); }
+  button.btn.busy { opacity: 0.6; pointer-events: none; }
+  button.btn.alt.on { background: var(--accent-2); border-color: var(--accent-2); color: #06231d; }
+
+  /* identify side panel */
+  #identify { position: fixed; top: 64px; right: 12px; width: 320px; max-height: calc(100vh - 84px);
+    z-index: 15; background: var(--panel); backdrop-filter: blur(10px);
+    border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: none;
+    flex-direction: column; }
+  #identify.show { display: flex; }
+  #identify h3 { margin: 0; padding: 12px 14px; font-size: 12px; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--ink-dim); border-bottom: 1px solid var(--line); }
+  #idlist { overflow-y: auto; padding: 6px; }
+  .idrow { padding: 10px 10px; border-radius: 10px; cursor: pointer; border: 1px solid transparent; }
+  .idrow:hover { background: rgba(255,255,255,0.04); }
+  .idrow.active { background: rgba(91,75,230,0.16); border-color: rgba(91,75,230,0.5); }
+  .idrow .name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .idrow .tags { margin-top: 5px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag { font-size: 10px; padding: 2px 6px; border-radius: 5px; background: rgba(255,255,255,0.06);
+    color: var(--ink-dim); }
+  .tag.intent { color: #cdc6ff; background: rgba(91,75,230,0.18); }
+  .tag.live { color: #06231d; background: var(--accent-2); }
+  .idrow .why { margin-top: 6px; font-size: 11px; color: var(--ink-dim); line-height: 1.4; display: none; }
+  .idrow.active .why { display: block; }
+
+  /* floating 3D labels (CSS2D) */
+  .label3d { font-size: 11px; color: var(--ink); background: var(--panel);
+    border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; white-space: nowrap;
+    pointer-events: none; backdrop-filter: blur(6px); }
+  .label3d .li { color: var(--accent-2); }
+  .label3d .sz { color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+  .label3d.live { border-color: var(--accent-2); }
+
+  /* bottom status / attention bar */
+  #statusbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 15;
+    display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+    background: linear-gradient(0deg, rgba(8,8,12,0.92), rgba(8,8,12,0.0)); pointer-events: none; }
+  #statusbar > * { pointer-events: auto; }
+  #narration { font-size: 13px; color: var(--ink); background: var(--panel);
+    border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; max-width: 60ch;
+    backdrop-filter: blur(8px); }
+  #narration .step { color: var(--accent-2); font-weight: 700; margin-right: 8px; }
+  #hint { font-size: 11px; color: var(--ink-dim); }
+
+  #loading { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center;
+    justify-content: center; background: var(--bg); color: var(--ink-dim); font-size: 14px; }
+  #loading.hide { display: none; }
+  .err { color: var(--warn); max-width: 60ch; text-align: center; line-height: 1.5; }
+
+  /* live camera (passthrough) view + 2D detection boxes */
+  #camview { position: fixed; inset: 0; z-index: 12; display: none; background: #000; }
+  #camview.show { display: block; }
+  #camvideo { width: 100%; height: 100%; object-fit: cover; }
+  #detboxes { position: absolute; inset: 0; pointer-events: none; }
+  .detbox { position: absolute; border: 2px solid var(--accent-2); border-radius: 4px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4); }
+  .detbox .cap { position: absolute; top: -22px; left: -2px; font-size: 11px; white-space: nowrap;
+    background: var(--accent-2); color: #06231d; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+  #camhud { position: absolute; top: 70px; left: 16px; z-index: 13; font-size: 12px; color: var(--ink);
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px;
+    backdrop-filter: blur(8px); max-width: 44ch; }
+  #camhud b { color: var(--accent-2); }
+
+  /* object-local control panel (CSS2D, interactive) */
+  .ctrlpanel { pointer-events: auto; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 7px; backdrop-filter: blur(8px); display: flex; flex-wrap: wrap;
+    gap: 5px; width: 168px; }
+  .ctrlpanel .ph { width: 100%; font-size: 10px; letter-spacing: .6px; text-transform: uppercase;
+    color: var(--ink-dim); margin-bottom: 2px; }
+  .ctrlpanel button { font: inherit; font-size: 11px; color: var(--ink); background: var(--panel-solid);
+    border: 1px solid var(--line); border-radius: 7px; padding: 4px 8px; cursor: pointer; }
+  .ctrlpanel button:hover { border-color: var(--accent); }
+  .ctrlpanel button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="topbar">
+  <span class="brand">SPAT<span class="ai">AI</span>L</span>
+  <div class="meta" id="sceneMeta">loading…</div>
+  <span class="spacer"></span>
+  <select class="btn" id="sceneSelect" title="Sample scene"></select>
+  <input class="btn" id="brainPrompt" placeholder="ask the brain… e.g. how a pendulum works" />
+  <button class="btn" id="btnBrain" title="Generate a live experience from the brain (/modular)">✦ Generate</button>
+  <button class="btn" id="btnIdentify" title="Toggle identify / hitbox overlay (I)">⊞ Identify / Hitboxes</button>
+  <button class="btn" id="btnControls" title="Object-local control panels (O)">⚙ Controls</button>
+  <button class="btn alt" id="btnLive" title="Toggle the sample 3D detection overlay (L)">◉ Detections</button>
+  <button class="btn alt" id="btnCam" title="Live webcam → Gemini detection (C)">◎ Live cam</button>
+  <button class="btn" id="btnStep" title="Step the attention track (Space)">▶ Story step</button>
+  <button class="btn" id="btnVR" title="Enter immersive XR">⛶ Enter XR</button>
+</div>
+
+<div id="identify">
+  <h3>Identified in scene · <span id="idcount">0</span></h3>
+  <div id="idlist"></div>
+</div>
+
+<div id="statusbar">
+  <div id="narration"><span class="step">Ready</span>Orbit: drag · zoom: scroll · pan: right-drag</div>
+  <span class="spacer"></span>
+  <span id="hint"></span>
+</div>
+
+<div id="camview">
+  <video id="camvideo" autoplay playsinline muted></video>
+  <div id="detboxes"></div>
+  <div id="camhud">Live perception off</div>
+</div>
+
+<div id="loading">Loading SPATAIL viewer…</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="./viewer.js"></script>
+</body>
+</html>

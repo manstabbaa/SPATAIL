@@ -1,6 +1,6 @@
 import SwiftUI
 
-// SPATAIL Educator — the phone/Vision Pro player.
+// SPATAIL — the phone/Vision Pro player.
 //
 // Pipeline position:  Blender → SPATAIL (USDZ + metadata) → THIS APP.
 // The app is a thin, modular runtime: it does NOT model anything. It loads the
@@ -9,7 +9,7 @@ import SwiftUI
 // scale that fits, and plays the demo in AR.
 
 @main
-struct SpatailEducatorApp: App {
+struct SpatailApp: App {
     var body: some Scene {
         WindowGroup {
             // Single entry: prompt → project → keep prompting to evolve the scene.

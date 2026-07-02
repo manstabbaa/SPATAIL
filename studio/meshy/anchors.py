@@ -522,4 +522,5 @@ def main():
     print(f"[anchors] {len(done)} ok, {len(failed)} failed")
 
 
-main()
+if __name__ == "__main__":     # guarded so skeleton.py can import the multi-view machinery
+    main()

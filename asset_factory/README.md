@@ -115,7 +115,7 @@ Worker/runtime: `asset_factory/config/worker_config.json`
 ## Test a processed asset on your phone (SPATAIL iOS app)
 
 iOS can't render GLB, so the app uses **USDZ**. To view a normalized asset in the
-SpatailEducator app **with no Xcode rebuild**, publish it into the SPATAIL library
+Spatail app **with no Xcode rebuild**, publish it into the SPATAIL library
 and load it via the app's existing **Representation** flow:
 
 ```bash

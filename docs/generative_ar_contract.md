@@ -57,7 +57,7 @@ queued ──► running ──► done
   in its largest dimension) OR provide a bbox in metadata so the client can scale.
 - **Metadata (optional but preferred):** reuse the existing shape from
   `studio/out/<exhibit>_metadata.json` (see `SpatailMetadata` in
-  `ios/SpatailEducator/Sources/SpatailModel.swift`). Minimum useful fields:
+  `ios/Spatail/Sources/SpatailModel.swift`). Minimum useful fields:
   `title`, `bbox_yup_m` (min/max) or a footprint, and `animation` (fps/frames/loop).
 
 ## Generator (PC side, open-ended)

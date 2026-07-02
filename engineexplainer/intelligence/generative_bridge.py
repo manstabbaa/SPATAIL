@@ -110,11 +110,15 @@ def generate_cad_manifest(plan: dict, *, asset_id: str, timeout: int = 600) -> s
     return str(manifest_path)
 
 
-def _mirror_to_live(glb_path: str, asset_id: str) -> dict:
+def _mirror_to_live(glb_path: str, asset_id: str,
+                    assembly: dict | None = None) -> dict:
     """Best-effort: push the built GLB into the user's live Blender session.
 
-    Imports the stdlib-only socket client lazily by path so a missing file or a
-    closed Blender can never break the headless build. Returns a status dict
+    *assembly* is the registry's ``{"order","offsets"}`` block; when present the
+    live mirror bakes a staggered exploded->seated assembly as Blender keyframes
+    (so the user can press Play to watch the asset assemble). Imports the
+    stdlib-only socket client lazily by path so a missing file or a closed
+    Blender can never break the headless build. Returns a status dict
     ({ok, skipped, reason?, ...}) and logs a one-line summary.
     """
     if not LIVE_BLENDER:
@@ -126,14 +130,15 @@ def _mirror_to_live(glb_path: str, asset_id: str) -> dict:
             "spatail_live_blender", str(LIVE_BLENDER_SCRIPT))
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)  # type: ignore[union-attr]
-        status = mod.mirror_asset_to_live(glb_path, asset_id)
+        status = mod.mirror_asset_to_live(glb_path, asset_id, assembly=assembly)
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "skipped": True,
                 "reason": f"live-mirror import/call failed: {e}"}
 
     if status.get("ok"):
         print(f"[generative_bridge] mirrored '{asset_id}' into LIVE Blender "
-              f"({status.get('n_meshes')} parts, extents {status.get('extents_m')} m).")
+              f"({status.get('n_meshes')} parts, {status.get('n_animated', 0)} "
+              f"animated, extents {status.get('extents_m')} m).")
     elif status.get("skipped"):
         print(f"[generative_bridge] live Blender mirror skipped: {status.get('reason')}")
     else:
@@ -196,8 +201,16 @@ def build_asset_from_plan(plan: dict, *, asset_id: str | None = None,
     result["elapsed_s"] = round(time.time() - t0, 1)
 
     # Mirror the freshly-exported GLB into the user's live Blender session so the
-    # assembled, correctly-scaled asset appears there (best-effort; never fatal).
-    result["live_mirror"] = _mirror_to_live(paths["glb_path"], asset_id)
+    # assembled, correctly-scaled asset appears there — and bake the assembly as
+    # keyframes from the registry's assembly block (best-effort; never fatal).
+    assembly = None
+    try:
+        reg = json.loads(Path(paths["registry_path"]).read_text(encoding="utf-8"))
+        assembly = reg.get("assembly")
+    except Exception:  # noqa: BLE001
+        assembly = None
+    result["live_mirror"] = _mirror_to_live(paths["glb_path"], asset_id,
+                                            assembly=assembly)
     return result
 
 

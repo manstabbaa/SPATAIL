@@ -1,4 +1,4 @@
-# SPATAIL Educator — iOS / Vision Pro player
+# SPATAIL — iOS / Vision Pro player
 
 The device end of the engine. It does **not** model anything — it loads the USDZ
 the studio built, reads the SPATAIL metadata, scans your room, runs SPATAIL
@@ -25,9 +25,9 @@ git clone https://github.com/manstabbaa/SPATAIL.git   # or: git pull
 cd SPATAIL && git checkout studio-pivot
 
 # generate + open
-cd ios/SpatailEducator
+cd ios/Spatail
 xcodegen generate
-open SpatailEducator.xcodeproj
+open Spatail.xcodeproj
 ```
 In Xcode: select your iPhone as the run destination, set your Team under
 Signing & Capabilities (personal Apple ID is fine), and press ⌘R. Approve the

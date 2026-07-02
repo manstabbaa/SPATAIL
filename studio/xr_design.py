@@ -123,6 +123,43 @@ CITATIONS = {
 }
 
 
+# --- Per-device comfort profiles ---------------------------------------------
+# The module constants above are the REFERENCE profile (Apple visionOS HIG +
+# Magic Leap). Most are human-factors — eye height, reach, gaze-down, the
+# no-head-turn comfort cone, read distances — and transfer across headsets
+# unchanged. Only a few values are device/optics-specific. A profile overrides
+# just those (dotted paths into as_dict()); everything else inherits the
+# reference. Added for the Android XR pivot (Master File 2026), so placement can
+# be tuned per target without forking this module.
+#
+# PROVISIONAL: the android_xr device values are seeded from public Galaxy XR /
+# Project Moohan specs + Quest-class ergonomics and MUST be validated on real
+# hardware (see docs/android-xr/PLATFORM_NOTES.md). The inherited human-factors
+# values are not provisional.
+DEVICE_PROFILES = {
+    "reference": {"label": "Apple visionOS HIG + Magic Leap (reference)", "overrides": {}},
+    "avp": {"label": "Apple Vision Pro", "overrides": {}},
+    "android_xr": {
+        "label": "Android XR (Galaxy XR / Project Moohan class)",
+        "provisional": True,
+        "overrides": {
+            # Video-passthrough MR (no optical see-through waveguide), fixed-focus
+            # micro-OLED — content may sit slightly closer than ML's see-through floor.
+            "distances_m.near_clip": 0.30,
+            # Galaxy XR: 72 Hz default, 90 Hz max.
+            "render.target_fps": 72,
+            "render.max_fps": 90,
+        },
+        "device": {
+            "displays": "dual 3552x3840 micro-OLED",
+            "refresh_hz": {"default": 72, "max": 90},
+            "fov_deg": None,                       # not published; TODO measure on hardware
+            "soc": "Qualcomm Snapdragon XR2+ Gen 2",
+        },
+    },
+}
+
+
 def as_dict() -> dict:
     """Flat, serialisable mirror of every constant — consumed by the JS viewer
     (to draw comfort guides) and the contract builder (to record reasoning)."""
@@ -145,7 +182,30 @@ def as_dict() -> dict:
         "room_m": {"w": ROOM_W, "d": ROOM_D, "h": ROOM_H},
         "render": {"target_fps": TARGET_FPS},
         "citations": CITATIONS,
+        "profiles": {
+            name: {"label": p["label"], "provisional": p.get("provisional", False),
+                   "overrides": p.get("overrides", {}), "device": p.get("device")}
+            for name, p in DEVICE_PROFILES.items()
+        },
     }
+
+
+def profile(name: str = "reference") -> dict:
+    """Comfort/placement dict for a device = the reference as_dict() with that
+    device's dotted-path overrides applied (e.g. "distances_m.near_clip").
+    Unknown name -> reference. The Android XR runtime loads profile("android_xr");
+    the iOS/visionOS reference path uses the default."""
+    base = as_dict()
+    prof = DEVICE_PROFILES.get((name or "reference").lower(), DEVICE_PROFILES["reference"])
+    for dotted, val in prof.get("overrides", {}).items():
+        d = base
+        *parents, leaf = dotted.split(".")
+        for key in parents:
+            d = d.setdefault(key, {})
+        d[leaf] = val
+    base["profile"] = {"name": (name or "reference").lower(), "label": prof.get("label"),
+                       "provisional": prof.get("provisional", False), "device": prof.get("device")}
+    return base
 
 
 if __name__ == "__main__":

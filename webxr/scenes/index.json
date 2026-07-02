@@ -1,0 +1,7 @@
+{
+  "_comment": "Scene list for the SPATAIL WebXR viewer. Each scene is a thin projection of schemas/spatialExperienceContract.schema.json. The PC brain (studio/director) emits these; the viewer renders them.",
+  "scenes": [
+    { "title": "Explain a V8 engine (Inspection)", "url": "./scenes/v8_engine.json" },
+    { "title": "Compare the planets (Astronomy)", "url": "./scenes/solar_system.json" }
+  ]
+}

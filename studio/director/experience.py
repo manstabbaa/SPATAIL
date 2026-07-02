@@ -146,7 +146,7 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
     # Threaded to the generation job by job_server; carried here for transparency.
     asset_requirements = {}
     for a in assets:
-        b = abrief.build_brief(a["id"], sequence=design["sequence"])
+        b = abrief.build_brief(a["id"], sequence=design["sequence"], understanding=understanding)
         if abrief.has_requirements(b):
             asset_requirements[a["id"]] = b
 

@@ -46,5 +46,37 @@
     "GAZE_DOWN_DEG": "Magic Leap \u2014 natural line of sight 10-15 deg below horizon",
     "MIN_TARGET_DEG": "Apple visionOS HIG \u2014 60 pt minimum interactive target",
     "TARGET_FPS": "Magic Leap \u2014 90-120 fps for comfort"
+  },
+  "profiles": {
+    "reference": {
+      "label": "Apple visionOS HIG + Magic Leap (reference)",
+      "provisional": false,
+      "overrides": {},
+      "device": null
+    },
+    "avp": {
+      "label": "Apple Vision Pro",
+      "provisional": false,
+      "overrides": {},
+      "device": null
+    },
+    "android_xr": {
+      "label": "Android XR (Galaxy XR / Project Moohan class)",
+      "provisional": true,
+      "overrides": {
+        "distances_m.near_clip": 0.3,
+        "render.target_fps": 72,
+        "render.max_fps": 90
+      },
+      "device": {
+        "displays": "dual 3552x3840 micro-OLED",
+        "refresh_hz": {
+          "default": 72,
+          "max": 90
+        },
+        "fov_deg": null,
+        "soc": "Qualcomm Snapdragon XR2+ Gen 2"
+      }
+    }
   }
 }

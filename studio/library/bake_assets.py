@@ -1,15 +1,18 @@
-"""bake_assets.py — headless Blender: bake library assets to real GLB + USDZ.
+"""bake_assets.py — headless Blender: bake library assets to canonical GLB (+ optional USDZ).
 
     blender --background --python studio/library/bake_assets.py -- <spec.json>
 
-Spec JSON: {repoRoot, result_path, assets: [{assetId, category, fallbackPrimitive,
-scaleMeters, pivot}]}. For each asset it builds clean geometry (the fallback
-primitive, or a small composed recipe for hero shapes), sizes it to scaleMeters,
-seats it by pivot, gives it a category-coloured Principled material, and exports a
-metres / Y-up GLB + a RealityKit-ready USDZ into
-public/assets/spatail-library/<category>/<id>.{glb,usdz}. Resilient: one bad asset
-is recorded and skipped, the rest continue. Writes a result sidecar the orchestrator
-(bake_run.py) reads to register the baked assets into the library.
+Spec JSON: {repoRoot, result_path, targets?, assets: [{assetId, category,
+fallbackPrimitive, scaleMeters, pivot}]}. For each asset it builds clean geometry
+(the fallback primitive, or a small composed recipe for hero shapes), sizes it to
+scaleMeters, seats it by pivot, gives it a category-coloured Principled material,
+and exports a metres / Y-up GLB into
+public/assets/spatail-library/<category>/<id>.glb. `targets` (default ["glb"])
+gates extra formats: include "usdz"/"ios" to also write a RealityKit USDZ twin.
+Master File pivot (2026): GLB is the canonical ship artifact (Android XR native);
+USDZ is the iOS reference target only. Resilient: one bad asset is recorded and
+skipped, the rest continue. Writes a result sidecar the orchestrator (bake_run.py)
+reads to register the baked assets into the library.
 
 Export settings mirror studio/blender/build_studio.py (proven on Blender 5.1 / iOS).
 """
@@ -294,6 +297,11 @@ def main():
     spec = json.loads(Path(spec_path).read_text(encoding="utf-8"))
     root = Path(spec["repoRoot"])
     lib_dir = root / "public" / "assets" / "spatail-library"
+    # Master File pivot (2026): GLB is the canonical ship artifact (Android XR
+    # native). USDZ is only baked for the iOS reference target. Default = GLB only;
+    # the orchestrator opts in via spec["targets"] containing "usdz"/"ios".
+    targets = [t.lower() for t in (spec.get("targets") or ["glb"])]
+    want_usdz = "usdz" in targets or "ios" in targets
     baked, failed = [], []
 
     for entry in spec["assets"]:
@@ -306,7 +314,7 @@ def main():
             glb = cat_dir / f"{aid}.glb"
             usdz = cat_dir / f"{aid}.usdz"
             ok_glb = _export_glb(glb)
-            ok_usdz = _export_usdz(usdz)
+            ok_usdz = _export_usdz(usdz) if want_usdz else False
             if not ok_glb:
                 raise RuntimeError("GLB export failed")
             baked.append({"assetId": aid, "category": entry["category"],

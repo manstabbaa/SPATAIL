@@ -71,12 +71,14 @@ def is_live(*, host: str = DEFAULT_HOST, port: int = DEFAULT_PORT,
 
 # ── import a GLB into a dedicated collection in the live scene ──────────────
 
-# Body runs inside Blender with GLB_PATH + ASSET_ID predefined; assigns `result`.
+# Body runs inside Blender with GLB_PATH + ASSET_ID (+ ASSEMBLY) predefined;
+# assigns `result`.
 _IMPORT_BODY = r'''
-import bpy
+import bpy, re
 from mathutils import Vector
 
 COLL = "SPATAIL_" + ASSET_ID
+ASSEMBLY = ASSEMBLY if "ASSEMBLY" in dir() else {}
 
 # Refresh our managed collection only (never touch user objects/collections).
 old = bpy.data.collections.get(COLL)
@@ -116,6 +118,14 @@ before = set(bpy.data.objects.keys())
 bpy.ops.import_scene.gltf(filepath=GLB_PATH)
 new = [bpy.data.objects[n] for n in bpy.data.objects.keys() if n not in before]
 
+# Flatten the glTF parent hierarchy so each mesh carries its own world
+# transform in .location — needed for clean per-part assembly keyframes below.
+for ob in new:
+    if ob.parent is not None:
+        mw = ob.matrix_world.copy()
+        ob.parent = None
+        ob.matrix_world = mw
+
 # Make sure imports live only in our collection.
 for ob in new:
     for c in list(ob.users_collection):
@@ -147,6 +157,81 @@ for o in meshes:
     ev.to_mesh_clear()
 ext = [round(mx[i] - mn[i], 4) for i in range(3)] if meshes else [0, 0, 0]
 
+# ── Bake the assembly as real Blender keyframes (exploded → seated) ─────────
+# ASSEMBLY = {"order": [...names], "offsets": {name: [gx,gy,gz]}} carries the
+# glTF-frame entrance vectors + assembly order from the registry. We convert
+# each offset back to Blender's Z-up frame (gltf (x,y,z) -> blender (x,-z,y)),
+# seat each part, then stagger them so pressing Play assembles the asset in the
+# live scene. Hardware (offset 0) stays put in its tray. Best-effort, never fatal.
+order = ASSEMBLY.get("order") or []
+offsets = ASSEMBLY.get("offsets") or {}
+n_animated = 0
+frame_start = 1
+frame_end = 1
+try:
+    if meshes and offsets:
+        FPS = 24
+        START = 1          # first frame: everything fully exploded
+        STEP = 13          # frames between successive parts beginning to move
+        DUR = 26           # frames each part travels exploded -> seated
+        order_index = {nm: i for i, nm in enumerate(order)}
+
+        # Make freshly-inserted keyframes ease in/out (smooth landing). Done via
+        # the new-keyframe preference rather than editing fcurves afterwards —
+        # Blender 4.4+ uses slotted actions where Action has no `.fcurves`.
+        try:
+            ke = bpy.context.preferences.edit
+            ke.keyframe_new_interpolation_type = 'BEZIER'
+            ke.keyframe_new_handle_type = 'AUTO_CLAMPED'
+        except Exception:
+            pass
+
+        def _lookup(nm):
+            if nm in offsets:
+                return nm
+            base = re.sub(r"\.\d+$", "", nm)        # Blender dedup suffix (.001)
+            if base in offsets:
+                return base
+            base = re.sub(r"_\d{2}$", "", base)     # hardware instance suffix (_02)
+            if base in offsets:
+                return base
+            return None
+
+        last_frame = START
+        for o in meshes:
+            o.animation_data_clear()
+            key = _lookup(o.name)
+            if key is None:
+                continue
+            off = offsets.get(key) or [0.0, 0.0, 0.0]
+            bo = Vector((off[0], -off[2], off[1]))   # glTF -> Blender frame
+            if bo.length < 1e-6:
+                continue                              # hardware / non-moving part
+            idx = order_index.get(key, len(order_index))
+            t0 = START + idx * STEP                   # this part's start frame
+            t1 = t0 + DUR                             # this part seated
+            seated = o.location.copy()
+            exploded = seated + bo
+            o.location = exploded
+            o.keyframe_insert(data_path="location", frame=START)
+            o.keyframe_insert(data_path="location", frame=t0)
+            o.location = seated
+            o.keyframe_insert(data_path="location", frame=t1)
+            o.location = seated
+            n_animated += 1
+            if t1 > last_frame:
+                last_frame = t1
+
+        sc = bpy.context.scene
+        sc.frame_start = START
+        sc.frame_end = last_frame + 8
+        sc.render.fps = FPS
+        sc.frame_set(sc.frame_end)        # leave the viewport on the assembled state
+        frame_start = sc.frame_start
+        frame_end = sc.frame_end
+except Exception as e:
+    print(f"[spatail_live_blender] keyframe baking skipped: {e}")
+
 # Distinct per-object colour + frame the viewport (best-effort, never fatal).
 try:
     for o in bpy.context.view_layer.objects:
@@ -173,31 +258,46 @@ result = {
     "collection": COLL,
     "parts": [o.name for o in meshes],
     "n_meshes": len(meshes),
+    "n_animated": n_animated,
     "tris": tris,
     "extents_m": ext,
     "z_min": round(mn[2], 4) if meshes else 0.0,
     "z_max": round(mx[2], 4) if meshes else 0.0,
+    "frame_start": frame_start,
+    "frame_end": frame_end,
 }
 '''
 
 
 def import_glb_into_live(glb_path: str, asset_id: str, *,
+                         assembly: dict | None = None,
                          host: str = DEFAULT_HOST, port: int = DEFAULT_PORT,
                          timeout: float = 60.0) -> dict:
     """Import *glb_path* into a ``SPATAIL_<asset_id>`` collection in the live
-    session and frame it. Returns the raw add-on reply dict."""
+    session, bake the assembly as keyframes, and frame it. *assembly* is the
+    registry's ``{"order": [...], "offsets": {name: [gx,gy,gz]}}`` block (glTF
+    frame); when omitted the import is static. Returns the raw add-on reply dict.
+
+    The header is injected via ``repr()`` — the assembly dict contains only
+    strings/numbers/lists, so its repr is a valid Python literal.
+    """
     glb = str(glb_path).replace("\\", "/")
-    header = "GLB_PATH = {!r}\nASSET_ID = {!r}\n".format(glb, asset_id)
+    header = "GLB_PATH = {!r}\nASSET_ID = {!r}\nASSEMBLY = {!r}\n".format(
+        glb, asset_id, assembly or {})
     return send_code(header + _IMPORT_BODY, host=host, port=port, timeout=timeout)
 
 
 def mirror_asset_to_live(glb_path: str, asset_id: str, *,
+                         assembly: dict | None = None,
                          host: str = DEFAULT_HOST, port: int = DEFAULT_PORT,
                          timeout: float = 60.0) -> dict:
     """Best-effort: push a built GLB into the live Blender session.
 
-    Returns ``{"ok": bool, "skipped": bool, "reason"?: str, **result}``. Never
-    raises — a closed Blender simply yields ``skipped=True``.
+    *assembly* is the registry's ``{"order","offsets"}`` block; when present the
+    live mirror bakes a staggered exploded->seated assembly as keyframes (press
+    Play in Blender to watch it assemble). Returns
+    ``{"ok": bool, "skipped": bool, "reason"?: str, **result}``. Never raises —
+    a closed Blender simply yields ``skipped=True``.
     """
     p = Path(glb_path)
     if not p.exists():
@@ -206,8 +306,8 @@ def mirror_asset_to_live(glb_path: str, asset_id: str, *,
         return {"ok": False, "skipped": True,
                 "reason": f"no live Blender on {host}:{port}"}
     try:
-        resp = import_glb_into_live(str(p), asset_id, host=host, port=port,
-                                    timeout=timeout)
+        resp = import_glb_into_live(str(p), asset_id, assembly=assembly,
+                                    host=host, port=port, timeout=timeout)
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "skipped": True, "reason": f"socket error: {e}"}
     if resp.get("status") != "ok":

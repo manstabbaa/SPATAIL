@@ -20,6 +20,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))     # studio/ for asset_manifest
 import asset_manifest as am  # noqa: E402
 
+# Platform-neutral hotspot schema (Android XR pivot). Imported defensively so a
+# fault here can never take down the always-on spine; the inline fallback keeps
+# the kind even if style/colour detail is lost.
+try:
+    from spatail.region_schema import to_hotspot as _to_hotspot  # noqa: E402
+except Exception:  # pragma: no cover
+    def _to_hotspot(region, effect=None):
+        if not region:
+            return None
+        e = (effect or "").strip().lower()
+        kind = ("reveal" if e == "ghost" else "recolor" if e.startswith("tint:")
+                else "marker" if e in ("", "none") else "emphasize")
+        return {"region": region, "emphasis": {"kind": kind, "intensity": 1.0}}
+
 
 def _clip_names(asset: dict) -> list[str]:
     return [c.get("name") for c in (asset.get("clips") or []) if c.get("name")]
@@ -219,6 +233,15 @@ def _validate_sequence(seq: list[dict], assets: list[dict]) -> list[dict]:
                 step["anchorOffset"] = off
             if s.get("target"):
                 step["target"] = str(s["target"])[:64]
+        # Platform-neutral hotspot (Android XR pivot): the SAME emphasis the iOS
+        # `effect` string encodes, described by intent so any runtime can render it.
+        # Emitted when the step targets a region or carries an effect; the legacy
+        # `effect` string is left intact for the frozen iOS reference path.
+        region_id = step.get("region") or step.get("target")
+        if region_id and (step.get("region") or step.get("effect")):
+            hs = _to_hotspot(region_id, step.get("effect"))
+            if hs:
+                step["hotspot"] = hs
         clean.append(step)
     return clean
 

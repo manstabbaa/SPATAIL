@@ -1,6 +1,6 @@
 {
   "category": "generated",
-  "count": 113,
+  "count": 131,
   "assets": [
     {
       "assetId": "cube",
@@ -4788,6 +4788,800 @@
           0.12
         ]
       }
+    },
+    {
+      "assetId": "pendulum_clock",
+      "name": "Pendulum Clock",
+      "category": "physics",
+      "semanticTags": [
+        "pendulum",
+        "clock",
+        "antique",
+        "wooden",
+        "grandfather",
+        "tall",
+        "narrow",
+        "polished",
+        "wood",
+        "case",
+        "round",
+        "white",
+        "face",
+        "black"
+      ],
+      "path": "/assets/spatail-library/meshy/pendulum_clock.glb",
+      "usdzPath": "/assets/spatail-library/meshy/pendulum_clock.usdz",
+      "scaleMeters": [
+        0.5,
+        1.8,
+        0.3
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "meshy_image_to_3d",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.5,
+          1.8,
+          0.3
+        ]
+      },
+      "source": "meshy"
+    },
+    {
+      "assetId": "childs_swing",
+      "name": "Child's Swing",
+      "category": "physics",
+      "semanticTags": [
+        "childs",
+        "swing",
+        "child",
+        "playground",
+        "flat",
+        "black",
+        "rubber",
+        "seat",
+        "hung",
+        "two",
+        "metal",
+        "chains",
+        "horizontal",
+        "top"
+      ],
+      "path": "/assets/spatail-library/meshy/childs_swing.glb",
+      "usdzPath": "/assets/spatail-library/meshy/childs_swing.usdz",
+      "scaleMeters": [
+        1.2,
+        1.6,
+        1.2
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "meshy_image_to_3d",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          1.2,
+          1.6,
+          1.2
+        ]
+      },
+      "source": "meshy"
+    },
+    {
+      "assetId": "fishing_sinker",
+      "name": "Fishing Sinker",
+      "category": "physics",
+      "semanticTags": [
+        "fishing",
+        "sinker",
+        "teardrop",
+        "shaped",
+        "grey",
+        "lead",
+        "weight",
+        "metal",
+        "eyelet",
+        "loop",
+        "narrow",
+        "top",
+        "short",
+        "length"
+      ],
+      "path": "/assets/spatail-library/meshy/fishing_sinker.glb",
+      "usdzPath": "/assets/spatail-library/meshy/fishing_sinker.usdz",
+      "scaleMeters": [
+        0.03,
+        0.06,
+        0.03
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation",
+        "side_by_side_comparison"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "meshy_image_to_3d",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.03,
+          0.06,
+          0.03
+        ]
+      },
+      "source": "meshy"
+    },
+    {
+      "assetId": "fire_extinguisher",
+      "name": "Fire Extinguisher",
+      "category": "general",
+      "semanticTags": [
+        "fire",
+        "extinguisher"
+      ],
+      "path": "/assets/spatail-library/meshy/fire_extinguisher_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/fire_extinguisher_anim.usdz",
+      "scaleMeters": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.4,
+          0.4,
+          0.4
+        ]
+      }
+    },
+    {
+      "assetId": "simple_pendulum",
+      "name": "Simple Pendulum",
+      "category": "general",
+      "semanticTags": [
+        "simple",
+        "pendulum"
+      ],
+      "path": "/assets/spatail-library/meshy/simple_pendulum_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/simple_pendulum_anim.usdz",
+      "scaleMeters": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.4,
+          0.4,
+          0.4
+        ]
+      }
+    },
+    {
+      "assetId": "frog_beer_6_pack",
+      "name": "Frog \u2014 Beer 6 Pack",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "frog",
+        "beer",
+        "pack"
+      ],
+      "path": "/assets/spatail-library/meshy/frog_beer_6_pack_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/frog_beer_6_pack_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      }
+    },
+    {
+      "assetId": "beer_6_pack",
+      "name": "Beer 6 Pack",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "beer",
+        "pack"
+      ],
+      "path": "/assets/spatail-library/meshy/beer_6_pack_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/beer_6_pack_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      }
+    },
+    {
+      "assetId": "lion",
+      "name": "Lion",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "lion"
+      ],
+      "path": "/assets/spatail-library/meshy/lion_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/lion_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      }
+    },
+    {
+      "assetId": "blue_scooter",
+      "name": "Blue Scooter",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "blue",
+        "scooter"
+      ],
+      "path": "/assets/spatail-library/meshy/blue_scooter_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/blue_scooter_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      }
+    },
+    {
+      "assetId": "newton_s_three_laws_of_motion",
+      "name": "Newton'S Three Laws Of Motion",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "newton",
+        "three",
+        "laws",
+        "motion"
+      ],
+      "path": "/assets/spatail-library/meshy/newton_s_three_laws_of_motion_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/newton_s_three_laws_of_motion_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      },
+      "realSizeMeters": [
+        0.01,
+        0.01,
+        0.01
+      ]
+    },
+    {
+      "assetId": "diving_board",
+      "name": "Diving Board",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "diving",
+        "board"
+      ],
+      "path": "/assets/spatail-library/meshy/diving_board_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/diving_board_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      },
+      "realSizeMeters": [
+        0.5,
+        0.8,
+        4.0
+      ]
+    },
+    {
+      "assetId": "bmw_m2_blue",
+      "name": "Bmw M2 Blue",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "bmw",
+        "blue"
+      ],
+      "path": "/assets/spatail-library/meshy/bmw_m2_blue_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/bmw_m2_blue_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      },
+      "realSizeMeters": [
+        2.068,
+        1.403,
+        4.58
+      ]
+    },
+    {
+      "assetId": "plant_growing",
+      "name": "Plant Growing",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "plant",
+        "growing"
+      ],
+      "path": "/assets/spatail-library/meshy/plant_growing_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/plant_growing_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      },
+      "realSizeMeters": [
+        0.6,
+        0.7,
+        0.6
+      ]
+    },
+    {
+      "assetId": "potted_plant",
+      "name": "Potted Plant",
+      "category": "general",
+      "semanticTags": [
+        "potted",
+        "plant"
+      ],
+      "path": "/assets/spatail-library/meshy/potted_plant_grow.glb",
+      "usdzPath": "/assets/spatail-library/meshy/potted_plant_grow.usdz",
+      "scaleMeters": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.4,
+          0.4,
+          0.4
+        ]
+      },
+      "realSizeMeters": [
+        0.5,
+        0.8,
+        0.5
+      ]
+    },
+    {
+      "assetId": "how_a_pendulum_works",
+      "name": "How A Pendulum Works",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "how",
+        "pendulum",
+        "works"
+      ],
+      "path": "/assets/spatail-library/meshy/how_a_pendulum_works_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/how_a_pendulum_works_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      },
+      "realSizeMeters": [
+        0.01,
+        0.01,
+        0.01
+      ]
+    },
+    {
+      "assetId": "ceramic_garden_gnome_wearing_tiny_sunglasses",
+      "name": "Ceramic Garden Gnome Wearing Tiny Sunglasses",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "ceramic",
+        "garden",
+        "gnome",
+        "wearing",
+        "tiny",
+        "sunglasses"
+      ],
+      "path": "/assets/spatail-library/meshy/ceramic_garden_gnome_wearing_tiny_sunglasses_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/ceramic_garden_gnome_wearing_tiny_sunglasses_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      },
+      "realSizeMeters": [
+        0.22,
+        0.35,
+        0.19
+      ]
+    },
+    {
+      "assetId": "frog",
+      "name": "Frog",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "frog"
+      ],
+      "path": "/assets/spatail-library/meshy/frog_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/frog_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      },
+      "realSizeMeters": [
+        0.05,
+        0.03,
+        0.08
+      ]
+    },
+    {
+      "assetId": "chameleon",
+      "name": "Chameleon",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "chameleon"
+      ],
+      "path": "/assets/spatail-library/meshy/chameleon_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/chameleon_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      },
+      "realSizeMeters": [
+        0.04,
+        0.18,
+        0.45
+      ]
     }
   ]
 }

@@ -3,7 +3,7 @@
     python studio/ios_sync.py [--scene studio/scenes/newtons_laws.json]
 
 For each beat in the scene it runs the single-exhibit AR+USDZ build, then copies
-<exhibit>.usdz + <exhibit>_metadata.json into ios/SpatailEducator/Resources so
+<exhibit>.usdz + <exhibit>_metadata.json into ios/Spatail/Resources so
 the app's Catalog picks them up. This is the Blender -> SPATAIL -> iOS bridge.
 Run on Windows; the artifacts are committed and the Mac just compiles.
 """
@@ -17,7 +17,7 @@ from pathlib import Path
 
 STUDIO = Path(__file__).resolve().parent
 ROOT = STUDIO.parent
-RES = ROOT / "ios" / "SpatailEducator" / "Resources"
+RES = ROOT / "ios" / "Spatail" / "Resources"
 BLENDER = os.environ.get(
     "BLENDER_EXE", r"C:\Program Files\Blender Foundation\Blender 5.1\blender.exe")
 
@@ -54,7 +54,7 @@ def main():
     print(f"[ios_sync] copied {len(copied)} files into {RES}:")
     for c in copied:
         print(f"           {c}")
-    print("[ios_sync] done. On the Mac: cd ios/SpatailEducator && xcodegen && open in Xcode.")
+    print("[ios_sync] done. On the Mac: cd ios/Spatail && xcodegen && open in Xcode.")
 
 
 if __name__ == "__main__":

@@ -73,6 +73,17 @@ def main() -> int:
             "pivot": a.get("pivot", "center_bottom"),
         })
 
+    # Master File pivot (2026): GLB is canonical (Android XR native). USDZ is the
+    # iOS reference target only — opt in with --ios (or --targets glb,usdz).
+    targets = ["glb"]
+    for i, a in enumerate(sys.argv):
+        if a == "--ios":
+            targets = ["glb", "usdz"]
+        elif a == "--targets" and i + 1 < len(sys.argv):
+            targets = [t.strip().lower() for t in sys.argv[i + 1].split(",") if t.strip()]
+    if "ios" in targets and "usdz" not in targets:
+        targets.append("usdz")
+
     result_path = REPO_ROOT / "studio" / "out" / "bake_result.json"
     result_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -83,7 +94,9 @@ def main() -> int:
         res = json.loads(result_path.read_text(encoding="utf-8"))
         print(f"[bake] register-only: {res['n_baked']} baked assets from {result_path.name}")
     else:
-        spec = {"repoRoot": str(REPO_ROOT), "result_path": str(result_path), "assets": spec_assets}
+        spec = {"repoRoot": str(REPO_ROOT), "result_path": str(result_path),
+                "targets": targets, "assets": spec_assets}
+        print(f"[bake] targets: {', '.join(targets)}")
         fd, spec_path = tempfile.mkstemp(suffix=".json")
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump(spec, f)

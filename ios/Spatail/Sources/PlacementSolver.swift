@@ -15,8 +15,9 @@ struct PlacementSolver {
 
     struct AssetReq {
         let id: String
-        let footprint: SIMD3<Float>     // true authored size (w, h, d) metres
+        let footprint: SIMD3<Float>     // real-world size (w, h, d) metres when known
         let role: String
+        var realScaleBaked = false      // GLB already metric → keep its scale at 1.0
     }
 
     struct Placement {
@@ -88,7 +89,12 @@ struct PlacementSolver {
         let neededW = widths.reduce(0, +) + gap * Float(n - 1)
         let availW = max(0.2, surfW * min(max(coverage, 0.2), 0.95))
         let fitScale = neededW > 0 ? min(1.0, availW / neededW) : 1.0
-        let scale: Float = variant == "real" ? 1.0 : fitScale
+        // A metric-baked hero renders at scale 1.0 (the render path enforces it), so keep
+        // the solver in agreement — don't coverage-shrink the holder out from under it.
+        // (Anchor choice is unchanged: a baked asset still sits on the table/floor it was
+        // assigned; only the uniform fit scale is pinned to 1.0.)
+        let heroBaked = ordered.first?.realScaleBaked ?? false
+        let scale: Float = (variant == "real" || heroBaked) ? 1.0 : fitScale
 
         let spread = min(coneDeg, 8.0 + 7.0 * Float(max(0, n - 1)))
         let slots = arc(n, distance: distance, height: baseH, spreadDeg: spread)

@@ -308,7 +308,17 @@ private struct BlockoutARView: UIViewRepresentable {
         private func rebuildDecision(_ exp: SpatialExperienceContract) {
             guard let anchor = decisionAnchor else { return }
             anchor.children.removeAll()
-            let result = ARSceneRenderer().build(for: exp)
+            // user_relative stand-ins place against where the user is NOW;
+            // surface_edge/surface_corner coordinates are world-space and
+            // ignore the context.
+            let floorY = scanner.liveSurfaces
+                .filter { $0.kind == .floor }
+                .flatMap { $0.polygon.compactMap { $0.count >= 3 ? $0[1] : nil } }
+                .min()
+            let context = ARSceneRenderer.PlacementContext(
+                cameraTransform: arView?.session.currentFrame?.camera.transform,
+                floorY: floorY)
+            let result = ARSceneRenderer().build(for: exp, context: context)
             anchor.addChild(result.root)
         }
 

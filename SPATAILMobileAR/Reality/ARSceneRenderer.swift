@@ -42,7 +42,20 @@ final class ARSceneRenderer {
         let explodableTargets: [(String, Explodable)]
     }
 
-    func build(for contract: SpatialExperienceContract) -> RenderResult {
+    /// Where the user is NOW, for `user_relative` placements. The brain's
+    /// stand-in branch (in_front_of_user) emits positions in a user frame —
+    /// x right / y above floor / -z ahead — not world space. Without this
+    /// context those elements land at the AR session origin, which after a
+    /// room sweep can be behind the user or inside a wall.
+    struct PlacementContext {
+        let cameraTransform: simd_float4x4?
+        /// World y of the real floor if known (scanned floor surface).
+        let floorY: Float?
+        static let none = PlacementContext(cameraTransform: nil, floorY: nil)
+    }
+
+    func build(for contract: SpatialExperienceContract,
+               context: PlacementContext = .none) -> RenderResult {
         let root = Entity()
         root.name = "SpatialExperienceRoot"
 
@@ -69,7 +82,7 @@ final class ARSceneRenderer {
         for el in contract.spatialElements {
             let entity = renderElement(el, allElements: elementsById)
             entity.name = el.id
-            applyTransform(el, to: entity)
+            applyTransform(el, to: entity, context: context)
             root.addChild(entity)
 
             if let h = entity as? Highlightable {
@@ -127,7 +140,28 @@ final class ARSceneRenderer {
         }
     }
 
-    private func applyTransform(_ el: SpatialElement, to entity: Entity) {
+    private func applyTransform(_ el: SpatialElement, to entity: Entity,
+                                context: PlacementContext) {
+        let isUserRelative = el.anchorStrategyEnum == .user_relative
+            || el.placementKindEnum == .in_front_of_user
+        if isUserRelative, let cam = context.cameraTransform {
+            let rel = el.placement.simdPosition
+            let camPos = SIMD3<Float>(cam.columns.3.x, cam.columns.3.y, cam.columns.3.z)
+            // Yaw-only heading: pitch shouldn't tilt "1 m ahead" into the
+            // floor or ceiling.
+            var fwd = SIMD3<Float>(-cam.columns.2.x, 0, -cam.columns.2.z)
+            fwd = simd_length(fwd) > 1e-4 ? simd_normalize(fwd) : SIMD3(0, 0, -1)
+            let right = simd_cross(fwd, SIMD3<Float>(0, 1, 0))
+            let xz = camPos + right * rel.x + fwd * (-rel.z)
+            // rel.y is height above the floor in the brain's user frame;
+            // without a scanned floor assume the phone rides ~1.4 m up.
+            let baseY = context.floorY ?? (camPos.y - 1.4)
+            entity.position = SIMD3(xz.x, baseY + rel.y, xz.z)
+            // Face the user (yaw toward the camera).
+            entity.orientation = simd_quatf(angle: atan2(fwd.x, fwd.z),
+                                            axis: SIMD3<Float>(0, 1, 0))
+            return
+        }
         entity.position = el.placement.simdPosition
         let r = el.placement.simdRotation
         entity.orientation = simd_quatf(angle: r.y, axis: SIMD3<Float>(0, 1, 0))

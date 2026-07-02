@@ -10,10 +10,12 @@
 //
 //   - Non-LiDAR: meshWithClassification is unsupported; we fall back to
 //     ARWorldTrackingConfiguration.planeDetection = [.horizontal, .vertical]
-//     and classify ARPlaneAnchors heuristically:
-//       horizontal at y <  0.2  → floor
-//       horizontal at 0.3..1.2  → table
-//       vertical                → wall
+//     and classify ARPlaneAnchors heuristically by height above the
+//     lowest horizontal plane (the floor estimate — ARKit world y=0 is
+//     the session-start device pose, NOT the floor):
+//       horizontal at rel-y <  0.2  → floor
+//       horizontal at rel-y 0.3..1.2 → table
+//       vertical                     → wall
 //     ceiling/seat/window/door are not classified on this tier.
 //
 // Coverage is a 0..1 confidence — square-metres-covered relative to a
@@ -162,22 +164,34 @@ final class RoomScannerService: NSObject, ObservableObject {
     }
 
     /// Non-LiDAR path — every ARPlaneAnchor becomes a surface. Kind is
-    /// heuristic by alignment + height.
+    /// heuristic by alignment + height ABOVE THE FLOOR: ARKit's world
+    /// y=0 is the session-start device pose (~1.2–1.6 m up), so absolute
+    /// world-y buckets classify every real table as "floor". Treat the
+    /// lowest horizontal plane as the floor and bucket relative to it.
     private func surfacesFromPlaneAnchors() -> [RoomSurface] {
         var out: [RoomSurface] = []
         var areaCounters: [SurfaceKind: Float] = [:]
-        for (uuid, plane) in planeAnchors {
-            let polygonModel = plane.geometry.boundaryVertices.map { v -> SIMD3<Float> in
-                let worldHomogeneous = plane.transform * SIMD4<Float>(v.x, v.y, v.z, 1)
-                return SIMD3(worldHomogeneous.x, worldHomogeneous.y, worldHomogeneous.z)
+        let items: [(uuid: UUID, plane: ARPlaneAnchor,
+                     polygon: [SIMD3<Float>], centroid: SIMD3<Float>)] =
+            planeAnchors.compactMap { (uuid, plane) in
+                let polygon = plane.geometry.boundaryVertices.map { v -> SIMD3<Float> in
+                    let h = plane.transform * SIMD4<Float>(v.x, v.y, v.z, 1)
+                    return SIMD3(h.x, h.y, h.z)
+                }
+                guard polygon.count >= 3 else { return nil }
+                let centroid = polygon.reduce(SIMD3<Float>(0, 0, 0), +) / Float(polygon.count)
+                return (uuid, plane, polygon, centroid)
             }
-            if polygonModel.count < 3 { continue }
-            let centroid = polygonModel.reduce(SIMD3<Float>(0, 0, 0), +) / Float(polygonModel.count)
+        let floorY = items
+            .filter { $0.plane.alignment == .horizontal }
+            .map(\.centroid.y).min() ?? 0
+        for (uuid, plane, polygonModel, centroid) in items {
+            let heightAboveFloor = centroid.y - floorY
             let kind: SurfaceKind = {
                 if plane.alignment == .vertical { return .wall }
-                if centroid.y < 0.2 { return .floor }
-                if centroid.y > 0.3 && centroid.y < 1.2 { return .table }
-                if centroid.y > 1.8 { return .ceiling }
+                if heightAboveFloor < 0.2 { return .floor }
+                if heightAboveFloor > 0.3 && heightAboveFloor < 1.2 { return .table }
+                if heightAboveFloor > 1.8 { return .ceiling }
                 return .floor
             }()
             let normal: SIMD3<Float> = plane.alignment == .vertical

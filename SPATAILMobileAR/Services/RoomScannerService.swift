@@ -359,8 +359,11 @@ extension ARMeshGeometry {
     /// at offset `faceIndex * classification?.bytesPerIndex`.
     func classificationOf(faceWithIndex faceIndex: Int) -> ARMeshClassification {
         guard let cls = self.classification else { return .none }
-        let buf = cls.buffer.contents().assumingMemoryBound(to: UInt8.self)
-        let raw = Int(buf[faceIndex])
+        // ARGeometrySource regions start at `offset` within the shared
+        // MTLBuffer and advance by `stride` — indexing the raw buffer
+        // reads the wrong region whenever offset != 0.
+        let ptr = cls.buffer.contents().advanced(by: cls.offset + faceIndex * cls.stride)
+        let raw = Int(ptr.assumingMemoryBound(to: UInt8.self).pointee)
         return ARMeshClassification(rawValue: raw) ?? .none
     }
 
@@ -382,9 +385,13 @@ extension ARMeshGeometry {
         let vb = vertices
         let xform = anchor.transform
         return indices.compactMap { idx -> SIMD3<Float>? in
-            let p = vb.buffer.contents().advanced(by: idx * vb.stride)
-                .assumingMemoryBound(to: SIMD3<Float>.self).pointee
-            let h = xform * SIMD4<Float>(p.x, p.y, p.z, 1)
+            // Load as packed (Float, Float, Float): the vertex stride is
+            // 12 bytes, but SIMD3<Float> is 16-byte aligned — a typed
+            // SIMD3 load reads 4 bytes past the vertex (heap over-read
+            // on the final one). Also honor the source's `offset`.
+            let p = vb.buffer.contents().advanced(by: vb.offset + idx * vb.stride)
+                .assumingMemoryBound(to: (Float, Float, Float).self).pointee
+            let h = xform * SIMD4<Float>(p.0, p.1, p.2, 1)
             return SIMD3(h.x, h.y, h.z)
         }
     }

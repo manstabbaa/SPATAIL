@@ -196,3 +196,89 @@ Built as a *detection source* that feeds the identify/hitbox overlay — not a s
 - **Closing the loop:** a confirmed detection is a placement-recognition target (p28) — the system can trace/highlight the part, attach a control panel (p29), or spawn a guided repair (p40).
 
 This turns the "Identify/Hitbox" tool into the **product's perception layer**, reusing the Gemini infra we keep live.
+
+---
+
+## 6. 2026-07-02 addendum — the app pivot & the Live Spatial Brain
+
+> Captured by Claude from the founder's 2026-07-02 direction, plus Claude's proposals
+> (each marked). **Founder to edit.** Where this section conflicts with §2a/§2d, §6 wins
+> once the founder confirms it as canon.
+
+### 6a. North star (founder's words, distilled)
+
+**SPATAIL is the layer where curiosity becomes spatial — ask anything, and the answer
+takes form in your space.** Explanations, searches, inquiries, games: a Google result you
+can stand inside. Not an app of demos — a **genre-dense experience builder** where one
+question can come back as a lesson, a simulation, an overlay on the real object in front
+of you, or a playable game.
+
+**The acceptance test for the whole rebuild — the bottle-cap test:** point the phone at a
+water bottle, ask about the cap, and the experience appears **on the cap** — locked,
+stable, real scale. If it concerns the edge of the cap, it sits on the edge of the cap.
+
+### 6b. The client pivot: ONE app, named Spatail (supersedes §2a / §2d)
+
+- The **product client is the iOS app `Spatail`** — one app, rebuilt fresh. The three
+  existing app targets (`SPATAILMobileAR`, `ios/Spatail`, `ios/SpatailViewer`) are
+  consolidated into it and then deleted. iOS Swift is **un-frozen**; the frozen tree
+  becomes the salvage donor (object tracking, solver ports, contract Codables,
+  perception pipeline, room scanner, vision uplink, generate/poll/hot-swap flow).
+- `ios/SpatailEngine` survives as-is (the tested, platform-agnostic contract runtime).
+- The **WebXR viewer stays the PC dev surface** (fastest way to exercise the brain
+  without a phone) — it is no longer "the primary client"; the app is.
+- The app's product surfaces: **Lens** (live camera — objects identified into real
+  hitboxes, askable), **Ask** (any prompt → experience in the room), **Library**, and
+  the **Truth Overlay** one toggle away everywhere.
+
+### 6c. The Live Spatial Brain (SPACE pillar, live path)
+
+The fusion the founder designed, stated as architecture. Three clocked layers meet in an
+on-device **ObjectRegistry**:
+
+| Clock | Where | Owns |
+|---|---|---|
+| 60 Hz | on device | ARKit pose/planes/LiDAR mesh; every hitbox & experience rides an ARAnchor |
+| 1–2 Hz | on device, background | detection boxes depth-sampled as a grid → oriented 3D hitbox per object, linked to its support surface |
+| ~1 Hz | PC (VLM) | identity **and parts** (`parts:[{label, box}]`); labels attach to registry objects by overlap, debounced; part boxes resolve onto regions of the parent hitbox — that's the cap |
+
+Laws: **ARKit owns where/form, the VLM owns what** (identity may be ~1 s stale; geometry
+never is). **Nothing heavy on the main thread.** One frame in flight, drop-on-busy,
+every stage latest-wins, no queues. The brain binds nouns to **objects first**, surfaces
+second (`objects[]` added to `room.update`; live 2 Hz `pose.update`; replan gated on
+kind-change + confidence + dwell, detached from the inference loop).
+
+### 6d. Verification-first (new operating principle)
+
+**If you can't see what it saw, it doesn't ship.**
+
+- **Truth Overlay** on device: merged concave surface boundaries with kind + confidence;
+  object hitbox wireframes with fused label + confidence + identification age; the
+  plan's binding decision highlighted with its `matchReason`. Mirrored on the :8799 view.
+- **Placement Trace** on PC: every `/modular` contract and every fusion plan (with its
+  exact brain input) persisted per experience id; decision traces from the design system;
+  a `/placement-report` leg where clients POST their resolved placements; one attribution
+  page with four columns — **Brain → Contract → Client → Asset** — so a bad placement
+  lights up the guilty column.
+- **Assets stop lying:** vision QA on by default; weld + smooth normals in normalize
+  (kills the faceted seams); a verify render for every asset; the WebXR viewer gets a
+  strict mode so the PC fails the same way the phone fails; schemas regenerated for the
+  real v0.6/v0.7 wire shapes and validated (warn-only) at the boundary.
+
+### 6e. Claude's suggestions beyond the MF (founder review)
+
+1. **Add "Answer" to the taxonomy (p15).** The query→experience vision ("Google a result,
+   get a spatial experience") deserves a first-class experience type: a question in, a
+   composed spatial answer out — distinct from Lesson/Presentation because it is
+   generated per-query, cited, and disposable.
+2. **IDENTITY pillar starter:** recover the brand design system from git history
+   (`078f40f` — indigo `#4941C1`, visionOS glass, squircles) as the app's UI foundation
+   and the first concrete brand-token set; render style (3D-pastel/Tarka) rides as Meshy
+   style refs + viewer render settings.
+3. **CREATION pillar starter:** the pipeline diagram in §2e *is* CREATION; document it as
+   such and fold the Placement Trace (§6d) in as CREATION's QA spine.
+4. **Retire the `.spatail` bundle lineage** from this repo (repoint the Vocab codegen,
+   keep the format spec); port the loader into the new app only if offline bundles
+   return as a requirement.
+5. **Part-level anchors in the contract:** extend the scene contract so a placement can
+   target `{objectId, part}` — the wire-level counterpart of the bottle-cap test.

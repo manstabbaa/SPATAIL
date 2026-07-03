@@ -17,6 +17,7 @@
 import Foundation
 import ARKit
 import RealityKit
+import Combine
 
 @MainActor
 final class ARSessionHub: NSObject, ObservableObject {
@@ -66,13 +67,79 @@ final class ARSessionHub: NSObject, ObservableObject {
 
     // MARK: Init + configuration
 
+    /// RealityKit render-tick subscription — the delivery spine (see pump()).
+    /// (`any Cancellable` — the iOS 17 spelling; EventSubscription is iOS 18+.)
+    private var sceneTick: (any Cancellable)?
+    /// Anchors we've already reported to sub-delegates (for add/update/remove diffing).
+    private var knownAnchors: [UUID: ARAnchor] = [:]
+    private var lastAnchorSweep: TimeInterval = 0
+    private static let anchorSweepInterval: TimeInterval = 0.25
+    private var pumpAnnounced = false
+
     override init() {
         arView = ARView(frame: .zero, cameraMode: .ar, automaticallyConfigureSession: false)
         super.init()
         // Cheap wins for a phone screen full of live geometry.
         arView.renderOptions.insert([.disableMotionBlur, .disableDepthOfField])
+        // Health callbacks only. Frame + anchor delivery does NOT rely on this:
+        // ARView has been observed to claim its session's delegate slot when the
+        // view attaches, silently starving an earlier assignee — the on-device
+        // "room stuck at 0%" bug. pump() below is the guaranteed path.
         arView.session.delegate = self          // delegateQueue nil → main queue
         arView.session.run(Self.makeConfiguration())
+        // SceneEvents.Update fires every rendered frame regardless of who owns
+        // the session delegate. All frame fan-out + anchor callbacks are
+        // synthesized from currentFrame here — deterministic by construction.
+        sceneTick = arView.scene.subscribe(to: SceneEvents.Update.self) { [weak self] _ in
+            guard let self else { return }
+            MainActor.assumeIsolated { self.pump() }
+        }
+    }
+
+    /// The delivery spine: fan the live frame out to consumers at their hz, and
+    /// diff currentFrame.anchors into didAdd/didUpdate/didRemove for listeners.
+    private func pump() {
+        guard let frame = arView.session.currentFrame else { return }
+        if !pumpAnnounced {
+            pumpAnnounced = true
+            print("[Hub] pump live — session delivering frames")
+        }
+        let now = frame.timestamp
+        for (id, consumer) in consumers {
+            if now - consumer.lastFired >= 1.0 / max(consumer.hz, 0.1) {
+                consumers[id]?.lastFired = now
+                consumer.handler(frame)
+            }
+        }
+        guard now - lastAnchorSweep >= Self.anchorSweepInterval else { return }
+        lastAnchorSweep = now
+
+        var added: [ARAnchor] = []
+        var updated: [ARAnchor] = []
+        var seen = Set<UUID>()
+        seen.reserveCapacity(frame.anchors.count)
+        for anchor in frame.anchors {
+            seen.insert(anchor.identifier)
+            if knownAnchors[anchor.identifier] == nil {
+                added.append(anchor)
+            } else {
+                updated.append(anchor)
+            }
+            knownAnchors[anchor.identifier] = anchor
+        }
+        let removedIds = knownAnchors.keys.filter { !seen.contains($0) }
+        let removed = removedIds.compactMap { knownAnchors.removeValue(forKey: $0) }
+
+        let session = arView.session
+        if !added.isEmpty {
+            for d in subDelegates { d.value?.session?(session, didAdd: added) }
+        }
+        if !updated.isEmpty {
+            for d in subDelegates { d.value?.session?(session, didUpdate: updated) }
+        }
+        if !removed.isEmpty {
+            for d in subDelegates { d.value?.session?(session, didRemove: removed) }
+        }
     }
 
     /// World tracking + the richest scene understanding the device offers.
@@ -95,33 +162,13 @@ final class ARSessionHub: NSObject, ObservableObject {
     }
 }
 
-// MARK: - ARSessionDelegate (fan-out)
+// MARK: - ARSessionDelegate (session HEALTH only)
+//
+// Frame + anchor delivery is synthesized in pump() from currentFrame — never
+// from these callbacks, because RealityKit may repossess the delegate slot.
+// If these do fire, health events flow; anchors/frames stay single-sourced.
 
 extension ARSessionHub: ARSessionDelegate {
-
-    func session(_ session: ARSession, didUpdate frame: ARFrame) {
-        // Throttled consumer fan-out (per-consumer hz), then the delegate chain.
-        let now = frame.timestamp
-        for (id, consumer) in consumers {
-            if now - consumer.lastFired >= 1.0 / max(consumer.hz, 0.1) {
-                consumers[id]?.lastFired = now
-                consumer.handler(frame)
-            }
-        }
-        for d in subDelegates { d.value?.session?(session, didUpdate: frame) }
-    }
-
-    func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
-        for d in subDelegates { d.value?.session?(session, didAdd: anchors) }
-    }
-
-    func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
-        for d in subDelegates { d.value?.session?(session, didUpdate: anchors) }
-    }
-
-    func session(_ session: ARSession, didRemove anchors: [ARAnchor]) {
-        for d in subDelegates { d.value?.session?(session, didRemove: anchors) }
-    }
 
     // Session health — forwarded so listeners can react honestly (spec §0 law 3).
 

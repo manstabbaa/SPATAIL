@@ -310,7 +310,18 @@ final class RoomScannerService: NSObject, ObservableObject {
         }
     }
 
+    /// Last (surfaceCount, wholePercent) printed — console truth-line dedupe.
+    private var lastLogged: (Int, Int) = (-1, -1)
+
     private func updateCoverage() {
+        defer {
+            let now = (surfaces.count, Int(coveragePercent.rounded()))
+            if now != lastLogged {
+                lastLogged = now
+                print("[Room] \(now.0) surfaces, coverage \(now.1)% " +
+                      "(planes \(planeAnchors.count), mesh \(meshAnchors.count))")
+            }
+        }
         if usingLiDAR, let snap = meshSnapshot {
             coveragePercent = Self.coverage(mappedArea: snap.totalAreaM2,
                                             bboxMin: snap.bboxMin, bboxMax: snap.bboxMax)

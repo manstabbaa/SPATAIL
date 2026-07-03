@@ -18,8 +18,13 @@ import math
 import sys
 from pathlib import Path
 
+from mathutils import Vector
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "library"))
 import bake_assets as BA  # noqa: E402  (reuse the proven GLB exporter)
+
+SMOOTH_ANGLE_DEG = 35.0
+WELD_REL = 1e-5                       # weld threshold as a share of the bbox diagonal
 
 
 def _clear():
@@ -44,6 +49,42 @@ def _import_glb(path):
         pass
     bpy.ops.import_scene.gltf(filepath=str(path))
     return [o for o in bpy.data.objects if o not in before]
+
+
+def _weld_smooth(obj, angle_deg=SMOOTH_ANGLE_DEG):
+    """Same faceted-seam fix as meshy_normalize: weld by a bbox-relative distance,
+    drop imported per-face custom split normals, shade smooth by angle. Applied
+    where the geometry is FINAL (right after import, before parenting/baking —
+    motion here is object-level keyframes, never mesh edits). Never fatal."""
+    try:
+        bpy.ops.object.select_all(action="DESELECT")
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+        bpy.context.view_layer.update()
+        pts = [obj.matrix_world @ Vector(c) for c in obj.bound_box]
+        mn = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
+        mx = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
+        thr = max((mx - mn).length * WELD_REL, 1e-7)
+        before = len(obj.data.vertices)
+        bpy.ops.object.mode_set(mode="EDIT")
+        bpy.ops.mesh.select_all(action="SELECT")
+        bpy.ops.mesh.remove_doubles(threshold=thr)
+        bpy.ops.object.mode_set(mode="OBJECT")
+        try:
+            bpy.ops.mesh.customdata_custom_splitnormals_clear()
+        except Exception:  # noqa: BLE001
+            pass
+        welded = before - len(obj.data.vertices)
+        try:
+            bpy.ops.object.shade_smooth_by_angle(angle=math.radians(angle_deg))
+        except Exception:  # noqa: BLE001
+            bpy.ops.object.shade_smooth()
+        print(f"[animate] weld+smooth {obj.name}: merged {welded} verts "
+              f"(thr={thr:.2e}), smooth by angle {angle_deg:.0f} deg")
+        return welded
+    except Exception as e:  # noqa: BLE001
+        print(f"[animate] weld+smooth skipped for {obj.name}: {e!r}")
+        return 0
 
 
 def _root_over(meshes, name="anim_root", pivot_z=0.0):
@@ -182,6 +223,8 @@ def main():
             meshes = [o for o in _import_glb(a["glb_in"]) if o.type == "MESH"]
             if not meshes:
                 raise RuntimeError("no mesh to animate")
+            for m in meshes:
+                _weld_smooth(m)
             root = _root_over(meshes)
             clips = _bake(root, meshes, a.get("motion"), int(a.get("fps", 30)),
                           float(a.get("seconds", 6.0)))

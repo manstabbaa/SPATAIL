@@ -61,10 +61,17 @@ rotation about gravity-aligned +Y. Existing `surfaces` fields unchanged; surface
 additionally carry `"confidence"` (0–1, classification confidence) and a concave
 `"boundary"` polygon (list of [x,y,z]) — additive, optional.
 
+The payload MAY also carry `"concept": "<the user's ask>"` (optional string). It scopes
+live replans to a question — the fusion brain only emits a part-addressed
+`target: {objectId, part}` when the concept names the part — so the phone's Ask flow
+sends it when the user asks about something in view. Absent → the engine clears any
+held concept (stale questions must not steer later plans).
+
 ### 1.3 `vision.identification` additions (PC → phone)
 
-Existing fields (primary, confidence, detections[{label, confidence, box}], latency,
-model) unchanged. Added:
+Existing fields (primary, detections[{label, confidence, box}], rawText, latencyMs,
+model) unchanged — there is no top-level `confidence`; the primary's confidence is
+`detections[0].confidence`. Added:
 
 ```json
 "frameTimestamp": 1783036800.123,   // capture time of the frame this identity describes
@@ -132,8 +139,10 @@ connection (the rule §10 documents; now actually implemented).
 
 ### 2.3 Decision provenance (inside contracts)
 
-- `placement.designSystem.decisionTrace: [string]` — which hint/threshold fired at each
-  step (emitted by `studio/spatail/design_system.py`).
+- `decisionTrace: [string]` — which hint/threshold fired at each step (emitted by
+  `studio/spatail/design_system.py`). Path: `placement.decisionTrace` in the **modular**
+  contract; `placement.designSystem.decisionTrace` in the **sceneContract** projection
+  (which embeds the whole modular placement as `designSystem`).
 - Per-asset `footprintSource: "library" | "object_size_llm" | "default_guess"`.
 - `schemaValidation` stamped into the trace (warn-only; never blocks the response).
 

@@ -21,7 +21,8 @@ export function isIOSRoomContract(json) {
 /**
  * Normalize an iOS RoomContract — or an already-brain-shaped room — into the
  * canonical brain room: { surfaces:[{id, kind, polygon, normal, centroid,
- * area, heightMeters, source}], boundingBox, meta }.
+ * area, heightMeters, source, confidence?, boundary?}], objects, boundingBox,
+ * meta }.
  */
 export function toBrainRoom(json) {
   if (!json) return null;
@@ -37,10 +38,36 @@ export function toBrainRoom(json) {
       area: num(s.area ?? s.areaMeters2, 0),
       heightMeters: s.heightMeters ?? s.height ?? null,
       source: s.source || "room_scan",
+      // additive optional fields (LIVE_BRAIN_SPEC §1.2): classification
+      // confidence and a concave boundary polygon ride through when the
+      // phone sends them; absent otherwise (JSON drops undefined — and NOT
+      // num(v, undefined), whose default param would coerce absent to 0).
+      confidence: Number.isFinite(s.confidence) ? s.confidence : undefined,
+      boundary: Array.isArray(s.boundary) ? s.boundary : undefined,
+    }));
+
+  // room.update objects[] (LIVE_BRAIN_SPEC §1.2) — tracked-object OBBs the
+  // device IoU-fused labels onto. Optional; absent on older room payloads.
+  const objects = (Array.isArray(json.objects) ? json.objects : [])
+    .filter((o) => o && o.id != null)
+    .map((o) => ({
+      id: String(o.id),
+      label: o.label ?? null,
+      confidence: num(o.confidence, 0),
+      obb: o.obb
+        ? {
+            center: (o.obb.center || [0, 0, 0]).map((v) => num(v)),
+            extents: (o.obb.extents || [0, 0, 0]).map((v) => num(v)),
+            yaw: num(o.obb.yaw, 0),
+          }
+        : null,
+      supportSurfaceId: o.supportSurfaceId ?? null,
+      lastSeenAt: o.lastSeenAt ?? null,
     }));
 
   return {
     surfaces,
+    objects,
     boundingBox: json.boundingBox || bboxOf(surfaces),
     meta: isIOSRoomContract(json)
       ? {

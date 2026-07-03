@@ -33,9 +33,19 @@ def _placement_for(modular: dict) -> dict:
         "layout": stage.get("layout", "arc"),
         "facing": stage.get("facing", "user"),
         "scaleMode": (design.get("scale") or {}).get("mode") or stage.get("scaleMode", "dynamic"),
+        # usable fraction of the anchor surface — the same knob every solver
+        # reads as intent.coverage (default 0.8, clamped there) and clients
+        # echo back in placement-report solverInputs (Live Brain spec §2.2).
+        # Sourced from the design-system preset's scale.maxSurfaceCoverage.
+        "coverage": (design.get("scale") or {}).get("maxSurfaceCoverage", 0.8),
         "primary": primary,
         # per-asset footprint requirement (true metres) the solver packs into space
         "footprints": {a["id"]: a.get("scaleMeters", [0.2, 0.2, 0.2]) for a in assets},
+        # provenance of those metres (Live Brain spec §2.3): library measured dims |
+        # object_size_llm estimate | default_guess — additive beside `footprints`
+        # so older runtimes keep reading the plain metres.
+        "footprintSources": {a["id"]: a.get("footprintSource", "default_guess")
+                             for a in assets},
         # relationships the solver should preserve (filled by composer later)
         "relationships": [],
         # zones the design system can target (level-design vocabulary)
@@ -60,6 +70,8 @@ def _content_for(modular: dict) -> list:
             "glbUrl": a.get("glbUrl", ""),
             "manifestUrl": a.get("manifestUrl", ""),   # asset-package manifest (Phase 1)
             "scaleMeters": a.get("scaleMeters", [0.2, 0.2, 0.2]),
+            # where the metres came from (Live Brain spec §2.3)
+            "footprintSource": a.get("footprintSource", "default_guess"),
             "capabilities": {
                 "animation": bool(a.get("supportsAnimation")),
                 "namedParts": bool(a.get("supportsHighlight")),

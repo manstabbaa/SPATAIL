@@ -30,7 +30,8 @@ const roundVec = (v, p = 3) => v.map((x) => round(x, p));
 // ── distribute a concept along the edges + corners of a labeled surface ────
 export function placeAlongEdgesAndCorners({ labeledSurface, concept }) {
   const geom = labeledSurface.geometry;
-  const surfaceId = labeledSurface.surfaceId;
+  // object bindings without a support surface anchor by their object id
+  const surfaceId = labeledSurface.surfaceId ?? labeledSurface.objectId;
   const kind = labeledSurface.kind;
   const label = labeledSurface.label || kind;
 
@@ -190,7 +191,8 @@ export function planSurfaceExperience({ identification, room, pose, concept, fus
       intentSummary: concept.reason || concept.title,
     },
     reasoningSummary: labeled
-      ? `Fused VLM label "${labeled.label}" onto ${labeled.surfaceId} ` +
+      ? `Fused VLM label "${labeled.label}" onto ` +
+        `${labeled.surfaceId ?? labeled.objectId} ` +
         `(${labeled.matchReason}); ${placed.summary.shoppingLine}.`
       : `No surface matched the VLM label; spawned a stand-in.`,
   });

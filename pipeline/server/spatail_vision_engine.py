@@ -49,6 +49,7 @@ import asyncio
 import base64
 import json
 import logging
+import os
 import re
 import time
 from dataclasses import dataclass, field
@@ -74,6 +75,38 @@ log = logging.getLogger("spatail.vision")
 # there is exactly ONE brain implementation shared by the CLI, the tests, and
 # this live path.
 BRAIN_SCRIPT = Path(__file__).resolve().parents[2] / "pipeline" / "spatail" / "plan_from_room.js"
+
+# Every replan is persisted for offline replay (LIVE_BRAIN_SPEC §2.1):
+# studio/out/traces/vision/<session-stamp>/plan_NNNN.json
+VISION_TRACE_ROOT = Path(__file__).resolve().parents[2] / "studio" / "out" / "traces" / "vision"
+
+# Replan gate knobs (LIVE_BRAIN_SPEC §1.4).
+REPLAN_MIN_CONF_ENV = "SPATAIL_REPLAN_MIN_CONF"
+REPLAN_DWELL_ENV = "SPATAIL_REPLAN_DWELL"
+REPLAN_MIN_CONF_DEFAULT = 0.55
+REPLAN_DWELL_DEFAULT = 2
+
+
+def _env_float(name: str, default: float) -> float:
+    raw = os.environ.get(name)
+    if raw is None or raw == "":
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        log.warning(f"{name}={raw!r} is not a number; using {default}")
+        return default
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = os.environ.get(name)
+    if raw is None or raw == "":
+        return default
+    try:
+        return int(raw)
+    except ValueError:
+        log.warning(f"{name}={raw!r} is not an integer; using {default}")
+        return default
 
 
 # ────────────────────────────────────────────────────────────────────────
@@ -103,6 +136,10 @@ class IdentifyResult:
     raw_text: str
     latency_ms: int
     model: str
+    # Sub-parts of the primary object ({label, box?, confidence?}) — spec §1.3.
+    parts: list[dict[str, Any]] = field(default_factory=list)
+    # Capture/ingest time (epoch seconds) of the frame this identity describes.
+    frame_timestamp: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -111,6 +148,8 @@ class IdentifyResult:
             "rawText": self.raw_text,
             "latencyMs": self.latency_ms,
             "model": self.model,
+            "parts": self.parts,
+            "frameTimestamp": self.frame_timestamp,
         }
 
 
@@ -126,9 +165,12 @@ _IDENTIFY_PROMPT = (
     '{"primary": "<short noun, e.g. \\"car engine air filter\\">", '
     '"confidence": <0..1>, '
     '"alternatives": [{"label": "<noun>", "confidence": <0..1>}], '
-    '"box": [x, y, w, h] }\n'
+    '"box": [x, y, w, h], '
+    '"parts": [{"label": "<part noun, e.g. \\"cap\\">", "box": [x, y, w, h]}] }\n'
     "box is the normalized bounding box of the primary object in 0..1 "
-    "(origin top-left); use null if unsure. Keep labels concrete and specific."
+    "(origin top-left); use null if unsure. parts lists the primary object's "
+    "visible sub-parts (cap, lid, handle, button, …) with boxes in the same "
+    "0..1 space; use [] if unsure. Keep labels concrete and specific."
 )
 
 
@@ -140,7 +182,7 @@ class VLMAdapter:
     """
 
     def __init__(self, base_url: str, model: str, api_key: str | None = None,
-                 prompt: str = _IDENTIFY_PROMPT, timeout_s: float = 30.0,
+                 prompt: str = _IDENTIFY_PROMPT, timeout_s: float = 8.0,
                  max_tokens: int = 300):
         self.base_url = base_url.rstrip("/")
         self.model = model
@@ -184,11 +226,11 @@ class VLMAdapter:
             return IdentifyResult([], None, f"<error: {exc}>", latency, self.model)
 
         latency = int((time.monotonic() - t0) * 1000)
-        dets, primary = _parse_identify_json(text)
-        return IdentifyResult(dets, primary, text, latency, self.model)
+        dets, primary, parts = _parse_identify_json(text)
+        return IdentifyResult(dets, primary, text, latency, self.model, parts=parts)
 
 
-def _parse_identify_json(text: str) -> tuple[list[Detection], str | None]:
+def _parse_identify_json(text: str) -> tuple[list[Detection], str | None, list[dict[str, Any]]]:
     """Best-effort extraction of detections from a chat VLM reply.
 
     VLMs wrap JSON in code fences or prose; pull the first {...} blob. If it
@@ -203,7 +245,7 @@ def _parse_identify_json(text: str) -> tuple[list[Detection], str | None]:
             blob = None
     if blob is None:
         label = text.strip().strip(".")[:80]
-        return ([Detection(label=label, confidence=0.3)] if label else []), (label or None)
+        return ([Detection(label=label, confidence=0.3)] if label else []), (label or None), []
 
     dets: list[Detection] = []
     primary = blob.get("primary") or blob.get("label")
@@ -218,7 +260,30 @@ def _parse_identify_json(text: str) -> tuple[list[Detection], str | None]:
             dets.append(Detection(label=str(alt["label"]),
                                   confidence=float(alt.get("confidence", 0.0) or 0.0),
                                   box=_clean_box(alt.get("box"))))
-    return dets, (str(primary) if primary else None)
+    return dets, (str(primary) if primary else None), _clean_parts(blob.get("parts"))
+
+
+def _clean_parts(raw: Any) -> list[dict[str, Any]]:
+    """Sub-parts of the primary object (spec §1.3). The VLM is free-form here —
+    anything that isn't {label[, box, confidence]} is dropped so a creative
+    reply can never break identification."""
+    if not isinstance(raw, list):
+        return []
+    parts: list[dict[str, Any]] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        label = item.get("label")
+        if not isinstance(label, str) or not label.strip():
+            continue
+        part: dict[str, Any] = {"label": label.strip()[:80], "box": _clean_box(item.get("box"))}
+        conf = item.get("confidence")
+        if isinstance(conf, (int, float)):
+            part["confidence"] = round(max(0.0, min(1.0, float(conf))), 3)
+        parts.append(part)
+        if len(parts) >= 16:
+            break
+    return parts
 
 
 def _clean_box(box: Any) -> list[float] | None:
@@ -235,6 +300,54 @@ def _clean_box(box: Any) -> list[float] | None:
     return vals
 
 
+# Mirrors labelToSurfaceKind() in pipeline/spatail/surface_fusion.js — the
+# open-vocabulary VLM noun mapped onto the scan's closed set of surface kinds.
+# Keep the two in lockstep: the replan gate (spec §1.4) must agree with the
+# fusion brain about what counts as "the same binding".
+_SURFACE_KIND_PATTERNS = (
+    ("table", re.compile(r"\b(table|desk|counter|workbench|nightstand|dresser|bench)\b")),
+    ("floor", re.compile(r"\b(floor|ground|rug|carpet)\b")),
+    ("wall", re.compile(r"\b(wall|door|window|whiteboard)\b")),
+    ("ceiling", re.compile(r"\b(ceiling)\b")),
+    ("seat", re.compile(r"\b(chair|seat|stool|sofa|couch)\b")),
+)
+
+
+def _label_to_surface_kind(label: Any) -> str | None:
+    if not label:
+        return None
+    s = str(label).lower()
+    for kind, pattern in _SURFACE_KIND_PATTERNS:
+        if pattern.search(s):
+            return kind
+    return None
+
+
+# Mirrors NOISE_ADJECTIVES / normalizeNoun() in surface_fusion.js — colors and
+# materials the VLM prepends ("blue water bottle") that device object labels
+# usually omit, stripped before containment matching. Same lockstep rule as
+# the surface-kind patterns above.
+_NOISE_ADJECTIVES = frozenset((
+    "red", "orange", "yellow", "green", "blue", "purple", "violet", "pink",
+    "black", "white", "gray", "grey", "brown", "beige", "tan", "silver",
+    "gold", "golden", "dark", "light", "pale", "bright", "clear",
+    "transparent", "shiny", "matte",
+    "plastic", "metal", "metallic", "wooden", "wood", "glass", "ceramic",
+    "leather", "steel", "aluminum", "aluminium", "rubber", "foam", "paper",
+    "cardboard", "fabric", "cloth", "stone", "marble", "chrome", "brass",
+    "copper", "stainless",
+))
+
+
+def _normalize_noun(text: Any) -> str:
+    if not text:
+        return ""
+    words = re.sub(r"[^a-z0-9\s]", " ", str(text).lower()).split()
+    kept = [w for w in words if w not in _NOISE_ADJECTIVES]
+    # an all-adjective noun ("glass") still deserves a match attempt
+    return " ".join(kept or words)
+
+
 # ────────────────────────────────────────────────────────────────────────
 # Vision engine — frame ingest + single-flight VLM worker + observability
 # ────────────────────────────────────────────────────────────────────────
@@ -245,8 +358,10 @@ class VisionEngine:
         self.min_interval_s = min_interval_s  # don't hammer the VLM faster than this
 
         self._latest_frame: bytes | None = None
+        self._latest_frame_ts: float | None = None  # epoch seconds at ingest
         self._frame_ready = asyncio.Event()
         self._result: IdentifyResult | None = None
+        self._last_result_at: float | None = None
         self._clients: set[WebSocketServerProtocol] = set()
 
         # rolling stats for the debug view
@@ -263,11 +378,39 @@ class VisionEngine:
         self._room: dict | None = None
         self._room_owner: WebSocketServerProtocol | None = None
         self._pose: dict | None = None
+        self._objects: list = []            # room.update objects[] (spec §1.2)
+        self._concept: str | None = None    # room.update concept — lets the
+        # phone's Ask flow drive part-addressed live plans (plan_from_room.js
+        # only emits a {objectId, part} target when the concept names the part)
         self._debug_identification: dict | None = None
         self._last_plan: dict | None = None
-        self._last_planned_label: str | None = None
         self._plan_version = 0
         self._plan_lock = asyncio.Lock()
+        self._replan_tasks: set = set()     # detached replans (spec §1.4)
+        self._inflight_bindings: set = set()  # bindings currently being planned
+        # room.update replans are coalesced latest-wins (spec §0.3: no
+        # unbounded queues) — while one is queued/running, further
+        # room.updates only mark it dirty and the runner replans ONCE more
+        # against the newest room. Identification replans are already
+        # coalesced by _inflight_bindings.
+        self._room_replan_active = False
+        self._room_replan_dirty = False
+
+        # replan gate (spec §1.4): the plan is bound to an identity — a mapped
+        # surface kind or a tracked object id — not to the raw label string.
+        # ("surface"|"object", value) tuples; None = nothing bound yet.
+        self.replan_min_conf = _env_float(REPLAN_MIN_CONF_ENV, REPLAN_MIN_CONF_DEFAULT)
+        self.replan_dwell = max(1, _env_int(REPLAN_DWELL_ENV, REPLAN_DWELL_DEFAULT))
+        self._last_planned_binding: tuple | None = None
+        self._pending_binding: tuple | None = None
+        self._pending_count = 0
+        self._last_conf = 0.0
+        self._last_replan_trigger: str | None = None
+
+        # plan trace directory (spec §2.1 {session}) — rotated whenever room
+        # ownership changes (see _handle_control) so plans from different
+        # ARKit coordinate systems never interleave in one folder.
+        self._trace_dir = self._mint_trace_dir()
 
     # -- frame ingest (called by the WS handler and the test feeder) -------
 
@@ -281,6 +424,7 @@ class VisionEngine:
         self._last_frame_at = now
         self._frames_in += 1
         self._latest_frame = jpeg
+        self._latest_frame_ts = time.time()
         self._frame_ready.set()
 
     # -- single-flight inference loop -------------------------------------
@@ -293,27 +437,43 @@ class VisionEngine:
                 await self._frame_ready.wait()
                 self._frame_ready.clear()
                 frame = self._latest_frame
+                frame_ts = self._latest_frame_ts
                 if frame is None:
                     continue
                 result = await self.vlm.identify(frame, http)
+                result.frame_timestamp = frame_ts
                 self._infers += 1
                 self._result = result
+                self._last_result_at = time.time()
                 await self._broadcast(result)
                 log.info(
                     f"id#{self._infers} {result.latency_ms}ms "
                     f"primary={result.primary!r} "
                     f"({len(result.detections)} det, ingest {self._ingest_fps:.1f}fps)"
                 )
-                # Fusion: when the phone has given us a room and the VLM's
-                # answer changed, re-run the placement brain so the phone gets
-                # a fresh experience.delta for what it is NOW looking at.
-                # Gated on the room's owner still being connected — a room
-                # with no live owner must never drive a replan.
-                if (self._room is not None
-                        and self._room_owner in self._clients
-                        and result.primary
-                        and result.primary != self._last_planned_label):
-                    await self._replan(trigger=f"identification:{result.primary}")
+                # Fusion replan gate (spec §1.4): raw label flapping never
+                # replans — the BINDING (mapped surface kind or bound object
+                # id) must change, the same binding must hold for
+                # `replan_dwell` consecutive identifications, and the primary
+                # confidence must clear `replan_min_conf`. Gated on the room's
+                # owner still being connected — a room with no live owner must
+                # never drive a replan.
+                if result.primary:
+                    binding = self._binding_for(result.primary)
+                    if binding == self._pending_binding:
+                        self._pending_count += 1
+                    else:
+                        self._pending_binding = binding
+                        self._pending_count = 1
+                    self._last_conf = (result.detections[0].confidence
+                                       if result.detections else 0.0)
+                    if (self._room is not None
+                            and self._room_owner in self._clients
+                            and binding != self._last_planned_binding
+                            and binding not in self._inflight_bindings
+                            and self._last_conf >= self.replan_min_conf
+                            and self._pending_count >= self.replan_dwell):
+                        self._spawn_replan(trigger=f"identification:{result.primary}")
                 # throttle so we don't melt the GPU on a fast frame stream
                 await asyncio.sleep(self.min_interval_s)
 
@@ -349,37 +509,146 @@ class VisionEngine:
         self._room = None
         self._room_owner = None
         self._pose = None
+        self._objects = []
+        self._concept = None
         self._debug_identification = None
         self._last_plan = None
-        self._last_planned_label = None
+        self._last_planned_binding = None
         self._plan_version = 0
+        self._last_replan_trigger = None
         log.info(f"room state cleared ({reason})")
+
+    def _binding_for(self, label: Any) -> tuple | None:
+        """The identity a plan is bound to (spec §1.4) — objects-first: a
+        tracked object whose label matches the VLM noun wins over the mapped
+        surface kind, so re-wordings of the same thing never replan. Match
+        semantics mirror matchNounToObject() in surface_fusion.js (containment
+        after adjective stripping; exact match outranks containment, then the
+        device's label confidence breaks ties) so the gate binds the same
+        object id the brain will."""
+        if not label:
+            return None
+        noun = _normalize_noun(label)
+        best: tuple | None = None  # (score, object id)
+        if noun:
+            for obj in self._objects:
+                if not isinstance(obj, dict) or not obj.get("id"):
+                    continue
+                have = _normalize_noun(obj.get("label"))
+                if not have or (noun != have and noun not in have and have not in noun):
+                    continue
+                conf = obj.get("confidence")
+                score = ((2.0 if noun == have else 1.0)
+                         + (float(conf) if isinstance(conf, (int, float)) else 0.0))
+                if best is None or score > best[0]:
+                    best = (score, str(obj["id"]))
+        if best is not None:
+            return ("object", best[1])
+        return ("surface", _label_to_surface_kind(label))
+
+    def _spawn_replan(self, trigger: str):
+        """Replans run detached (spec §1.4) so neither the frame receive loop
+        nor the identification downlink ever waits on the brain; the existing
+        _plan_lock still serializes the node subprocess."""
+        task = asyncio.create_task(self._replan(trigger=trigger))
+        self._replan_tasks.add(task)
+        task.add_done_callback(self._replan_tasks.discard)
+
+    @staticmethod
+    def _mint_trace_dir() -> Path:
+        """A fresh stamped session folder under the vision trace root — the
+        `{session}` in spec §2.1's studio/out/traces/vision/{session}/. Suffixed
+        on collision so a same-second owner handover can never overwrite an
+        earlier session's plans."""
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+        path = VISION_TRACE_ROOT / stamp
+        n = 1
+        while path.exists():
+            n += 1
+            path = VISION_TRACE_ROOT / f"{stamp}-{n}"
+        return path
+
+    def _persist_plan_trace(self, trigger: str, brain_input: dict, plan: dict):
+        """Spec §2.1: every replan is archived for offline replay — brainInput
+        is exactly what plan_from_room.js --stdin accepts. Best-effort: a full
+        disk or bad path must never take down the live loop."""
+        try:
+            self._trace_dir.mkdir(parents=True, exist_ok=True)
+            path = self._trace_dir / f"plan_{self._plan_version:04d}.json"
+            path.write_text(json.dumps({
+                "planVersion": self._plan_version,
+                "trigger": trigger,
+                "brainInput": brain_input,
+                "plan": plan,
+            }, indent=2))
+        except Exception as exc:
+            log.warning(f"plan trace persist failed (plan#{self._plan_version}): {exc}")
 
     async def _handle_control(self, ws: WebSocketServerProtocol, text: str):
         """Text messages on the frame WS are the phone's control channel.
         `room.update` carries the device's RoomContract (or a brain-shaped
-        room) plus the camera pose; receiving one re-runs the brain. The
-        sending socket becomes the room's owner — every plan derived from
-        this room is delivered to it alone."""
+        room) plus the camera pose and tracked objects; receiving one re-runs
+        the brain. The sending socket becomes the room's owner — every plan
+        derived from this room is delivered to it alone. `pose.update`
+        (spec §1.1) keeps the gaze ray live between room sends and NEVER
+        triggers a replan."""
         try:
             msg = json.loads(text)
         except json.JSONDecodeError:
             log.debug(f"frame-ws text (not JSON): {text[:120]}")
             return
-        if msg.get("type") != "room.update":
-            log.debug(f"frame-ws control ignored: {msg.get('type')!r}")
+        mtype = msg.get("type")
+        if mtype == "pose.update":
+            # Pose only steers plans for the held room, so only its owner may
+            # move it — a debug client must not bend another phone's gaze ray.
+            if self._room_owner is not None and ws is not self._room_owner:
+                log.debug("pose.update ignored: not from the room owner")
+                return
+            payload = msg.get("payload") or {}
+            if isinstance(payload, dict) and payload.get("position") and payload.get("forward"):
+                self._pose = payload
+            return
+        if mtype != "room.update":
+            log.debug(f"frame-ws control ignored: {mtype!r}")
             return
         payload = msg.get("payload") or {}
         # Accept {room, pose} or a bare RoomContract as the payload.
         self._room = payload.get("room") or payload
+        if ws is not self._room_owner:
+            # New owner = new client session/coordinate system → new trace
+            # folder (spec §2.1 {session}); plan_NNNN restarts and stays
+            # monotonic within the folder.
+            self._trace_dir = self._mint_trace_dir()
+            self._plan_version = 0
         self._room_owner = ws
-        self._pose = payload.get("pose") or payload.get("userPose")
+        # Keep a live pose.update-fed pose when this room.update carries none.
+        self._pose = payload.get("pose") or payload.get("userPose") or self._pose
+        # objects[] (spec §1.2) may ride at payload level or inside the room;
+        # attach them to the held room so the brain's room adapter sees them.
+        objs = payload.get("objects") or (self._room or {}).get("objects") or []
+        self._objects = objs if isinstance(objs, list) else []
+        if isinstance(self._room, dict) and self._objects:
+            self._room["objects"] = self._objects
+        # Optional ask-context: when the phone's Ask flow scopes the live
+        # session to a question ("explain the cap"), the brain can emit a
+        # part-addressed target for it. Absent → cleared (stale questions
+        # must not steer later plans).
+        concept = payload.get("concept")
+        self._concept = concept if isinstance(concept, str) and concept.strip() else None
         # Dev hook: lets a test client (or the HUD) pin the identification
         # without running a VLM — the brain path stays identical.
         self._debug_identification = payload.get("debugIdentification")
         n_surfaces = len((self._room or {}).get("surfaces") or [])
-        log.info(f"room.update: {n_surfaces} surfaces, pose={'yes' if self._pose else 'no'}")
-        await self._replan(trigger="room.update")
+        log.info(f"room.update: {n_surfaces} surfaces, {len(self._objects)} objects, "
+                 f"pose={'yes' if self._pose else 'no'}")
+        if self._room_replan_active:
+            # A room.update replan is already queued/running — coalesce
+            # latest-wins (spec §0.3): its runner replans ONCE more against
+            # the newest room instead of stacking a task per message.
+            self._room_replan_dirty = True
+        else:
+            self._room_replan_active = True
+            self._spawn_replan(trigger="room.update")
 
     async def _replan(self, trigger: str):
         """Run the node fusion brain against (room, pose, identification) and
@@ -388,73 +657,109 @@ class VisionEngine:
         the client whose scan they came from."""
         owner = self._room_owner
         if self._room is None or owner is None:
+            if trigger == "room.update":
+                self._room_replan_active = False
+                self._room_replan_dirty = False
             return
         ident = self._debug_identification
         if ident is None and self._result and self._result.primary \
                 and not self._result.raw_text.startswith("<error"):
+            # Same identification shape the phone gets (spec §1.3): parts ride
+            # along so the brain can emit a part-addressed target, and
+            # frameTimestamp keeps the persisted brainInput replayable as-is.
             ident = {
                 "primary": self._result.primary,
                 "detections": [d.to_dict() for d in self._result.detections],
+                "parts": self._result.parts,
+                "frameTimestamp": self._result.frame_timestamp,
             }
-        brain_input = json.dumps({
+        # The binding this plan will be bound to — captured now, against the
+        # objects the plan is actually computed from (spec §1.4). It is marked
+        # in-flight until this task finishes so the worker gate can't queue a
+        # duplicate replan of the same binding while the brain is thinking.
+        planned_binding = self._binding_for((ident or {}).get("primary"))
+        # room.objects is the ONE objects channel (plan_from_room.js reads
+        # {room, pose?, identification?, concept?}); _handle_control already
+        # attached objects[] to the held room.
+        brain_input_obj = {
             "room": self._room, "pose": self._pose, "identification": ident,
-        }).encode()
+        }
+        if self._concept:
+            brain_input_obj["concept"] = self._concept
+        brain_input = json.dumps(brain_input_obj).encode()
 
-        async with self._plan_lock:
-            try:
-                proc = await asyncio.create_subprocess_exec(
-                    "node", str(BRAIN_SCRIPT), "--stdin",
-                    stdin=asyncio.subprocess.PIPE,
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                )
-                out, err = await asyncio.wait_for(
-                    proc.communicate(brain_input), timeout=15)
-            except FileNotFoundError:
-                log.warning("replan skipped: `node` not on PATH")
-                return
-            except asyncio.TimeoutError:
-                proc.kill()
-                log.warning("replan: brain subprocess timed out")
-                return
-            if proc.returncode != 0:
-                log.warning(f"replan failed rc={proc.returncode}: "
-                            f"{err.decode(errors='replace')[:200]}")
-                return
-            try:
-                plan = json.loads(out.decode())
-            except json.JSONDecodeError as exc:
-                log.warning(f"replan: brain emitted bad JSON: {exc}")
-                return
-
-        # The brain ran against a snapshot owned by `owner`; if that session
-        # ended (or the room changed hands) while node was thinking, the plan
-        # describes a coordinate system nobody holds — drop it.
-        if owner is not self._room_owner or owner not in self._clients:
-            log.info(f"plan [{trigger}] dropped: room owner left mid-plan")
-            return
-
-        self._plan_version += 1
-        self._last_plan = plan
-        self._last_planned_label = (ident or {}).get("primary")
-        shopping = (plan.get("summary") or {}).get("shoppingLine", "")
-        log.info(f"plan#{self._plan_version} [{trigger}] "
-                 f"mode={plan.get('mode')} — {shopping}")
-        delta = json.dumps({
-            "type": "experience.delta",
-            "sentAt": datetime.now(timezone.utc).isoformat(),
-            "payload": {
-                "version": self._plan_version,
-                "kind": "full",
-                "experience": plan.get("contract"),
-            },
-        })
+        self._inflight_bindings.add(planned_binding)
         try:
-            await owner.send(delta)
-        except websockets.ConnectionClosed:
-            self._clients.discard(owner)
-            if owner is self._room_owner:
-                self._clear_room_state("room owner send failed")
+            async with self._plan_lock:
+                try:
+                    proc = await asyncio.create_subprocess_exec(
+                        "node", str(BRAIN_SCRIPT), "--stdin",
+                        stdin=asyncio.subprocess.PIPE,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE,
+                    )
+                    out, err = await asyncio.wait_for(
+                        proc.communicate(brain_input), timeout=15)
+                except FileNotFoundError:
+                    log.warning("replan skipped: `node` not on PATH")
+                    return
+                except asyncio.TimeoutError:
+                    proc.kill()
+                    log.warning("replan: brain subprocess timed out")
+                    return
+                if proc.returncode != 0:
+                    log.warning(f"replan failed rc={proc.returncode}: "
+                                f"{err.decode(errors='replace')[:200]}")
+                    return
+                try:
+                    plan = json.loads(out.decode())
+                except json.JSONDecodeError as exc:
+                    log.warning(f"replan: brain emitted bad JSON: {exc}")
+                    return
+
+            # The brain ran against a snapshot owned by `owner`; if that session
+            # ended (or the room changed hands) while node was thinking, the plan
+            # describes a coordinate system nobody holds — drop it.
+            if owner is not self._room_owner or owner not in self._clients:
+                log.info(f"plan [{trigger}] dropped: room owner left mid-plan")
+                return
+
+            self._plan_version += 1
+            self._last_plan = plan
+            self._last_planned_binding = planned_binding
+            self._last_replan_trigger = trigger
+            self._persist_plan_trace(trigger, brain_input_obj, plan)
+            shopping = (plan.get("summary") or {}).get("shoppingLine", "")
+            log.info(f"plan#{self._plan_version} [{trigger}] "
+                     f"mode={plan.get('mode')} — {shopping}")
+            delta = json.dumps({
+                "type": "experience.delta",
+                "sentAt": datetime.now(timezone.utc).isoformat(),
+                "payload": {
+                    "version": self._plan_version,
+                    "kind": "full",
+                    "experience": plan.get("contract"),
+                },
+            })
+            try:
+                await owner.send(delta)
+            except websockets.ConnectionClosed:
+                self._clients.discard(owner)
+                if owner is self._room_owner:
+                    self._clear_room_state("room owner send failed")
+        finally:
+            self._inflight_bindings.discard(planned_binding)
+            if trigger == "room.update":
+                # Coalesced re-run: room.updates that landed while this plan
+                # was queued/running collapse into ONE more replan against
+                # the newest room — or the slot frees up.
+                if (self._room_replan_dirty and self._room is not None
+                        and self._room_owner in self._clients):
+                    self._room_replan_dirty = False
+                    self._spawn_replan(trigger="room.update")
+                else:
+                    self._room_replan_active = False
+                    self._room_replan_dirty = False
 
     # -- frame uplink WebSocket -------------------------------------------
 
@@ -491,9 +796,31 @@ class VisionEngine:
             "ingestFps": round(self._ingest_fps, 2),
             "clients": len(self._clients),
             "result": self._result.to_dict() if self._result else None,
+            "identificationAge": (round(time.time() - self._last_result_at, 2)
+                                  if self._last_result_at else None),
             "roomSurfaces": len((self._room or {}).get("surfaces") or []),
+            "objects": [
+                {
+                    "id": o.get("id"),
+                    "label": o.get("label"),
+                    "extents": (o.get("obb") or {}).get("extents"),
+                    "supportSurfaceId": o.get("supportSurfaceId"),
+                }
+                for o in self._objects if isinstance(o, dict)
+            ],
             "planVersion": self._plan_version,
             "planSummary": (self._last_plan or {}).get("summary"),
+            "replan": {
+                "lastTrigger": self._last_replan_trigger,
+                "gate": {
+                    "plannedBinding": _binding_str(self._last_planned_binding),
+                    "candidateBinding": _binding_str(self._pending_binding),
+                    "dwell": self._pending_count,
+                    "dwellNeeded": self.replan_dwell,
+                    "lastConfidence": round(self._last_conf, 3),
+                    "minConfidence": self.replan_min_conf,
+                },
+            },
         }
 
     def build_http_app(self) -> web.Application:
@@ -527,6 +854,12 @@ class VisionEngine:
         return app
 
 
+def _binding_str(binding: Any) -> str | None:
+    if binding is None:
+        return None
+    return "{}:{}".format(binding[0], binding[1] if binding[1] is not None else "?")
+
+
 # Browser overlay: polls /state.json, draws /frame.jpg, overlays boxes+labels.
 # No server-side image libs needed — the browser does the compositing, which is
 # exactly what you watch over Parsec.
@@ -540,6 +873,7 @@ _DEBUG_HTML = """<!doctype html><html><head><meta charset=utf-8>
  #frame{max-width:96vw;max-height:78vh;border-radius:10px;display:block;background:#000}
  #ov{position:absolute;left:0;top:0;pointer-events:none}
  #raw{padding:6px 14px;color:#6f6f86;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:12px}
+ .panel{padding:4px 14px;color:#9a9ab0;white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:12px}
  .dot{height:8px;width:8px;border-radius:50%;display:inline-block;margin-right:6px;background:#444}
  .live{background:#3ddc84}
 </style></head><body>
@@ -547,12 +881,15 @@ _DEBUG_HTML = """<!doctype html><html><head><meta charset=utf-8>
  <span><span id="conn" class="dot"></span><b>SPATAIL Vision Engine</b></span>
  <span><span class="k">primary</span> <span id="primary" class="v">—</span></span>
  <span><span class="k">conf</span> <span id="conf" class="v">—</span></span>
+ <span><span class="k">age</span> <span id="age" class="v">—</span></span>
  <span><span class="k">latency</span> <span id="lat" class="v">—</span></span>
  <span><span class="k">ingest</span> <span id="fps" class="v">—</span></span>
  <span><span class="k">infers</span> <span id="inf" class="v">—</span></span>
  <span><span class="k">clients</span> <span id="cli" class="v">—</span></span>
 </header>
 <div id="wrap"><img id="frame" src="/frame.jpg"><canvas id="ov"></canvas></div>
+<div id="replan" class="panel"></div>
+<div id="objects" class="panel"></div>
 <div id="raw"></div>
 <script>
 const $=id=>document.getElementById(id);
@@ -566,6 +903,19 @@ async function tick(){
   $('fps').textContent=s.ingestFps+' fps';
   $('inf').textContent=s.inferences;
   $('cli').textContent=s.clients;
+  $('age').textContent=(s.identificationAge==null)?'—':s.identificationAge.toFixed(1)+'s';
+  const g=(s.replan&&s.replan.gate)||{};
+  $('replan').textContent='replan  plan#'+(s.planVersion||0)
+   +'  last='+((s.replan&&s.replan.lastTrigger)||'—')
+   +'  |  gate: planned='+(g.plannedBinding||'—')
+   +'  candidate='+(g.candidateBinding||'—')
+   +'  dwell '+(g.dwell||0)+'/'+(g.dwellNeeded||0)
+   +'  conf '+(g.lastConfidence!=null?g.lastConfidence:'—')+'≥'+(g.minConfidence!=null?g.minConfidence:'—');
+  const objs=s.objects||[];
+  $('objects').textContent='objects ('+objs.length+')'+(objs.length?':\\n':'')
+   +objs.map(o=>'  '+(o.label||'(unlabeled)')
+     +'  ['+((o.extents||[]).map(e=>(+e).toFixed(2)).join(' × ')||'?')+' m]'
+     +'  on '+(o.supportSurfaceId||'—')).join('\\n');
   const r=s.result;
   if(r){
    $('primary').textContent=r.primary||'—';
@@ -671,7 +1021,9 @@ def main():
     p.add_argument("--vlm-model", default="qwen2.5vl:7b",
                    help="model id (default: qwen2.5vl:7b)")
     p.add_argument("--vlm-key", default=None, help="bearer token if your endpoint needs one")
-    p.add_argument("--vlm-timeout", type=float, default=30.0)
+    # 8 s (LIVE_BRAIN_SPEC §1.4): a VLM that slow is a dead identification —
+    # time it out and identify the newest frame instead of blocking the loop.
+    p.add_argument("--vlm-timeout", type=float, default=8.0)
     p.add_argument("--max-tokens", type=int, default=300)
     p.add_argument("--min-interval", type=float, default=0.4,
                    help="minimum seconds between VLM calls (GPU throttle)")

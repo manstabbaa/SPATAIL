@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<!-- traces_view.html — the placement attribution instrument (LIVE_BRAIN_SPEC §2.2).
+
+     Served by job_server at GET /traces/view. Self-contained: no external deps,
+     data fetched client-side from GET /traces + GET /traces/{experienceId}.
+     One row per experience, four columns:
+       Brain    — placement decisionTrace + every why-field found in the contract
+       Contract — schemaValidation + per-asset footprint / footprintSource
+       Client   — each placement report: solver inputs, plan reasons,
+                  intent-vs-final deltas (highlight >0.15 m pos / >10 % scale)
+       Asset    — generation job metadata / QA provenance by generationJobId
+     Plain and functional — this is an instrument, not a brochure. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPATAIL placement traces</title>
+<style>
+  :root {
+    --bg: #101216; --panel: #181b21; --panel2: #1f232b; --line: #2b313c;
+    --fg: #d6dae2; --dim: #8a93a3; --accent: #7f8cff;
+    --ok: #4cc38a; --warn: #e5b567; --bad: #e5726a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 13px/1.45 ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  header { padding: 14px 18px; border-bottom: 1px solid var(--line);
+           display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; }
+  header .sub { color: var(--dim); }
+  header button { margin-left: auto; background: var(--panel2); color: var(--fg);
+                  border: 1px solid var(--line); border-radius: 4px;
+                  padding: 4px 10px; font: inherit; cursor: pointer; }
+  header button:hover { border-color: var(--accent); }
+  #status { padding: 10px 18px; color: var(--dim); }
+  .exp { border-bottom: 1px solid var(--line); }
+  .exp-head { display: flex; gap: 14px; align-items: baseline; padding: 9px 18px;
+              cursor: pointer; flex-wrap: wrap; }
+  .exp-head:hover { background: var(--panel); }
+  .exp-head .id { color: var(--accent); }
+  .exp-head .title { font-weight: 600; }
+  .exp-head .meta { color: var(--dim); }
+  .badge { display: inline-block; border-radius: 3px; padding: 0 6px;
+           font-size: 11px; border: 1px solid var(--line); }
+  .badge.ok   { color: var(--ok);   border-color: var(--ok); }
+  .badge.warn { color: var(--warn); border-color: var(--warn); }
+  .badge.bad  { color: var(--bad);  border-color: var(--bad); }
+  .cols { display: grid; grid-template-columns: repeat(4, minmax(230px, 1fr));
+          gap: 1px; background: var(--line); border-top: 1px solid var(--line); }
+  @media (max-width: 1100px) { .cols { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 640px)  { .cols { grid-template-columns: 1fr; } }
+  .col { background: var(--panel); padding: 10px 12px; min-width: 0;
+         overflow-x: auto; }
+  .col h2 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase;
+            letter-spacing: .08em; color: var(--accent); }
+  .col h3 { margin: 10px 0 4px; font-size: 12px; color: var(--fg); }
+  .kv { color: var(--dim); }
+  .kv b { color: var(--fg); font-weight: 600; }
+  ol.trace { margin: 4px 0 0; padding-left: 20px; }
+  ol.trace li { margin: 2px 0; }
+  ul.plain { margin: 4px 0 0; padding-left: 16px; }
+  ul.plain li { margin: 2px 0; }
+  .why-path { color: var(--dim); }
+  table { border-collapse: collapse; margin-top: 4px; width: 100%; }
+  th, td { border: 1px solid var(--line); padding: 2px 6px; text-align: left;
+           font-size: 12px; vertical-align: top; }
+  th { color: var(--dim); font-weight: 600; }
+  .num { text-align: right; white-space: nowrap; }
+  .hot { background: rgba(229, 114, 106, .18); color: var(--bad); font-weight: 600; }
+  .src-library         { color: var(--ok); }
+  .src-object_size_llm { color: var(--warn); }
+  .src-default_guess   { color: var(--dim); }
+  .errors { color: var(--bad); }
+  .dim { color: var(--dim); }
+  a { color: var(--accent); }
+  .report { border: 1px solid var(--line); border-radius: 4px;
+            padding: 8px; margin-top: 8px; background: var(--panel2); }
+  .report:first-of-type { margin-top: 4px; }
+  img.qa { max-width: 100%; border: 1px solid var(--line); border-radius: 4px;
+           margin-top: 6px; display: block; }
+  pre { margin: 4px 0 0; white-space: pre-wrap; word-break: break-word;
+        color: var(--dim); }
+</style>
+</head>
+<body>
+<header>
+  <h1>SPATAIL placement traces</h1>
+  <span class="sub">brain &rarr; contract &rarr; client &rarr; asset attribution</span>
+  <button id="expandAll">expand all</button>
+  <button id="reload">reload</button>
+</header>
+<div id="status">loading /traces &hellip;</div>
+<div id="list"></div>
+
+<script>
+"use strict";
+/* thresholds from LIVE_BRAIN_SPEC §2.2: highlight intent-vs-final disagreement */
+var POS_DELTA_M = 0.15;
+var SCALE_DELTA_FRAC = 0.10;
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function fmt(n, digits) {
+  if (typeof n !== "number" || !isFinite(n)) return "&mdash;";
+  return n.toFixed(digits == null ? 2 : digits);
+}
+function vec(v, digits) {
+  if (!Array.isArray(v)) return "&mdash;";
+  return "[" + v.map(function (x) { return fmt(x, digits == null ? 2 : digits); }).join(", ") + "]";
+}
+
+/* ── Brain: decisionTrace + every why-field anywhere in the contract ───────── */
+var WHY_KEYS = /^(why|reason|reasoning|whyThisPlacement|whyThisRepresentation|scaleNote|intentSummary)$/;
+function collectWhys(node, path, out, depth) {
+  if (depth > 12 || out.length >= 60 || node == null) return;
+  if (Array.isArray(node)) {
+    for (var i = 0; i < node.length; i++) collectWhys(node[i], path + "[" + i + "]", out, depth + 1);
+    return;
+  }
+  if (typeof node !== "object") return;
+  for (var k in node) {
+    if (!Object.prototype.hasOwnProperty.call(node, k)) continue;
+    var v = node[k];
+    if (WHY_KEYS.test(k) && typeof v === "string" && v.trim()) {
+      out.push({ path: path ? path + "." + k : k, text: v.trim() });
+    } else {
+      collectWhys(v, path ? path + "." + k : k, out, depth + 1);
+    }
+  }
+}
+function brainCol(trace) {
+  var c = trace.contract || {};
+  var sc = trace.sceneContract || c.sceneContract || {};
+  var ds = (sc.placement && sc.placement.designSystem) || c.placement || {};
+  var steps = Array.isArray(ds.decisionTrace) ? ds.decisionTrace : [];
+  var h = "<h2>Brain</h2>";
+  h += '<div class="kv">preset <b>' + esc(ds.preset || "?") + "</b> &middot; anchor <b>"
+    + esc(((ds.anchor || {}).type) || "?") + "</b> &middot; scale <b>"
+    + esc(((ds.scale || {}).mode) || "?") + "</b> &middot; anchoring <b>"
+    + esc(((ds.anchoring || (c.anchoring || {})) || {}).mode || "?") + "</b></div>";
+  h += "<h3>decisionTrace</h3>";
+  if (steps.length) {
+    h += '<ol class="trace">' + steps.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ol>";
+  } else {
+    h += '<div class="dim">no decisionTrace in this contract (pre-provenance brain)</div>';
+  }
+  var whys = [];
+  collectWhys(c, "", whys, 0);
+  h += "<h3>why-fields</h3>";
+  if (whys.length) {
+    h += '<ul class="plain">' + whys.map(function (w) {
+      return '<li><span class="why-path">' + esc(w.path) + ":</span> " + esc(w.text) + "</li>";
+    }).join("") + "</ul>";
+  } else {
+    h += '<div class="dim">none found</div>';
+  }
+  return h;
+}
+
+/* ── Contract: schemaValidation + per-asset footprint provenance ───────────── */
+function contractCol(trace) {
+  var c = trace.contract || {};
+  var sv = trace.schemaValidation || c.schemaValidation || null;
+  var h = "<h2>Contract</h2>";
+  h += '<div class="kv">' + esc(c.schemaVersion || "?") + " &middot; composer <b>"
+    + esc(c.composer || "?") + "</b>"
+    + (trace.sceneContract || c.sceneContract ? " &middot; sceneContract <b>yes</b>" : "")
+    + "</div>";
+  h += "<h3>schemaValidation</h3>";
+  if (!sv) {
+    h += '<div class="dim">not stamped</div>';
+  } else if (sv.ok) {
+    h += '<span class="badge ok">ok</span>';
+  } else {
+    var errs = sv.errors || [];
+    h += '<span class="badge bad">' + errs.length + " error" + (errs.length === 1 ? "" : "s") + "</span>";
+    h += '<ul class="plain errors">' + errs.slice(0, 12).map(function (e) {
+      return "<li>" + esc(e) + "</li>";
+    }).join("") + (errs.length > 12 ? "<li>&hellip; " + (errs.length - 12) + " more</li>" : "") + "</ul>";
+  }
+  var assets = Array.isArray(c.assets) ? c.assets : [];
+  h += "<h3>assets &middot; footprints</h3>";
+  if (!assets.length) {
+    h += '<div class="dim">no assets</div>';
+  } else {
+    h += "<table><tr><th>asset</th><th>footprint (m)</th><th>source</th><th>status</th></tr>";
+    assets.forEach(function (a) {
+      var src = a.footprintSource || "default_guess";
+      h += "<tr><td>" + esc(a.id) + (a.role === "primary_object" ? " *" : "") + "</td>"
+        + '<td class="num">' + vec(a.realSizeMeters || a.scaleMeters) + "</td>"
+        + '<td class="src-' + esc(src) + '">' + esc(src)
+        + (a.realScaleBaked ? " (baked)" : "") + "</td>"
+        + "<td>" + esc(a.status || "?") + "</td></tr>";
+    });
+    h += "</table>";
+  }
+  h += '<div class="kv" style="margin-top:8px">'
+    + '<a href="/traces/' + encodeURIComponent(trace.experienceId || "") + '">raw trace JSON</a></div>';
+  return h;
+}
+
+/* ── Client: each placement report — inputs, plan, intent-vs-final deltas ──── */
+function finalPosition(wt) {
+  /* worldTransform is 16 floats, column-major: translation lives at [12..14] */
+  if (!Array.isArray(wt) || wt.length !== 16) return null;
+  return [wt[12], wt[13], wt[14]];
+}
+function dist(a, b) {
+  if (!Array.isArray(a) || !Array.isArray(b) || a.length < 3 || b.length < 3) return null;
+  var dx = a[0] - b[0], dy = a[1] - b[1], dz = a[2] - b[2];
+  return Math.sqrt(dx * dx + dy * dy + dz * dz);
+}
+function reportBlock(r, idx) {
+  var h = '<div class="report">';
+  h += '<div class="kv">#' + (idx + 1) + " &middot; client <b>" + esc(r.client || "?") + "</b>"
+    + (typeof r.reportedAt === "number"
+        ? " &middot; " + esc(new Date(r.reportedAt * 1000).toISOString()) : "")
+    + "</div>";
+  var si = r.solverInputs || {};
+  h += "<h3>solver inputs</h3>";
+  h += '<div class="kv">anchorPreference <b>' + esc(si.anchorPreference || "?")
+    + "</b> &middot; scaleMode <b>" + esc(si.scaleMode || "?") + "</b>"
+    + (typeof si.coverage === "number" ? " &middot; coverage <b>" + fmt(si.coverage) + "</b>" : "")
+    + "</div>";
+  var fps = Array.isArray(si.footprints) ? si.footprints : [];
+  if (fps.length) {
+    h += "<table><tr><th>asset</th><th>meters</th><th>source</th></tr>";
+    fps.forEach(function (f) {
+      var src = f.source || "?";
+      h += "<tr><td>" + esc(f.assetId) + '</td><td class="num">' + vec(f.meters)
+        + '</td><td class="src-' + esc(src) + '">' + esc(src) + "</td></tr>";
+    });
+    h += "</table>";
+  }
+  var room = (si.roomSummary || {}).surfaces;
+  if (Array.isArray(room) && room.length) {
+    h += '<div class="kv" style="margin-top:4px">room: ' + room.map(function (s) {
+      return esc(s.kind || "?") + " " + vec(s.sizeMeters, 1)
+        + (typeof s.y === "number" ? " @y" + fmt(s.y) : "");
+    }).join(" &middot; ") + "</div>";
+  }
+  var plan = r.plan || {};
+  var placements = Array.isArray(plan.placements) ? plan.placements : [];
+  h += "<h3>plan (" + esc(plan.anchor || "?") + ")</h3>";
+  if (placements.length) {
+    h += "<table><tr><th>element</th><th>position</th><th>yaw</th><th>scale</th><th>fits</th><th>reason</th></tr>";
+    placements.forEach(function (p) {
+      h += "<tr><td>" + esc(p.elementId) + '</td><td class="num">' + vec(p.position)
+        + '</td><td class="num">' + fmt(p.yaw) + '</td><td class="num">' + fmt(p.scale)
+        + "</td><td>" + (p.fits === false ? '<span class="bad">no</span>' : "yes")
+        + "</td><td>" + esc(p.reason || "") + "</td></tr>";
+    });
+    h += "</table>";
+  } else {
+    h += '<div class="dim">no planned placements in the report</div>';
+  }
+  var finals = Array.isArray(r.finalPlacements) ? r.finalPlacements : [];
+  h += "<h3>intent vs final</h3>";
+  if (!finals.length) {
+    h += '<div class="dim">no final placements reported</div>';
+  } else {
+    h += "<table><tr><th>element</th><th>&Delta;pos (m)</th><th>&Delta;scale</th><th>corrections</th></tr>";
+    finals.forEach(function (f) {
+      var p = null;
+      for (var i = 0; i < placements.length; i++) {
+        if (placements[i].elementId === f.elementId) { p = placements[i]; break; }
+      }
+      var fpos = finalPosition(f.worldTransform);
+      var dp = p && fpos ? dist(p.position, fpos) : null;
+      var dsFrac = null;
+      if (p && typeof p.scale === "number" && typeof f.renderScale === "number") {
+        dsFrac = Math.abs(f.renderScale - p.scale) / Math.max(Math.abs(p.scale), 1e-6);
+      }
+      var posHot = dp != null && dp > POS_DELTA_M;
+      var sclHot = dsFrac != null && dsFrac > SCALE_DELTA_FRAC;
+      h += "<tr><td>" + esc(f.elementId) + "</td>"
+        + '<td class="num' + (posHot ? " hot" : "") + '">'
+        + (dp == null ? '<span class="dim">n/a</span>' : fmt(dp, 3)) + "</td>"
+        + '<td class="num' + (sclHot ? " hot" : "") + '">'
+        + (dsFrac == null ? '<span class="dim">n/a</span>' : fmt(dsFrac * 100, 1) + "%") + "</td>"
+        + "<td>" + esc((f.corrections || []).join("; ")) + "</td></tr>";
+    });
+    h += "</table>";
+    h += '<div class="dim">highlight: &Delta;pos &gt; ' + POS_DELTA_M
+      + " m or &Delta;scale &gt; " + (SCALE_DELTA_FRAC * 100) + "%</div>";
+  }
+  return h + "</div>";
+}
+function clientCol(trace) {
+  var reports = Array.isArray(trace.reports) ? trace.reports : [];
+  var h = "<h2>Client</h2>";
+  if (!reports.length) {
+    return h + '<div class="dim">no placement reports yet '
+      + "(clients POST /placement-report after solving)</div>";
+  }
+  return h + reports.map(reportBlock).join("");
+}
+
+/* ── Asset: generation job metadata + QA provenance by generationJobId ─────── */
+function assetCol(trace, mountId) {
+  var c = trace.contract || {};
+  var gid = c.generationJobId || (trace.sceneContract || {}).generationJobId || "";
+  var h = "<h2>Asset</h2>";
+  var assets = Array.isArray(c.assets) ? c.assets : [];
+  var links = [];
+  assets.forEach(function (a) {
+    if (a.glbUrl) links.push('<a href="' + esc(a.glbUrl) + '">' + esc(a.id) + ".glb</a>");
+    if (a.usdzUrl) links.push('<a href="' + esc(a.usdzUrl) + '">' + esc(a.id) + ".usdz</a>");
+  });
+  if (links.length) h += '<div class="kv">models: ' + links.join(" &middot; ") + "</div>";
+  if (!gid) {
+    return h + '<div class="dim">no generation job '
+      + "(all assets resolved from the library)</div>";
+  }
+  h += '<div class="kv" style="margin-top:4px">job <b>' + esc(gid) + "</b> &middot; "
+    + '<a href="/jobs/' + encodeURIComponent(gid) + '">status</a> &middot; '
+    + '<a href="/artifacts/' + encodeURIComponent(gid) + '_metadata.json">metadata</a> &middot; '
+    + '<a href="/artifacts/' + encodeURIComponent(gid) + '_manifest.json">manifest</a></div>';
+  h += '<div id="' + mountId + '"><span class="dim">loading job metadata &hellip;</span></div>';
+  return h;
+}
+function fillAssetMeta(mountId, gid) {
+  var el = document.getElementById(mountId);
+  if (!el) return;
+  fetch("/artifacts/" + encodeURIComponent(gid) + "_metadata.json")
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (m) {
+      var h = "<h3>QA / provenance</h3>";
+      var xr = m.xrReady;
+      h += '<div class="kv">placementClass <b>' + esc(m.placementClass || "?") + "</b>"
+        + " &middot; xrReady " + (xr === true ? '<span class="badge ok">yes</span>'
+                                  : xr === false ? '<span class="badge bad">no</span>'
+                                  : '<span class="badge warn">unknown</span>')
+        + (m.realSizeMeters ? " &middot; realSize " + vec(m.realSizeMeters) : "")
+        + (m.realScaleBaked ? " (baked)" : "") + "</div>";
+      var qa = m.normalizeQA || {};
+      if (qa.pipeline) {
+        h += '<div class="kv">normalize pipeline <b>' + esc(qa.pipeline) + "</b></div>";
+      }
+      if (m.libraryGlb || m.libraryUsdz) {
+        h += '<div class="kv">library: '
+          + (m.libraryGlb ? '<a href="' + esc(m.libraryGlb) + '">glb</a>' : "")
+          + (m.libraryGlb && m.libraryUsdz ? " &middot; " : "")
+          + (m.libraryUsdz ? '<a href="' + esc(m.libraryUsdz) + '">usdz</a>' : "") + "</div>";
+      }
+      /* QA image: /traces/qa/{jobId} resolves the render from the job's own
+         metadata on the PC; fall back to probing /artifacts/{basename} (flat
+         studio/out/gen), then hide the img if neither exists. */
+      if (qa.image) {
+        var base = String(qa.image).split(/[\\/]/).pop();
+        h += '<img class="qa" alt="QA render" src="/traces/qa/' + encodeURIComponent(gid)
+          + '" onerror="if(!this.dataset.alt){this.dataset.alt=1;'
+          + "this.src='/artifacts/" + esc(base) + "'}else{this.remove()}\">";
+        h += '<pre>' + esc(qa.image) + "</pre>";
+      }
+      el.innerHTML = h;
+    })
+    .catch(function () {
+      el.innerHTML = '<div class="dim">job metadata not available yet '
+        + "(build pending or artifact pruned)</div>";
+    });
+}
+
+/* ── page assembly ─────────────────────────────────────────────────────────── */
+var detailCache = {};        /* experienceId -> trace (avoid refetch on re-toggle) */
+
+function renderDetail(row, trace) {
+  var body = row.querySelector(".cols");
+  var mountId = "asset-meta-" + row.dataset.n;
+  body.innerHTML =
+    '<div class="col">' + brainCol(trace) + "</div>"
+    + '<div class="col">' + contractCol(trace) + "</div>"
+    + '<div class="col">' + clientCol(trace) + "</div>"
+    + '<div class="col">' + assetCol(trace, mountId) + "</div>";
+  var c = trace.contract || {};
+  var gid = c.generationJobId || (trace.sceneContract || {}).generationJobId || "";
+  if (gid) fillAssetMeta(mountId, gid);
+}
+
+function toggleRow(row) {
+  var body = row.querySelector(".cols");
+  if (body.style.display !== "none") { body.style.display = "none"; return; }
+  body.style.display = "";
+  var eid = row.dataset.eid;
+  if (detailCache[eid]) { renderDetail(row, detailCache[eid]); return; }
+  body.innerHTML = '<div class="col" style="grid-column:1/-1">loading /traces/'
+    + esc(eid) + " &hellip;</div>";
+  fetch("/traces/" + encodeURIComponent(eid))
+    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function (trace) { detailCache[eid] = trace; renderDetail(row, trace); })
+    .catch(function (e) {
+      body.innerHTML = '<div class="col errors" style="grid-column:1/-1">failed: '
+        + esc(e.message) + "</div>";
+    });
+}
+
+function load() {
+  var status = document.getElementById("status");
+  var list = document.getElementById("list");
+  status.textContent = "loading /traces …";
+  list.innerHTML = "";
+  detailCache = {};
+  fetch("/traces")
+    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function (items) {
+      if (!Array.isArray(items) || !items.length) {
+        status.textContent = "no traces yet — every POST /modular writes one to studio/out/traces/";
+        return;
+      }
+      status.textContent = items.length + " experience" + (items.length === 1 ? "" : "s");
+      items.forEach(function (it, n) {
+        var row = document.createElement("div");
+        row.className = "exp";
+        row.dataset.eid = it.experienceId;
+        row.dataset.n = String(n);
+        row.innerHTML =
+          '<div class="exp-head">'
+          + '<span class="id">' + esc(it.experienceId) + "</span>"
+          + '<span class="title">' + esc(it.title || "(untitled)") + "</span>"
+          + '<span class="meta">' + esc(it.createdAt || "") + "</span>"
+          + '<span class="badge ' + (it.reportCount ? "ok" : "warn") + '">'
+          + it.reportCount + " report" + (it.reportCount === 1 ? "" : "s") + "</span>"
+          + "</div>"
+          + '<div class="cols" style="display:none"></div>';
+        row.querySelector(".exp-head").addEventListener("click", function () { toggleRow(row); });
+        list.appendChild(row);
+      });
+    })
+    .catch(function (e) { status.textContent = "failed to load /traces: " + e.message; });
+}
+
+document.getElementById("reload").addEventListener("click", load);
+document.getElementById("expandAll").addEventListener("click", function () {
+  document.querySelectorAll(".exp").forEach(function (row) {
+    if (row.querySelector(".cols").style.display === "none") toggleRow(row);
+  });
+});
+load();
+</script>
+</body>
+</html>

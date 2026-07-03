@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spatail.dev/schemas/sceneContract.v0_6.schema.json",
+  "title": "SpatailSceneContract",
+  "description": "SPATAIL v0.6 Scene Contract — exactly what studio/director/scene_contract.py::to_scene_contract projects from the v0.7 modular contract today: content / placement / brand / logic, one section per design pillar. Placement carries REQUIREMENTS the on-device solver resolves against the live RoomModel, never coordinates. Validated warn-only by studio/server/trace_store.py.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "experienceId",
+    "title",
+    "source",
+    "understanding",
+    "content",
+    "placement",
+    "anchoring",
+    "brand",
+    "logic",
+    "progressive"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schemaVersion":  { "const": "0.6.0-spatail-scene" },
+    "experienceId":   { "type": "string", "minLength": 1 },
+    "title":          { "type": "string" },
+    "source":         { "type": "object" },
+    "understanding":  { "type": "object" },
+    "content": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/contentItem" }
+    },
+    "placement": {
+      "type": "object",
+      "required": ["anchorPreference", "layout", "facing", "scaleMode", "primary",
+                   "footprints", "footprintSources", "relationships", "zones",
+                   "designSystem"],
+      "properties": {
+        "anchorPreference": { "enum": ["table", "floor", "wall", "object", "room", "free"] },
+        "layout":           { "enum": ["arc", "line", "cluster"] },
+        "facing":           { "enum": ["user", "forward"] },
+        "scaleMode":        { "enum": ["true_scale", "fit_to_surface", "miniature",
+                                        "enlarged_detail", "adaptive",
+                                        "dynamic", "fixed"] },
+        "primary":          { "type": ["string", "null"] },
+        "coverage":         { "type": "number", "minimum": 0, "maximum": 1 },
+        "footprints": {
+          "type": "object",
+          "additionalProperties": { "type": "array", "items": { "type": "number" },
+                                     "minItems": 3, "maxItems": 3 }
+        },
+        "footprintSources": {
+          "type": "object",
+          "additionalProperties": { "enum": ["library", "object_size_llm",
+                                              "default_guess"] }
+        },
+        "relationships": { "type": "array" },
+        "zones":         { "type": "array", "items": { "type": "string" } },
+        "designSystem":  { "$ref": "#/$defs/designSystemPlacement" }
+      }
+    },
+    "anchoring": { "$ref": "#/$defs/anchoring" },
+    "brand":     { "type": "object" },
+    "logic": {
+      "type": "object",
+      "required": ["sequence", "triggers", "objectives", "worldState"],
+      "properties": {
+        "sequence":   { "type": "array" },
+        "triggers":   { "type": "array" },
+        "objectives": { "type": "array" },
+        "worldState": {
+          "type": "object",
+          "required": ["stepIndex"],
+          "properties": { "stepIndex": { "type": "number" } }
+        }
+      }
+    },
+    "progressive":     { "type": "object" },
+    "generation":      { "type": ["object", "null"] },
+    "generationJobId": { "type": ["string", "null"] }
+  },
+  "$defs": {
+    "anchoring": {
+      "type": "object",
+      "required": ["mode", "fallback"],
+      "properties": {
+        "mode":                { "enum": ["world", "object"] },
+        "fallback":            { "enum": ["world"] },
+        "objectId":            { "type": "string" },
+        "referenceObjectUrl":  { "type": "string" },
+        "tracking":            { "enum": ["detection", "tracking"] },
+        "pauseOnTrackingLoss": { "type": "boolean" }
+      }
+    },
+    "contentItem": {
+      "type": "object",
+      "required": ["id", "name", "role", "usdzUrl", "glbUrl", "manifestUrl",
+                   "scaleMeters", "capabilities", "status"],
+      "properties": {
+        "id":          { "type": "string", "minLength": 1 },
+        "name":        { "type": "string" },
+        "role":        { "enum": ["primary_object", "part", "comparison_object",
+                                   "environment", "label"] },
+        "usdzUrl":     { "type": "string" },
+        "glbUrl":      { "type": "string" },
+        "manifestUrl": { "type": "string" },
+        "scaleMeters": { "type": "array", "items": { "type": "number" },
+                          "minItems": 3, "maxItems": 3 },
+        "footprintSource": { "enum": ["library", "object_size_llm", "default_guess"] },
+        "capabilities": {
+          "type": "object",
+          "required": ["animation", "namedParts", "transparency", "physics"],
+          "properties": {
+            "animation":    { "type": "boolean" },
+            "namedParts":   { "type": "boolean" },
+            "transparency": { "type": "boolean" },
+            "physics":      { "type": "boolean" }
+          }
+        },
+        "status": { "enum": ["processed", "placeholder"] }
+      }
+    },
+    "designSystemPlacement": {
+      "description": "Same §12 contract as modularContract.v0_7 placement (studio/spatail/design_system.py) — duplicated here so this schema resolves standalone.",
+      "type": "object",
+      "required": ["mode", "anchor", "scale", "position", "interaction", "ui",
+                   "comfort", "fallback", "intent", "preset", "zones", "anchoring"],
+      "properties": {
+        "mode": { "enum": ["miniature", "real_scale", "exploded", "object_overlay",
+                            "wall_board", "room_simulation"] },
+        "anchor": {
+          "type": "object",
+          "required": ["type", "fallback"],
+          "properties": {
+            "type":     { "enum": ["table", "floor", "wall", "object", "room"] },
+            "fallback": { "enum": ["table", "floor", "floating_panel", "world"] }
+          }
+        },
+        "scale": {
+          "type": "object",
+          "required": ["mode", "maxSurfaceCoverage", "showScaleReference"],
+          "properties": {
+            "mode": { "enum": ["true_scale", "fit_to_surface", "miniature",
+                                "enlarged_detail", "adaptive"] },
+            "maxSurfaceCoverage": { "type": "number" },
+            "showScaleReference": { "type": "boolean" },
+            "scaleNote":          { "type": "string" }
+          }
+        },
+        "position":    { "type": "object" },
+        "interaction": { "type": "object" },
+        "ui":          { "type": "object" },
+        "comfort":     { "type": "object" },
+        "fallback":    { "type": "object" },
+        "intent": { "enum": ["tabletop_learning_model", "true_scale_product_preview",
+                              "mechanical_exploded_view", "object_anchored_repair_guide",
+                              "wall_explanation_board", "room_scale_simulation"] },
+        "preset": { "enum": ["tabletop_learning_model", "true_scale_product_preview",
+                              "mechanical_exploded_view", "object_anchored_repair_guide",
+                              "wall_explanation_board", "room_scale_simulation"] },
+        "zones": { "type": "object" },
+        "anchoring":     { "$ref": "#/$defs/anchoring" },
+        "decisionTrace": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

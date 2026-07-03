@@ -320,6 +320,8 @@ Bundle download is still HTTP because: cacheable, signed-URL revocation, CDN-fri
 
 ## 10. Vision uplink + live identification (v0.2 — the TRACKED stream)
 
+> **Normative spec:** the live-brain wire & fusion contract (message shapes, env-var names, gate defaults, trace paths, on-device fusion semantics) is `docs/xr/LIVE_BRAIN_SPEC.md`. This section describes the channel; where the two disagree, the spec wins.
+
 v0.1 understands the world from a *typed prompt* + room geometry. v0.2 adds a **vision channel**: the phone streams camera frames to a **PC live intelligence engine** that runs a VLM (NVIDIA NIM / Ollama / vLLM via an OpenAI-compatible endpoint) and answers *"what is the user looking at?"*. Implemented by `pipeline/server/spatail_vision_engine.py`.
 
 **Why a separate channel (not the WS control plane):** camera frames are far larger than the 64 KB control-plane cap. They ride a **dedicated binary WebSocket**; only small identification results return on the control plane (or that same socket).
@@ -335,7 +337,7 @@ v0.1 understands the world from a *typed prompt* + room geometry. v0.2 adds a **
 | `http://<pc>:8799/frame.jpg`, `/state.json` | Raw latest frame + engine state (what the overlay polls) |
 
 ### `vision.frame` (iOS → engine)
-Not a JSON envelope — a **raw binary WebSocket message** whose bytes are a downscaled JPEG (~640 px long edge, ~2–5 Hz). Keeping it binary avoids base64 bloat. Text messages on this socket are reserved (future: ROI / capability hints).
+Not a JSON envelope — a **raw binary WebSocket message** whose bytes are a downscaled JPEG (~640 px long edge, ~2–5 Hz). Keeping it binary avoids base64 bloat. Text messages on this socket carry the fusion control plane (`room.update` / `pose.update` — §10.1).
 
 ### `vision.identification` (engine → iOS)
 ```json
@@ -348,14 +350,16 @@ Not a JSON envelope — a **raw binary WebSocket message** whose bytes are a dow
       { "label": "car engine air filter", "confidence": 0.82, "box": [0.31, 0.28, 0.4, 0.35] },
       { "label": "airbox", "confidence": 0.4, "box": null }
     ],
-    "rawText": "{...}", "latencyMs": 940, "model": "qwen2.5vl:7b"
+    "rawText": "{...}", "latencyMs": 940, "model": "qwen2.5vl:7b",
+    "frameTimestamp": 1783036825.412,
+    "parts": [ { "label": "air intake hose", "box": [0.55, 0.30, 0.2, 0.18], "confidence": 0.7 } ]
   }
 }
 ```
-`box` is normalized `[x, y, w, h]` (origin top-left) or `null` — treat it as a hint; chat VLMs are unreliable at precise boxes. iOS raycasts the box centre onto an ARKit-tracked anchor for placement.
+`box` is normalized `[x, y, w, h]` (origin top-left) or `null` — treat it as a hint; chat VLMs are unreliable at precise boxes. `frameTimestamp` echoes the capture/ingest time of the frame this identity describes; `parts` are the primary object's visible sub-parts (same box space, may be `[]` — the engine parses them defensively so a creative VLM reply never breaks identification). On device, identity attaches to tracked objects by projecting each object's OBB into the `frameTimestamp` frame and taking the best IoU against `detections[].box`, with part boxes resolved through the depth-grid path (LIVE_BRAIN_SPEC §3) — this replaces the earlier "raycast the box centre" design.
 
 ### Convergence with the PLACED stream
-A confident `vision.identification` can auto-fire the equivalent of a `user.prompt` (`"explain this <primary>"`) into the v0.1 prompt→Blender pipeline, so the explanation builds for whatever the camera is pointed at — no typing. That bridge lives in the engine, gated on a confidence threshold + dwell.
+A confident `vision.identification` can auto-fire the equivalent of a `user.prompt` (`"explain this <primary>"`) into the v0.1 prompt→Blender pipeline, so the explanation builds for whatever the camera is pointed at — no typing. That gate is now real in the engine: replans fire through the binding gate of §10.1 (`SPATAIL_REPLAN_MIN_CONF`, default 0.55; `SPATAIL_REPLAN_DWELL`, default 2 consecutive identifications) per LIVE_BRAIN_SPEC §1.4.
 
 ### Observability (the "joint activity" surface)
 The engine renders an HTML overlay at `http://<pc>:8799/` (latest frame + detection boxes + labels + ingest fps + per-call latency + raw VLM text). Open it over Parsec to watch the pipeline end-to-end while you point the phone. `--test-dir <imgs>` feeds local images so the engine + VLM + overlay can be verified on the PC **before** the phone is wired.
@@ -371,13 +375,18 @@ The text channel on the vision socket is no longer reserved: it carries the **fu
   "payload": {
     "room": { /* an iOS RoomContract (0.4.0-spatail-room) or brain-shaped room */ },
     "pose": { "position": [0, 1.5, 1.6], "forward": [0, -0.45, -0.89] },
+    "objects": [ { "id": "8C1A…", "label": "water bottle", "confidence": 0.91,
+                   "obb": { "center": [0.2, 0.8, -0.5], "extents": [0.08, 0.24, 0.08], "yaw": 0.42 },
+                   "supportSurfaceId": "surf-…", "lastSeenAt": 1783036800.123 } ],
     "debugIdentification": { "primary": "table", "detections": [] }
   }
 }
 ```
-`room` accepts the device's persisted RoomContract verbatim (`room_contract_adapter.js` normalizes it). `pose` is the camera at send time — the brain raycasts it through the scanned surfaces. `debugIdentification` is a dev hook that pins the VLM answer for tests; live traffic omits it and the engine uses its latest `vision.identification`.
+`room` accepts the device's persisted RoomContract verbatim (`room_contract_adapter.js` normalizes it). `pose` is the camera at send time — the brain raycasts it through the scanned surfaces (`surface_fusion.js`: the camera-forward ray, kind-gated by the VLM noun, picks the frontmost pierced surface). `objects` is the device ObjectRegistry's tracked-object list (LIVE_BRAIN_SPEC §1.2); the engine hands it through to the brain so placements can bind to real objects, objects-first. `debugIdentification` is a dev hook that pins the VLM answer for tests; live traffic omits it and the engine uses its latest `vision.identification`.
 
-**`experience.delta` (engine → iOS, same socket):** same envelope as §4 — `payload.kind = "full"`, `payload.experience` = a SpatialExperienceContract whose elements use the v0.6 `surface_edge` / `surface_corner` placements (with `surfaceRef`, `from`/`to`, `count`, `spanMeters`). The engine replans on every `room.update` and whenever the VLM's `primary` changes while a room is held.
+**`pose.update` (iOS → engine, same socket, ≤ 2 Hz):** `{"type": "pose.update", "payload": {"position", "forward", "up", "timestamp"}}` keeps the brain's gaze ray live between room sends. It updates the held pose only (owner-gated) and **never** triggers a replan (LIVE_BRAIN_SPEC §1.1).
+
+**`experience.delta` (engine → iOS, same socket):** same envelope as §4 — `payload.kind = "full"`, `payload.experience` = a SpatialExperienceContract whose elements use the v0.6 `surface_edge` / `surface_corner` placements (with `surfaceRef`, `from`/`to`, `count`, `spanMeters`). The engine replans on every `room.update`; identification-driven replans are gated on the **binding** — the label's mapped surface kind (mirroring `labelToSurfaceKind` in `surface_fusion.js`) or the matched tracked-object id — changing, with confidence ≥ `SPATAIL_REPLAN_MIN_CONF` (default 0.55) and the same binding held for `SPATAIL_REPLAN_DWELL` (default 2) consecutive identifications. Raw label re-wordings with the same binding never replan (LIVE_BRAIN_SPEC §1.4). Replans run as detached asyncio tasks (serialized by a plan lock) so the identification downlink never blocks on the brain, and every replan is archived to `studio/out/traces/vision/<session>/plan_NNNN.json` — `brainInput` replays offline through `plan_from_room.js --stdin` (LIVE_BRAIN_SPEC §2.1). The `:8799` overlay and `/state.json` expose the gate state (planned/candidate binding, dwell, confidence), the tracked-object list, and identification age.
 
 **Room ownership (v0.3.1):** the room is scoped to the **connection that sent it**. `experience.delta` is sent **only to that socket** — never broadcast — because its coordinates only mean something in the sender's ARKit session. Identification-triggered replans run only while the owner is still connected. When the owner disconnects (and if an ownerless room is ever found when a new client connects), the engine clears the held room, pose, plan, and plan version, so a fresh session can never receive placements computed against another session's coordinate system. `vision.identification` remains a broadcast to every connected client. iOS additionally ignores `experience.delta` until it has sent a `room.update` on the current connection.
 

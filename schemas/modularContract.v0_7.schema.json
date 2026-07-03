@@ -1,0 +1,303 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spatail.dev/schemas/modularContract.v0_7.schema.json",
+  "title": "SpatailModularContract",
+  "description": "SPATAIL v0.7 modular experience contract — exactly what studio/director/experience.py::build_modular_experience emits today, plus the additive keys job_server stamps on the wire (generationJobId, sceneContract, schemaValidation, traceUrl). Closed vocabularies mirror studio/spatail/design_system.py, studio/director/composer.py and studio/server/experience_spec.py. Validated warn-only by studio/server/trace_store.py (hand-rolled subset interpreter: type/const/enum/required/properties/items/additionalProperties/$ref).",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "experienceId",
+    "title",
+    "source",
+    "understanding",
+    "stage",
+    "placement",
+    "anchoring",
+    "assets",
+    "assetRequirements",
+    "composer",
+    "sequence",
+    "triggers",
+    "clips",
+    "clipsUsed",
+    "objectives",
+    "progressive"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schemaVersion": { "const": "0.7.0-spatail-modular" },
+    "experienceId":  { "type": "string", "minLength": 1 },
+    "title":         { "type": "string" },
+    "source": {
+      "type": "object",
+      "required": ["kind", "input"],
+      "properties": {
+        "kind":        { "enum": ["text", "image"] },
+        "input":       { "type": "string" },
+        "subjectHint": { "type": "string" },
+        "vision":      { "type": "object" }
+      }
+    },
+    "understanding": {
+      "type": "object",
+      "required": ["domain", "intent", "subject", "summary"],
+      "properties": {
+        "domain":    { "type": "string" },
+        "intent":    { "type": "string" },
+        "subject":   { "type": "string" },
+        "summary":   { "type": "string" },
+        "reasoning": { "type": "string" }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "required": ["anchor", "layout", "facing", "scaleMode"],
+      "properties": {
+        "anchor":    { "enum": ["table", "floor", "free"] },
+        "layout":    { "enum": ["arc", "line", "cluster"] },
+        "facing":    { "enum": ["user", "forward"] },
+        "scaleMode": { "enum": ["dynamic", "fixed"] }
+      }
+    },
+    "placement": { "$ref": "#/$defs/designSystemPlacement" },
+    "anchoring": { "$ref": "#/$defs/anchoring" },
+    "assets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/asset" }
+    },
+    "assetRequirements": { "type": "object" },
+    "composer": { "enum": ["deterministic", "gemini"] },
+    "sequence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/step" }
+    },
+    "triggers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/trigger" }
+    },
+    "clips":     { "type": "array", "items": { "type": "object" } },
+    "clipsUsed": { "type": "array", "items": { "type": "string" } },
+    "objectives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "goal", "summary"],
+        "properties": {
+          "id":      { "type": "string" },
+          "goal":    { "type": "string" },
+          "summary": { "type": "string" }
+        }
+      }
+    },
+    "progressive": {
+      "type": "object",
+      "required": ["firstInteractiveMsBudget", "phase0Assets", "needsGeneration"],
+      "properties": {
+        "firstInteractiveMsBudget": { "type": "number" },
+        "phase0Assets":             { "type": "array", "items": { "type": "string" } },
+        "needsGeneration":          { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "generation": {
+      "type": "object",
+      "required": ["brief", "subject", "assetId"],
+      "properties": {
+        "brief":    { "type": "string" },
+        "subject":  { "type": "string" },
+        "assetId":  { "type": "string" },
+        "answer":   { "type": "string" },
+        "question": { "type": "string" }
+      }
+    },
+    "generationJobId": { "type": "string" },
+    "sceneContract":   { "type": "object" },
+    "schemaValidation": {
+      "type": "object",
+      "required": ["ok", "errors"],
+      "properties": {
+        "ok":     { "type": "boolean" },
+        "errors": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "traceUrl": { "type": "string" }
+  },
+  "$defs": {
+    "anchoring": {
+      "type": "object",
+      "required": ["mode", "fallback"],
+      "properties": {
+        "mode":                { "enum": ["world", "object"] },
+        "fallback":            { "enum": ["world"] },
+        "objectId":            { "type": "string" },
+        "referenceObjectUrl":  { "type": "string" },
+        "tracking":            { "enum": ["detection", "tracking"] },
+        "pauseOnTrackingLoss": { "type": "boolean" }
+      }
+    },
+    "designSystemPlacement": {
+      "description": "The §12 placement contract from studio/spatail/design_system.py::decide_placement — POLICY only, never coordinates. decisionTrace is the additive LIVE_BRAIN_SPEC §2.3 provenance field.",
+      "type": "object",
+      "required": ["mode", "anchor", "scale", "position", "interaction", "ui",
+                   "comfort", "fallback", "intent", "preset", "zones", "anchoring"],
+      "properties": {
+        "mode": { "enum": ["miniature", "real_scale", "exploded", "object_overlay",
+                            "wall_board", "room_simulation"] },
+        "anchor": {
+          "type": "object",
+          "required": ["type", "fallback"],
+          "properties": {
+            "type":     { "enum": ["table", "floor", "wall", "object", "room"] },
+            "fallback": { "enum": ["table", "floor", "floating_panel", "world"] }
+          }
+        },
+        "scale": {
+          "type": "object",
+          "required": ["mode", "maxSurfaceCoverage", "showScaleReference"],
+          "properties": {
+            "mode": { "enum": ["true_scale", "fit_to_surface", "miniature",
+                                "enlarged_detail", "adaptive"] },
+            "maxSurfaceCoverage": { "type": "number" },
+            "showScaleReference": { "type": "boolean" },
+            "scaleNote":          { "type": "string" }
+          }
+        },
+        "position": {
+          "type": "object",
+          "required": ["alignment", "faceUser", "avoidOcclusion"],
+          "properties": {
+            "alignment": { "enum": ["centered_on_surface", "in_front_of_user",
+                                     "aligned_to_object", "flush_on_wall_eye_level",
+                                     "main_action_in_front"] },
+            "faceUser":             { "type": "boolean" },
+            "avoidOcclusion":       { "type": "boolean" },
+            "groundWithShadow":     { "type": "boolean" },
+            "leaveWalkAroundSpace": { "type": "boolean" },
+            "avoidBehindUser":      { "type": "boolean" },
+            "panelsOffsetFromTarget": { "type": "boolean" }
+          }
+        },
+        "interaction": {
+          "type": "object",
+          "required": ["canMove", "canRotate", "canScale", "semanticActions"],
+          "properties": {
+            "canMove":         { "type": "boolean" },
+            "canRotate":       { "type": "boolean" },
+            "canScale":        { "type": "boolean" },
+            "semanticActions": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "ui": {
+          "type": "object",
+          "required": ["labelBehavior", "panelPosition", "textMode"],
+          "properties": {
+            "labelBehavior": { "enum": ["on_select", "current_step_only", "progressive"] },
+            "panelPosition": { "enum": ["beside_object", "on_board",
+                                         "user_relative_temporary"] },
+            "textMode":      { "enum": ["flat_user_facing"] }
+          }
+        },
+        "comfort": {
+          "type": "object",
+          "required": ["preferredDistance", "avoidForcedHeadTurn", "allowRecentering"],
+          "properties": {
+            "preferredDistance":   { "type": "string" },
+            "avoidForcedHeadTurn": { "type": "boolean" },
+            "allowRecentering":    { "type": "boolean" }
+          }
+        },
+        "fallback": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "intent": { "enum": ["tabletop_learning_model", "true_scale_product_preview",
+                              "mechanical_exploded_view", "object_anchored_repair_guide",
+                              "wall_explanation_board", "room_scale_simulation"] },
+        "preset": { "enum": ["tabletop_learning_model", "true_scale_product_preview",
+                              "mechanical_exploded_view", "object_anchored_repair_guide",
+                              "wall_explanation_board", "room_scale_simulation"] },
+        "zones": { "type": "object" },
+        "anchoring":     { "$ref": "#/$defs/anchoring" },
+        "decisionTrace": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": ["id", "name", "role", "description", "glbUrl", "usdzUrl",
+                   "fallbackPrimitive", "scaleMeters", "supportsAnimation",
+                   "supportsHighlight", "supportsTransparency", "source", "status",
+                   "animation"],
+      "properties": {
+        "id":          { "type": "string", "minLength": 1 },
+        "name":        { "type": "string" },
+        "role":        { "enum": ["primary_object", "part", "comparison_object",
+                                   "environment", "label"] },
+        "description": { "type": "string" },
+        "glbUrl":      { "type": "string" },
+        "usdzUrl":     { "type": "string" },
+        "fallbackPrimitive": { "type": "string" },
+        "scaleMeters": { "type": "array", "items": { "type": "number" },
+                          "minItems": 3, "maxItems": 3 },
+        "supportsAnimation":    { "type": "boolean" },
+        "supportsHighlight":    { "type": "boolean" },
+        "supportsTransparency": { "type": "boolean" },
+        "source": { "enum": ["library", "primitive", "generate", "cached", "generated"] },
+        "status": { "enum": ["processed", "placeholder"] },
+        "animation": {},
+        "parts":   { "type": "array" },
+        "clips":   { "type": "array" },
+        "anchors": { "type": "array" },
+        "regions": { "type": "array" },
+        "realSizeMeters": { "type": "array", "items": { "type": "number" },
+                             "minItems": 3, "maxItems": 3 },
+        "realScaleBaked": { "type": "boolean" },
+        "footprintSource": { "enum": ["library", "object_size_llm", "default_guess"] }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": ["id", "title", "narration", "focus", "clip", "loop", "panels", "advance"],
+      "properties": {
+        "id":        { "type": "string" },
+        "title":     { "type": "string" },
+        "narration": { "type": "string" },
+        "focus":     { "type": "string" },
+        "clip":      { "type": "string" },
+        "loop":      { "type": "boolean" },
+        "panels":    { "type": "array", "maxItems": 4 },
+        "advance":   { "enum": ["tap", "auto"] },
+        "effect":    { "type": "string" },
+        "target":    { "type": "string" },
+        "region":    { "type": "string" },
+        "anchorOffset": { "type": "array", "items": { "type": "number" },
+                           "minItems": 3, "maxItems": 3 },
+        "hotspot":   { "type": "object" }
+      }
+    },
+    "trigger": {
+      "type": "object",
+      "required": ["when", "do"],
+      "properties": {
+        "when": {
+          "type": "object",
+          "required": ["event", "target"],
+          "properties": {
+            "event":  { "enum": ["onTap", "onApproach", "onGaze"] },
+            "target": { "type": "string" },
+            "params": { "type": "object" }
+          }
+        },
+        "do": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["action"],
+            "properties": {
+              "action": { "enum": ["advance", "playClip", "label"] },
+              "target": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

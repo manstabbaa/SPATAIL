@@ -103,8 +103,9 @@ def _arc(n: int, distance: float, height: float, spread_deg: float):
 
 
 def solve(room: "rmod.RoomModel", assets: list[dict], intent: dict | None = None) -> PlacementPlan:
-    """assets: [{id, footprint:[w,d,h] metres, role}]; intent: {anchorPreference,
-    layout, scaleMode, primary}. Returns a PlacementPlan in the device frame."""
+    """assets: [{id, footprint:[w,d,h] metres, role, realScaleBaked?}]; intent:
+    {anchorPreference, layout, scaleMode, primary, coverage}. Returns a
+    PlacementPlan in the device frame."""
     intent = intent or {}
     n = len(assets)
     if n == 0:
@@ -112,6 +113,13 @@ def solve(room: "rmod.RoomModel", assets: list[dict], intent: dict | None = None
 
     pref = intent.get("anchorPreference", "table")
     scale_mode = intent.get("scaleMode", "dynamic")
+    # usable fraction of the surface width (design system §5) — clamped like the
+    # Swift solver so both sides agree on the same fixture
+    try:
+        coverage = float(intent.get("coverage", 0.8))
+    except (TypeError, ValueError):
+        coverage = 0.8
+    coverage = min(max(coverage, 0.2), 0.95)
     primary = intent.get("primary") or assets[0]["id"]
     # put the primary first (hero, centred)
     assets = sorted(assets, key=lambda a: 0 if a["id"] == primary else 1)
@@ -140,18 +148,27 @@ def solve(room: "rmod.RoomModel", assets: list[dict], intent: dict | None = None
     widths = [max(a.get("footprint", [0.2, 0.2, 0.2])[0], 0.03) for a in assets]
     gap = 0.12
     needed_w = sum(widths) + gap * (n - 1)
-    avail_w = max(0.2, surf_w * 0.8)                          # 80% of surface usable
+    avail_w = max(0.2, surf_w * coverage)                     # coverage of surface usable
     fit_scale = min(1.0, avail_w / needed_w) if needed_w > 0 else 1.0
-    scale = 1.0 if variant == "real" else fit_scale
+    # A metric-baked hero renders at scale 1.0 (the render path enforces it), so keep
+    # the solver in agreement — don't coverage-shrink the holder out from under it.
+    # (Anchor choice is unchanged: a baked asset still sits on the table/floor it was
+    # assigned; only the uniform fit scale is pinned to 1.0.)
+    hero_baked = bool(assets[0].get("realScaleBaked", False))
+    scale = 1.0 if (variant == "real" or hero_baked) else fit_scale
 
     # arc spread: wider for more items, capped to the comfort cone
     spread = min(CONE_DEG, 8.0 + 7.0 * max(0, n - 1))
     height = base_h + 0.0                                     # asset origins sit on the surface
     slots = _arc(n, distance, height, spread)
 
-    # obstacle footprints (project to floor) for a simple keep-out check
+    # keep-out only against obstacles that REST ON the chosen surface — floor
+    # furniture (a chair tucked under a table) is shielded by the tabletop, so it
+    # must not block a table placement (mirrors the Blender placer's _on_support
+    # gate). For a floor placement base_h = 0, so floor obstacles still count.
+    on_surface = [o for o in room.obstacles if o.bbox_min_m[1] >= base_h - 0.05]
     obstacles_xz = [((o.bbox_min_m[0], o.bbox_min_m[2]), (o.bbox_max_m[0], o.bbox_max_m[2]))
-                    for o in room.obstacles]
+                    for o in on_surface]
 
     placements = []
     for i, a in enumerate(assets):
@@ -176,6 +193,9 @@ def solve(room: "rmod.RoomModel", assets: list[dict], intent: dict | None = None
             "needed_w_m": round(needed_w, 3), "fit_scale": round(fit_scale, 3),
             "distance_m": round(distance, 3), "spread_deg": round(spread, 1),
             "obstacles": len(room.obstacles), "source": room.source,
+            "coverage": round(coverage, 3),
+            "obstacles_on_surface": len(obstacles_xz),
+            "hero_baked": hero_baked,
         })
 
 
@@ -213,3 +233,57 @@ if __name__ == "__main__":
     ]
     plan = solve(room, assets, {"anchorPreference": "table", "scaleMode": "dynamic", "primary": "sun"})
     print(json.dumps(plan.as_dict(), indent=2))
+
+    # selftest — the canonical richness + the Swift back-ported behaviors
+    d = plan.as_dict()
+    assert d["anchor"] == "table" and d["scaleVariant"] == "tabletop"
+    assert all(p["fits"] and p["reason"] for p in d["placements"])
+    assert d["placements"][0]["zone"] == "hero" and d["placements"][0]["assetId"] == "sun"
+    for k in ("assets", "surface_m", "needed_w_m", "fit_scale", "distance_m",
+              "spread_deg", "obstacles", "source", "coverage",
+              "obstacles_on_surface", "hero_baked"):
+        assert k in d["diagnostics"], k
+
+    # 1) obstacle filtering: the demo chair is FLOOR furniture -> it never blocks a
+    #    TABLE placement, but it still counts against a floor placement at its spot.
+    assert d["diagnostics"]["obstacles"] == 1 and d["diagnostics"]["obstacles_on_surface"] == 0
+    hero_xz = d["placements"][0]["position_m"]
+    blocked_room = rmod.demo()
+    blocked_room.obstacles.append(rmod.Obstacle(
+        bbox_min_m=(hero_xz[0] - 0.1, 0.70, hero_xz[2] - 0.1),
+        bbox_max_m=(hero_xz[0] + 0.1, 1.00, hero_xz[2] + 0.1), category="plant"))
+    blocked = solve(blocked_room, assets,
+                    {"anchorPreference": "table", "scaleMode": "dynamic", "primary": "sun"}).as_dict()
+    assert blocked["diagnostics"]["obstacles_on_surface"] == 1
+    assert not blocked["placements"][0]["fits"]
+    assert "out-of-bounds" in blocked["placements"][0]["reason"]   # reason strings kept
+
+    # 2) coverage: tighter budget -> smaller fit scale (default 0.8 preserved above)
+    tight = solve(room, assets, {"anchorPreference": "table", "scaleMode": "dynamic",
+                                 "primary": "sun", "coverage": 0.4}).as_dict()
+    assert tight["diagnostics"]["coverage"] == 0.4
+    assert tight["placements"][0]["scale"] < d["placements"][0]["scale"]
+
+    # 3) baked-scale pinning: a metric-baked hero locks the uniform scale to 1.0
+    #    even when the set would otherwise coverage-shrink.
+    big = [
+        {"id": "engine", "footprint": [0.9, 0.6, 0.6], "role": "primary_object",
+         "realScaleBaked": True},
+        {"id": "piston", "footprint": [0.5, 0.3, 0.3], "role": "part"},
+    ]
+    baked = solve(room, big, {"anchorPreference": "table", "scaleMode": "dynamic",
+                              "primary": "engine"}).as_dict()
+    assert baked["diagnostics"]["hero_baked"] is True
+    assert baked["diagnostics"]["fit_scale"] < 1.0        # it WOULD have shrunk
+    assert all(p["scale"] == 1.0 for p in baked["placements"])
+    unbaked = solve(room, [dict(big[0], realScaleBaked=False), big[1]],
+                    {"anchorPreference": "table", "scaleMode": "dynamic",
+                     "primary": "engine"}).as_dict()
+    assert unbaked["placements"][0]["scale"] < 1.0
+
+    # 4) real-scale variant unchanged: floor anchor, scale 1.0
+    real = solve(room, big, {"anchorPreference": "floor", "scaleMode": "real",
+                             "primary": "engine"}).as_dict()
+    assert real["anchor"] == "floor" and real["scaleVariant"] == "real"
+    assert all(p["scale"] == 1.0 for p in real["placements"])
+    print("SELFTEST PASS")

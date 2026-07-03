@@ -12,6 +12,12 @@
 //           reads {room, pose?, identification?, concept?} as one JSON blob —
 //           this is how spatail_vision_engine.py invokes the brain live.
 //
+// Either mode: room may carry objects[] (LIVE_BRAIN_SPEC §1.2) — tracked
+// object OBBs the device fused labels onto. They flow into fusion for
+// objects-first binding; matches surface in the output as fused.objectId
+// (+ supportSurfaceId) and, when the concept addresses an identified part,
+// a top-level target: {objectId, part}.
+//
 // Defaults: concept = the newborn foam-padding slice. Pose, when absent and
 // the room has a table, is synthesized standing 1.5 m back looking at the
 // largest table (so file-mode runs work without hand-authoring a pose).
@@ -31,6 +37,27 @@ const DEFAULT_CONCEPT = {
   cornerSizeMeters: 0.08,
   insetMeters: 0.0,
 };
+
+// Part addressability (LIVE_BRAIN_SPEC §1.3/§3): when identity binds to an
+// object, the identification carries parts, and the concept's text talks
+// about one of them, the plan targets {objectId, part} so clients anchor to
+// the part's resolved region instead of the whole object.
+function partTarget(labeled, identification, concept) {
+  if (!labeled || !labeled.objectId) return null;
+  const parts = identification?.parts;
+  if (!Array.isArray(parts) || parts.length === 0) return null;
+  const text = [concept.prompt, concept.title, concept.reason]
+    .filter(Boolean).join(" ").toLowerCase();
+  for (const part of parts) {
+    const partLabel = String(part?.label || "").toLowerCase().trim();
+    if (!partLabel) continue;
+    const escaped = partLabel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    if (new RegExp(`\\b${escaped}\\b`).test(text)) {
+      return { objectId: labeled.objectId, part: part.label };
+    }
+  }
+  return null;
+}
 
 function synthPoseLookingAtLargest(room, kind = "table") {
   const candidates = room.surfaces.filter((s) => s.kind === kind);
@@ -65,8 +92,9 @@ function main() {
   }
 
   const room = toBrainRoom(input.room);
-  if (!room || room.surfaces.length === 0) {
-    console.error("plan_from_room: no usable surfaces in room input");
+  const objects = room?.objects || [];
+  if (!room || (room.surfaces.length === 0 && objects.length === 0)) {
+    console.error("plan_from_room: no usable surfaces or objects in room input");
     process.exit(2);
   }
   const pose =
@@ -80,15 +108,21 @@ function main() {
     identification, room, pose, concept,
     fuse: fuseIdentificationToSurface,
   });
+  const target = partTarget(labeled, identification, concept);
 
   process.stdout.write(JSON.stringify({
     mode,
     summary,
     fused: labeled
-      ? { surfaceId: labeled.surfaceId, kind: labeled.kind,
+      ? { surfaceId: labeled.surfaceId ?? null, kind: labeled.kind,
           label: labeled.label, confidence: labeled.confidence,
-          matchReason: labeled.matchReason }
+          matchReason: labeled.matchReason,
+          ...(labeled.objectId
+            ? { objectId: labeled.objectId,
+                supportSurfaceId: labeled.supportSurfaceId ?? null }
+            : {}) }
       : null,
+    ...(target ? { target } : {}),
     roomMeta: room.meta,
     contract,
   }));

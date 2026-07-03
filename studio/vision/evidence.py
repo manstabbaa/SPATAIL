@@ -131,11 +131,60 @@ def _geometry(obj):
     }
 
 
+def _split_normal_ratio(me):
+    """Share of interior edges (two adjacent faces) whose corner normals disagree
+    across the edge — the unwelded faceted-seam signature a weld+smooth repair
+    removes. None = could not be measured."""
+    try:
+        loops = me.loops
+        try:
+            corner = me.corner_normals            # Blender 4.1+ / 5.x
+
+            def _n(li):
+                return corner[li].vector
+        except AttributeError:                    # legacy loop normals
+            try:
+                me.calc_normals_split()
+            except Exception:
+                pass
+
+            def _n(li):
+                return loops[li].normal
+        edge_polys = {}
+        vert_loop = {}
+        for poly in me.polygons:
+            for li in poly.loop_indices:
+                lp = loops[li]
+                edge_polys.setdefault(lp.edge_index, []).append(poly.index)
+                vert_loop[(poly.index, lp.vertex_index)] = li
+        interior, split = 0, 0
+        cos_eps = 0.99996                          # ~0.5 deg
+        for ei, polys in edge_polys.items():
+            if len(polys) != 2:
+                continue
+            interior += 1
+            pa, pb = polys
+            for v in me.edges[ei].vertices:
+                la = vert_loop.get((pa, v))
+                lb = vert_loop.get((pb, v))
+                if la is None or lb is None:
+                    continue
+                na, nb = _n(la), _n(lb)
+                if na.length > 1e-6 and nb.length > 1e-6 and \
+                        na.normalized().dot(nb.normalized()) < cos_eps:
+                    split += 1
+                    break
+        return round(split / interior, 4) if interior else 0.0
+    except Exception:
+        return None
+
+
 def _health(obj, bbox):
     me = obj.data
     verts = len(me.vertices)
     loose = None                                     # None = not scanned (very heavy mesh)
     nm = None
+    snr = None
     normals_valid = True
     if verts <= _MANIFOLD_VERT_CAP:
         bm = bmesh.new()
@@ -148,6 +197,7 @@ def _health(obj, bbox):
             pass
         finally:
             bm.free()
+        snr = _split_normal_ratio(me)
     if me.polygons:
         n = me.polygons[0].normal
         normals_valid = n.length > 1e-6
@@ -158,6 +208,8 @@ def _health(obj, bbox):
         "loose_geometry": loose,
         "non_manifold": nm,
         "normals_valid": normals_valid,
+        # ->1 = unwelded split normals everywhere (faceted seams if repairs skipped)
+        "split_normal_ratio": snr,
         "flatness": round((min(size) / (max(size) or 1.0)), 4),   # ->0 = a flat/thin object
         "manifold_scanned": verts <= _MANIFOLD_VERT_CAP,
     }
@@ -385,6 +437,7 @@ def _contact_sheet(view_paths, report, out_path, subject):
     b = report["source_bbox_m"]; g = report["geometry"]; h = report["health"]
     loose_disp = "unknown" if h.get("loose_geometry") is None else h["loose_geometry"]
     nm_disp = "unknown" if h.get("non_manifold") is None else h["non_manifold"]
+    snr_disp = "unknown" if h.get("split_normal_ratio") is None else h["split_normal_ratio"]
     draw.text((pad, py), f'EVIDENCE  —  {report["asset_id"]}   "{subject}"',
               fill=(255, 220, 120), font=big)
     lines = [
@@ -392,7 +445,7 @@ def _contact_sheet(view_paths, report, out_path, subject):
         f'tris {g["triangle_count"]}   verts {g["vertex_count"]}   mats {g["material_count"]}'
         f'   textured {g["has_textures"]}   uvs {g["has_uvs"]}',
         f'normals_valid {h["normals_valid"]}   loose {loose_disp}'
-        f'   non_manifold {nm_disp}   flatness {h["flatness"]}',
+        f'   non_manifold {nm_disp}   split_normals {snr_disp}   flatness {h["flatness"]}',
         'axes: +X red  +Y green  +Z blue (up).  Decide TRUE up/front, real scale, class, repair.',
     ]
     for j, ln in enumerate(lines):
@@ -442,7 +495,8 @@ def run(spec):
     geometry = _geometry(obj)
     health = _health(obj, source_bbox)
     log(f"{asset_id}: source bbox {source_bbox['size']} m, {geometry['triangle_count']} tris, "
-        f"normals_valid={health['normals_valid']}")
+        f"normals_valid={health['normals_valid']}, "
+        f"split_normal_ratio={health['split_normal_ratio']}")
 
     frame_scale = _frame(obj, target=2.0)
     mn, mx = _bbox_world(obj)

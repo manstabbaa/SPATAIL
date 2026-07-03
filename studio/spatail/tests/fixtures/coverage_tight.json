@@ -1,0 +1,41 @@
+{
+  "schema": "spatail-placement-parity/1",
+  "name": "coverage_tight",
+  "description": "The coverage parameter (Swift back-port): same trio and room as table_arc_trio but coverage 0.4 shrinks the usable width to 0.48 m, so the whole set scales to 0.48/0.67 = 0.7164 while the arc geometry stays identical.",
+  "room": {
+    "schema": "spatail-room-model/1",
+    "surfaces": [
+      {"cls": "floor", "center_m": [0.0, 0.0, -2.0], "size_m": [4.0, 3.5],
+       "normal": [0.0, 1.0, 0.0], "yaw_rad": 0.0, "height_m": 0.0, "confidence": 1.0},
+      {"cls": "table", "center_m": [0.0, 0.74, -1.2], "size_m": [1.2, 0.7],
+       "normal": [0.0, 1.0, 0.0], "yaw_rad": 0.0, "height_m": 0.74, "confidence": 1.0}
+    ],
+    "obstacles": [
+      {"bbox_min_m": [-1.8, 0.0, -2.8], "bbox_max_m": [-1.0, 0.8, -2.0], "category": "chair"}
+    ],
+    "free_floor_m": [],
+    "user": {"position_m": [0.0, 0.0, 0.0], "forward": [0.0, 0.0, -1.0], "eye_height_m": 1.45},
+    "bounds_m": [4.0, 3.5, 2.6],
+    "source": "fixture"
+  },
+  "assets": [
+    {"id": "sun", "footprint": [0.25, 0.25, 0.25], "role": "primary_object", "realScaleBaked": false},
+    {"id": "earth", "footprint": [0.12, 0.12, 0.12], "role": "comparison_object", "realScaleBaked": false},
+    {"id": "moon", "footprint": [0.06, 0.06, 0.06], "role": "part", "realScaleBaked": false}
+  ],
+  "intent": {"anchorPreference": "table", "scaleMode": "dynamic", "primary": "sun", "coverage": 0.4},
+  "expect": {
+    "anchor": "table",
+    "scaleVariant": "tabletop",
+    "tolerances": {"position_m": 0.005, "yaw_rad": 0.005, "scale": 0.005},
+    "placements": [
+      {"assetId": "sun", "position_m": [0.0, 0.74, -0.7], "yaw_rad": 0.0,
+       "scale": 0.7164, "anchor": "table", "zone": "hero", "fits": true},
+      {"assetId": "earth", "position_m": [0.1336, 0.74, -0.6871], "yaw_rad": 0.1885,
+       "scale": 0.7164, "anchor": "table", "zone": "secondary", "fits": true},
+      {"assetId": "moon", "position_m": [-0.1336, 0.74, -0.6871], "yaw_rad": -0.1885,
+       "scale": 0.7164, "anchor": "table", "zone": "secondary", "fits": true}
+    ],
+    "diagnostics": {"obstacles_on_surface": 0, "coverage": 0.4, "hero_baked": false}
+  }
+}

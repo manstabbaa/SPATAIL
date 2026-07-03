@@ -174,51 +174,83 @@ _LIFESIZE_HINTS = ("chair", "sofa", "table", "tv", "television", "fridge",
                    "monitor", "skeleton", "human body", "mannequin")
 
 
-def categorize(understanding: dict) -> str:
-    """§2 step 2 — object category (engine domain refined by subject keywords)."""
+def _first_hint(text: str, hints) -> str | None:
+    return next((k for k in hints if k in text), None)
+
+
+def categorize(understanding: dict, trace: list | None = None) -> str:
+    """§2 step 2 — object category (engine domain refined by subject keywords).
+    Appends a human-readable line per fired rule to `trace` (spec §2.3)."""
+    t = trace if trace is not None else []
     domain = (understanding.get("domain") or "general_knowledge").lower()
     subject = (understanding.get("subject") or "").lower()
     summary = (understanding.get("summary") or "").lower()
     text = f"{subject} {summary}"
-    if any(k in text for k in _BOARD_HINTS):
+    hint = _first_hint(text, _BOARD_HINTS)
+    if hint:
+        t.append(f"hint '{hint}' -> board")
         return "board"
-    if any(k in text for k in _ROOM_SIM_HINTS):
+    hint = _first_hint(text, _ROOM_SIM_HINTS)
+    if hint:
+        t.append(f"hint '{hint}' -> room_process")
         return "room_process"
-    if domain == "product" or any(k in text for k in _LIFESIZE_HINTS):
+    hint = _first_hint(text, _LIFESIZE_HINTS)
+    if domain == "product" or hint:
+        why = " + ".join((["domain=product"] if domain == "product" else [])
+                         + ([f"hint '{hint}'"] if hint else []))
+        t.append(f"{why} -> lifesize_product")
         return "lifesize_product"
     if domain == "mechanical" or domain == "manufacturing":
+        t.append(f"domain={domain} -> mechanical")
         return "mechanical"
     if domain == "architectural":
+        t.append("domain=architectural -> large_structure")
         return "large_structure"
     if domain == "biological":
+        t.append("domain=biological -> organism_or_part")
         return "organism_or_part"
     if domain == "data_visualization":
+        t.append("domain=data_visualization -> board")
         return "board"
+    t.append(f"domain={domain}, no category hint -> learning_object")
     return "learning_object"
 
 
-def choose_preset(understanding: dict, *, tracked: bool = False) -> str:
+def choose_preset(understanding: dict, *, tracked: bool = False,
+                  trace: list | None = None) -> str:
     """§2 steps 1–3 — intent + category → placement mode (a preset id)."""
+    t = trace if trace is not None else []
     if tracked:
         # The TRACKED stream: a real object is the anchor. Placement mode is the
         # object-anchored overlay regardless of category (spec §3.4).
+        t.append("stream=tracked (real object is the anchor, §3.4) "
+                 "-> object_anchored_repair_guide")
         return "object_anchored_repair_guide"
     intent = (understanding.get("intent") or "explain").lower()
-    cat = categorize(understanding)
+    cat = categorize(understanding, trace=t)
     if cat == "board":
+        t.append("category=board -> wall_explanation_board")
         return "wall_explanation_board"
     if cat == "room_process":
+        t.append("category=room_process -> room_scale_simulation")
         return "room_scale_simulation"
     if cat == "lifesize_product" and intent in ("preview", "compare", "present", "explore"):
+        t.append(f"category=lifesize_product + intent '{intent}' "
+                 "-> true_scale_product_preview")
         return "true_scale_product_preview"
     if cat == "lifesize_product":
         # learning about a product (not judging fit) still reads best at true scale
+        t.append(f"category=lifesize_product (intent '{intent}' still reads best at "
+                 "true scale) -> true_scale_product_preview")
         return "true_scale_product_preview"
     if cat == "mechanical" and intent in ("explain", "learn", "analyze", "assemble",
                                           "demonstrate", "explore"):
+        t.append(f"category=mechanical + intent '{intent}' -> mechanical_exploded_view")
         return "mechanical_exploded_view"
     if cat == "large_structure":
+        t.append("category=large_structure -> tabletop_learning_model (miniature, §3.2)")
         return "tabletop_learning_model"        # §3.2 miniature on the table
+    t.append(f"category={cat} + intent '{intent}' -> tabletop_learning_model")
     return "tabletop_learning_model"
 
 
@@ -234,18 +266,22 @@ def _primary_footprint_m(assets: list[dict] | None) -> float:
         return 0.0
 
 
-def _adjust_scale(contract: dict, footprint_m: float) -> None:
+def _adjust_scale(contract: dict, footprint_m: float, trace: list | None = None) -> None:
     """§2 step 5 / §5 — refine the preset's scale mode with the REAL footprint.
     Mutates contract['scale'] (and notes). Usability first, realism second."""
+    t = trace if trace is not None else []
     scale = contract["scale"]
     mode = scale["mode"]
     if footprint_m <= 0.0:
+        t.append(f"no real footprint -> keep preset scale mode '{mode}'")
         return
     # §5 Enlarged Detail: tiny things become hand-inspectable — and say so.
     if footprint_m < HAND_INSPECTABLE_MIN_M and mode != "true_scale":
         scale["mode"] = "enlarged_detail"
         scale["showScaleReference"] = True
         scale["scaleNote"] = "Enlarged for inspection — not actual size."
+        t.append(f"footprint {footprint_m:.2f}m < HAND_INSPECTABLE_MIN_M "
+                 f"{HAND_INSPECTABLE_MIN_M} -> enlarged_detail")
         return
     # §5 Miniature: too big for the anchor surface → intentional reduction + note.
     anchor = contract["anchor"]["type"]
@@ -256,12 +292,20 @@ def _adjust_scale(contract: dict, footprint_m: float) -> None:
             ratio = max(2, round(footprint_m / 0.6))
             scale["scaleNote"] = (f"Scaled to about 1:{ratio} — too large for the "
                                   f"current room at true scale.")
+            t.append(f"footprint {footprint_m:.1f}m > TOO_LARGE_FOR_ROOM_M "
+                     f"{TOO_LARGE_FOR_ROOM_M} -> miniature 1:{ratio}")
+        else:
+            t.append(f"footprint {footprint_m:.2f}m fits the room -> keep true_scale")
         return
     if anchor == "table" and footprint_m > TOO_LARGE_FOR_TABLE_M:
         scale["mode"] = "miniature"
         scale["showScaleReference"] = True
         ratio = max(2, round(footprint_m / 0.5))
         scale["scaleNote"] = f"Scaled to about 1:{ratio} for tabletop view."
+        t.append(f"footprint {footprint_m:.1f}m > TOO_LARGE_FOR_TABLE_M "
+                 f"{TOO_LARGE_FOR_TABLE_M} -> miniature 1:{ratio}")
+        return
+    t.append(f"footprint {footprint_m:.2f}m within '{mode}' limits -> keep {mode}")
 
 
 def decide_anchoring(*, tracked: bool, reference_object_url: str | None = None,
@@ -288,17 +332,29 @@ def decide_placement(understanding: dict, assets: list[dict] | None = None, *,
                      tracked: bool = False, reference_object_url: str | None = None,
                      tracked_object_id: str | None = None) -> dict:
     """§2 hierarchy, end to end: understanding (+ real footprints, + stream) →
-    the §12 placement contract. Policy only — the device solver does geometry."""
-    preset_id = choose_preset(understanding, tracked=tracked)
+    the §12 placement contract. Policy only — the device solver does geometry.
+    contract['decisionTrace'] records which hint/threshold fired at each step
+    (spec §2.3: placement.designSystem.decisionTrace)."""
+    trace: list = []
+    preset_id = choose_preset(understanding, tracked=tracked, trace=trace)
     import copy
     contract = copy.deepcopy(PRESETS[preset_id])
     contract["intent"] = preset_id
     contract["preset"] = preset_id
     contract["zones"] = ZONES
-    _adjust_scale(contract, _primary_footprint_m(assets))
+    footprint_m = _primary_footprint_m(assets)
+    if assets and footprint_m > 0.0:
+        primary = next((a for a in assets if a.get("role") == "primary_object"), assets[0])
+        src = primary.get("footprintSource")
+        trace.append(f"primary footprint {footprint_m:.2f}m"
+                     + (f" (source={src})" if src else ""))
+    _adjust_scale(contract, footprint_m, trace=trace)
     contract["anchoring"] = decide_anchoring(
         tracked=tracked, reference_object_url=reference_object_url,
         object_id=tracked_object_id)
+    trace.append(f"anchoring.mode={contract['anchoring']['mode']} "
+                 f"(fallback={contract['anchoring']['fallback']})")
+    contract["decisionTrace"] = trace
     return contract
 
 
@@ -347,6 +403,9 @@ if __name__ == "__main__":
         # invariants (spec §10 + §12): every contract has a fallback + comfort + ui
         ok = ok and bool(c["fallback"]) and bool(c["comfort"]) and bool(c["ui"])
         ok = ok and c["anchoring"]["mode"] == ("object" if tracked else "world")
+        # spec §2.3: every contract carries a non-empty human-readable decisionTrace
+        ok = ok and bool(c.get("decisionTrace")) \
+            and all(isinstance(s, str) and s for s in c["decisionTrace"])
         status = "PASS" if ok else "FAIL"
         if not ok:
             failures += 1
@@ -362,6 +421,14 @@ if __name__ == "__main__":
     # tracked contract must pause on tracking loss and fall back to world
     t = decide_placement(CASES[5][0], None, tracked=True)
     assert t["anchoring"]["pauseOnTrackingLoss"] and t["anchoring"]["fallback"] == "world"
+    # decisionTrace must exist and NAME the threshold/hint that fired (spec §2.3)
+    assert any("TOO_LARGE_FOR_TABLE_M" in s for s in bridge["decisionTrace"]), bridge["decisionTrace"]
+    assert any("HAND_INSPECTABLE_MIN_M" in s for s in cell["decisionTrace"]), cell["decisionTrace"]
+    assert any("stream=tracked" in s for s in t["decisionTrace"]), t["decisionTrace"]
+    chair = decide_placement(CASES[0][0], CASES[0][1])
+    assert any("hint 'chair'" in s and "lifesize_product" in s
+               for s in chair["decisionTrace"]), chair["decisionTrace"]
+    assert any(s.startswith("anchoring.mode=") for s in chair["decisionTrace"])
 
     if failures:
         print(f"SELFTEST FAIL ({failures})")

@@ -50,6 +50,15 @@ import generator  # noqa: E402
 import director  # noqa: E402
 import headless_build  # noqa: E402  (per-phone isolated Blender executor)
 
+# Placement traces + schema truth (LIVE_BRAIN_SPEC §2): every /modular decision is
+# persisted for attribution and validated warn-only. Imported defensively — a trace
+# problem must NEVER break /modular or take down the spine.
+try:
+    import trace_store  # noqa: E402
+except Exception as _tr_exc:  # noqa: BLE001
+    trace_store = None
+    print(f"[spine] trace store unavailable: {_tr_exc}", flush=True)
+
 # Representation Engine — opt-in mode="representation". Purely additive: the
 # existing "experience"/"object" modes are untouched. Imported defensively so a
 # fault in the optional subsystem can never take down the always-on spine.
@@ -406,6 +415,8 @@ class Handler(BaseHTTPRequestHandler):
         path = urlsplit(self.path).path
         if path == "/modular":
             return self._modular()
+        if path == "/placement-report":
+            return self._placement_report()
         if path != "/jobs":
             return self._send(404, obj={"error": "not found"})
         try:
@@ -546,6 +557,32 @@ class Handler(BaseHTTPRequestHandler):
                 contract["sceneContract"] = _sc.to_scene_contract(contract)
             except Exception as _sce:  # noqa: BLE001
                 print(f"[modular] sceneContract skip: {_sce}", flush=True)
+            # LIVE_BRAIN_SPEC §2.1/§2.3 — schema truth (warn-only, never blocks) +
+            # the placement trace, persisted BEFORE returning so every contract on
+            # the wire is attributable at /traces/{experienceId}.
+            if trace_store is not None:
+                validation = trace_store.validate_contract(
+                    contract, contract.get("sceneContract"))
+                contract["schemaValidation"] = validation
+                if not validation.get("ok", True):
+                    errs = validation.get("errors") or []
+                    print(f"[modular] schema WARN ({len(errs)}): "
+                          f"{'; '.join(errs[:3])}", flush=True)
+                try:
+                    eid = contract.get("experienceId") or ""
+                    if eid:
+                        contract["traceUrl"] = f"/traces/{eid}"
+                        trace = {"experienceId": eid,
+                                 "createdAt": trace_store.iso_now(),
+                                 "prompt": (contract.get("source") or {}).get("input") or "",
+                                 "contract": contract}
+                        if contract.get("sceneContract"):
+                            trace["sceneContract"] = contract["sceneContract"]
+                        trace["schemaValidation"] = validation
+                        trace["reports"] = []
+                        trace_store.save(trace)
+                except Exception as _te:  # noqa: BLE001
+                    print(f"[modular] trace persist skip: {_te}", flush=True)
             print(f"[modular] {kind} -> {contract.get('title')!r} "
                   f"({contract.get('composer')}, {len(contract.get('beats', []))} beats, "
                   f"{len(contract.get('mechanicsUsed', []))} mechanics)", flush=True)
@@ -554,6 +591,40 @@ class Handler(BaseHTTPRequestHandler):
             import traceback
             traceback.print_exc()
             return self._send(500, obj={"error": "modular build failed", "detail": str(e)[:300]})
+
+    def _placement_report(self):
+        """Client attribution (LIVE_BRAIN_SPEC §2.2): the runtime posts what it
+        actually DID with a contract (solver inputs, plan, final transforms);
+        appended into the experience's trace.reports[] for /traces/view."""
+        if trace_store is None:
+            return self._send(503, obj={"error": "trace store unavailable"})
+        try:
+            length = int(self.headers.get("Content-Length", 0) or 0)
+            report = json.loads(self.rfile.read(length) or b"{}")
+        except (ValueError, json.JSONDecodeError):
+            return self._send(400, obj={"error": "invalid JSON body"})
+        if not isinstance(report, dict):
+            return self._send(400, obj={"error": "body must be a JSON object"})
+        eid = report.get("experienceId")
+        eid = eid.strip() if isinstance(eid, str) else ""
+        client = report.get("client")
+        if not eid:
+            return self._send(400, obj={"error": "missing 'experienceId'"})
+        if not client or not isinstance(client, str):
+            return self._send(400, obj={"error": "missing 'client'"})
+        report.setdefault("receivedAt", time.time())
+        try:
+            trace = trace_store.append_report(eid, report)
+        except Exception as exc:  # noqa: BLE001
+            return self._send(500, obj={"error": "trace append failed",
+                                        "detail": str(exc)[:200]})
+        if trace is None:
+            return self._send(404, obj={"error": "unknown experience",
+                                        "experienceId": eid})
+        n = len(trace.get("reports") or [])
+        print(f"[trace] {eid}: placement report #{n} from {client!r}", flush=True)
+        return self._send(200, obj={"ok": True, "experienceId": eid,
+                                    "reportCount": n})
 
     def do_HEAD(self):
         self.do_GET()
@@ -573,6 +644,55 @@ class Handler(BaseHTTPRequestHandler):
                 "jobs": njobs, "artifacts_dir": str(ARTIFACTS),
             })
         # "/" serves the web viewer (flat asset+explanation preview) further down.
+
+        # ── Placement traces (LIVE_BRAIN_SPEC §2.2): list / file / attribution
+        # page. /traces/view must match before the /traces/{experienceId} prefix. ──
+        if path in ("/traces", "/traces/"):
+            if trace_store is None:
+                return self._send(503, obj={"error": "trace store unavailable"})
+            return self._send(200, obj=trace_store.list_traces())
+
+        if path == "/traces/view":
+            page = Path(__file__).resolve().parent / "traces_view.html"
+            if not page.is_file():
+                return self._send(404, obj={"error": "traces view not installed"})
+            return self._send(200, raw=page.read_bytes(),
+                              ctype="text/html; charset=utf-8")
+
+        if path.startswith("/traces/qa/"):
+            # QA/verify render for a generation job (the attribution page's Asset
+            # column): the job's metadata names a PC-side render under studio/out
+            # (vision verify.png / meshy_normalize *_qa.png) that no artifact route
+            # serves. Resolve it FROM the metadata (server-written, never client
+            # input) and serve it read-only, locked inside studio/out.
+            gid = Path(unquote(path[len("/traces/qa/"):])).name
+            meta_fp = ARTIFACTS / f"{gid}_metadata.json"
+            if not gid or not meta_fp.is_file():
+                return self._send(404, obj={"error": "unknown job", "id": gid})
+            try:
+                meta = json.loads(meta_fp.read_text(encoding="utf-8"))
+            except (ValueError, OSError):
+                return self._send(404, obj={"error": "metadata unreadable", "id": gid})
+            img = str((meta.get("normalizeQA") or {}).get("image") or "")
+            base = (ROOT / "studio" / "out").resolve()
+            fp = Path(img).resolve() if img else None
+            if fp is None or not str(fp).startswith(str(base)) or not fp.is_file():
+                return self._send(404, obj={"error": "qa render not found", "id": gid})
+            ext = fp.suffix.lower()
+            ctype = ("image/png" if ext == ".png"
+                     else "image/jpeg" if ext in (".jpg", ".jpeg")
+                     else "application/octet-stream")
+            return self._send(200, raw=fp.read_bytes(), ctype=ctype)
+
+        if path.startswith("/traces/"):
+            if trace_store is None:
+                return self._send(503, obj={"error": "trace store unavailable"})
+            eid = unquote(path[len("/traces/"):]).strip("/")
+            trace = trace_store.read(eid)
+            if trace is None:
+                return self._send(404, obj={"error": "unknown experience",
+                                            "experienceId": eid})
+            return self._send(200, obj=trace)
 
         if path.startswith("/mechanics/"):
             base = (ROOT / "public" / "mechanics").resolve()

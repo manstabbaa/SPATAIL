@@ -10,6 +10,10 @@
 // space. That labeled primitive is what the placement layer reasons over
 // ("put foam on the corners and edges of that scan").
 //
+// Objects-first (LIVE_BRAIN_SPEC §1.2): when the room carries tracked
+// objects[] and the noun matches one of their device-fused labels, identity
+// binds to that OBJECT (kind "object") before any surface logic runs.
+//
 // Pure geometry + plain data in/out, so it runs identically in the PC brain
 // service today and could be ported to any client later. No deps.
 
@@ -64,9 +68,33 @@ export function surfaceGeometry(surface) {
 // caller spawns a stand-in primitive instead).
 export function fuseIdentificationToSurface({ identification, room, pose, opts = {} }) {
   const surfaces = room?.surfaces || [];
+  const label = identification?.primary || null;
+
+  // Objects-first: a tracked object whose device-fused label matches the noun
+  // owns the identity; surfaces only bind when no object matches.
+  const obj = matchNounToObject(label, room?.objects);
+  if (obj) {
+    const support = obj.supportSurfaceId
+      ? surfaces.find((s) => s.id === obj.supportSurfaceId) || null
+      : null;
+    const vlmConf = identification?.detections?.[0]?.confidence ?? 0.5;
+    return {
+      objectId: obj.id,
+      kind: "object",
+      supportSurfaceId: obj.supportSurfaceId ?? null,
+      surfaceId: obj.supportSurfaceId ?? null,
+      label: obj.label,
+      confidence: obj.confidence || vlmConf,
+      matchReason: `noun matched object ${obj.label} (IoU-fused on device)`,
+      hitPoint: null,
+      geometry: support ? surfaceGeometry(support) : obbTopGeometry(obj.obb),
+      surface: support,
+      object: obj,
+    };
+  }
+
   if (surfaces.length === 0) return null;
 
-  const label = identification?.primary || null;
   const wantKind = labelToSurfaceKind(label);
 
   // 1) Preferred: raycast the camera-forward ray and take the frontmost
@@ -135,6 +163,63 @@ function labelToSurfaceKind(label) {
   if (/\b(ceiling)\b/.test(s)) return "ceiling";
   if (/\b(chair|seat|stool|sofa|couch)\b/.test(s)) return "seat";
   return null;
+}
+
+// ── noun → tracked-object fuzzy match (objects-first binding) ──────────────
+// Colors + materials the VLM prepends to nouns ("blue water bottle") that the
+// device's object labels usually omit — stripped before containment matching.
+const NOISE_ADJECTIVES = new Set([
+  "red", "orange", "yellow", "green", "blue", "purple", "violet", "pink",
+  "black", "white", "gray", "grey", "brown", "beige", "tan", "silver",
+  "gold", "golden", "dark", "light", "pale", "bright", "clear",
+  "transparent", "shiny", "matte",
+  "plastic", "metal", "metallic", "wooden", "wood", "glass", "ceramic",
+  "leather", "steel", "aluminum", "aluminium", "rubber", "foam", "paper",
+  "cardboard", "fabric", "cloth", "stone", "marble", "chrome", "brass",
+  "copper", "stainless",
+]);
+
+function normalizeNoun(text) {
+  if (!text) return "";
+  const words = String(text)
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  const kept = words.filter((w) => !NOISE_ADJECTIVES.has(w));
+  // an all-adjective noun ("glass") still deserves a match attempt
+  return (kept.length ? kept : words).join(" ");
+}
+
+// Case-insensitive containment either way after adjective stripping; exact
+// equality outranks containment, then the device's label confidence breaks
+// ties. Returns the matched object or null.
+export function matchNounToObject(label, objects) {
+  const noun = normalizeNoun(label);
+  if (!noun) return null;
+  let best = null;
+  for (const obj of objects || []) {
+    const objLabel = normalizeNoun(obj?.label);
+    if (!objLabel) continue;
+    if (noun !== objLabel && !noun.includes(objLabel) && !objLabel.includes(noun)) continue;
+    const score = (noun === objLabel ? 2 : 1) + (obj.confidence ?? 0);
+    if (!best || score > best.score) best = { obj, score };
+  }
+  return best ? best.obj : null;
+}
+
+// Placement geometry for an object with no resolvable support surface: the
+// OBB's top face (extents are full sizes; yaw about gravity-aligned +Y).
+function obbTopGeometry(obb) {
+  const c = obb?.center || [0, 0, 0];
+  const e = obb?.extents || [0.2, 0.2, 0.2];
+  const yaw = obb?.yaw || 0;
+  const hx = e[0] / 2, hz = e[2] / 2;
+  const top = c[1] + e[1] / 2;
+  const cos = Math.cos(yaw), sin = Math.sin(yaw);
+  const rot = (x, z) => [c[0] + x * cos + z * sin, top, c[2] - x * sin + z * cos];
+  const polygon = [rot(-hx, -hz), rot(hx, -hz), rot(hx, hz), rot(-hx, hz)];
+  return surfaceGeometry({ polygon, normal: [0, 1, 0], centroid: [c[0], top, c[2]] });
 }
 
 // ── geometry primitives ───────────────────────────────────────────────────

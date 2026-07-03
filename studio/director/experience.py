@@ -110,6 +110,17 @@ def _resolve_assets(plan, manifest, lib) -> list[dict]:
                 a["realSizeMeters"] = list(res.realSizeMeters)
             if getattr(res, "realScaleBaked", False):
                 a["realScaleBaked"] = True
+        # Footprint provenance (Live Brain spec §2.3), so clients + traces can tell a
+        # measured size from a guess: realSizeMeters only ever comes from the
+        # object_size LLM estimate (asset_service.produce baked it into the library);
+        # otherwise library/primitive hits carry catalog dims; anything else is the
+        # default footprint guess.
+        if res is not None and getattr(res, "realSizeMeters", None):
+            a["footprintSource"] = "object_size_llm"
+        elif res is not None and res.source in ("library", "primitive"):
+            a["footprintSource"] = "library"
+        else:
+            a["footprintSource"] = "default_guess"
         # Drop assets that resolve to the SAME model as one already kept — the library
         # returns the whole object for unknown "parts", which would otherwise render as
         # N identical copies (e.g. "a v8 engine" -> 4 engine blocks). Real distinct

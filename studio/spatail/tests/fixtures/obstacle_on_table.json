@@ -1,0 +1,36 @@
+{
+  "schema": "spatail-placement-parity/1",
+  "name": "obstacle_on_table",
+  "description": "Keep-out against obstacles RESTING ON the chosen surface: a plant sitting on the tabletop (bbox_min.y 0.72 >= table 0.74 - 0.05) covers the hero slot, so the placement reports fits=false; the floor chair is filtered out as before.",
+  "room": {
+    "schema": "spatail-room-model/1",
+    "surfaces": [
+      {"cls": "floor", "center_m": [0.0, 0.0, -2.0], "size_m": [4.0, 3.5],
+       "normal": [0.0, 1.0, 0.0], "yaw_rad": 0.0, "height_m": 0.0, "confidence": 1.0},
+      {"cls": "table", "center_m": [0.0, 0.74, -1.2], "size_m": [1.2, 0.7],
+       "normal": [0.0, 1.0, 0.0], "yaw_rad": 0.0, "height_m": 0.74, "confidence": 1.0}
+    ],
+    "obstacles": [
+      {"bbox_min_m": [-1.8, 0.0, -2.8], "bbox_max_m": [-1.0, 0.8, -2.0], "category": "chair"},
+      {"bbox_min_m": [-0.15, 0.72, -0.85], "bbox_max_m": [0.15, 1.0, -0.55], "category": "plant"}
+    ],
+    "free_floor_m": [],
+    "user": {"position_m": [0.0, 0.0, 0.0], "forward": [0.0, 0.0, -1.0], "eye_height_m": 1.45},
+    "bounds_m": [4.0, 3.5, 2.6],
+    "source": "fixture"
+  },
+  "assets": [
+    {"id": "kettle", "footprint": [0.2, 0.2, 0.25], "role": "primary_object", "realScaleBaked": false}
+  ],
+  "intent": {"anchorPreference": "table", "scaleMode": "dynamic", "primary": "kettle", "coverage": 0.8},
+  "expect": {
+    "anchor": "table",
+    "scaleVariant": "tabletop",
+    "tolerances": {"position_m": 0.005, "yaw_rad": 0.005, "scale": 0.005},
+    "placements": [
+      {"assetId": "kettle", "position_m": [0.0, 0.74, -0.7], "yaw_rad": 0.0,
+       "scale": 1.0, "anchor": "table", "zone": "hero", "fits": false}
+    ],
+    "diagnostics": {"obstacles_on_surface": 1, "coverage": 0.8, "hero_baked": false}
+  }
+}

@@ -23,6 +23,8 @@ Knobs:
     SPATAIL_ASSET_PATH=meshy|procedural   default meshy (when both API keys exist)
     SPATAIL_MESHY_ANCHORS=1|0             default 1 (Blender-computed surface anchors)
     SPATAIL_MESHY_DECIMATE=1|0            default 1 (ship the _ar.usdz budget cut)
+    SPATAIL_MESHY_VISION=1|0              force vision QA on/off; unset = auto (ON when
+                                          the slug's review is cached — no Gemini cost)
     SPATAIL_MESHY_POLL_S=540              Meshy task poll timeout (seconds)
     BLENDER_EXE                           headless Blender (defaults to 5.1 path)
 """
@@ -154,17 +156,36 @@ def _run_blender(script: Path, spec: dict, result_path: Path, timeout: int = 120
 VISION_DIR = REPO / "studio" / "vision"
 
 
-def _vision_enabled() -> bool:
-    return os.environ.get("SPATAIL_MESHY_VISION", "0").lower() in ("1", "true", "yes", "on")
+def _vision_review_cache(slug: str) -> Path:
+    # where driver.py "all" writes/reuses the review for _vision_normalize's out tree
+    return OUT / slug / "vision" / slug / "reports" / "visual_review_result.json"
+
+
+def _vision_enabled(slug: str) -> bool:
+    """SPATAIL_MESHY_VISION=0 force-disables, =1 force-enables. Unset: vision QA
+    defaults ON when a real review is already cached for the slug (the driver
+    reuses it — no Gemini round-trip, so no latency cost on the live path) and
+    stays opt-in for fresh subjects."""
+    v = os.environ.get("SPATAIL_MESHY_VISION", "").strip().lower()
+    if v in ("0", "false", "no", "off"):
+        return False
+    if v in ("1", "true", "yes", "on"):
+        return True
+    rp = _vision_review_cache(slug)
+    try:
+        rev = json.loads(rp.read_text(encoding="utf-8")) if rp.exists() else None
+    except Exception:  # noqa: BLE001
+        return False
+    return bool(rev) and rev.get("reviewer", "") not in ("", "none")
 
 
 def _vision_normalize(slug, subject, glb_in, real_size_m, asset_out):
-    """Opt-in (SPATAIL_MESHY_VISION=1): replace the blind uniform-fit normalize with the
-    vision-guided pipeline (studio/vision) — evidence -> Gemini review -> reorient +
-    real-scale + repair + verify render. Returns {glb, usdz, review, applied} or None on
-    any failure (caller then falls back to meshy_normalize, so this never breaks a build).
-    Note: this is a PREP-time path; the default live server path leaves it OFF so no
-    Gemini round-trip is added once a prompt is in flight."""
+    """Gated by _vision_enabled(): replace the blind uniform-fit normalize with the
+    vision-guided pipeline (studio/vision) — evidence -> Gemini review (reused when
+    cached) -> reorient + real-scale + repair + verify render. Returns {glb, usdz,
+    verify_render, apply_report, review, applied} or None on any failure (caller then
+    falls back to meshy_normalize, so this never breaks a build). Fresh subjects stay
+    opt-in (env) so no Gemini round-trip is added once a prompt is in flight."""
     try:
         out_root = Path(asset_out) / "vision"
         cmd = [sys.executable, str(VISION_DIR / "driver.py"), "all",
@@ -193,6 +214,8 @@ def _vision_normalize(slug, subject, glb_in, real_size_m, asset_out):
             return None
         usdz = od / "exports" / "normalized.usdz"
         return {"glb": str(glb), "usdz": str(usdz) if usdz.exists() else "",
+                "verify_render": str(od / "preview" / "verify.png"),
+                "apply_report": str(ap),
                 "review": rev, "applied": applied.get("applied", {})}
     except Exception as exc:  # noqa: BLE001
         print(f"[asset] vision normalize failed ({exc}) — falling back to meshy_normalize")
@@ -326,12 +349,14 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
             glb_in = quad_glb       # the rest of the pipeline works on the clean mesh
 
     # 3) Normalize to real scale (metres/Y-up, library exporters) → LIB_DIR.
-    # Opt-in (SPATAIL_MESHY_VISION=1): the vision-guided path SEES the mesh first —
-    # evidence pack → review → reorient + real-scale + repair — instead of the blind
-    # uniform-fit-to-0.4m that bakes in Meshy's arbitrary pose. Falls back on failure.
+    # Vision QA (auto on cached reviews, env-forced otherwise): the vision-guided path
+    # SEES the mesh first — evidence pack → review → reorient + real-scale + repair —
+    # instead of the blind uniform-fit-to-0.4m that bakes in Meshy's arbitrary pose.
+    # Falls back on failure.
     LIB_DIR.mkdir(parents=True, exist_ok=True)
+    norm_qa = None
     vision = _vision_normalize(slug, subject, glb_in, real_size_m, asset_out) \
-        if _vision_enabled() else None
+        if _vision_enabled(slug) else None
     if vision:
         on_stage("vision-validated normalize (orient + real scale)")
         shutil.copyfile(vision["glb"], LIB_DIR / f"{slug}.glb")
@@ -351,6 +376,7 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
             OUT / f"_{slug}_normalize.json")
         if not norm.get("done"):
             raise RuntimeError(f"normalize failed: {norm.get('failed')}")
+        norm_qa = (norm.get("done") or [{}])[0]
 
     # 3.5) ANCHORS — Blender-computed semantic surface anchors (Phase 1 of the
     # spatial-intelligence plan): render canonical views of the normalized mesh,
@@ -533,7 +559,15 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
         "libraryGlb": lib_glb, "libraryUsdz": lib_usdz,
         "elapsedS": round(time.time() - t0, 1),
     }
+    # QA provenance: ALWAYS reference the normalize QA image + report, whichever
+    # normalize path ran, so every job's metadata points at visual proof.
     if vision:
+        meta["normalizeQA"] = {
+            "pipeline": "vision",
+            "image": vision.get("verify_render", ""),
+            "report": vision.get("applied", {}),
+            "reportFile": vision.get("apply_report", ""),
+        }
         ap = vision.get("applied", {})
         q = (vision.get("review", {}).get("quality") or {})
         meta["vision"] = vision.get("review", {})
@@ -549,6 +583,13 @@ def produce(subject: str, brief: str, job_id: str, artifacts_dir, *,
         if ap.get("final_size_m"):
             meta["realSizeMeters"] = ap["final_size_m"]
             meta["realScaleBaked"] = True
+    else:
+        meta["normalizeQA"] = {
+            "pipeline": "meshy_normalize",
+            "image": (norm_qa or {}).get("qa_render", ""),
+            "report": (norm_qa or {}).get("qa") or {},
+            "reportFile": str(OUT / f"_{slug}_normalize.json"),
+        }
     metadata_name = f"{job_id}_metadata.json"
     (artifacts_dir / metadata_name).write_text(json.dumps(meta, indent=2), encoding="utf-8")
     # the Blender↔composer contract: clips the sequencer plays by name + anchors the

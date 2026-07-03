@@ -284,7 +284,15 @@ async function renderSetting(setting, base) {
   for (const f of settingFields.slice()) f.dispose();
   for (const s of settingElements) s.row?.remove();
   settingElements = [];
-  settingGroup.clear();   // CSS2D labels drop their DOM on 'removed'
+  // Group.clear() only fires 'removed' on DIRECT children — CSS2D labels nested
+  // inside loaded setting elements never hear it and their DOM floats over the
+  // next scene. Purge label DOM explicitly before clearing.
+  settingGroup.traverse((o) => {
+    if (o.isCSS2DObject && o.element && o.element.parentNode) {
+      o.element.parentNode.removeChild(o.element);
+    }
+  });
+  settingGroup.clear();
   const table = scene.getObjectByName('__table');
   if (table) table.visible = !setting;   // the setting IS the context; the synthetic table yields
   hemi.intensity = (setting && setting.ambiance && setting.ambiance.light === 'soft-day') ? 0.85 : 0.6;
@@ -1037,6 +1045,7 @@ async function pollGeneration(jobId, targetElId, opts) {
   const doSwap = o.swap || swapElementGlb;
   const mySession = genSession;
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  let swapTries = 0;
   while (genSession === mySession) {
     let j;
     try { j = await (await fetch(BRAIN_URL + '/jobs/' + jobId)).json(); }
@@ -1047,10 +1056,20 @@ async function pollGeneration(jobId, targetElId, opts) {
     } else if (j.status === 'done') {
       if (j.glb_url) {
         put(`Meshy mesh ready — spawning in`);
-        try { await doSwap(targetElId, j.glb_url.startsWith('http') ? j.glb_url : BRAIN_URL + j.glb_url); } catch (e) { console.error('swap failed', e); }
-        put(`Meshy asset live · ${jobId}`);
-      } else { put(`gen done (no GLB) · ${jobId}`); }
-      return;
+        try {
+          await doSwap(targetElId, j.glb_url.startsWith('http') ? j.glb_url : BRAIN_URL + j.glb_url);
+          put(`Meshy asset live · ${jobId}`);
+          return;
+        } catch (e) {
+          // The artifact can 503 transiently while a Blender stage still holds
+          // it — retry on the poll cadence, and never claim "live" on a failed
+          // swap (the label must stay honest).
+          swapTries += 1;
+          console.error('swap failed', e);
+          if (swapTries >= 5) { put(`Meshy done but swap failed ×${swapTries}: ${e.message || e} · ${jobId}`); return; }
+          put(`Meshy done — swap failed (${e.message || e}), retrying ${swapTries}/5`);
+        }
+      } else { put(`gen done (no GLB) · ${jobId}`); return; }
     } else if (j.status === 'error' || j.status === 'failed') {
       put(`Meshy generation failed: ${j.message || ''}`); return;
     } else {

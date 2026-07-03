@@ -423,6 +423,31 @@ def _llm_setting(understanding: dict, experience_id: str):
 
 
 # ── element asset resolution (library first; NEVER a placeholder path) ───────
+_HEAD_STOPWORDS = {"a", "an", "the", "its", "his", "her", "their", "my", "our",
+                   "of", "and", "or", "for", "with"}
+
+
+def _head_tokens(subject: str) -> set:
+    """Nouns of the subject's HEAD phrase (before 'with'/','): the thing itself,
+    not its qualifiers — 'sedan car with its hood open' -> {sedan, car}."""
+    head = re.split(r"\bwith\b|,", str(subject).lower(), maxsplit=1)[0]
+    return {t for t in re.findall(r"[a-z]+", head)
+            if t not in _HEAD_STOPWORDS and len(t) > 2}
+
+
+def _hit_matches_subject(res, subject: str) -> bool:
+    """A library hit must share a head-phrase token with the subject. Guards the
+    loose semantic scorer: observed live, a bespoke 'car…engine exposed' subject
+    resolved to engine_block_simplified.glb on the token 'engine' — a wrong asset
+    silently suppressing generation of the right one."""
+    heads = _head_tokens(subject)
+    if not heads:
+        return True
+    hay = " ".join(str(getattr(res, k, "") or "")
+                   for k in ("assetId", "asset_id", "name", "glbPath"))
+    return bool(heads & set(re.findall(r"[a-z]+", hay.lower())))
+
+
 def _resolve_element_assets(setting: dict, library, domain) -> None:
     """Fill assetPath for elements the library already has as REAL GLBs
     (source == 'library'). A 'primitive' tier match is NOT a real model — the
@@ -433,7 +458,9 @@ def _resolve_element_assets(setting: dict, library, domain) -> None:
         try:
             res = library.resolve(asset_id=_slug(el["subject"]), subject=el["subject"],
                                   domain=domain, semantic_role="environment")
-            if getattr(res, "source", "") == "library" and getattr(res, "glbPath", ""):
+            if (getattr(res, "source", "") == "library"
+                    and getattr(res, "glbPath", "")
+                    and _hit_matches_subject(res, el["subject"])):
                 el["assetPath"] = res.glbPath
         except Exception:  # noqa: BLE001 — resolution trouble must never kill the setting
             continue

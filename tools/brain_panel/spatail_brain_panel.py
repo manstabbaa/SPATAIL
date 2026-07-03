@@ -87,7 +87,7 @@ class Config:
     model: str = "qwen2.5vl:3b"
     test_dir: str = ""
     use_test_dir: bool = False
-    vlm_timeout: int = 90
+    vlm_timeout: int = 8   # spec §1.4 — a hung VLM must never stall the loop
     extra_args: str = ""
     data: dict = field(default_factory=dict)
 
@@ -259,8 +259,8 @@ def start_engine(cfg: Config) -> str:
     engine = repo / "pipeline" / "server" / "spatail_vision_engine.py"
     if not engine.exists():
         return (f"engine file not found:\n  {engine}\n"
-                f"→ Repo path must be a checkout of branch "
-                f"claude/interesting-goldwasser-35d3c5 (Browse… to fix).")
+                f"→ Repo path must be a SPATAIL checkout with the rebuilt "
+                f"engine (branch claude/nice-wilbur-28fc94 or later; Browse… to fix).")
     if port_open(DEBUG_PORT):
         return "engine already running (port 8799 busy) — use Restart."
 

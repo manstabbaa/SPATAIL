@@ -144,21 +144,26 @@ print("library resolution (hit -> assetPath; miss/primitive -> pending)")
 
 
 class FakeLib:
+    """Subject-aware mock: a 'library' hit answers with a GLB named after the
+    requested asset slug (like the real registry) — the head-noun guard requires
+    the hit to actually be the thing that was asked for."""
+
     def __init__(self, source, glb=""):
         self.source, self.glb = source, glb
         self.calls = []
 
     def resolve(self, **kw):
         self.calls.append(kw)
-        return SimpleNamespace(source=self.source, glbPath=self.glb,
+        glb = self.glb or ("/assets/spatail-library/generated/"
+                           + str(kw.get("asset_id") or "x") + ".glb")
+        return SimpleNamespace(source=self.source, glbPath=glb,
                                usdzPath="", libraryAssetId="x")
 
 
-hit = FakeLib("library", "/assets/spatail-library/generated/sedan_car.glb")
+hit = FakeLib("library")
 s_hit = settings.compose_setting(V8, "exp_lib_hit", library=hit)
 check("library hit fills assetPath",
-      all(e["assetPath"] == "/assets/spatail-library/generated/sedan_car.glb"
-          for e in s_hit["elements"]))
+      all((e["assetPath"] or "").endswith(".glb") for e in s_hit["elements"]))
 check("resolver got subject + environment role",
       hit.calls and hit.calls[0]["semantic_role"] == "environment"
       and "hood" in hit.calls[0]["subject"])
@@ -166,6 +171,16 @@ check("hit leaves generationJobId null (no job needed)",
       all(e["generationJobId"] is None for e in s_hit["elements"]))
 check("no pending elements after a full library hit",
       settings.pending_elements(s_hit) == [])
+
+print("head-noun guard (wrong-asset hits stay pending — observed live: "
+      "car subject -> engine_block_simplified.glb)")
+wrong = FakeLib("library", "/assets/spatail-library/mechanical/engine_block_simplified.glb")
+s_wrong = settings.compose_setting(V8, "exp_lib_wrong", library=wrong)
+car_el = next(e for e in s_wrong["elements"] if "car" in e["subject"])
+check("a hit sharing no head-phrase token with the subject is rejected",
+      car_el["assetPath"] is None)
+check("rejected elements stay pending (generation still gets minted)",
+      car_el in settings.pending_elements(s_wrong))
 
 prim = FakeLib("primitive")
 s_prim = settings.compose_setting(V8, "exp_lib_prim", library=prim)

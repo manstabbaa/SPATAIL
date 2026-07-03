@@ -59,7 +59,13 @@ from typing import Any
 
 try:
     import websockets
-    from websockets.server import WebSocketServerProtocol
+    try:
+        # websockets ≥ 13 renamed the class; the old path emits a
+        # DeprecationWarning at boot. The name is annotation-only here
+        # (from __future__ import annotations), so either resolves fine.
+        from websockets.asyncio.server import ServerConnection as WebSocketServerProtocol
+    except ImportError:  # older websockets
+        from websockets.server import WebSocketServerProtocol
     from aiohttp import web, ClientSession, ClientTimeout
 except ImportError as exc:  # pragma: no cover
     raise SystemExit(
@@ -222,8 +228,13 @@ class VLMAdapter:
                 text = (data["choices"][0]["message"]["content"] or "").strip()
         except Exception as exc:
             latency = int((time.monotonic() - t0) * 1000)
-            log.warning(f"VLM call failed in {latency}ms: {exc}")
-            return IdentifyResult([], None, f"<error: {exc}>", latency, self.model)
+            # asyncio.TimeoutError stringifies to "" — name the failure honestly
+            # (observed at cold start while Ollama loads the model).
+            reason = str(exc).strip() or exc.__class__.__name__
+            if isinstance(exc, asyncio.TimeoutError):
+                reason = f"timeout after {latency}ms (--vlm-timeout {self.timeout_s:g}s)"
+            log.warning(f"VLM call failed in {latency}ms: {reason}")
+            return IdentifyResult([], None, f"<error: {reason}>", latency, self.model)
 
         latency = int((time.monotonic() - t0) * 1000)
         dets, primary, parts = _parse_identify_json(text)

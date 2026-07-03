@@ -51,6 +51,7 @@ cfg = bp.Config.load()
 cfg.repo_root   = r'C:\SPATAIL_MAX'   # pin the panel to the canonical checkout
 cfg.model       = 'qwen2.5vl:3b'      # 3b runs 100% on the 8GB GPU (~0.6s); 7b is CPU-bound
 cfg.vlm_timeout = 8                   # LIVE_BRAIN_SPEC 1.4: VLM timeout is 8 s (matches the panel default since b3a9329)
+cfg.extra_args  = '--vlm-url http://127.0.0.1:8098/v1'  # llama-server with GPU mmproj (see 1b); drop to use ollama :11434
 cfg.use_test_dir = False
 cfg.test_dir    = ''
 cfg.save()
@@ -62,19 +63,45 @@ print('  engine:', bp.start_engine(cfg))
   $brain | & $Py -
 }
 
-# --- 1b. warm the VLM so the first live identification never hits a cold load
-#         (cold load ~13s > the 8s VLM cap -> every phone call times out until
-#         warmed; OLLAMA_KEEP_ALIVE=-1 is setx'd so the model then stays resident)
-if (Test-Port 11434) {
-  try {
-    $cfgPath = Join-Path $env:APPDATA 'SPATAIL\brain_panel_config.json'
-    $model = 'qwen2.5vl:3b'
-    if (Test-Path $cfgPath) { $m = (Get-Content $cfgPath -Raw | ConvertFrom-Json).model; if ($m) { $model = $m } }
-    $warm = @{ model = $model; messages = @(@{ role = 'user'; content = 'hi' }); max_tokens = 2 } | ConvertTo-Json -Depth 4 -Compress
-    Invoke-RestMethod -Uri 'http://127.0.0.1:11434/v1/chat/completions' -Method Post -ContentType 'application/json' -Body $warm -TimeoutSec 180 | Out-Null
-    Write-Host ("[up]   VLM warmed                {0} resident" -f $model)
-  } catch { Write-Host "[warn] VLM warm-up failed: $($_.Exception.Message)" }
+# --- 1b. VLM serving: ollama's bundled llama-server with the projector ON GPU
+#         ollama 0.30.10 CPU-pins the qwen2.5vl vision tower on this 8GB card
+#         ("disabling multimodal projector offload" reason=limited-vram — no env
+#         override exists: ollama/ollama#10889, #13742) -> ~9s per NEW image,
+#         which the 8s VLM cap turns into 100% identification timeouts on live
+#         phone frames. The SAME 3b blob under llama-server with CUDA + GPU
+#         mmproj: 0.3-1.1s per fresh image. The engine points at it via
+#         --vlm-url http://127.0.0.1:8098/v1 (panel extra_args, pinned below).
+$Llama = 'C:\Users\manst\AppData\Local\Programs\Ollama\lib\ollama\llama-server.exe'
+$Blob  = 'C:\Users\manst\.ollama\models\blobs\sha256-e9758e589d443f653821b7be9bb9092c1bf7434522b70ec6e83591b1320fdb4d'  # qwen2.5vl:3b (re-resolve after `ollama pull`: ollama show qwen2.5vl:3b --modelfile)
+if (Test-Port 8098) {
+  Write-Host "[skip] vlm (llama-server)       :8098 already up"
+} elseif ((Test-Path $Llama) -and (Test-Path $Blob)) {
+  # The bare exe is CPU-only: ggml loads its CUDA backend ONLY via
+  # GGML_BACKEND_PATH pointing at the ggml-cuda.dll FILE (not the dir).
+  # Use cuda_v12 (self-contained: ships cudart/cublas); cuda_v13 lacks cudart.
+  # Verified on the RTX 5060 Ti: CPU-only = ~9-14s per fresh image;
+  # CUDA = 0.3-1.1s (the spec's ~1 Hz VLM clock).
+  $llamaDir = Split-Path $Llama
+  $env:GGML_BACKEND_PATH = Join-Path $llamaDir 'cuda_v12\ggml-cuda.dll'
+  $env:PATH = (Join-Path $llamaDir 'cuda_v12') + ';' + $llamaDir + ';' + $env:PATH
+  $log = Join-Path $LogDir 'spatail-vlm.out.log'
+  $err = Join-Path $LogDir 'spatail-vlm.err.log'
+  Start-Process -FilePath $Llama -WindowStyle Hidden -RedirectStandardOutput $log -RedirectStandardError $err -ArgumentList @(
+    '--model', $Blob, '--mmproj', $Blob, '--port', '8098', '--host', '127.0.0.1',
+    '-c', '2048', '-np', '1', '--no-webui', '-ngl', '99',
+    '--chat-template', 'chatml', '--no-jinja', '--flash-attn', 'auto', '-b', '512', '-ub', '512', '--no-mmap')
+  Write-Host "[up]   vlm (llama-server)       :8098 (CUDA, GPU mmproj)"
+} else {
+  Write-Host "[MISS] vlm (llama-server)       binary or 3b blob not found - engine will fall back to ollama"
 }
+
+# --- 1c. warm the VLM so the first live identification never pays the lazy load
+if (-not (Test-Port 8098)) { Start-Sleep -Seconds 3 }
+try {
+  $warm = @{ model = 'qwen2.5vl:3b'; messages = @(@{ role = 'user'; content = 'hi' }); max_tokens = 2 } | ConvertTo-Json -Depth 4 -Compress
+  Invoke-RestMethod -Uri 'http://127.0.0.1:8098/v1/chat/completions' -Method Post -ContentType 'application/json' -Body $warm -TimeoutSec 180 | Out-Null
+  Write-Host "[up]   VLM warmed                qwen2.5vl:3b resident on :8098"
+} catch { Write-Host ('[warn] VLM warm-up failed: ' + $_.Exception.Message) }
 
 # --- 2. SPINE: Blender bridge (:9876) ----------------------------------------
 if (Test-Port 9876) {
@@ -97,7 +124,8 @@ Start-Web 'devlog'          4137 $Py   @('-m','http.server','4137','--directory'
 Start-Sleep -Seconds 3
 Write-Host "`n=== status ==="
 $svc = [ordered]@{
-  'ollama (VLM)'        = 11434
+  'ollama (pulls)'      = 11434
+  'vlm (llama-server)'  = 8098
   'vision engine ws'    = 8798
   'vision engine debug' = 8799
   'blender bridge'      = 9876

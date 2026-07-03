@@ -61,7 +61,7 @@ struct LensView: View {
                     // the pill tucks in just under it. (RootView applies
                     // .ignoresSafeArea() to the whole Lens, so the inset is
                     // re-derived from the window.)
-                    .padding(.top, WindowChrome.topInset + 56)
+                    .padding(.top, WindowChrome.cachedTopInset + 56)
                 Spacer()
             }
         }
@@ -256,6 +256,20 @@ struct ARViewContainer: UIViewRepresentable {
 
 @MainActor
 enum WindowChrome {
+    /// Read by view BODIES — a plain cached value, never a live window walk.
+    /// Reading the key window's safeAreaInsets DURING a body/layout pass is a
+    /// circular attribute dependency (the inset depends on the layout being
+    /// computed) — the prime suspect for the "AttributeGraph: cycle detected"
+    /// that severed the observation graph in every 2026-07-03 field session.
+    static private(set) var cachedTopInset: CGFloat = 59
+
+    /// Called once from AppModel.start() — which runs deferred, AFTER the
+    /// first render transaction, when the window exists and is stable.
+    static func prime() {
+        cachedTopInset = topInset
+    }
+
+    /// Live window read — safe from event handlers/tasks, NEVER from a body.
     static var topInset: CGFloat {
         let window = UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }

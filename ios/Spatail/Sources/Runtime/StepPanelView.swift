@@ -133,7 +133,7 @@ struct StepPanelView: View {
                 .padding(.horizontal, SpatailSpace.s3)
                 .padding(.vertical, SpatailSpace.s2)
                 .spatailGlass(tone: .dark, radius: SpatailRadius.pill)
-                .padding(.top, WindowChrome.topInset + 100)
+                .padding(.top, WindowChrome.cachedTopInset + 100)
             }
             Spacer()
             if engine.genre == "shooter" {

@@ -146,6 +146,7 @@ final class AppModel: ObservableObject {
     func start() {
         guard !started else { return }
         started = true
+        WindowChrome.prime()   // window exists post-transaction; bodies read the cache
         pipeline.start()
         connectBrain()
     }

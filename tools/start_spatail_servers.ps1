@@ -50,7 +50,7 @@ import spatail_brain_panel as bp
 cfg = bp.Config.load()
 cfg.repo_root   = r'C:\SPATAIL_MAX'   # pin the panel to the canonical checkout
 cfg.model       = 'qwen2.5vl:3b'      # 3b runs 100% on the 8GB GPU (~0.6s); 7b is CPU-bound
-cfg.vlm_timeout = 8                   # LIVE_BRAIN_SPEC 1.4: VLM timeout default is 8 s (panel dataclass still says 90)
+cfg.vlm_timeout = 8                   # LIVE_BRAIN_SPEC 1.4: VLM timeout is 8 s (matches the panel default since b3a9329)
 cfg.use_test_dir = False
 cfg.test_dir    = ''
 cfg.save()
@@ -60,6 +60,20 @@ print('  engine:', bp.start_engine(cfg))
 '@
   Write-Host "[..]   brain (ollama + engine)"
   $brain | & $Py -
+}
+
+# --- 1b. warm the VLM so the first live identification never hits a cold load
+#         (cold load ~13s > the 8s VLM cap -> every phone call times out until
+#         warmed; OLLAMA_KEEP_ALIVE=-1 is setx'd so the model then stays resident)
+if (Test-Port 11434) {
+  try {
+    $cfgPath = Join-Path $env:APPDATA 'SPATAIL\brain_panel_config.json'
+    $model = 'qwen2.5vl:3b'
+    if (Test-Path $cfgPath) { $m = (Get-Content $cfgPath -Raw | ConvertFrom-Json).model; if ($m) { $model = $m } }
+    $warm = @{ model = $model; messages = @(@{ role = 'user'; content = 'hi' }); max_tokens = 2 } | ConvertTo-Json -Depth 4 -Compress
+    Invoke-RestMethod -Uri 'http://127.0.0.1:11434/v1/chat/completions' -Method Post -ContentType 'application/json' -Body $warm -TimeoutSec 180 | Out-Null
+    Write-Host ("[up]   VLM warmed                {0} resident" -f $model)
+  } catch { Write-Host "[warn] VLM warm-up failed: $($_.Exception.Message)" }
 }
 
 # --- 2. SPINE: Blender bridge (:9876) ----------------------------------------

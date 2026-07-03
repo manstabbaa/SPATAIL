@@ -1,6 +1,6 @@
 {
   "category": "generated",
-  "count": 135,
+  "count": 136,
   "assets": [
     {
       "assetId": "cube",
@@ -5772,6 +5772,52 @@
         0.45,
         0.12,
         0.98
+      ]
+    },
+    {
+      "assetId": "water_bottle_cap_explanation",
+      "name": "Water Bottle Cap Explanation",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "water",
+        "bottle",
+        "cap",
+        "explanation"
+      ],
+      "path": "/assets/spatail-library/meshy/water_bottle_cap_explanation_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/water_bottle_cap_explanation_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      },
+      "realSizeMeters": [
+        0.03,
+        0.018,
+        0.03
       ]
     }
   ]

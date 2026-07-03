@@ -93,8 +93,10 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
     public var supportSurfaceId: String?
     public var parts: [SpatailPart]
     /// Debounce state — a candidate label must win twice (or conf ≥ 0.8) to be adopted.
-    public var pendingLabel: String?
-    public var pendingCount: Int
+    /// Property defaults required: these are excluded from CodingKeys (not wire fields),
+    /// so Decodable synthesis needs them defaulted when decoding wire payloads.
+    public var pendingLabel: String? = nil
+    public var pendingCount: Int = 0
     public var lastMeasuredAt: TimeInterval
     public var lastIdentifiedAt: TimeInterval?
 

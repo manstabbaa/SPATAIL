@@ -37,7 +37,7 @@ public final class SpatailEngine {
 
         // 2. kit + params (params mirrored into blackboard under "param.*" for rules)
         let kit = KitRegistry.shared.kit(c.kit.isEmpty ? c.genre : c.kit) ?? ExplainerKit()
-        let params = kit.normalize(c.params)
+        let params = kit.normalize(params: c.params)
         ctx.params = params
         for (k, v) in params { world.set("param." + k, v) }
 

@@ -1,0 +1,70 @@
+# Spatail — the 2026 rebuild app (the Lens client for the PC Live Brain).
+# One app target; every module (App/Core/Contracts/DesignSystem/Lens/Net/
+# Perception/Placement/Registry/Room/Runtime/Settings) compiles together from
+# Sources/. Regenerate the project with `xcodegen generate` (xcodegen 2.45.4).
+
+name: Spatail
+options:
+  bundleIdPrefix: dev.spatail
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    GENERATE_INFOPLIST_FILE: YES
+    TARGETED_DEVICE_FAMILY: "1,2"   # iPhone, iPad (ARKit devices)
+    # Tracked stream (iOS 27 object tracking): trackingObjects and
+    # ARObjectAnchor.isTracked only exist in the iOS 27 SDK. Once the Xcode 27
+    # beta is the build toolchain, uncomment the next line (then `xcodegen
+    # generate`); until then tracked requests degrade to the placed stream.
+    # OFF by default.
+    # SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) SPATAIL_IOS27_TRACKING"
+
+packages:
+  # Platform-agnostic engine: pure core + RealityKit adapter. See ios/SpatailEngine.
+  SpatailEngine:
+    path: ../SpatailEngine
+
+targets:
+  Spatail:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    dependencies:
+      - package: SpatailEngine
+        product: SpatailEngineCore
+      - package: SpatailEngine
+        product: SpatailEngineRealityKit
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleDisplayName: Spatail
+        UILaunchScreen: {}
+        NSCameraUsageDescription: "Spatail sees your space to place experiences in it"
+        NSLocalNetworkUsageDescription: "Spatail talks to your PC brain on your network (Tailscale or LAN) to identify objects and generate experiences."
+        # The live loop talks cleartext HTTP/WS to the PC brain over Tailscale
+        # (e.g. http://spatail-pc.<tailnet>.ts.net:8788 or http://100.x.y.z:8788,
+        # ws://…:8798/v1/vision). iOS App Transport Security blocks cleartext by
+        # default, so allow it. Dev setting: NSAllowsArbitraryLoads covers BOTH
+        # the MagicDNS hostname and the raw 100.x tailnet IP (ATS domain
+        # exceptions don't apply to IP literals).
+        # To tighten for production, drop NSAllowsArbitraryLoads and use instead:
+        #   NSExceptionDomains: { ts.net: { NSIncludesSubdomains: true,
+        #                                   NSExceptionAllowsInsecureHTTPLoads: true } }
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+        UIRequiredDeviceCapabilities: [arkit]
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.spatail.app
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES

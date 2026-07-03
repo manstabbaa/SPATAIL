@@ -19,7 +19,7 @@ import simd
 public final class RealityKitBackend: SceneBackend {
 
     /// Attach the engine's content under this root (your AnchorEntity / object anchor).
-    public let root = Entity()
+    public let root = RealityKit.Entity()
 
     /// Host injects how to turn an asset URL string into a *local* file URL to load
     /// (the app already downloads USDZs in ModularRuntime; reuse that). Return nil to
@@ -32,7 +32,7 @@ public final class RealityKitBackend: SceneBackend {
     /// Host pushes engine events back here (it owns the SpatailEngine instance).
     public var emit: ((EngineEvent) -> Void)?
 
-    private var nodes: [EntityID: Entity] = [:]
+    private var nodes: [EntityID: RealityKit.Entity] = [:]
     private var idByEntity: [ObjectIdentifier: EntityID] = [:]
     private var savedMaterials: [EntityID: [Material]] = [:]
 
@@ -62,7 +62,7 @@ public final class RealityKitBackend: SceneBackend {
     // MARK: host → engine
 
     /// Call from your ARView tap handler with the hit RealityKit entity (or nil).
-    public func reportTap(on rkEntity: Entity?) {
+    public func reportTap(on rkEntity: RealityKit.Entity?) {
         emit?(EngineEvent(Ev.tap, entity: rkEntity.flatMap { mappedID(for: $0) }))
     }
 
@@ -83,8 +83,8 @@ public final class RealityKitBackend: SceneBackend {
     // MARK: command impls
 
     private func createVisual(_ id: EntityID, _ spec: VisualSpec) {
-        let entity: Entity
-        if let urlStr = spec.assetUSDZ, let url = resolveAssetURL?(urlStr), let loaded = try? Entity.load(contentsOf: url) {
+        let entity: RealityKit.Entity
+        if let urlStr = spec.assetUSDZ, let url = resolveAssetURL?(urlStr), let loaded = try? RealityKit.Entity.load(contentsOf: url) {
             entity = loaded
             fit(loaded, spec)
         } else {
@@ -109,7 +109,7 @@ public final class RealityKitBackend: SceneBackend {
         return ModelEntity(mesh: mesh, materials: [SimpleMaterial(color: color, isMetallic: false)])
     }
 
-    private func fit(_ e: Entity, _ spec: VisualSpec) {
+    private func fit(_ e: RealityKit.Entity, _ spec: VisualSpec) {
         if spec.realScaleBaked { e.scale = .one; return }
         let b = e.visualBounds(relativeTo: nil)
         let maxDim = max(b.extents.x, max(b.extents.y, b.extents.z))
@@ -129,7 +129,7 @@ public final class RealityKitBackend: SceneBackend {
 
     private func playClip(_ id: EntityID, name: String, loop: Bool) {
         guard let e = nodes[id] else { return }
-        func play(_ x: Entity) {
+        func play(_ x: RealityKit.Entity) {
             for a in x.availableAnimations {
                 x.playAnimation(loop ? a.repeat() : a, transitionDuration: 0.2, startsPaused: false)
             }
@@ -191,12 +191,12 @@ public final class RealityKitBackend: SceneBackend {
 
     // MARK: helpers
 
-    private func register(_ e: Entity, as id: EntityID) {
+    private func register(_ e: RealityKit.Entity, as id: EntityID) {
         nodes[id] = e
         idByEntity[ObjectIdentifier(e)] = id
     }
-    private func mappedID(for e: Entity) -> EntityID? {
-        var cur: Entity? = e
+    private func mappedID(for e: RealityKit.Entity) -> EntityID? {
+        var cur: RealityKit.Entity? = e
         while let c = cur { if let id = idByEntity[ObjectIdentifier(c)] { return id }; cur = c.parent }
         return nil
     }
@@ -206,7 +206,7 @@ public final class RealityKitBackend: SceneBackend {
     private func unpack(_ t: EffectTarget) -> (EntityID, String?) {
         switch t { case .entity(let id): return (id, nil); case .region(let id, let r): return (id, r) }
     }
-    private func rk(_ t: Transform) -> RealityKit.Transform {
+    private func rk(_ t: SpatailEngineCore.Transform) -> RealityKit.Transform {
         RealityKit.Transform(scale: SIMD3(t.scale.x, t.scale.y, t.scale.z),
                              rotation: simd_quatf(ix: t.rotation.x, iy: t.rotation.y, iz: t.rotation.z, r: t.rotation.w),
                              translation: SIMD3(t.position.x, t.position.y, t.position.z))

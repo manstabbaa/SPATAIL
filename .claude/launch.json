@@ -3,13 +3,6 @@
   "configurations": [
     {
       "name": "spatail-webxr",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8765"],
-      "port": 8765,
-      "autoPort": false
-    },
-    {
-      "name": "spatail-webxr-py3",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8765"],
       "port": 8765,
@@ -17,44 +10,26 @@
     },
     {
       "name": "spatail-detector",
-      "runtimeExecutable": "python",
+      "runtimeExecutable": "python3",
       "runtimeArgs": ["webxr/live/detector_server.py", "--port", "8766"],
       "port": 8766,
       "autoPort": false
     },
     {
       "name": "spatail-server",
-      "runtimeExecutable": "python",
+      "runtimeExecutable": "python3",
       "runtimeArgs": ["studio/server/job_server.py", "--port", "8788", "--no-watchdog", "--no-keep-awake"],
       "port": 8788
     },
     {
       "name": "studio-viewer",
-      "runtimeExecutable": "python",
+      "runtimeExecutable": "python3",
       "runtimeArgs": ["studio/viewer/server.py"],
       "port": 5180
     },
     {
-      "name": "engineexplainer",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "5174", "--directory", "engineexplainer"],
-      "port": 5174
-    },
-    {
-      "name": "engineexplainer-intelligence",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["engineexplainer/intelligence/server.py"],
-      "port": 5175
-    },
-    {
-      "name": "spatail-viewer",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["viewer/server.js"],
-      "port": 5173
-    },
-    {
       "name": "devlog",
-      "runtimeExecutable": "python",
+      "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "4137", "--directory", "mydevelopertools"],
       "port": 4137
     }

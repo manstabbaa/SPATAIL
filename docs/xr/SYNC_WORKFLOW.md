@@ -1,5 +1,12 @@
 # Cross-Machine Sync Workflow
 
+> **HISTORICAL (2026-07-03 teardown).** This manual describes the retired
+> SpatailPlayer lineage: `ios/SpatailPlayer`, the `tools/sync/*.mjs` codegen,
+> and the `npm run sync:*` / `git:sync` scripts no longer exist (see
+> `tools/sync/README.md` and `docs/LEGACY.md`). The live client is
+> `ios/Spatail` (see `ios/README.md`); use plain `git` between machines.
+> Kept for the protocol history and the sync *principles*, not the commands.
+
 Two machines, one product. The Windows machine owns the Blender pipeline + server. The Macbook owns the iOS player. The two must stay in lockstep without drift.
 
 This doc is the manual for that.

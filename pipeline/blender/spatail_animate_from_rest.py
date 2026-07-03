@@ -425,4 +425,4 @@ def export_glb(target_path):
 if __name__ == "__main__":
     rest_dir = r"C:/SPATAIL_MAX/assets_processed/rest_poses/v8_engine"
     bake_animations_from_rest(rest_dir)
-    export_glb(r"C:/SPATAIL_MAX/engineexplainer/engine/v8_engine.glb")
+    export_glb(r"C:/SPATAIL_MAX/assets_processed/v8_engine.glb")

@@ -4,10 +4,7 @@
   "private": true,
   "description": "SPATAIL — the XR layer: prompt → a spatial experience in your space (object-tracked overlay or world-placed).",
   "type": "module",
-  "scripts": {
-    "git:sync": "bash tools/sync/git-sync.sh",
-    "git:push": "bash tools/sync/git-push.sh"
-  },
+  "scripts": {},
   "engines": {
     "node": ">=18"
   }

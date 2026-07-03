@@ -594,8 +594,8 @@ def restore_from_rest(rest_dir):
 
 if __name__ == "__main__":
     # Convenience self-run for quick interactive use. Adjust as needed.
+    # (Pass role_overrides_json=<path> to apply hand-tuned role overrides.)
     direct_blender(
         asset_id="current_scene",
         out_dir=r"C:/SPATAIL_MAX/assets_processed/rest_poses/current_scene",
-        role_overrides_json=r"C:/SPATAIL_MAX/engineexplainer/engine/manual_overrides.json",
     )

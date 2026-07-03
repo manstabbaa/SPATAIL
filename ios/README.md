@@ -1,156 +1,74 @@
-# SpatailPlayer (iOS) — Macbook Bootstrap
+# ios/ — the Spatail client
 
-This is the iOS side of SPATAIL. The Windows side is `pipeline/` + `skills/`. Both live in the same repo so the contract files (`docs/xr/`, `pipeline/spatail/experience_contract.js`) stay in sync.
+One app, one package. Everything else that used to live here (SPATAILMobileAR,
+SpatailViewer, SpatailPlayer, `_legacy_Spatail`) was retired in the 2026-07-03
+teardown — see `docs/LEGACY.md`; recover from git history if ever needed.
 
-**Read [`docs/xr/SYNC_WORKFLOW.md`](../docs/xr/SYNC_WORKFLOW.md) first.** It's the manual for keeping the two machines coherent.
+```
+ios/
+├── Spatail/        — the product app (iPhone/iPad, ARKit). xcodegen project.
+│   ├── project.yml — source of truth; Spatail.xcodeproj is generated from it
+│   └── Sources/    — App/Core/Contracts/DesignSystem/Lens/Net/Perception/
+│                     Placement/Registry/Room/Runtime/Settings — one target
+└── SpatailEngine/  — platform-agnostic spatial-experience engine (SwiftPM).
+                      Pure simulation core + RealityKit adapter seam.
+                      Consumed by the app as a local package.
+```
 
----
+**Spatail** is the Lens client for the PC Live Brain: it streams the room up,
+receives contracts (`Sources/Contracts/` — raw-string tolerant decoding), and
+runs experiences via `SpatailEngine`. Two streams: object-TRACKED overlay
+(iOS 27 object tracking, gated behind `SPATAIL_IOS27_TRACKING` in `project.yml`)
+and world-PLACED (design-system placement).
 
-## First 10 minutes on Macbook
+## Read first
 
-Assumes Xcode 15+, Node 18+ (for codegen + sync checks).
+- `CLAUDE.md` (repo root) — build mentality + project orientation.
+- `docs/spatail_2026_mf_pivot.md` — the 2026 Master File (the product spec).
+- `docs/xr/LIVE_BRAIN_SPEC.md` — the PC brain the app talks to.
+- `docs/spatail_engine_spec.md` — the engine's design spec.
+- `ios/SpatailEngine/README.md` — engine architecture + seam.
+
+## Build (Mac)
+
+`xcode-select` points at the CLT on this Mac, so prefix builds with
+`DEVELOPER_DIR`.
 
 ```bash
-# 1. Clone the repo (skip if you already have it)
-git clone <your-remote-url> spatail
-cd spatail
+# App — regenerate the project, then build (no signing needed for a checkbuild)
+cd ios/Spatail
+xcodegen generate
+DEVELOPER_DIR=/Applications/Xcode.app xcodebuild \
+  -project Spatail.xcodeproj -scheme Spatail \
+  -destination 'generic/platform=iOS' -configuration Debug \
+  CODE_SIGNING_ALLOWED=NO build
 
-# 2. Install Node deps used by the sync tooling
-npm install     # nothing required yet, but runs cleanly
-
-# 3. Regenerate Swift from JS — proves the toolchain works on Mac
-npm run sync:swift-vocab
-
-# 4. Confirm the boundary files are coherent
-npm run sync:check
-
-# 5. Open the Swift package in Xcode
-open ios/SpatailPlayer/Package.swift
+# Engine — pure-core tests run host-side, no simulator
+cd ios/SpatailEngine
+DEVELOPER_DIR=/Applications/Xcode.app swift test
 ```
 
-At step 5, Xcode loads the `SpatailPlayer` library target. You can `Cmd-U` to run `VocabSyncTests` (host-side, no simulator needed) — they verify your local checkout's Vocab.swift matches the JS contract.
+## Deploy to a device
 
----
-
-## Wiring an iOS app target around the library
-
-The library doesn't ship an Xcode app project yet — by design, so the project file isn't a git diff trap. Create the app once:
-
-1. **Xcode → File → New → Project → iOS → App.**
-2. **Product Name:** `SpatailPlayer`. **Interface:** SwiftUI. **Language:** Swift. **Storage:** None.
-3. Save it into `ios/SpatailPlayer-App/` (sibling to `ios/SpatailPlayer/`, gitignored — see `.gitignore` step below).
-4. In the new project, **File → Add Package Dependencies → Add Local…** → pick `ios/SpatailPlayer/Package.swift`.
-5. Replace the default `ContentView` with:
-   ```swift
-   import SpatailPlayer
-   struct ContentView: View { var body: some View { PlayerView() } }
-   ```
-6. **Project → Info → Custom iOS Target Properties:**
-   - Add `NSCameraUsageDescription`: "Used to anchor AR explanations to the real world."
-   - Add `NSDocumentTypes` entry for `.spatail` (see `docs/xr/IOS_APP_ARCHITECTURE.md` §"URL / file association").
-7. **Signing & Capabilities:** Team = your Apple ID, bundle id = `com.<you>.spatailplayer`.
-8. **Run** on a real device with ARKit support.
-
-The app target imports from the library. **All your real code goes into the library** (`ios/SpatailPlayer/Sources/...`) so it's git-tracked and reviewable; the app target is a 50-line shell that consumes it.
-
-### `.gitignore` entry
-
-Add at repo root (or extend the existing one):
-
-```gitignore
-# Xcode app target — generated, not tracked
-ios/SpatailPlayer-App/
-
-# Xcode local state
-ios/**/xcuserdata/
-ios/**/*.xcuserstate
-ios/**/.DS_Store
-ios/**/build/
-```
-
----
-
-## What's in the library right now
-
-```
-ios/SpatailPlayer/
-├── Package.swift                       — SwiftPM manifest
-├── Sources/SpatailPlayer/
-│   ├── App/
-│   │   └── SpatailPlayerApp.swift      — @main shell (use from app target or test in isolation)
-│   ├── Bundle/
-│   │   ├── BundleLoader.swift          — unzip + decode .spatail; TODO: ZIPFoundation
-│   │   └── Manifest.swift              — Codable for manifest.json
-│   ├── Contract/
-│   │   ├── ExperienceContract.swift    — Codable for experience.json (v0.5)
-│   │   ├── PrimsIndex.swift            — prim ↔ element-id maps
-│   │   └── Vocab.swift                 — ⚠️ GENERATED. Do not hand-edit.
-│   ├── Session/                        — LIVE MODE
-│   │   ├── SessionEvent.swift          — wire types per REALTIME_PROTOCOL.md
-│   │   └── SessionClient.swift         — actor wrapping URLSessionWebSocketTask
-│   ├── Scene/
-│   │   ├── SceneController.swift       — owns the RealityKit Entity tree
-│   │   └── EntityRegistry.swift        — prim ↔ Entity lookup
-│   ├── Mechanics/
-│   │   └── MechanicRenderer.swift      — protocol; per-mechanic files land here
-│   └── UI/
-│       └── PlayerView.swift            — SwiftUI ARView wrapper
-└── Tests/
-    └── SpatailPlayerTests/
-        └── VocabSyncTests.swift        — fails if codegen drifts
-```
-
-Sized for one developer: ~1.5k lines today, growing to ~5k as mechanics ship.
-
----
-
-## Daily workflow
+Build signed (add your team via Xcode signing or
+`DEVELOPMENT_TEAM=<TEAMID> CODE_SIGN_STYLE=Automatic` on the xcodebuild line,
+with `-destination 'platform=iOS,id=<device-udid>'`), then install + launch
+with devicectl — this is the recipe that is verified working against an
+iOS 27 iPhone:
 
 ```bash
-# Start of session:
-git pull
-npm run sync:check          # verifies my Swift code still matches the contract
-
-# Work in Xcode. Build. Run on device.
-
-# When committing:
-git add -p
-git commit -m "ios: <short description>"
-# If you touched the contract or the protocol, prefix with `protocol:` instead
-# of `ios:` so cross-boundary changes are easy to grep.
-git push
+xcrun devicectl list devices                       # find the device id
+xcrun devicectl device install app \
+  --device <device-udid> <path/to/Spatail.app>     # from DerivedData/Build/Products
+xcrun devicectl device process launch \
+  --device <device-udid> dev.spatail.Spatail
 ```
 
-**If `npm run sync:check` fails after a pull:** someone bumped the contract on Windows. Read the diff in `pipeline/spatail/experience_contract.js`, run `npm run sync:swift-vocab`, commit the new `Vocab.swift`. The failure message tells you exactly which file is out of date.
+## Conventions
 
----
-
-## Roadmap (offline-first, then live)
-
-Listed in `docs/xr/IOS_APP_ARCHITECTURE.md` §"v1 milestones". The next 3 concrete steps:
-
-1. **Wire ZIPFoundation** — replace the `unzipFailed` stub in `BundleLoader.swift`. Add the dep via SwiftPM. ~30 minutes.
-2. **Load `bundles/f1_wheel_buttons.spatail`** (already exported on Windows; sync via git or AirDrop). Open the app, tap "Files," pick it. Should see the wheel float ahead of the camera. ~1 day.
-3. **First mechanic: `annotatedCallouts`.** Create `Mechanics/AnnotatedCalloutsRenderer.swift`, register in `MechanicRegistry.shipped`, draw a `Text` entity above each tagged prim. ~2 days.
-
-After offline mode renders cleanly, switch on the `Session/` module and connect to the dev server.
-
----
-
-## Common gotchas
-
-- **`unzipFailed`** — expected until you add ZIPFoundation. Until then, manually unzip a `.spatail` to a folder and pass the folder URL to `BundleLoader.load(from:)`.
-- **`schemaUnsupported`** — the bundle was exported by a newer Windows-side pipeline than your `Manifest.swift` knows. Pull, run `npm run sync:swift-vocab`, rebuild.
-- **`webSocketTask` immediately fails** — server isn't running on Windows. Start it: `python pipeline/server/spatail_session_server.py`.
-
----
-
-## How "always in sync" actually works
-
-Three mechanisms enforce coherence, listed in order of strength:
-
-1. **Codegen** — `Vocab.swift` is regenerated from JS. Hand edits are caught by reviewers (the file starts with `⚠️ GENERATED`) and by the sync check.
-2. **Schema version tokens** — `0.5.0-spatail` / `0.5.0-spatail-bundle` strings live in three places (JS, Python, Swift). `npm run sync:check` greps for them and fails on mismatch.
-3. **Convention** — protocol-touching PRs are prefixed `protocol:`, must include `[ ] sync:check passed` in the description, and must touch both sides in the same commit.
-
-If you find yourself wanting a fourth mechanism, add it to `tools/sync/` and document it in `docs/xr/SYNC_WORKFLOW.md`.
+- `Spatail.xcodeproj` is generated — edit `project.yml`, then `xcodegen generate`.
+- Commit prefix `ios:` (or `protocol:` when a change touches the wire contract
+  on both the PC and iOS sides in the same commit).
+- Contract vocabularies are decoded as raw Strings on purpose (unknown values
+  must never break decoding); the vocabulary source of truth stays
+  `pipeline/spatail/experience_contract.js` + `docs/xr/`.

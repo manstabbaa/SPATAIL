@@ -320,8 +320,10 @@ def mirror_asset_to_live(glb_path: str, asset_id: str, *,
 
 if __name__ == "__main__":
     import sys
-    glb = sys.argv[1] if len(sys.argv) > 1 else \
-        str(Path(__file__).resolve().parents[2] / "engineexplainer" / "engine" / "gen_kallax.glb")
-    aid = sys.argv[2] if len(sys.argv) > 2 else "gen_kallax"
+    if len(sys.argv) < 2:
+        print("usage: python spatail_live_blender.py <path/to/asset.glb> [asset_id]")
+        sys.exit(2)
+    glb = sys.argv[1]
+    aid = sys.argv[2] if len(sys.argv) > 2 else Path(glb).stem
     print(f"live? {is_live()}")
     print(json.dumps(mirror_asset_to_live(glb, aid), indent=2))

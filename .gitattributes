@@ -50,6 +50,3 @@
 *.pdf     binary
 *.ico     binary
 *.icns    binary
-
-# Generated files — mark so reviewers know not to hand-edit
-ios/SpatailPlayer/Sources/SpatailPlayer/Contract/Vocab.swift linguist-generated=true

@@ -17,8 +17,9 @@ export const SPATAIL_SCHEMA_VERSION = "0.5.0-spatail";
 //
 // Closed vocab. Each name in this list MUST have:
 //   - spec/mechanics/v1/<name>.json   (param + source-shape manifest)
-//   - viewer/mechanics/handlers/<name>.js  (renderer; can be a stub for
-//     the placeholder mechanics, but the file must exist)
+//   - a renderer in the live client (the old viewer/mechanics/handlers/*.js
+//     implementations were removed with viewer/ in the 2026-07-03 teardown;
+//     new renderers land in the WebXR viewer, webxr/)
 //
 // "Shipped" mechanics carry a `qualityBar` reference example in their
 // spec; "placeholder" mechanics route to the closest shipped neighbour

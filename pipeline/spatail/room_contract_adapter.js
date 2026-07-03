@@ -1,8 +1,8 @@
 // room_contract_adapter.js — closes the loop between the DEVICE's real room
 // scan and the fusion brain.
 //
-// iOS persists what it scanned as a RoomContract (SPATAILMobileAR/Models/
-// RoomContract.swift, schema "0.4.0-spatail-room"): surfaces with
+// iOS persists what it scanned as a RoomContract (ios/Spatail/Sources/
+// Contracts/WireMessages.swift, schema "0.4.0-spatail-room"): surfaces with
 // {id, kind, polygon[[x,y,z]], normal, area, height?, source}. The brain
 // (surface_fusion.js / room_aware_planner.js) wants the same surfaces plus a
 // centroid and `heightMeters`. This adapter normalizes either shape into the

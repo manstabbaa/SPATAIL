@@ -15,15 +15,14 @@ The five decisions map directly onto code:
 | Decision                                | Where it's made                                  |
 | --------------------------------------- | ------------------------------------------------ |
 | What should appear                      | `pipeline/spatail/understanding.js` — per-source content typing |
-| Which representation each piece takes   | `pipeline/spatail/representation_selector.js` (public: `src/planner/RepresentationSelector.js`) |
-| Where it lives in the physical room     | `pipeline/spatail/placement_engine.js` (public: `src/planner/SpatialPlacementEngine.js`) |
+| Which representation each piece takes   | `pipeline/spatail/representation_selector.js` |
+| Where it lives in the physical room     | `pipeline/spatail/placement_engine.js` |
 | How large / what scale                  | same module (`scaleMode` per element)            |
-| How users interact                      | `experience_reasoning.js#interactionsFor` (public: `src/planner/ExperienceReasoning.js`) |
+| How users interact                      | `experience_reasoning.js#interactionsFor` |
 | How attention is guided over time       | `experience_reasoning.js#buildAttentionPlan`     |
 
 The runtime JSON schema lives in `schemas/spatialExperienceContract.schema.json`
-and JSDoc typedefs in `src/types/SpatialExperienceContract.js` — both stay in
-lockstep with `pipeline/spatail/experience_contract.js`.
+and stays in lockstep with `pipeline/spatail/experience_contract.js`.
 
 The output is one **`SpatialExperienceContract.json`** per experience. The
 contract is consumed by the web viewer today and (per the existing
@@ -277,8 +276,10 @@ schemas/
 └── spatialExperienceContract.schema.json   # JSON Schema, mirrors the enums
 ```
 
-`src/planner/*` and `src/types/*` are the stable public API. `pipeline/spatail/*`
-is the implementation home; consumers should not import from there directly.
+`pipeline/spatail/*` is the canonical home for the planner and contract code.
+(The old `src/planner/*` + `src/types/*` "public API" wrappers were duplicates
+nothing imported; they were removed in the 2026-07-03 teardown — see
+`docs/LEGACY.md`.)
 
 ## What's still stubbed
 

@@ -28,6 +28,29 @@
  */
 window.SPATAIL_LOG = [
   {
+    "id": "2026-07-03-pc-bringup-rebuild",
+    "date": "2026-07-03",
+    "title": "PC brain live on the rebuild — the setting loop verified end to end",
+    "category": "tooling",
+    "status": "shipped",
+    "area": "PC brain / stack",
+    "summary": "Brought C:\\SPATAIL_MAX up on the one-app/one-engine/one-brain rebuild branch and proved the whole live loop on real hardware — gated replans, Blender-5.1 asset QA, staged garage generation through Meshy, library registration, webxr hot-swap, and 4-column placement attribution.",
+    "details": [
+      "Checked out claude/nice-wilbur-28fc94 on the canonical checkout; all three sanity suites green (settings SELFTEST, parity 5 fixtures, object-binding).",
+      "Autostart swept: only stale pointers lived in tools/start_spatail_servers.ps1 (engineexplainer :5174/:5175, root viewer :5173 — removed); a leftover :5174 static server was killed; the panel's saved 90s VLM timeout pinned to the spec's 8s.",
+      "Vision engine verified live: replan gating held 90s of car/aircraft-wheel label flapping to ONE delta at dwell 2 (15 deltas at SPATAIL_REPLAN_DWELL=1), pose.update never replans, objects-first noun binding over the wire, 16 plan traces under studio/out/traces/vision/.",
+      "Asset QA first run (rubber duck): weld + shade-smooth-by-angle on Blender 5.1 with zero bpy exceptions, QA render + report beside the library export, normalizeQA stamped into job metadata, seam-free result.",
+      "Setting system: use_llm:false returns the deterministic garage (engine_bay on the hood-open sedan) with REAL generationJobIds; both props ran Meshy, the car registered as sedan_car_with_its_hood_open and later /modular runs resolve it straight from the library.",
+      "webxr viewer: honest materializing fields hot-swapped to the generated sedan + tool cart with live per-element Meshy progress; placement report POSTed and the /traces/view page filled all four columns (Brain decisionTrace verbatim).",
+      "Seven findings reported (Gemini-bespoke vs template default, resolver over-match on 'engine', viewer label leak, transient artifact 503, empty parts[] from 3b, panel defaults, misleading swap toast) — fixed same-day on the Mac in b3a9329.",
+      "Phone endpoints ready: mansourspc.tail922496.ts.net — vision ws :8798, job server :8788."
+    ],
+    "why": "The rebuild landed compile-checked from the Mac; the PC is where the brain actually runs, so every new wire behavior had to be proven against real Ollama, Blender, Meshy, and a browser before the phone's live loop goes on air.",
+    "tags": ["windows", "vision-engine", "setting-system", "meshy", "webxr", "traces", "bring-up"],
+    "files": ["tools/start_spatail_servers.ps1", "public/assets/spatail-library/manifests/generated.json", "studio/out/traces/vision/"],
+    "commits": ["db8ee05", "b3a9329"]
+  },
+  {
     "id": "2026-07-02-repo-consolidation",
     "date": "2026-07-02",
     "title": "One branch to rule them all — repo consolidated to main",

@@ -732,14 +732,24 @@ class VisionEngine:
             shopping = (plan.get("summary") or {}).get("shoppingLine", "")
             log.info(f"plan#{self._plan_version} [{trigger}] "
                      f"mode={plan.get('mode')} — {shopping}")
+            # fused (which surface/object identity bound to + matchReason) and
+            # target ({objectId, part} for part-addressed asks) ride along so
+            # the phone's Truth Overlay can show the binding decision and the
+            # runtime can land content on the part. Both optional — the phone
+            # decodes them tolerantly.
+            delta_payload = {
+                "version": self._plan_version,
+                "kind": "full",
+                "experience": plan.get("contract"),
+            }
+            if plan.get("fused") is not None:
+                delta_payload["fused"] = plan["fused"]
+            if plan.get("target") is not None:
+                delta_payload["target"] = plan["target"]
             delta = json.dumps({
                 "type": "experience.delta",
                 "sentAt": datetime.now(timezone.utc).isoformat(),
-                "payload": {
-                    "version": self._plan_version,
-                    "kind": "full",
-                    "experience": plan.get("contract"),
-                },
+                "payload": delta_payload,
             })
             try:
                 await owner.send(delta)

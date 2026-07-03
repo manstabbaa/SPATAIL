@@ -123,7 +123,8 @@ struct AskBar: View {
         if let part = scope.part { target += " — specifically its \(part)" }
         lines.append(target + ".")
 
-        if let object = registry.objects.first(where: { $0.id == scope.objectId }) {
+        // Merge-alias aware: a chip tapped pre-merge still describes the survivor.
+        if let object = registry.object(for: scope.objectId) {
             let e = object.obb.extents
             lines.append(String(format: "Measured size: %.2f × %.2f × %.2f m.", e.x, e.y, e.z))
             var idLine = "objectId: \(object.id.uuidString)"

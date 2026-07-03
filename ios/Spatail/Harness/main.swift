@@ -1,4 +1,4 @@
-// FormFitter off-device harness — Perception v2 verification (spec §0 law 5:
+// FormFitter + Scene Coherence off-device harness (spec §0 law 5:
 // if you can't see what it saw, it doesn't ship).
 //
 // Compiles the EXACT shipped sources (no copies) against macOS:
@@ -10,6 +10,8 @@
 //     Sources/Perception/Form/FormPriors.swift \
 //     Sources/Perception/Form/FormFitter.swift \
 //     Sources/Perception/Form/FormPointCloud.swift \
+//     Sources/Registry/RegistryFusionMath.swift \
+//     Sources/Registry/RegistryCoherence.swift \
 //     Harness/main.swift -o /tmp/form_harness && /tmp/form_harness
 //
 // Lives OUTSIDE Sources/ so xcodegen never compiles it into the app.
@@ -288,6 +290,231 @@ do {
           "'sunglasses' does NOT match 'glass'")
     check(FormPriors.revolutionClass(for: "Coffee Mug") == "mug", "'Coffee Mug' → mug")
     check(FormPriors.prior(for: "wine glass")?.height == 0.14, "'wine glass' prior")
+}
+
+// MARK: 7. Scene Coherence — registry merge pass (the dedupe backstop)
+
+func makeObject(label: String? = nil, confidence: Float = 0,
+                center: SIMD3<Float>, extents: SIMD3<Float>, yaw: Float = 0,
+                parts: [SpatailPart] = [], form: ObjectForm? = nil,
+                seenStreak: Int = 0, established: Bool = false,
+                firstSeenAt: TimeInterval, lastMeasuredAt: TimeInterval)
+    -> SpatailObject {
+    SpatailObject(label: label, confidence: confidence,
+                  obb: OrientedBox(center: center, extents: extents, yaw: yaw),
+                  parts: parts, form: form,
+                  seenStreak: seenStreak, established: established,
+                  firstSeenAt: firstSeenAt, lastMeasuredAt: lastMeasuredAt)
+}
+
+do {
+    print("[7] RegistryCoherence merge pass")
+
+    // (a) two overlapping OBBs → ONE survivor with absorbed parts + label
+    let labeled = makeObject(label: "headphones", confidence: 0.85,
+                             center: SIMD3(0.50, 0.15, -0.80),
+                             extents: SIMD3(0.20, 0.22, 0.18),
+                             parts: [SpatailPart(label: "cap", box: nil,
+                                                 region: nil, confidence: 0.9)],
+                             firstSeenAt: 1, lastMeasuredAt: 10)
+    var dup = makeObject(center: SIMD3(0.55, 0.16, -0.78),          // 5–6 cm offset
+                         extents: SIMD3(0.18, 0.20, 0.16),
+                         firstSeenAt: 6, lastMeasuredAt: 11)
+    dup.parts = [SpatailPart(label: "speaker", box: nil, region: nil, confidence: 0.5)]
+
+    let far = makeObject(label: "mug", confidence: 0.7,
+                         center: SIMD3(1.60, 0.10, -0.80),          // 1.1 m away
+                         extents: SIMD3(0.09, 0.10, 0.09),
+                         firstSeenAt: 2, lastMeasuredAt: 10)
+
+    let (merged, aliases) = RegistryCoherence.mergePass([labeled, dup, far])
+    check(merged.count == 2, "overlapping pair merged, distant object kept",
+          "count \(merged.count)")
+    let survivor = merged.first { $0.id == labeled.id }
+    check(survivor != nil, "labeled object survives (labeled beats unlabeled)")
+    check(aliases[dup.id] == labeled.id, "loser id aliased to survivor")
+    check(survivor?.parts.contains { $0.label == "speaker" } == true,
+          "survivor absorbed the loser's parts")
+    check(survivor?.parts.contains { $0.label == "cap" } == true,
+          "survivor kept its own parts")
+    check(survivor?.lastMeasuredAt == 11, "freshness = max of both")
+    check(merged.contains { $0.id == far.id }, "non-overlapping stays separate")
+
+    // (b) survivor rules: labeled-no-form beats unlabeled-with-measured-form,
+    //     but absorbs the measured form + its OBB (geometry truth travels)
+    let measuredForm = ObjectForm(kind: .revolution,
+                                  dimensions: ["bodyDiameter": 0.063, "height": 0.218],
+                                  source: .measured, arcCoverage: 0.6, residual: 0.002)
+    let formOnly = makeObject(center: SIMD3(0.02, 0.11, 0.02),
+                              extents: SIMD3(0.063, 0.218, 0.063),
+                              form: measuredForm,
+                              firstSeenAt: 3, lastMeasuredAt: 12)
+    let labeledOnly = makeObject(label: "bottle", confidence: 0.9,
+                                 center: SIMD3(0.00, 0.10, 0.00),
+                                 extents: SIMD3(0.07, 0.20, 0.07),
+                                 firstSeenAt: 8, lastMeasuredAt: 12)
+    let (merged2, aliases2) = RegistryCoherence.mergePass([formOnly, labeledOnly])
+    check(merged2.count == 1, "form-only + labeled merge to one")
+    check(merged2.first?.id == labeledOnly.id, "labeled survives over measured form")
+    check(merged2.first?.form?.source == .measured, "measured form absorbed")
+    check(merged2.first?.obb.extents.y == 0.218, "form OBB absorbed with the form")
+    check(aliases2[formOnly.id] == labeledOnly.id, "alias recorded")
+
+    // (c) re-detection after merge matches the survivor (hysteresis: the loser
+    //     is gone; a fresh duplicate OBB merges straight into the survivor)
+    if let s = survivor {
+        let redetect = makeObject(center: SIMD3(0.56, 0.15, -0.77),
+                                  extents: SIMD3(0.19, 0.21, 0.17),
+                                  seenStreak: 1,
+                                  firstSeenAt: 20, lastMeasuredAt: 20)
+        check(RegistryCoherence.shouldMerge(s, redetect),
+              "re-detection near survivor merges into it")
+        let (again, aliases3) = RegistryCoherence.mergePass([s, redetect, far])
+        check(again.count == 2 && aliases3[redetect.id] == s.id,
+              "re-detection collapsed onto the SAME survivor id")
+        // stability: a second pass over the merged set changes nothing
+        let (stable, aliases4) = RegistryCoherence.mergePass(again)
+        check(stable.count == again.count && aliases4.isEmpty,
+              "merge is stable — no oscillation")
+    }
+
+    // (d) center-branch height gate: same XZ spot, different shelf → NO merge
+    let low = makeObject(center: SIMD3(0, 0.10, 0), extents: SIMD3(0.1, 0.1, 0.1),
+                         firstSeenAt: 1, lastMeasuredAt: 5)
+    let high = makeObject(center: SIMD3(0, 0.60, 0), extents: SIMD3(0.1, 0.1, 0.1),
+                          firstSeenAt: 1, lastMeasuredAt: 5)
+    check(!RegistryCoherence.shouldMerge(low, high),
+          "stacked shelf levels never merge")
+
+    // (e) XZ IoU sanity: identical footprints = 1, half-shift ≈ 1/3
+    let boxA = OrientedBox(center: SIMD3(0, 0, 0), extents: SIMD3(0.2, 0.2, 0.2), yaw: 0)
+    let boxB = OrientedBox(center: SIMD3(0.1, 0, 0), extents: SIMD3(0.2, 0.2, 0.2), yaw: 0)
+    check(approx(RegistryCoherence.xzIoU(boxA, boxA), 1.0, tol: 0.001), "IoU self = 1")
+    check(approx(RegistryCoherence.xzIoU(boxA, boxB), 1.0 / 3.0, tol: 0.01),
+          "IoU half-shift = 1/3", "\(RegistryCoherence.xzIoU(boxA, boxB))")
+}
+
+// MARK: 8. Scene Coherence — display-worthiness gating
+
+do {
+    print("[8] display-worthiness (labeled OR form OR 3 consecutive ticks, cap 12)")
+
+    let form = ObjectForm(kind: .box, dimensions: [:], source: .prior,
+                          arcCoverage: 0, residual: 0)
+    var objs: [SpatailObject] = [
+        makeObject(label: "bottle", confidence: 0.9, center: SIMD3(0, 0, 0),
+                   extents: SIMD3(0.1, 0.1, 0.1), firstSeenAt: 1, lastMeasuredAt: 10),
+        makeObject(center: SIMD3(2, 0, 0), extents: SIMD3(0.1, 0.1, 0.1),
+                   form: form, firstSeenAt: 1, lastMeasuredAt: 10),      // form only
+        makeObject(center: SIMD3(4, 0, 0), extents: SIMD3(0.1, 0.1, 0.1),
+                   seenStreak: 3, firstSeenAt: 1, lastMeasuredAt: 10),   // streak 3
+        makeObject(center: SIMD3(6, 0, 0), extents: SIMD3(0.1, 0.1, 0.1),
+                   seenStreak: 1, firstSeenAt: 1, lastMeasuredAt: 10),   // candidate
+        makeObject(center: SIMD3(8, 0, 0), extents: SIMD3(0.1, 0.1, 0.1),
+                   seenStreak: 0, established: true,
+                   firstSeenAt: 1, lastMeasuredAt: 10),                  // hysteresis
+    ]
+    RegistryCoherence.assignDisplayWorthiness(&objs)
+    check(objs[0].displayWorthy, "labeled → worthy")
+    check(objs[1].displayWorthy, "measured/prior form → worthy")
+    check(objs[2].displayWorthy, "3 consecutive ticks → worthy")
+    check(!objs[3].displayWorthy, "1 tick, no label/form → internal")
+    check(objs[4].displayWorthy, "once-established survives a missed tick")
+
+    // Cap at 12: 14 labeled (conf 0.99 … 0.86) + 1 established-unlabeled →
+    // exactly 12 worthy, all labeled, lowest-confidence labeled excluded.
+    var crowd: [SpatailObject] = (0..<14).map { i in
+        makeObject(label: "obj\(i)", confidence: 0.99 - Float(i) * 0.01,
+                   center: SIMD3(Float(i), 0, 0), extents: SIMD3(0.1, 0.1, 0.1),
+                   firstSeenAt: 1, lastMeasuredAt: 10)
+    }
+    crowd.append(makeObject(center: SIMD3(20, 0, 0), extents: SIMD3(0.1, 0.1, 0.1),
+                            established: true, firstSeenAt: 1, lastMeasuredAt: 11))
+    RegistryCoherence.assignDisplayWorthiness(&crowd)
+    let worthy = crowd.filter(\.displayWorthy)
+    check(worthy.count == 12, "cap at 12", "\(worthy.count)")
+    check(worthy.allSatisfy { $0.label != nil }, "labeled outrank unlabeled at the cap")
+    check(!crowd[12].displayWorthy && !crowd[13].displayWorthy,
+          "lowest-confidence labeled excluded")
+}
+
+// MARK: 9. Scene Coherence — named-slice geometry (generic part regions)
+
+do {
+    print("[9] named OBB slices (top/base/left_side/right_side/front/back)")
+    let parent = OrientedBox(center: SIMD3(1.0, 0.5, -2.0),
+                             extents: SIMD3(0.30, 0.25, 0.18), yaw: 0)
+
+    if let top = RegistryCoherence.namedSlice("top", of: parent) {
+        check(approx(top.center.y, 0.6, tol: 0.0001) &&
+              approx(top.extents.y, 0.05, tol: 0.0001) &&
+              approx(top.extents.x, 0.30, tol: 0.0001),
+              "top = upper 20% slice", "\(top)")
+    } else { check(false, "top slice produced") }
+
+    if let base = RegistryCoherence.namedSlice("base", of: parent) {
+        check(approx(base.center.y, 0.4, tol: 0.0001) &&
+              approx(base.extents.y, 0.05, tol: 0.0001),
+              "base = lower 20% slice", "\(base)")
+    } else { check(false, "base slice produced") }
+    check(RegistryCoherence.namedSlice("bottom", of: parent)
+          == RegistryCoherence.namedSlice("base", of: parent),
+          "'bottom' aliases 'base'")
+
+    // Minor horizontal axis is Z (0.18 < 0.30): sides are outer 30% along Z.
+    if let left = RegistryCoherence.namedSlice("left_side", of: parent) {
+        check(approx(left.extents.z, 0.054, tol: 0.0001) &&
+              approx(left.center.z, -2.063, tol: 0.0001) &&
+              approx(left.extents.x, 0.30, tol: 0.0001) &&
+              approx(left.extents.y, 0.25, tol: 0.0001) &&
+              approx(left.center.x, 1.0, tol: 0.0001),
+              "left_side = outer 30% along minor axis (−Z)",
+              "center \(left.center), extents \(left.extents)")
+    } else { check(false, "left_side slice produced") }
+    if let right = RegistryCoherence.namedSlice("right_side", of: parent) {
+        check(approx(right.center.z, -1.937, tol: 0.0001),
+              "right_side mirrors on +Z", "\(right.center)")
+    } else { check(false, "right_side slice produced") }
+
+    // Major axis is X: front faces the camera when one is given.
+    let camera = SIMD3<Float>(3.0, 0.5, -2.0)          // off the +X end
+    if let front = RegistryCoherence.namedSlice("front", of: parent,
+                                                cameraPosition: camera) {
+        check(approx(front.center.x, 1.105, tol: 0.0001) &&
+              approx(front.extents.x, 0.09, tol: 0.0001),
+              "front = outer 30% along major axis, nearer the camera",
+              "\(front.center)")
+    } else { check(false, "front slice produced") }
+    if let back = RegistryCoherence.namedSlice("back", of: parent,
+                                               cameraPosition: camera) {
+        check(approx(back.center.x, 0.895, tol: 0.0001),
+              "back = far end from the camera", "\(back.center)")
+    } else { check(false, "back slice produced") }
+    if let frontAxis = RegistryCoherence.namedSlice("front", of: parent) {
+        check(approx(frontAxis.center.x, 1.105, tol: 0.0001),
+              "no camera → axis-aligned front (+axis)")
+    } else { check(false, "axis-aligned front produced") }
+
+    // Yaw carries through: yaw π/2 maps local +Z onto world +X.
+    let turned = OrientedBox(center: SIMD3(1.0, 0.5, -2.0),
+                             extents: SIMD3(0.30, 0.25, 0.18), yaw: .pi / 2)
+    if let right = RegistryCoherence.namedSlice("right_side", of: turned) {
+        check(approx(right.center.x, 1.063, tol: 0.001) &&
+              approx(right.center.z, -2.0, tol: 0.001),
+              "yawed OBB: side slice follows the local frame", "\(right.center)")
+        check(right.yaw == turned.yaw, "slice oriented to the parent")
+    } else { check(false, "yawed right_side produced") }
+
+    check(RegistryCoherence.namedSlice("spout", of: parent) == nil,
+          "unknown name → nil (solver falls back to the whole OBB)")
+
+    // Byte-compat with PlacementSolver's §3 cap/lid/top fallback: same math.
+    if let cap = RegistryCoherence.namedSlice("cap", of: parent) {
+        let topSlice = max(parent.extents.y * 0.2, Float(0.01))
+        let solverCenterY = parent.center.y + parent.extents.y / 2 - topSlice / 2
+        check(cap.center.y == solverCenterY && cap.extents.y == topSlice,
+              "'cap' slice byte-compatible with the §3 solver fallback")
+    } else { check(false, "cap slice produced") }
 }
 
 print("\n\(passed) passed, \(failed) failed")

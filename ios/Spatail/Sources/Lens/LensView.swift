@@ -164,6 +164,12 @@ private struct ObjectChip: View {
         .spatailGlass(tone: .dark, radius: SpatailRadius.pill)
         .onTapGesture { onAsk(nil) }
         .contextMenu {
+            // Form truth first — the measured/prior line, no overlay needed.
+            if let formLine = chip.formLine {
+                Section {
+                    Label(formLine, systemImage: "ruler")
+                }
+            }
             Button { onAsk(nil) } label: {
                 Label("Ask about the \(chip.label)", systemImage: "sparkles")
             }
@@ -188,6 +194,10 @@ final class LensChipsModel: ObservableObject {
         var confidence: Float
         var point: CGPoint
         var parts: [String]
+        /// Compact Form-Engine truth ("⌀ 63 · h 218 mm · measured · 62% arc" /
+        /// "prior — transparent?") — shown in the chip's context menu so a tap
+        /// reveals the object's form truth without the overlay.
+        var formLine: String?
     }
 
     @Published private(set) var chips: [Chip] = []
@@ -223,7 +233,7 @@ final class LensChipsModel: ObservableObject {
         }
 
         var next: [Chip] = []
-        for object in registry.objects {
+        for object in registry.objects where object.displayWorthy {
             guard let label = object.label else { continue }   // chips = identified only
             let top = object.obb.center
                 + SIMD3<Float>(0, object.obb.extents.y / 2 + 0.03, 0)
@@ -234,7 +244,11 @@ final class LensChipsModel: ObservableObject {
                              label: label,
                              confidence: object.confidence,
                              point: p,
-                             parts: object.parts.map(\.label)))
+                             parts: object.parts.map(\.label),
+                             formLine: object.form.map {
+                                 TruthOverlayModel.formLines($0)
+                                     .joined(separator: " · ")
+                             }))
         }
         if next != chips { chips = next }
     }

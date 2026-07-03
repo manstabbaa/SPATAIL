@@ -217,7 +217,7 @@ final class AppModel: ObservableObject {
                 self.runtime.apply(contract: contract, raw: raw,
                                    arView: self.hub.arView,
                                    surfaces: self.scanner.surfaces,
-                                   objects: self.registry.objects,
+                                   objects: self.registry.objects.filter(\.displayWorthy),
                                    preferredTarget: target)
                 self.askState = .idle
             } catch {
@@ -226,30 +226,45 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// How ask words map onto part geometry: a named OBB slice, or "a side"
+    /// (left_side/right_side — whichever faces the user's camera at solve time).
+    private enum SlicePick { case named(String), side }
+
+    /// The ask-side lexicon: part words → slice choice. VLM/measured parts of the
+    /// same name ALWAYS override the synthetic slice (checked first in targetFor).
+    private static let sliceLexicon: [String: SlicePick] = [
+        "cap": .named("top"), "lid": .named("top"), "top": .named("top"),
+        "base": .named("base"), "bottom": .named("base"), "stand": .named("base"),
+        "speaker": .side, "earcup": .side, "side": .side,
+        "wheel": .side, "handle": .side,
+        "screen": .named("front"), "face": .named("front"), "front": .named("front"),
+        "back": .named("back"), "rear": .named("back"),
+    ]
+
+    /// Part words with no generic slice — they still scope the ask to a part
+    /// (VLM box when known; else the solver's whole-OBB fallback).
+    private static let extraPartWords = ["spout", "neck", "label", "button",
+                                         "hood", "door"]
+
     /// Words that name sub-regions of an object — an ask mentioning one lands
-    /// on that part's region (registry part when resolved, §3 slice fallback).
-    private static let partLexicon = ["cap", "lid", "top", "handle", "spout",
-                                      "neck", "base", "bottom", "label", "button",
-                                      "screen", "wheel", "hood", "door"]
+    /// on that part's region (registry part, named slice, or solver fallback).
+    private static let partLexicon: [String] =
+        Array(sliceLexicon.keys) + extraPartWords
 
     /// The ask's spatial target: the tapped chip's object first, else the
     /// registry object whose label the prompt names. Nil → room placement.
+    /// Only DISPLAY-WORTHY objects can win — the ask must never bind to an
+    /// internal duplicate the user can't see (Scene Coherence, one definition).
     private func resolveAskTarget(prompt: String) -> PlacementTarget? {
         let p = prompt.lowercased()
         let promptTokens = Set(p.split(whereSeparator: { !$0.isLetter }).map(String.init))
         let partWord = Self.partLexicon.first { promptTokens.contains($0) }
 
-        func targetFor(_ obj: SpatailObject, partLabel: String?) -> PlacementTarget {
-            guard let label = partLabel else { return .object(obj) }
-            let part = obj.parts.first { $0.label.lowercased() == label }
-                ?? obj.parts.first { $0.label.lowercased().contains(label) }
-                ?? SpatailPart(label: label, box: nil, region: nil, confidence: 0)
-            return .part(obj, part)
-        }
-
-        // 1. Tapped chip (Lens → AskScope): explicit, always wins.
+        // 1. Tapped chip (Lens → AskScope): explicit, always wins. The id is
+        //    resolved through merge aliases — a chip minted pre-merge still
+        //    lands on the survivor.
         if let scope = AskScope.shared.scope,
-           let obj = registry.objects.first(where: { $0.id == scope.objectId }) {
+           let obj = registry.object(for: scope.objectId) {
             return targetFor(obj, partLabel: scope.part?.lowercased() ?? partWord)
         }
 
@@ -257,7 +272,7 @@ final class AppModel: ObservableObject {
         //    most label tokens found in the prompt wins; ties break on label
         //    confidence. "water bottle cap explanation" → the bottle it can see.
         var best: (obj: SpatailObject, score: Int)?
-        for obj in registry.objects {
+        for obj in registry.objects where obj.displayWorthy {
             guard let label = obj.label?.lowercased() else { continue }
             let labelTokens = label.split(whereSeparator: { !$0.isLetter })
                 .map(String.init).filter { $0.count > 2 }
@@ -270,6 +285,51 @@ final class AppModel: ObservableObject {
             }
         }
         return best.map { targetFor($0.obj, partLabel: partWord) }
+    }
+
+    /// Object + optional part word → the placement target. Resolution order:
+    ///   1. a registry part of the same name (VLM box / Form-Engine measured —
+    ///      these ALWAYS override synthetic slices);
+    ///   2. a synthetic named OBB slice (top/base/front/back, or the side nearer
+    ///      the camera for side-ish words) — synthesized on demand, never stored;
+    ///   3. a bare named part (region nil) → the solver's §3 fallback geometry.
+    private func targetFor(_ obj: SpatailObject, partLabel: String?) -> PlacementTarget {
+        guard let ask = partLabel else { return .object(obj) }
+        if let part = obj.parts.first(where: { $0.label.lowercased() == ask })
+            ?? obj.parts.first(where: { $0.label.lowercased().contains(ask) }) {
+            return .part(obj, part)
+        }
+
+        let cameraPosition: SIMD3<Float>? = hub.currentFrame.map {
+            let c = $0.camera.transform.columns.3
+            return SIMD3(c.x, c.y, c.z)
+        }
+        switch Self.sliceLexicon[ask] {
+        case .named(let slice):
+            let region = RegistryCoherence.namedSlice(slice, of: obj.obb,
+                                                      cameraPosition: cameraPosition)
+            return .part(obj, SpatailPart(label: slice, box: nil, region: region,
+                                          confidence: 0))
+        case .side:
+            // Pick the side nearer the user's camera at solve time; the choice
+            // is noted in the part label, which the placement reason carries.
+            let left = RegistryCoherence.namedSlice("left_side", of: obj.obb)
+            let right = RegistryCoherence.namedSlice("right_side", of: obj.obb)
+            var name = "left_side"
+            var region = left
+            if let cam = cameraPosition, let l = left, let r = right,
+               simd_distance_squared(cam, r.center)
+                   < simd_distance_squared(cam, l.center) {
+                name = "right_side"
+                region = r
+            }
+            let noted = cameraPosition != nil ? "\(name) (nearer camera)" : name
+            return .part(obj, SpatailPart(label: noted, box: nil, region: region,
+                                          confidence: 0))
+        case nil:
+            return .part(obj, SpatailPart(label: ask, box: nil, region: nil,
+                                          confidence: 0))
+        }
     }
 
     func dismissAskFailure() {
@@ -294,7 +354,11 @@ final class AppModel: ObservableObject {
 
     private func sendRoomSnapshot() {
         // Pose rides its own 2 Hz channel via FrameStreamer; nil here is correct.
-        uplink.sendRoom(surfaces: scanner.surfaces, objects: registry.objects,
+        // Only display-worthy objects ride the wire: the brain binds asks against
+        // this list, and internal duplicates/candidates must never win a binding
+        // (the same ONE definition the chips, overlay and local ask-match use).
+        uplink.sendRoom(surfaces: scanner.surfaces,
+                        objects: registry.objects.filter(\.displayWorthy),
                         pose: nil, concept: liveConcept)
     }
 

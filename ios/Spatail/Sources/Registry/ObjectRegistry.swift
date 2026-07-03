@@ -38,8 +38,10 @@ final class ObjectRegistry: ObservableObject {
     private static let matchBaseDistance: Float = 0.15
     /// …or half the mean extent, whichever is larger.
     private static let matchExtentFactor: Float = 0.5
-    /// Seconds unseen before an unpinned object expires.
+    /// Seconds unseen before an unpinned LABELED-or-FORMED object expires.
     private static let expirySeconds: TimeInterval = 10
+    /// Bound on the merged-id alias memory (hysteresis; oldest dropped first).
+    private static let aliasCapacity = 256
     /// Blend weight of the NEW measurement when smoothing an existing object.
     private static let smoothing: Float = 0.35
     /// Identity attach needs at least this IoU (spec §3).
@@ -71,7 +73,50 @@ final class ObjectRegistry: ObservableObject {
 
     /// Objects a placed experience anchors to — exempt from expiry (spec §3:
     /// "unless anchored by a placed experience"). The runtime/AppModel maintains this.
+    /// Ids are resolved through the merge-alias map, so a pin on a merged-away
+    /// duplicate keeps protecting the survivor.
     var pinnedObjectIds: Set<UUID> = []
+
+    /// Fired (on main) whenever the coherence pass merged duplicates —
+    /// loser id → survivor id. The pipeline repoints Form Engine clouds with it.
+    var onObjectsMerged: (([UUID: UUID]) -> Void)?
+
+    // MARK: Merge hysteresis (Scene Coherence pass)
+
+    /// Loser → survivor memory, chain-collapsed, bounded. A re-detection, pin,
+    /// chip tap or ask that still holds a merged-away id resolves to the survivor
+    /// here — merges can never oscillate because the loser no longer exists.
+    private(set) var mergedAliases: [UUID: UUID] = [:]
+    private var aliasOrder: [UUID] = []
+
+    /// The live id an (possibly merged-away) object id resolves to.
+    func canonicalId(_ id: UUID) -> UUID { mergedAliases[id] ?? id }
+
+    /// The live object an id resolves to, through merge aliases.
+    func object(for id: UUID) -> SpatailObject? {
+        let canonical = canonicalId(id)
+        return objects.first { $0.id == canonical }
+    }
+
+    private func recordAliases(_ aliases: [UUID: UUID]) {
+        for (loser, survivor) in aliases {
+            // New survivor may itself alias somewhere from an older merge.
+            let target = mergedAliases[survivor] ?? survivor
+            if mergedAliases[loser] == nil { aliasOrder.append(loser) }
+            mergedAliases[loser] = target
+            // Re-target older entries that pointed at the (now merged) loser.
+            for (k, v) in mergedAliases where v == loser { mergedAliases[k] = target }
+        }
+        while aliasOrder.count > Self.aliasCapacity {
+            let oldest = aliasOrder.removeFirst()
+            mergedAliases.removeValue(forKey: oldest)
+        }
+    }
+
+    /// pinnedObjectIds with every id resolved through the alias map.
+    private func effectivePinnedIds() -> Set<UUID> {
+        Set(pinnedObjectIds.map(canonicalId))
+    }
 
     // MARK: Anchors
 
@@ -88,7 +133,9 @@ final class ObjectRegistry: ObservableObject {
 
     /// The world anchor carrying an object (at its OBB center, rotated by its yaw).
     /// Placed experiences parent to this so geometry rides ARKit's 60 Hz corrections.
-    func arAnchor(for id: UUID) -> ARAnchor? { anchors[id] }
+    /// Resolves through merge aliases — an anchor request for a merged-away
+    /// duplicate returns the survivor's anchor.
+    func arAnchor(for id: UUID) -> ARAnchor? { anchors[canonicalId(id)] }
 
     // MARK: - Measurement ingest (1–2 Hz)
 
@@ -153,35 +200,77 @@ final class ObjectRegistry: ObservableObject {
                 usedObjects.insert(best.objectIdx)
                 var obj = updated[best.objectIdx]
                 obj.lastMeasuredAt = now       // seen — OBB stays prior-seated
+                obj.seenStreak += 1
+                if obj.seenStreak >= RegistryCoherence.establishTicks {
+                    obj.established = true
+                }
                 updated[best.objectIdx] = obj
                 matches[r.detection.id] = obj.id
             }
         }
 
-        // Unmatched measurements mint new objects.
+        // Consecutive-tick discipline: a pre-existing object NOT matched this
+        // ingest loses its streak (established objects keep their standing).
+        for oi in updated.indices where !usedObjects.contains(oi) {
+            updated[oi].seenStreak = 0
+        }
+
+        // Unmatched measurements mint new objects (streak 1, birth-stamped).
         for (di, r) in resolved.enumerated() where !usedDetections.contains(di) {
             let minted = SpatailObject(obb: r.obb,
                                        supportSurfaceId: r.supportSurfaceId,
+                                       seenStreak: 1,
+                                       firstSeenAt: now,
                                        lastMeasuredAt: now)
             updated.append(minted)
             matches[r.detection.id] = minted.id
         }
 
-        // Expiry — ~10 s unseen, unless pinned by a placed experience.
+        // Scene Coherence merge pass — the backstop that guarantees ONE object
+        // per physical thing (duplicate minting on garbage depth is already
+        // reduced by the rescue match above; this closes the rest).
+        matches = runMergePass(on: &updated, matches: matches)
+
+        // Expiry — labeled/formed objects keep the spec-§3 ~10 s; unlabeled
+        // no-form candidates go in 5 s; pinned (through aliases) are exempt.
+        let pinned = effectivePinnedIds()
         var expired: [UUID] = []
         updated.removeAll { obj in
-            let stale = now - obj.lastMeasuredAt > Self.expirySeconds
-            let drop = stale && !pinnedObjectIds.contains(obj.id)
+            let limit = (obj.label == nil && obj.form == nil)
+                ? RegistryCoherence.unlabeledExpirySeconds : Self.expirySeconds
+            let stale = now - obj.lastMeasuredAt > limit
+            let drop = stale && !pinned.contains(obj.id)
             if drop { expired.append(obj.id) }
             return drop
         }
         for id in expired { removeAnchor(for: id) }
+
+        // ONE shared display-worthiness definition (chips + overlay + asks).
+        RegistryCoherence.assignDisplayWorthiness(&updated)
 
         // Anchor sync: create/update a world anchor per object at its OBB center.
         for obj in updated { syncAnchor(for: obj) }
 
         objects = updated   // single publish
         return matches
+    }
+
+    /// Run the coherence merge over `updated`; record aliases, drop loser anchors,
+    /// repoint this pass's detection→object matches and notify the Form Engine so
+    /// fused clouds follow the survivor. Returns the repointed matches.
+    private func runMergePass(on updated: inout [SpatailObject],
+                              matches: [UUID: UUID]) -> [UUID: UUID] {
+        let (mergedObjects, aliases) = RegistryCoherence.mergePass(updated)
+        guard !aliases.isEmpty else { return matches }
+        updated = mergedObjects
+        recordAliases(aliases)
+        for loser in aliases.keys { removeAnchor(for: loser) }
+        var repointed = matches
+        for (detectionId, objectId) in matches {
+            if let survivor = aliases[objectId] { repointed[detectionId] = survivor }
+        }
+        onObjectsMerged?(aliases)
+        return repointed
     }
 
     /// One matched measurement → object update, honoring the fitted form:
@@ -220,6 +309,8 @@ final class ObjectRegistry: ObservableObject {
         // measurement's taps missed the surface entirely.
         if let support = r.supportSurfaceId { obj.supportSurfaceId = support }
         obj.lastMeasuredAt = now
+        obj.seenStreak += 1
+        if obj.seenStreak >= RegistryCoherence.establishTicks { obj.established = true }
     }
 
     // MARK: - Form ingest (Form Engine → registry, immutable results on main)
@@ -234,7 +325,11 @@ final class ObjectRegistry: ObservableObject {
         var changed = false
 
         for result in results {
-            guard let idx = updated.firstIndex(where: { $0.id == result.objectId })
+            // Merge-alias aware: a pass in flight during a coherence merge can
+            // deliver a fit for a merged-away loser — it lands on the survivor
+            // (whose cloud the Form Engine already inherited), not the floor.
+            let targetId = canonicalId(result.objectId)
+            guard let idx = updated.firstIndex(where: { $0.id == targetId })
             else { continue }
             var obj = updated[idx]
 
@@ -265,11 +360,18 @@ final class ObjectRegistry: ObservableObject {
             }
 
             updated[idx] = obj
-            syncAnchor(for: obj)
             changed = true
         }
 
-        if changed { objects = updated }   // single publish
+        guard changed else { return }
+
+        // A fitted/prior-seated OBB can land on top of a duplicate the center
+        // gate missed — the coherence pass also runs after applyForms.
+        _ = runMergePass(on: &updated, matches: [:])
+        RegistryCoherence.assignDisplayWorthiness(&updated)
+        for obj in updated { syncAnchor(for: obj) }
+
+        objects = updated   // single publish
     }
 
     /// Keep part identity stable across refits (no id churn for SwiftUI/renderer).
@@ -384,6 +486,9 @@ final class ObjectRegistry: ObservableObject {
             parent.parts = newParts
             updated[pi] = parent
         }
+
+        // Label adoption flips display eligibility — reassign before publishing.
+        RegistryCoherence.assignDisplayWorthiness(&updated)
 
         objects = updated   // single publish
     }

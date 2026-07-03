@@ -67,6 +67,9 @@ final class TruthOverlayRenderer {
     private var lastObjects: [SpatailObject] = []
     private var boundSurfaceId: String?
     private var boundObjectId: UUID?
+    /// Objects the current ask/experience anchors to — accent treatment
+    /// (thicker wireframe, bound color) like the delta binding.
+    private var pinnedObjectIds: Set<UUID> = []
 
     // MARK: Lifecycle
 
@@ -147,13 +150,15 @@ final class TruthOverlayRenderer {
 
     // MARK: Objects (OBB wireframes + part regions)
 
-    func update(objects: [SpatailObject]) {
+    func update(objects: [SpatailObject], pinned: Set<UUID>? = nil) {
+        if let pinned { pinnedObjectIds = pinned }
         lastObjects = objects
         var seen = Set<UUID>()
 
         for object in objects {
             seen.insert(object.id)
             let bound = object.id == boundObjectId
+                || pinnedObjectIds.contains(object.id)
             let sig = Self.signature(for: object, bound: bound)
             let node: Node
             if let existing = objectNodes[object.id] {
@@ -183,10 +188,16 @@ final class TruthOverlayRenderer {
     private func rebuildObject(_ container: Entity, _ object: SpatailObject, bound: Bool) {
         container.children.removeAll()
 
+        // Visual hierarchy: bound/pinned = accent + thickest; labeled = bright;
+        // unlabeled-but-displayed = dimmer AND thinner (still honest, less loud).
+        let labeled = object.label != nil
         let color: Color = bound ? TruthPalette.bound
-            : (object.label != nil ? TruthPalette.objectLabeled : TruthPalette.objectUnlabeled)
-        let material = UnlitMaterial(color: UIColor(color))
-        let thickness: Float = bound ? 0.007 : 0.0035
+            : (labeled ? TruthPalette.objectLabeled : TruthPalette.objectUnlabeled)
+        let uiColor = bound || labeled
+            ? UIColor(color)
+            : UIColor(color).withAlphaComponent(0.55)
+        let material = UnlitMaterial(color: uiColor)
+        let thickness: Float = bound ? 0.007 : (labeled ? 0.0035 : 0.0025)
 
         for edge in Self.boxEdges(extents: object.obb.extents,
                                   center: .zero,

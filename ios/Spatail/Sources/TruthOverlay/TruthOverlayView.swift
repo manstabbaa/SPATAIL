@@ -94,6 +94,12 @@ struct TruthOverlayView: View {
                         .foregroundStyle(SpatailColor.paper)
                 }
             }
+            // Curation honesty: hidden fragments are counted, never denied.
+            if model.hiddenSurfaceCount > 0 {
+                Text("+\(model.hiddenSurfaceCount) minor surfaces hidden")
+                    .spatailType(.micro)
+                    .foregroundStyle(SpatailColor.paper.opacity(0.65))
+            }
         }
         .padding(.horizontal, SpatailSpace.s3)
         .padding(.vertical, SpatailSpace.s1 + 2)
@@ -227,6 +233,12 @@ final class TruthOverlayModel: ObservableObject {
     @Published private(set) var vlmBoxes: [VLMBox] = []
     @Published private(set) var binding: BindingInfo?
     @Published private(set) var legendKinds: [SurfaceKind] = []
+    /// Honest count of surfaces the curation filter kept off-screen.
+    @Published private(set) var hiddenSurfaceCount = 0
+
+    /// The curated surface list the renderer AND the label tick both draw —
+    /// one filter, applied once per scanner publish.
+    private var shownSurfaces: [RoomSurface] = []
 
     private let renderer = TruthOverlayRenderer()
     private var cancellables: Set<AnyCancellable> = []
@@ -257,24 +269,32 @@ final class TruthOverlayModel: ObservableObject {
         print("[Overlay] attach — scanner \(scanner.tag), " +
               "\(scanner.surfaces.count) surfaces at attach")
         renderer.attach(to: hub.arView)
-        renderer.update(surfaces: scanner.surfaces)
-        renderer.update(objects: registry.objects)
+        applySurfaces(scanner.surfaces)
+        renderer.update(objects: registry.objects.filter(\.displayWorthy),
+                        pinned: Set(registry.pinnedObjectIds.map(registry.canonicalId)))
 
         scanner.$surfaces
             .throttle(for: .milliseconds(300), scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] surfaces in
                 guard let self else { return }
                 print("[Overlay] renderer gets \(surfaces.count) surfaces")
-                self.renderer.update(surfaces: surfaces)
-                let kinds = Set(surfaces.map(\.kind))
-                self.legendKinds = SurfaceKind.allCases.filter(kinds.contains)
+                self.applySurfaces(surfaces)
             }
             .store(in: &cancellables)
 
         registry.$objects
             .throttle(for: .milliseconds(250), scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] objects in
-                self?.renderer.update(objects: objects)
+                guard let self else { return }
+                // The thoughtful scene: only display-worthy objects draw; the
+                // ask/experience-bound (pinned) ones get the accent treatment.
+                // Pins resolve through merge aliases so the survivor keeps the
+                // accent (same treatment as the 10 Hz label tick).
+                let pinned = self.registry.map {
+                    Set($0.pinnedObjectIds.map($0.canonicalId))
+                } ?? []
+                self.renderer.update(objects: objects.filter(\.displayWorthy),
+                                     pinned: pinned)
             }
             .store(in: &cancellables)
 
@@ -307,6 +327,32 @@ final class TruthOverlayModel: ObservableObject {
         objectLabels = []
         vlmBoxes = []
         attached = false
+    }
+
+    // MARK: Surface curation (the thoughtful scene, not perception exhaust)
+
+    /// Floor/table/seat always draw; wall/door/window/ceiling (and unknown) only
+    /// at ≥ 0.8 m²; fragments under 0.15 m² never draw. One filter for the 3D
+    /// renderer AND the 2D labels; the legend reports what it hid.
+    static let alwaysDrawnKinds: Set<SurfaceKind> = [.floor, .table, .seat]
+    static let minSurfaceArea: Float = 0.15
+    static let minorSurfaceArea: Float = 0.8
+
+    static func curatedSurfaces(_ surfaces: [RoomSurface]) -> [RoomSurface] {
+        surfaces.filter { surface in
+            surface.areaM2 >= minSurfaceArea
+                && (alwaysDrawnKinds.contains(surface.kind)
+                    || surface.areaM2 >= minorSurfaceArea)
+        }
+    }
+
+    private func applySurfaces(_ surfaces: [RoomSurface]) {
+        let shown = Self.curatedSurfaces(surfaces)
+        shownSurfaces = shown
+        hiddenSurfaceCount = surfaces.count - shown.count
+        renderer.update(surfaces: shown)
+        let kinds = Set(shown.map(\.kind))
+        legendKinds = SurfaceKind.allCases.filter(kinds.contains)
     }
 
     // MARK: Binding (experience.delta → highlight + card)
@@ -344,14 +390,14 @@ final class TruthOverlayModel: ObservableObject {
     // MARK: 10 Hz label + box projection
 
     private func tick(_ frame: ARFrame) {
-        guard let hub, let scanner, let registry else { return }
+        guard let hub, scanner != nil, let registry else { return }
         let arView = hub.arView
         let bounds = arView.bounds
         guard bounds.width > 1, bounds.height > 1 else { return }
 
-        // (a) surface labels at the boundary centroid
+        // (a) surface labels at the boundary centroid — CURATED list only
         var sLabels: [ProjectedLabel] = []
-        for surface in scanner.surfaces {
+        for surface in shownSurfaces {
             guard !surface.boundary.isEmpty else { continue }
             var centroid = surface.boundary.reduce(SIMD3<Float>(0, 0, 0), +)
             centroid /= Float(surface.boundary.count)
@@ -374,12 +420,15 @@ final class TruthOverlayModel: ObservableObject {
         // lastIdentifiedAt lives on the ARKit uptime clock (frame timestamps),
         // so "now" must too — the frame in hand carries it.
         let now = frame.timestamp
+        // The ask/experience binding: the delta's fused object OR any pinned
+        // object (a placed ask pins its target) gets the accent treatment.
+        let pinnedIds = Set(registry.pinnedObjectIds.map(registry.canonicalId))
         var oLabels: [ProjectedLabel] = []
-        for object in registry.objects {
+        for object in registry.objects where object.displayWorthy {
             guard let p = arView.project(object.obb.center),
                   p.x > -40, p.x < bounds.width + 40,
                   p.y > -40, p.y < bounds.height + 40 else { continue }
-            let accent = object.id == boundObjectId
+            let accent = object.id == boundObjectId || pinnedIds.contains(object.id)
             var text = "\(object.label ?? "unlabeled") · \(String(format: "%.2f", object.confidence))"
             if let age = object.identificationAge(now: now), age >= 0, age < 3600 {
                 text += String(format: " · %.1fs", age)

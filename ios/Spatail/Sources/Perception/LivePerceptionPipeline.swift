@@ -97,6 +97,12 @@ final class LivePerceptionPipeline: ObservableObject {
         self.service = initial.makeService()
         debug.noteSource(service.sourceName)
 
+        // Coherence merges repoint the Form Engine's fused clouds (clouds are
+        // keyed by object id — the survivor inherits the loser's accumulation).
+        registry.onObjectsMerged = { [weak self] aliases in
+            self?.formEngine.repointClouds(aliases)
+        }
+
         // Form Engine results land on MAIN as immutable values → registry + debug.
         formEngine.onResults = { [weak self] publication in
             guard let self else { return }

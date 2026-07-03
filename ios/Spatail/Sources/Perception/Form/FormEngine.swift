@@ -135,6 +135,27 @@ final class FormEngine {
         }
     }
 
+    // MARK: Merge aliases (registry coherence pass → clouds follow the survivor)
+
+    /// The registry merged duplicate objects (loser → survivor). Repoint each
+    /// loser's fused cloud to the survivor so accumulated geometry survives the
+    /// merge. Queue-confined state → serialized, non-dropping hop; when both ids
+    /// already have clouds the bigger accumulation wins.
+    func repointClouds(_ aliases: [UUID: UUID]) {
+        guard !aliases.isEmpty else { return }
+        executor.enqueue { [weak self] in
+            guard let self else { return }
+            for (loser, survivor) in aliases {
+                guard let cloud = self.clouds.removeValue(forKey: loser) else { continue }
+                if let existing = self.clouds[survivor] {
+                    if cloud.count > existing.count { self.clouds[survivor] = cloud }
+                } else {
+                    self.clouds[survivor] = cloud
+                }
+            }
+        }
+    }
+
     // MARK: The pass (form queue)
 
     private func run(_ pass: Pass) -> Publication {

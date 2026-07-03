@@ -99,6 +99,13 @@ final class InferenceExecutor {
         }
         return true
     }
+
+    /// Serialized, NON-dropping enqueue for queue-confined state maintenance
+    /// (e.g. the Form Engine repointing clouds after a registry merge). Does not
+    /// touch the single-flight latch — pure FIFO behind any in-flight pass.
+    func enqueue(_ work: @escaping () -> Void) {
+        queue.async(execute: work)
+    }
 }
 
 // MARK: - Sensor-space conversion

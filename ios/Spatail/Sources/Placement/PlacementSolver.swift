@@ -287,21 +287,27 @@ struct PlacementSolver {
     }
 
     /// The world-space landing region: the part's resolved region, the §3 fallback
-    /// slice for cap/lid/top parts, or the parent OBB's TOP face (mounting on a whole
+    /// slice for cap/lid/top parts, a generic NAMED slice (base/left_side/right_side/
+    /// front/back + aliases — the Scene Coherence generalization; axis-aligned at
+    /// this depth, no camera), or the parent OBB's TOP face (mounting on a whole
     /// object means resting on it, so the pad rides the top plane, centered).
     static func landingRegion(for obj: SpatailObject, part: SpatailPart?) -> OrientedBox {
         if let region = part?.region { return region }
         let obb = obj.obb
         let topSlice = max(obb.extents.y * 0.2, 0.01)
         if let part, ["cap", "lid", "top"].contains(part.label.lowercased()) {
-            // spec §3 fallback: top 20% slice of the parent OBB
+            // spec §3 fallback: top 20% slice of the parent OBB (byte-compatible)
             return OrientedBox(
                 center: SIMD3(obb.center.x, obb.center.y + obb.extents.y / 2 - topSlice / 2, obb.center.z),
                 extents: SIMD3(obb.extents.x, topSlice, obb.extents.z),
                 yaw: obb.yaw)
         }
-        if part != nil {
-            // named part with no region yet → parent center (identity will refine it)
+        if let part {
+            // generalized §3: any other slice name the geometry can answer
+            if let slice = RegistryCoherence.namedSlice(part.label, of: obb) {
+                return slice
+            }
+            // named part with no region/slice yet → parent center (identity will refine it)
             return obb
         }
         // whole object → the top face as a zero-height pad

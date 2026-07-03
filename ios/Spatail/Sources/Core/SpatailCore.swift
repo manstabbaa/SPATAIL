@@ -160,6 +160,22 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
     /// When the form was last fitted (device uptime clock) — freshness gate for the
     /// registry's smoothing rules. Device-local, NOT a wire field.
     public var formUpdatedAt: TimeInterval? = nil
+    /// Consecutive ingest ticks this object was matched by a measurement (resets on
+    /// a missed tick). Device-local mint/display discipline, NOT a wire field.
+    public var seenStreak: Int = 0
+    /// The streak reached the establish threshold at least once — hysteresis so a
+    /// once-established object doesn't flicker out of display on one missed tick.
+    public var established: Bool = false
+    /// THE one shared definition of "the Lens shows this" (chips + overlay boxes +
+    /// ask-matching). Assigned by the registry's coherence pass
+    /// (`RegistryCoherence.assignDisplayWorthiness`) on every publish: eligible =
+    /// labeled OR fitted form OR seen ≥ 3 consecutive ticks; capped at 12 by
+    /// (labeled first, then confidence, then recency). Device-local, NOT a wire
+    /// field — non-worthy objects never even ride `room.update`.
+    public var displayWorthy: Bool = false
+    /// When this object was first minted (device uptime clock) — merge-pass
+    /// survivor stability ("older id wins" ties). Device-local, NOT a wire field.
+    public var firstSeenAt: TimeInterval? = nil
     public var lastMeasuredAt: TimeInterval
     public var lastIdentifiedAt: TimeInterval?
 
@@ -168,6 +184,8 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
                 parts: [SpatailPart] = [], form: ObjectForm? = nil,
                 pendingLabel: String? = nil,
                 pendingCount: Int = 0, formUpdatedAt: TimeInterval? = nil,
+                seenStreak: Int = 0, established: Bool = false,
+                displayWorthy: Bool = false, firstSeenAt: TimeInterval? = nil,
                 lastMeasuredAt: TimeInterval,
                 lastIdentifiedAt: TimeInterval? = nil) {
         self.id = id
@@ -180,6 +198,10 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
         self.pendingLabel = pendingLabel
         self.pendingCount = pendingCount
         self.formUpdatedAt = formUpdatedAt
+        self.seenStreak = seenStreak
+        self.established = established
+        self.displayWorthy = displayWorthy
+        self.firstSeenAt = firstSeenAt
         self.lastMeasuredAt = lastMeasuredAt
         self.lastIdentifiedAt = lastIdentifiedAt
     }
@@ -190,7 +212,8 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        // pendingLabel/pendingCount/formUpdatedAt are device internals — not wire fields.
+        // pendingLabel/pendingCount/formUpdatedAt/seenStreak/established/
+        // displayWorthy/firstSeenAt are device internals — not wire fields.
         case id, label, confidence, obb, supportSurfaceId, parts, form
         case lastMeasuredAt = "lastSeenAt"
         case lastIdentifiedAt

@@ -201,7 +201,8 @@ struct LibraryView: View {
         // re-instantiates its kits exactly like a fresh /modular response.
         runtime.apply(contract: contract, raw: store.contractData(for: entry.id),
                       arView: hub.arView,
-                      surfaces: scanner.surfaces, objects: registry.objects)
+                      surfaces: scanner.surfaces,
+                      objects: registry.objects.filter(\.displayWorthy))
         dismiss()
     }
 }

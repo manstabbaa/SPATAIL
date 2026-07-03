@@ -133,14 +133,35 @@ struct ExperienceDeltaWire: Decodable {
     /// or tracked object the identity landed on and WHY. Additive — absent on
     /// payloads that don't forward it; the Truth Overlay just hides the card.
     let fused: FusedBindingWire?
+    /// Part-addressed placement (spatail_vision_engine delta assembly): the brain
+    /// asks the runtime to land the plan ON this registry object (optionally on a
+    /// named part of it). Additive — absent on non-part-addressed plans; the
+    /// runtime routes it into the PlacementTarget .object/.part solve path.
+    let target: TargetRefWire?
 
-    enum K: String, CodingKey { case version, kind, experience, fused }
+    enum K: String, CodingKey { case version, kind, experience, fused, target }
     init(from d: Decoder) throws {
         let c = try d.container(keyedBy: K.self)
         version = (try? c.decode(Int.self, forKey: .version)) ?? 0
         kind = (try? c.decode(String.self, forKey: .kind)) ?? "full"
         experience = try? c.decode(SpatialExperienceContract.self, forKey: .experience)
         fused = try? c.decode(FusedBindingWire.self, forKey: .fused)
+        target = try? c.decode(TargetRefWire.self, forKey: .target)
+    }
+}
+
+/// The brain's part-addressed anchor request: `{objectId, part}` — objectId is
+/// our registry UUID echoed back (or, defensively, the noun the VLM used);
+/// `part` names a sub-region ("cap"). Every field optional — tolerant by design.
+struct TargetRefWire: Decodable, Equatable {
+    let objectId: String?
+    let part: String?
+
+    enum K: String, CodingKey { case objectId, part }
+    init(from d: Decoder) throws {
+        let c = try d.container(keyedBy: K.self)
+        objectId = try? c.decode(String.self, forKey: .objectId)
+        part = try? c.decode(String.self, forKey: .part)
     }
 }
 

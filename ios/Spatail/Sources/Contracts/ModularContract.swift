@@ -337,15 +337,20 @@ struct ModularContract: Decodable {
         var action = ""
         var clip: String? = nil
         var target: String? = nil
+        /// Named mechanic for `action == "mechanic"` (logic.py emits e.g.
+        /// {"action": "mechanic", "mechanic": "highlight", "target": hero}).
+        /// Tolerant-optional: legacy payloads without it still decode.
+        var mechanic: String? = nil
         var params: [String: AnyParam] = [:]
         init(from d: Decoder) throws {
             let c = try d.container(keyedBy: K.self)
             action = (try? c.decode(String.self, forKey: .action)) ?? ""
             clip = try? c.decode(String.self, forKey: .clip)
             target = try? c.decode(String.self, forKey: .target)
+            mechanic = try? c.decode(String.self, forKey: .mechanic)
             params = (try? c.decode([String: AnyParam].self, forKey: .params)) ?? [:]
         }
-        enum K: String, CodingKey { case action, clip, target, params }
+        enum K: String, CodingKey { case action, clip, target, mechanic, params }
     }
 }
 

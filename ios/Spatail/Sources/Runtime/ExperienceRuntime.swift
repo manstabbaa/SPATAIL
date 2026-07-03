@@ -28,15 +28,26 @@
 // After every modular apply, a PlacementReportWire goes out through
 // `onPlacementReport` — solver inputs, the plan verbatim (reasons included), and
 // the final world transforms with corrections — the Client column of /traces/view.
+// Step-driven changes that MOVE content re-report with a "step N reposition"
+// correction (same solve context, fresh finals).
+//
+// On top of the placed scene sits the game-manager layer (built per apply from
+// the same contract): StepDirector walks `sequence` (per-step named clips,
+// focus/isolate, part effects, narration on the glass StepPanelView), TriggerVM
+// runs `triggers` (tap/stepEnter/timer/approach/gaze/quizCorrect), and
+// EngineHost instantiates SpatailEngine kits when the raw payload carries the
+// v0.8 engine shape (rules/objectives/entities). All of it obeys the same
+// diff-only law: every touch is stashed and restored, never rebuilt.
 
 import Foundation
 import ARKit
 import RealityKit
+import Combine
 import UIKit
 import simd
 
 @MainActor
-final class ExperienceRuntime: ObservableObject {
+final class ExperienceRuntime: NSObject, ObservableObject {
 
     // MARK: Seams (wired by AppModel — the composition root)
 
@@ -52,6 +63,29 @@ final class ExperienceRuntime: ObservableObject {
     @Published private(set) var currentExperienceId: String?
     @Published private(set) var currentTitle: String?
     @Published private(set) var lastAppliedDeltaVersion: Int = 0
+    /// The active sequence step for the glass panel (nil = no sequenced experience).
+    @Published private(set) var stepHUD: StepHUD?
+    /// SpatailEngine HUD (score/objective/outcome; nil = no engine experience).
+    @Published private(set) var engineHUD: EngineHost.HUDState?
+
+    // MARK: Game-manager layer (steps · triggers · engine)
+    //
+    // Built per modular apply from the SAME contract that placed the scene.
+    // The director/VM only touch the entities a step or trigger names — every
+    // touch is stashed and restored (diff discipline holds through sequencing).
+
+    private var director: StepDirector?
+    private var triggerVM: TriggerVM?
+    private var engineHost: EngineHost?
+    private let narrator = SpeechNarrator()
+    private var hasStepSequence = false
+    private var tapRecognizer: UITapGestureRecognizer?
+    private var updateSub: Cancellable?
+    private weak var attachedView: ARView?
+    private var lastTickAt: TimeInterval = 0
+    /// Everything needed to RE-emit the placement report after a step-driven
+    /// content move ("step 3 reposition" corrections — spec §2.2 honesty).
+    private var reportContext: ModularReportContext?
 
     // MARK: Scene graph
     //
@@ -69,15 +103,20 @@ final class ExperienceRuntime: ObservableObject {
     /// Element change signatures (id → signature) so delta updates that only
     /// move an element never rebuild its content.
     private var deltaSignatures: [String: String] = [:]
+    /// Pins from the two inbound streams, unioned into the registry exemption.
+    private var modularPinned: Set<UUID> = []
+    private var deltaPinned: Set<UUID> = []
     private var pinnedObjectIds: Set<UUID> = [] {
         didSet { if pinnedObjectIds != oldValue { onPinnedObjectsChanged?(pinnedObjectIds) } }
     }
+    private func updatePinned() { pinnedObjectIds = modularPinned.union(deltaPinned) }
     /// Bumped per modular apply — a stale async model load must not swap in.
     private var modelGeneration = 0
 
     // MARK: - Scene attachment
 
     private func ensureAttached(to arView: ARView) {
+        installInteraction(on: arView)
         if let anchor = worldAnchor, anchor.scene != nil { return }
         let anchor = AnchorEntity(world: SIMD3<Float>(0, 0, 0))
         anchor.addChild(modularRoot)
@@ -86,13 +125,38 @@ final class ExperienceRuntime: ObservableObject {
         worldAnchor = anchor
     }
 
+    /// One tap recognizer + one per-frame subscription per view — present() runs
+    /// per experience, and stacked identical recognizers all fire (the diagnosed
+    /// legacy bug: every tap advanced one extra step per re-present).
+    private func installInteraction(on arView: ARView) {
+        attachedView = arView
+        if tapRecognizer == nil {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+            arView.addGestureRecognizer(tap)
+            tapRecognizer = tap
+        }
+        if updateSub == nil {
+            updateSub = arView.scene.subscribe(to: SceneEvents.Update.self) { [weak self] _ in
+                self?.tick()
+            }
+        }
+    }
+
     // MARK: - Modular contract (ask / Library re-place)
 
-    func apply(contract: ModularContract, arView: ARView,
+    /// `raw` = the server's verbatim response bytes. Optional-but-wanted: the
+    /// engine wiring decodes v0.8 payloads (rules/objectives/entities) out of it
+    /// tolerantly, so a wire contract without them behaves exactly as before.
+    func apply(contract: ModularContract, raw: Data? = nil, arView: ARView,
                surfaces: [RoomSurface], objects: [SpatailObject]) {
         ensureAttached(to: arView)
         modelGeneration += 1
         let generation = modelGeneration
+
+        // Tear the previous game layer down BEFORE the diff-apply: the director
+        // restores every stashed material/opacity/overlay touch first, so nodes
+        // that survive the diff carry their authored look into the new sequence.
+        teardownGameLayer()
 
         currentExperienceId = contract.experienceId
         currentTitle = contract.title
@@ -141,7 +205,8 @@ final class ExperienceRuntime: ObservableObject {
                                                  primary: primary,
                                                  coverage: coverage)
         }
-        pinnedObjectIds = pinned
+        modularPinned = pinned
+        updatePinned()
 
         // The room can't answer yet → raycast fallback (always place SOMETHING).
         let resolved = layout ?? Self.raycastFallback(arView: arView,
@@ -177,6 +242,186 @@ final class ExperienceRuntime: ObservableObject {
         report(contract: contract, layout: resolved, reqs: reqs,
                anchorPreference: anchorPreference, scaleMode: scaleMode,
                coverage: coverage, surfaces: surfaces)
+
+        // ── game manager: step sequence, trigger VM, engine kits ────────────
+        buildGameLayer(contract: contract, raw: raw, arView: arView)
+    }
+
+    // MARK: - Game layer (sequence · triggers · SpatailEngine)
+
+    private func teardownGameLayer() {
+        director?.teardown()
+        director = nil
+        triggerVM = nil
+        engineHost?.clear()
+        engineHost = nil
+        stepHUD = nil
+        engineHUD = nil
+        hasStepSequence = false
+        narrator.stop()
+    }
+
+    private func buildGameLayer(contract: ModularContract, raw: Data?, arView: ARView) {
+        hasStepSequence = !contract.sequence.isEmpty
+
+        // Step director: built whenever steps OR triggers exist — trigger
+        // actions (labels/effects/clips) go through its transient, restorable
+        // touch discipline even when there is no sequence to walk.
+        if !contract.sequence.isEmpty || !contract.triggers.isEmpty {
+            let d = StepDirector(
+                root: modularRoot,
+                node: { [weak self] id in self?.modularNodes[id] },
+                assets: orderedAssets(contract),
+                steps: contract.sequence,
+                policy: contract.placement,
+                experienceTitle: contract.title,
+                narrator: narrator,
+                onHUD: { [weak self] hud in self?.stepHUD = hud })
+            d.onContentMoved = { [weak self] label in self?.reportStepMutation(label) }
+            director = d
+        }
+
+        // Trigger VM: the contract's event → action bindings, genre-agnostic.
+        if !contract.triggers.isEmpty {
+            let vm = TriggerVM(triggers: contract.triggers, actuator: .init(
+                advance: { [weak self] in self?.director?.next() },
+                playClip: { [weak self] target, clip in
+                    self?.director?.playClipForTrigger(target: target, clip: clip)
+                },
+                showLabel: { [weak self] target in
+                    self?.director?.addTriggerLabel(target: target)
+                },
+                playSound: { [weak self] cue in self?.director?.playCue(cue) },
+                applyEffect: { [weak self] target, effect in
+                    self?.director?.applyTriggerEffect(target: target, effect: effect)
+                }))
+            triggerVM = vm
+            director?.onStepEnter = { [weak vm] index, step in
+                vm?.stepEntered(index: index, step: step)
+            }
+        }
+        director?.start()
+
+        // SpatailEngine: v0.8 payloads (rules/objectives/entities/kits) decoded
+        // tolerantly from the same raw bytes — ExplainerKit/ShooterKit run under
+        // the SAME solved placement root. No payload → nil → zero change.
+        if let raw, let engineContract = EngineHost.detectEnginePayload(in: raw) {
+            let host = EngineHost(contract: engineContract, narrator: narrator,
+                                  playCue: { StepDirector.cue($0) })
+            host.onHUD = { [weak self] hud in self?.engineHUD = hud }
+            engineHUD = EngineHost.HUDState(genre: host.genre, fields: [])
+            host.mount(under: modularRoot, scene: arView.scene, resolver: assetResolver)
+            engineHost = host
+            print("SPATAIL engine: kit=\(host.genre) mounted "
+                  + "(\(engineContract.entities.count) entities, "
+                  + "\(engineContract.rules.count) rules, "
+                  + "\(engineContract.objectives.count) objectives)")
+        }
+    }
+
+    // MARK: Interaction (taps route: engine → triggers → step advance)
+
+    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+        guard let arView = attachedView else { return }
+        let point = gesture.location(in: arView)
+        let hit = arView.entity(at: point)
+
+        // Engine first: hits under the engine root always belong to it; empty-
+        // space taps go to the engine only when no modular sequence owns them
+        // (the engine's own StepSequencerSystem advances on scene taps).
+        if let host = engineHost,
+           host.handleTap(entity: hit, ownsSceneTaps: !(director?.hasSteps ?? false)) {
+            return
+        }
+
+        // Trigger VM: tap-on-element (part name first — most specific — then the
+        // owning asset id, then scene). A consumed tap never also advances.
+        var targets: [String] = []
+        if let hit {
+            if let part = Self.partName(for: hit) { targets.append(part) }
+            if let assetId = assetId(for: hit), !targets.contains(assetId) {
+                targets.append(assetId)
+            }
+        }
+        targets.append("scene")
+        if let vm = triggerVM, vm.fire(event: "tap", targets: targets) { return }
+
+        director?.advanceViaTap()
+    }
+
+    /// Walk up from a hit entity to its owning modular container's asset id.
+    private func assetId(for entity: Entity) -> String? {
+        var cursor: Entity? = entity
+        while let c = cursor {
+            if let id = modularNodes.first(where: { $0.value === c })?.key { return id }
+            cursor = c.parent
+        }
+        return nil
+    }
+
+    private static func partName(for entity: Entity) -> String? {
+        let n = entity.name
+        guard !n.isEmpty, n != "placeholder", n != "model",
+              !n.hasPrefix("spatail.") else { return nil }
+        return n
+    }
+
+    // MARK: Per-frame tick (marker pulse · spatial/timer triggers · engine)
+
+    private func tick() {
+        guard director != nil || triggerVM != nil || engineHost != nil else { return }
+        let now = CACurrentMediaTime()
+        let dt = lastTickAt == 0 ? 1.0 / 60.0 : min(max(now - lastTickAt, 0), 0.1)
+        lastTickAt = now
+
+        director?.tick(now: now)
+
+        if let vm = triggerVM, !vm.isEmpty {
+            var camera: (position: SIMD3<Float>, forward: SIMD3<Float>)?
+            if let view = attachedView {
+                let t = view.cameraTransform
+                let f = -t.matrix.columns.2
+                camera = (t.translation, SIMD3(f.x, f.y, f.z))
+            }
+            vm.tick(now: now, camera: camera,
+                    elementIds: Array(modularNodes.keys),
+                    elementWorld: { [weak self] id in
+                        self?.modularNodes[id]?.position(relativeTo: nil)
+                    })
+        }
+
+        engineHost?.tick(dt: dt)
+    }
+
+    // MARK: Step/quiz surface for the glass panel (StepPanelView)
+
+    func stepNext() { director?.next() }
+    func stepPrevious() { director?.previous() }
+
+    /// Quiz option answered on the glass panel. Correct → onQuizCorrect triggers
+    /// (advance falls through when no trigger claims it).
+    func quizAnswered(correct: Bool) {
+        director?.quizAnswered(correct: correct)
+        guard correct else { return }
+        var targets: [String] = []
+        if let stepId = director?.currentStep?.id, !stepId.isEmpty { targets.append(stepId) }
+        targets.append("scene")
+        let consumed = triggerVM?.fire(event: "quizCorrect", targets: targets) ?? false
+        if !consumed {
+            // brief beat so the correct-cue lands before the scene moves on
+            Task { [weak self] in
+                try? await Task.sleep(nanoseconds: 600_000_000)
+                self?.director?.next()
+            }
+        }
+    }
+
+    /// Shooter fire control (engine kits): projectile down the camera ray.
+    func engineFire() {
+        guard let host = engineHost, let view = attachedView else { return }
+        let t = view.cameraTransform
+        let f = -t.matrix.columns.2
+        host.fire(origin: t.translation, direction: SIMD3(f.x, f.y, f.z))
     }
 
     /// Hero first (the solver's arc puts index 0 dead ahead).
@@ -297,6 +542,7 @@ final class ExperienceRuntime: ObservableObject {
            node.findEntity(named: "model") == nil {
             let placeholder = Self.primitive(for: asset, fitScale: fitScale)
             placeholder.name = "placeholder"
+            placeholder.generateCollisionShapes(recursive: false)   // tappable now
             node.addChild(placeholder)
         }
 
@@ -314,7 +560,19 @@ final class ExperienceRuntime: ObservableObject {
             Self.fit(loaded, asset: asset, fitScale: fitScale)
             node.findEntity(named: "placeholder")?.removeFromParent()
             node.addChild(loaded)
-            if asset.supportsAnimation { Self.playClips(loaded) }
+            // Tap-on-element/part triggers need collision on the real geometry.
+            loaded.generateCollisionShapes(recursive: true)
+            // Story region overlays ship visible in the USDZ but stay OFF until
+            // a step summons them.
+            StepDirector.disableRegionOverlays(in: loaded)
+            if let director = self.director, director.hasSteps {
+                // The sequence owns playback: re-anchor the current step's
+                // visuals and start ITS named clip (not auto-play-all).
+                director.modelDidSwap(assetId: asset.id)
+            } else if asset.supportsAnimation {
+                // No sequence → the legacy default: play everything, looped.
+                Self.playClips(loaded)
+            }
         }
     }
 
@@ -402,6 +660,54 @@ final class ExperienceRuntime: ObservableObject {
         currentExperienceId = experience.experienceId
         currentTitle = experience.title
 
+        // ── part-addressed target (delta.target {objectId, part}) ───────────
+        // The brain asked for the plan to land ON a registry object (or a named
+        // part of it). Route through the SAME PlacementTarget .object/.part
+        // solve path the modular stream uses: the solver's landing region (the
+        // part's resolved sub-OBB, the §3 cap/lid/top fallback slice, or the
+        // parent's top face) re-bases the elements; the brain's own layout is
+        // still what the report's `plan` carries (intent vs reality).
+        var overrides: [String: (position: SIMD3<Float>, yaw: Float)] = [:]
+        var targetCorrections: [String] = []
+        deltaPinned = []
+        if let ref = delta.target {
+            if let obj = Self.resolveTargetObject(ref.objectId, in: objects) {
+                let part: SpatailPart? = ref.part.map { label in
+                    obj.parts.first { $0.label.lowercased() == label.lowercased() }
+                        ?? obj.parts.first { $0.label.lowercased().contains(label.lowercased()) }
+                        // unknown part label → synthesize; the solver's §3
+                        // fallback (top-slice for cap/lid/top) still applies
+                        ?? SpatailPart(label: label, box: nil, region: nil, confidence: 0)
+                }
+                let target: PlacementTarget = part.map { .part(obj, $0) } ?? .object(obj)
+                let reqs = experience.spatialElements.map { el -> PlacementSolver.AssetReq in
+                    let (w, h, d) = el.placement.boxSizeMeters
+                    return PlacementSolver.AssetReq(id: el.id, footprint: SIMD3(w, h, d),
+                                                    role: el.contentType)
+                }
+                if let layout = PlacementPlanner.planOnObject(
+                        target: target, assets: reqs,
+                        primary: experience.spatialElements.first?.id,
+                        coverage: 0.8) {
+                    let rootT = Transform(matrix: layout.root)
+                    for (id, local) in layout.locals {
+                        overrides[id] = (rootT.rotation.act(local) + rootT.translation,
+                                         obj.obb.yaw)
+                    }
+                    deltaPinned.insert(obj.id)   // anchored → exempt from expiry (§3)
+                    let site = ([obj.label ?? "object"] + (ref.part.map { [$0] } ?? []))
+                        .joined(separator: "·")
+                    targetCorrections = ["target-pin \(site)"]
+                }
+            }
+            if overrides.isEmpty {
+                targetCorrections = ["target-unresolved("
+                    + (ref.objectId ?? "?")
+                    + (ref.part.map { "·" + $0 } ?? "") + ") — brain plan verbatim"]
+            }
+        }
+        updatePinned()
+
         var seen = Set<String>()
         var finals: [PlacementReportWire.FinalPlacement] = []
         var planned: [PlacementReportWire.PlannedPlacement] = []
@@ -417,12 +723,12 @@ final class ExperienceRuntime: ObservableObject {
                 deltaRoot.addChild(node)
                 deltaNodes[element.id] = node
             }
-            materialize(element: element, into: node)
+            materialize(element: element, into: node, override: overrides[element.id])
 
             let world = node.transformMatrix(relativeTo: nil)
             finals.append(.init(elementId: element.id,
                                 worldTransform: Self.flatten(world),
-                                renderScale: 1.0, corrections: []))
+                                renderScale: 1.0, corrections: targetCorrections))
             let p = element.placement.simdPosition
             planned.append(.init(elementId: element.id,
                                  position: [Double(p.x), Double(p.y), Double(p.z)],
@@ -453,28 +759,52 @@ final class ExperienceRuntime: ObservableObject {
         onPlacementReport?(report)
     }
 
+    /// Resolve delta.target.objectId against the registry: UUID match first,
+    /// then label (the brain sometimes echoes the noun rather than our UUID).
+    private static func resolveTargetObject(_ idOrLabel: String?,
+                                            in objects: [SpatailObject]) -> SpatailObject? {
+        guard let raw = idOrLabel, !raw.isEmpty else { return nil }
+        if let uuid = UUID(uuidString: raw),
+           let hit = objects.first(where: { $0.id == uuid }) {
+            return hit
+        }
+        let needle = raw.lowercased()
+        return objects.first {
+            $0.label.map { needle.contains($0.lowercased()) || $0.lowercased().contains(needle) } ?? false
+        }
+    }
+
     /// Build/refresh one live element's content in place. The container node
     /// survives updates; only its children rebuild when the element changed.
-    private func materialize(element: SpatialElement, into node: Entity) {
+    /// `override` = part-addressed landing (world position + parent yaw) from
+    /// the .object/.part solve; nil → the brain's coordinates verbatim.
+    private func materialize(element: SpatialElement, into node: Entity,
+                             override: (position: SIMD3<Float>, yaw: Float)? = nil) {
+        // Edge strips do their own world-frame layout math — never re-based.
+        let isEdge = element.placement.kind == "surface_edge"
+        let position = (isEdge ? nil : override?.position) ?? element.placement.simdPosition
+
         let signature = Self.signature(for: element)
         if deltaSignatures[element.id] == signature {
             // Geometry unchanged → position-only update (cheap, in place).
-            node.position = element.placement.simdPosition
+            node.position = position
+            if let override, !isEdge {
+                node.orientation = simd_quatf(angle: override.yaw, axis: SIMD3(0, 1, 0))
+            }
             return
         }
         deltaSignatures[element.id] = signature
         node.children.forEach { $0.removeFromParent() }   // this element only
-        node.position = element.placement.simdPosition
+        node.position = position
 
-        switch element.placement.kind {
-        case "surface_edge":
+        if isEdge {
             // Edge units are laid out in world coordinates relative to the
             // node's position — keep the node unrotated so that math holds.
             node.orientation = simd_quatf(angle: 0, axis: SIMD3(0, 1, 0))
             buildEdgeStrip(element: element, into: node)
-        default:
-            let r = element.placement.simdRotation
-            node.orientation = simd_quatf(angle: r.y, axis: SIMD3(0, 1, 0))
+        } else {
+            let yaw = override?.yaw ?? element.placement.simdRotation.y
+            node.orientation = simd_quatf(angle: yaw, axis: SIMD3(0, 1, 0))
             buildBody(element: element, into: node)
         }
 
@@ -562,6 +892,45 @@ final class ExperienceRuntime: ObservableObject {
 
     // MARK: - Placement report (modular path — spec §2.2, field-for-field)
 
+    /// The captured solve, kept so step-driven content moves can RE-report with
+    /// their correction appended ("step 3 reposition") without re-solving.
+    private struct ModularReportContext {
+        let experienceId: String
+        let anchorPreference: String
+        let scaleMode: String
+        let coverage: Float
+        let footprints: [PlacementReportWire.Footprint]
+        let planAnchor: String
+        let planned: [PlacementReportWire.PlannedPlacement]
+        let baseCorrections: [String]
+        let renderScale: Float
+        let roomSummary: PlacementReportWire.RoomSummary
+    }
+
+    /// Re-emit the placement report after a step/trigger-driven change MOVED
+    /// content: same solver inputs and plan (the intent is unchanged), fresh
+    /// final world transforms, corrections gaining the step's entry.
+    private func reportStepMutation(_ label: String) {
+        guard let ctx = reportContext else { return }
+        let finals = modularNodes.map { id, node -> PlacementReportWire.FinalPlacement in
+            .init(elementId: id,
+                  worldTransform: Self.flatten(node.transformMatrix(relativeTo: nil)),
+                  renderScale: Double(ctx.renderScale),
+                  corrections: ctx.baseCorrections + [label])
+        }
+        let report = PlacementReportWire(
+            experienceId: ctx.experienceId,
+            reportedAt: Date().timeIntervalSince1970,
+            solverInputs: .init(anchorPreference: ctx.anchorPreference,
+                                scaleMode: ctx.scaleMode,
+                                coverage: Double(ctx.coverage),
+                                footprints: ctx.footprints,
+                                roomSummary: ctx.roomSummary),
+            plan: .init(anchor: ctx.planAnchor, placements: ctx.planned),
+            finalPlacements: finals)
+        onPlacementReport?(report)
+    }
+
     private func report(contract: ModularContract,
                         layout: PlannedLayout,
                         reqs: [(req: PlacementSolver.AssetReq,
@@ -609,19 +978,35 @@ final class ExperienceRuntime: ObservableObject {
                                 roomSummary: roomSummary),
             plan: .init(anchor: layout.plan.anchor, placements: planned),
             finalPlacements: finals)
+        // Keep the solve so step-driven moves can re-report honestly (§2.2).
+        reportContext = ModularReportContext(
+            experienceId: contract.experienceId,
+            anchorPreference: anchorPreference,
+            scaleMode: scaleMode,
+            coverage: coverage,
+            footprints: footprints,
+            planAnchor: layout.plan.anchor,
+            planned: planned,
+            baseCorrections: layout.corrections,
+            renderScale: layout.scale,
+            roomSummary: roomSummary)
         onPlacementReport?(report)
     }
 
     // MARK: - Clear (the user's explicit action — the ONLY bulk removal)
 
     func clear() {
+        teardownGameLayer()
         for (_, node) in modularNodes { node.removeFromParent() }
         for (_, node) in deltaNodes { node.removeFromParent() }
         modularNodes.removeAll()
         deltaNodes.removeAll()
         deltaSignatures.removeAll()
         modelGeneration += 1
-        pinnedObjectIds = []
+        modularPinned = []
+        deltaPinned = []
+        updatePinned()
+        reportContext = nil
         currentExperienceId = nil
         currentTitle = nil
     }

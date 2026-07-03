@@ -203,7 +203,8 @@ final class AppModel: ObservableObject {
                 if let jobId = contract.generationJobId, !jobId.isEmpty {
                     GenerationTracker.shared.track(jobId: jobId, client: client)
                 }
-                self.runtime.apply(contract: contract, arView: self.hub.arView,
+                self.runtime.apply(contract: contract, raw: raw,
+                                   arView: self.hub.arView,
                                    surfaces: self.scanner.surfaces,
                                    objects: self.registry.objects)
                 self.askState = .idle

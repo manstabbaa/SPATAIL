@@ -13,6 +13,11 @@ struct RootView: View {
             LensView()
                 .ignoresSafeArea()
 
+            // The sequenced experience's reading surface (step narration/quiz
+            // glass panel + engine HUD) — over the Lens, under the chrome.
+            StepPanelView()
+                .ignoresSafeArea()
+
             VStack(spacing: 0) {
                 HStack(alignment: .top) {
                     LinkStatusChip(state: uplink.state)

@@ -150,6 +150,18 @@ final class BrainClient {
         try? FileManager.default.removeItem(at: dir)
     }
 
+    /// Synchronous cache probe — the local file URL for a server path IF it has
+    /// already been downloaded, else nil. Never touches the network (safe on
+    /// main). The SpatailEngine RealityKit backend resolves assets through this
+    /// (its `resolveAssetURL` seam is synchronous); EngineHost prefetches the
+    /// contract's assets through `downloadAsset` before the engine loads, so by
+    /// load time this normally hits.
+    static func cachedAssetURL(for path: String) -> URL? {
+        guard let dir = try? cacheDirectory() else { return nil }
+        let url = dir.appendingPathComponent(cacheFileName(for: path))
+        return FileManager.default.fileExists(atPath: url.path) ? url : nil
+    }
+
     private func cacheURL(for path: String) throws -> URL {
         try Self.cacheDirectory()
             .appendingPathComponent(Self.cacheFileName(for: path))

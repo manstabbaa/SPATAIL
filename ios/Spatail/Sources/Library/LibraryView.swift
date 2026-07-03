@@ -197,7 +197,10 @@ struct LibraryView: View {
             placeProblem = "Couldn't read “\(entry.title)” from disk — the saved contract is missing or corrupt."
             return
         }
-        runtime.apply(contract: contract, arView: hub.arView,
+        // Raw bytes ride along so a saved engine payload (rules/objectives)
+        // re-instantiates its kits exactly like a fresh /modular response.
+        runtime.apply(contract: contract, raw: store.contractData(for: entry.id),
+                      arView: hub.arView,
                       surfaces: scanner.surfaces, objects: registry.objects)
         dismiss()
     }

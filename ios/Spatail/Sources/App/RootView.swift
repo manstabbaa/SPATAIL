@@ -40,7 +40,12 @@ struct RootView: View {
         }
         .sheet(isPresented: $model.showLibrary) { LibraryView() }
         .sheet(isPresented: $model.showSettings) { SettingsView() }
-        .onAppear { model.start() }
+        // Deferred out of the render transaction: start() mutates @Published
+        // state (uplink.state, …) and doing that DURING the first view update
+        // is what produced "AttributeGraph: cycle detected" and a severed,
+        // frozen observation graph on device (field sessions 2026-07-03: pill
+        // stuck on Scanning…, eye toggle dead, while the services ran fine).
+        .onAppear { DispatchQueue.main.async { model.start() } }
     }
 
     // MARK: Toolbar (truth overlay · library · settings)

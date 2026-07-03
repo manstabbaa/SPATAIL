@@ -62,7 +62,12 @@ struct TruthOverlayView: View {
         }
         .allowsHitTesting(false)   // pure instrument — never eats a tap
         .onAppear {
-            model.attach(hub: hub, scanner: scanner, registry: registry, uplink: uplink)
+            // Deferred: attach's @Published sinks emit synchronously with the
+            // current value — mutating observed state during the update
+            // transaction severs the AttributeGraph (the dead-eye bug).
+            DispatchQueue.main.async {
+                model.attach(hub: hub, scanner: scanner, registry: registry, uplink: uplink)
+            }
         }
         .onDisappear { model.detach() }
     }
@@ -249,6 +254,8 @@ final class TruthOverlayModel: ObservableObject {
         self.scanner = scanner
         self.registry = registry
 
+        print("[Overlay] attach — scanner \(scanner.tag), " +
+              "\(scanner.surfaces.count) surfaces at attach")
         renderer.attach(to: hub.arView)
         renderer.update(surfaces: scanner.surfaces)
         renderer.update(objects: registry.objects)
@@ -257,6 +264,7 @@ final class TruthOverlayModel: ObservableObject {
             .throttle(for: .milliseconds(300), scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] surfaces in
                 guard let self else { return }
+                print("[Overlay] renderer gets \(surfaces.count) surfaces")
                 self.renderer.update(surfaces: surfaces)
                 let kinds = Set(surfaces.map(\.kind))
                 self.legendKinds = SurfaceKind.allCases.filter(kinds.contains)

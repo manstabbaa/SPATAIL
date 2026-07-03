@@ -42,6 +42,11 @@ final class RoomScannerService: NSObject, ObservableObject {
     @Published private(set) var coveragePercent: Double = 0
 
     /// True when the device reconstructs a classified LiDAR mesh (spec §1.2 source).
+    /// Instance tag — the 2026-07-03 field sessions showed the console's
+    /// scanner publishing surfaces while the UI's scanner showed none. Every
+    /// truth-line and observer carries this tag until the split is explained.
+    nonisolated let tag = String(UUID().uuidString.prefix(4))
+
     nonisolated let usingLiDAR =
         ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification)
 
@@ -318,7 +323,7 @@ final class RoomScannerService: NSObject, ObservableObject {
             let now = (surfaces.count, Int(coveragePercent.rounded()))
             if now != lastLogged {
                 lastLogged = now
-                print("[Room] \(now.0) surfaces, coverage \(now.1)% " +
+                print("[Room \(tag)] \(now.0) surfaces, coverage \(now.1)% " +
                       "(planes \(planeAnchors.count), mesh \(meshAnchors.count))")
             }
         }

@@ -83,7 +83,7 @@ struct StepPanelView: View {
             }
             .animation(SpatailMotion.standard, value: runtime.stepHUD)
         }
-        .onAppear { projector.attach(hub: hub, runtime: runtime) }
+        .onAppear { DispatchQueue.main.async { projector.attach(hub: hub, runtime: runtime) } }
         .onDisappear { projector.detach() }
         .allowsHitTesting(runtime.stepHUD != nil || runtime.engineHUD != nil)
     }

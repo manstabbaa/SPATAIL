@@ -49,7 +49,17 @@ struct LensView: View {
                 Spacer()
             }
         }
-        .onAppear { chips.attach(hub: hub, registry: registry) }
+        .onAppear {
+            // Deferred: attach wires publishers that can emit synchronously —
+            // never mutate observed state inside the update transaction.
+            DispatchQueue.main.async {
+                chips.attach(hub: hub, registry: registry)
+                print("[UI] Lens observing scanner \(scanner.tag)")
+            }
+        }
+        .onChange(of: scanner.surfaces.count) { _, n in
+            print("[UI] pill sees \(n) surfaces (scanner \(scanner.tag))")
+        }
         .onDisappear { chips.detach() }
     }
 

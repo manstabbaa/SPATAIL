@@ -10,6 +10,11 @@
 //   • Detections           — sample 3D detection overlay (the contract shape)
 //   • Live cam             — webcam → Gemini detector → boxes over the camera feed (MF p28/p40)
 //   • Story step           — the attention track (MF p13)
+//   • Strict assets        — render every GLB raw (scale 1.0, no re-centre, no fit) to
+//                            reproduce phone failures; baked real-scale assets always
+//                            render at 1.0 seated by their authored pivot
+//   • Placement report     — POSTs what the web solver actually did back to the brain
+//                            (LIVE_BRAIN_SPEC §2.2, client:"web") after a live /modular render
 // ----------------------------------------------------------------------------
 
 import * as THREE from 'three';
@@ -29,6 +34,7 @@ const INTENT_COLOR = {
 };
 const intentColor = (i) => INTENT_COLOR[(i || '').toLowerCase()] || INTENT_COLOR.default;
 const hex = (n) => '#' + n.toString(16).padStart(6, '0');
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const IMPL_VERBS = new Set(['rotate', 'animate', 'scale', 'isolate', 'explode']);
 
 // ---------------------------------------------------------------- renderer/scene
@@ -89,7 +95,12 @@ let identifyOn = false, liveOn = false, controlsOn = false, camOn = false;
 let attentionIdx = -1, activeId = null;
 let isolatedId = null, explodeOn = false;
 let sceneCentroid = new THREE.Vector3(0, 1, 0);
+let lastLabel = '';
 const effects = [];
+// Strict-asset mode: render every GLB raw (scale 1.0, no re-centre, no fit) so the
+// PC reproduces phone failures instead of papering over them. Persisted; default OFF.
+const STRICT_KEY = 'spatail.strictAssets';
+let strictAssets = localStorage.getItem(STRICT_KEY) === '1';
 
 // ---------------------------------------------------------------- helpers
 function box3From(center, size) {
@@ -115,17 +126,35 @@ function setGroupOpacity(group, a) {
 }
 function placeModel(gltfScene, el) {
   const group = new THREE.Group(); group.add(gltfScene);
-  const box = new THREE.Box3().setFromObject(gltfScene);
-  const size = new THREE.Vector3(); box.getSize(size);
-  const center = new THREE.Vector3(); box.getCenter(center);
-  const target = el.placement.sizeMeters || [0.3, 0.3, 0.3];
-  const s = Math.max(...target) / (Math.max(size.x, size.y, size.z) || 1);
-  gltfScene.scale.setScalar(s);
-  gltfScene.position.sub(center.multiplyScalar(s));
+  const corrections = [];
+  let s = 1;
+  if (el.realScaleBaked) {
+    // the asset pipeline baked real-world scale + pivot into the GLB: render at 1.0
+    // and seat by mesh origin like iOS — never re-centre, so a bad bake fails here
+    // exactly the way it fails on the phone.
+    corrections.push('baked: rendered at scale 1.0, authored pivot honored');
+  } else if (strictAssets && !el.realSizeMeters) {
+    corrections.push('strict: raw render (scale 1.0, no re-centre, no fit)');
+  } else {
+    const box = new THREE.Box3().setFromObject(gltfScene);
+    const size = new THREE.Vector3(); box.getSize(size);
+    const target = el.realSizeMeters || el.placement.sizeMeters || [0.3, 0.3, 0.3];
+    s = Math.max(...target) / (Math.max(size.x, size.y, size.z) || 1);
+    gltfScene.scale.setScalar(s);
+    corrections.push(`fit longest dim to ${Math.max(...target).toFixed(2)}m (×${s.toFixed(3)}${el.realSizeMeters ? ', from realSizeMeters' : ''})`);
+    if (strictAssets) {
+      corrections.push('strict: authored pivot honored (no re-centre)');
+    } else {
+      const center = new THREE.Vector3(); box.getCenter(center);
+      gltfScene.position.sub(center.multiplyScalar(s));
+      corrections.push('re-centred to AABB centre');
+    }
+  }
   const p = el.placement.position || [0, 0.9, 0];
   const r = el.placement.rotationDeg || [0, 0, 0];
   group.position.set(...p);
   group.rotation.set(THREE.MathUtils.degToRad(r[0]), THREE.MathUtils.degToRad(r[1]), THREE.MathUtils.degToRad(r[2]));
+  group.userData.renderScale = s; group.userData.corrections = corrections;
   return group;
 }
 const affordList = (el) => (el.affordances || []).map((a) => `<span class="tag">${a}</span>`).join('');
@@ -338,7 +367,8 @@ async function loadScene(url) {
 async function renderScene(c, label) {
   for (const e of elements) { scene.remove(e.group); overlayGroup.remove(e.helper); overlayGroup.remove(e.label); panelGroup.remove(e.panel); }
   elements = []; $('idlist').innerHTML = '';
-  setNarration('Ready', label || c.title || '');
+  lastLabel = label || c.title || '';
+  setNarration('Ready', lastLabel);
   attentionIdx = -1; activeId = null; isolatedId = null; explodeOn = false;
 
   contract = c;
@@ -369,17 +399,20 @@ async function renderScene(c, label) {
         group = new THREE.Group();
         group.add(new THREE.Mesh(new THREE.BoxGeometry(...sz), new THREE.MeshStandardMaterial({ color: 0x33334a, roughness: 0.7 })));
         group.position.set(...p);
+        group.userData.renderScale = 1; group.userData.corrections = ['placeholder box (no GLB yet)'];
       }
       group.userData.elId = el.id; scene.add(group);
 
       const center = el.placement.position || [0, 0.9, 0]; const size = el.placement.sizeMeters || [0.2, 0.2, 0.2];
-      const box = box3From(center, size); const col = intentColor(el.intent);
+      // baked elements are seated by mesh origin, so their declared box sits ON the position
+      const boxCenter = el.realScaleBaked ? [center[0], center[1] + size[1] / 2, center[2]] : center;
+      const box = box3From(boxCenter, size); const col = intentColor(el.intent);
       const helper = boxHelper(box, col); helper.visible = false; overlayGroup.add(helper);
       const szTxt = size.map((n) => n.toFixed(2)).join('×');
       const label = makeLabel(
         `<b>${el.title || el.id}</b>` + (el.intent ? ` <span class="li">${el.intent}</span>` : '') +
         `<br><span class="sz">${szTxt} m · ${el.anchorStrategy || el.placement.kind || ''}</span>`);
-      label.position.set(center[0], center[1] + size[1] / 2 + 0.06, center[2]); label.visible = false; overlayGroup.add(label);
+      label.position.set(boxCenter[0], boxCenter[1] + size[1] / 2 + 0.06, boxCenter[2]); label.visible = false; overlayGroup.add(label);
 
       const e = {
         el, group, box, helper, label, mixer, action,
@@ -417,8 +450,12 @@ function addIdRow(el, col) {
       (el.representationMode ? `<span class="tag">${el.representationMode}</span>` : '') +
       (el.scaleMode ? `<span class="tag">${el.scaleMode}</span>` : '') + affordList(el) +
     `</div><div class="why">` +
+      // honesty rule: brain text is labelled "Brain:" and shown verbatim; the client's
+      // own layout resolution is labelled "Web solver:" — never blended.
       (el.whyThisRepresentation ? `<b>Why this:</b> ${el.whyThisRepresentation}<br>` : '') +
-      (el.whyThisPlacement ? `<b>Why here:</b> ${el.whyThisPlacement}` : '') + `</div>`;
+      (el.brainTrace && el.brainTrace.length ? `<b>Brain:</b> ${el.brainTrace.map(esc).join('<br>')}<br>` : '') +
+      (el.whyThisPlacement ? `<b>Why here:</b> ${el.whyThisPlacement}<br>` : '') +
+      (el.webSolver ? `<b>Web solver:</b> ${esc(el.webSolver)}` : '') + `</div>`;
   row.addEventListener('click', () => focusElement(el.id));
   $('idlist').appendChild(row); return row;
 }
@@ -589,16 +626,18 @@ function resolveLayout(items, layout, baseY) {
   let x = -totalW / 2, stackY = baseY; const out = [];
   for (let i = 0; i < n; i++) {
     const w = widths[i], h = Math.max(0.08, items[i].size[1]), cx = x + w / 2; x += w + gap;
+    // baked assets are seated by mesh origin (authored pivot), not by AABB centre
+    const yOff = items[i].baked ? 0 : h / 2;
     if (layout === 'arc' && n > 1) {
       const ang = (i / (n - 1) - 0.5) * 0.7, R = 0.5 + totalW * 0.2;
-      out.push([Math.sin(ang) * R, baseY + h / 2, R - Math.cos(ang) * R]);
+      out.push([Math.sin(ang) * R, baseY + yOff, R - Math.cos(ang) * R]);
     } else if (layout === 'stack') {
-      out.push([0, stackY + h / 2, 0]); stackY += h + 0.02;
+      out.push([0, stackY + yOff, 0]); stackY += h + 0.02;
     } else if (layout === 'cluster' || layout === 'grid') {
       const r = Math.floor(i / cols), col = i % cols, sp = 0.28;
-      out.push([(col - (cols - 1) / 2) * sp, baseY + h / 2, (r - 0.5) * sp]);
+      out.push([(col - (cols - 1) / 2) * sp, baseY + yOff, (r - 0.5) * sp]);
     } else {
-      out.push([cx, baseY + h / 2, 0]); // row / default
+      out.push([cx, baseY + yOff, 0]); // row / default
     }
   }
   return out;
@@ -607,7 +646,10 @@ function resolveLayout(items, layout, baseY) {
 function brainToWebScene(c, brainBase) {
   const u = c.understanding || {};
   const pl = (c.sceneContract || {}).placement || {};
-  const ds = pl.designSystem || {};
+  // the §12 design-system contract (spec §2.3): the sceneContract projection embeds
+  // it as placement.designSystem; the raw modular contract carries it at placement.
+  // Read both so decisionTrace survives when the projection is absent.
+  const ds = pl.designSystem || c.placement || {};
   const layout = (c.stage || {}).layout || pl.layout || 'arc';
   const anchor = (c.stage || {}).anchor || pl.anchorPreference || 'table';
   const sem = (ds.interaction || {}).semanticActions || ['rotate', 'scale', 'isolate', 'animate'];
@@ -617,11 +659,19 @@ function brainToWebScene(c, brainBase) {
   const primaryId = pl.primary || (assets.find((a) => a.role === 'primary_object') || {}).id || (assets[0] || {}).id;
   const items = assets.map((a) => ({
     id: a.id, name: a.name || a.id, role: a.role, glbUrl: a.glbUrl || '',
-    size: (fp[a.id] || a.scaleMeters || [0.2, 0.2, 0.2]).slice(0, 3),
+    size: (a.realSizeMeters || fp[a.id] || a.scaleMeters || [0.2, 0.2, 0.2]).slice(0, 3),
     anim: !!a.supportsAnimation, named: !!a.supportsHighlight,
+    // real-scale contract (asset_service.produce): baked → GLB is already metric,
+    // render at 1.0 honoring the authored pivot; realSizeMeters → fit to it.
+    baked: !!a.realScaleBaked, realSizeMeters: a.realSizeMeters || null,
+    footprintSource: a.footprintSource ||
+      ((a.realSizeMeters || fp[a.id] || a.scaleMeters) ? 'library' : 'default_guess'),
   }));
   const baseY = anchor === 'floor' ? 0.02 : anchor === 'wall' ? 1.3 : TABLE_TOP;
   const pos = resolveLayout(items, layout, baseY);
+  // honesty: whatever the brain said travels verbatim (decisionTrace → "Brain:");
+  // what THIS client resolved is labelled "Web solver:" — never blended.
+  const brainTrace = Array.isArray(ds.decisionTrace) ? ds.decisionTrace : [];
   const spatialElements = items.map((a, i) => ({
     id: a.id, title: a.name,
     intent: a.id === primaryId ? (u.intent || 'inspect') : 'explain',
@@ -629,10 +679,14 @@ function brainToWebScene(c, brainBase) {
     scaleMode: mapScale((c.stage || {}).scaleMode || pl.scaleMode),
     anchorStrategy: mapAnchor(anchor),
     asset: a.glbUrl ? { glbUrl: a.glbUrl } : undefined,
+    realScaleBaked: a.baked || undefined,
+    realSizeMeters: a.realSizeMeters || undefined,
     placement: { kind: anchor, position: pos[i], rotationDeg: [0, 0, 0], sizeMeters: a.size },
     affordances: [...new Set([...baseAff, ...(a.anim ? ['animate'] : []), ...(a.named ? ['isolate', 'label'] : [])])],
-    whyThisRepresentation: u.summary || `${a.role} of ${u.subject || 'the subject'}`,
-    whyThisPlacement: `Anchored on the ${anchor} in a ${layout} layout — resolved here from the brain's placement intent (${ds.intent || ds.preset || 'tabletop'}).`,
+    whyThisRepresentation: u.summary || '',
+    brainTrace,
+    webSolver: `${layout} layout, baseY=${baseY}, slot ${i + 1}/${items.length}` +
+      (a.baked ? ', seat-by-origin (baked)' : ''),
   }));
   const seq = c.sequence || [];
   let attentionPlan = seq.filter((s) => s && (s.assetId || s.narration || s.text))
@@ -645,7 +699,66 @@ function brainToWebScene(c, brainBase) {
     detectedDomain: { name: u.domain || 'general', confidence: 'medium', source: c.composer || 'brain' },
     experienceType: u.intent ? cap(u.intent) : (c.composer || 'Experience'),
     glbBase: brainBase, spatialElements, attentionPlan, primaryId,
+    // inputs the web solver worked from — reported back via POST /placement-report
+    solver: {
+      anchor, layout, baseY,
+      scaleMode: (c.stage || {}).scaleMode || pl.scaleMode || 'dynamic',
+      // sceneContract projection carries it as coverage; the raw modular §12 contract
+      // as scale.maxSurfaceCoverage (same knob). Absent in both → JSON drops undefined.
+      coverage: pl.coverage ?? (ds.scale || {}).maxSurfaceCoverage,
+      footprints: items.map((a) => ({ assetId: a.id, meters: a.size, source: a.footprintSource })),
+    },
   };
+}
+
+// §2.2 placement report — tell the brain what this client ACTUALLY did with its
+// placement intent, so /traces/view can put intent vs web reality side by side.
+// Fire-and-forget: rendering never waits on it; failures go to the console.
+function sendPlacementReport(web) {
+  const sv = web && web.solver; if (!sv) return;   // only scenes resolved from a live /modular contract
+  const fitsOn = (p, size) => {
+    const reach = Math.hypot(p[0], p[2]) + Math.max(size[0], size[2]) / 2;
+    if (sv.anchor === 'table') return reach <= 0.75;   // the built room's table radius
+    if (sv.anchor === 'floor') return reach <= 4;      // the built room's floor radius
+    return true;                                       // wall/free: nothing built to collide with
+  };
+  for (const e of elements) e.group.updateMatrixWorld(true);
+  const body = {
+    experienceId: web.experienceId,
+    client: 'web',
+    reportedAt: Date.now() / 1000,
+    solverInputs: {
+      anchorPreference: sv.anchor,
+      scaleMode: sv.scaleMode,
+      coverage: sv.coverage,
+      footprints: sv.footprints,
+      roomSummary: { surfaces: [                       // the synthetic room, as built
+        { kind: 'table', sizeMeters: [1.5, 1.5], y: 0.74 },
+        { kind: 'floor', sizeMeters: [8, 8], y: 0 },
+      ] },
+    },
+    plan: {
+      anchor: sv.anchor,
+      placements: elements.map((e) => ({
+        elementId: e.el.id,
+        position: e.el.placement.position || [0, 0, 0],
+        yaw: THREE.MathUtils.degToRad((e.el.placement.rotationDeg || [0, 0, 0])[1]),
+        scale: e.group.userData.renderScale ?? 1,
+        fits: fitsOn(e.el.placement.position || [0, 0, 0], e.el.placement.sizeMeters || [0.2, 0.2, 0.2]),
+        reason: e.el.webSolver || '',
+      })),
+    },
+    finalPlacements: elements.map((e) => ({
+      elementId: e.el.id,
+      worldTransform: e.group.matrixWorld.elements.slice(),   // 16 floats, column-major (three.js native)
+      renderScale: e.group.userData.renderScale ?? 1,
+      corrections: e.group.userData.corrections || [],
+    })),
+  };
+  fetch(BRAIN_URL + '/placement-report', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  }).then((r) => { if (!r.ok) console.warn('placement-report rejected: ' + r.status); })
+    .catch((e) => console.warn('placement-report failed:', e.message));
 }
 
 // Poll a Meshy generation job and hot-swap the placeholder for the real mesh when
@@ -699,6 +812,8 @@ async function swapElementGlb(elId, url) {
   if (e.action) e.action.paused = !e.playing;
   spawnIn(newGroup, e.box, intentColor(e.el.intent), 0);   // "spawning in" the real Meshy mesh
   e.row?.classList.remove('placeholder');
+  newGroup.userData.corrections = [...(newGroup.userData.corrections || []), 'meshy hot-swap'];
+  sendPlacementReport(contract);   // the final placement changed — re-report (append-only server side)
 }
 
 async function generateFromBrain() {
@@ -717,6 +832,7 @@ async function generateFromBrain() {
     liveGroup.clear(); detections = [];
     const web = brainToWebScene(c, BRAIN_URL);
     await renderScene(web, c.title);
+    sendPlacementReport(web);
     const placeholders = (c.assets || []).filter((a) => !a.glbUrl).length;
     $('hint').textContent = `live from brain · ${c.composer || ''}` +
       (placeholders ? ` · ${placeholders} asset(s) generating via Meshy` : '') +
@@ -734,6 +850,20 @@ $('btnBrain').addEventListener('click', generateFromBrain);
 $('brainPrompt').addEventListener('keydown', (e) => { if (e.key === 'Enter') generateFromBrain(); });
 
 // ---------------------------------------------------------------- UI wiring
+$('btnStrict').classList.toggle('on', strictAssets);
+$('btnStrict').addEventListener('click', async () => {
+  strictAssets = !strictAssets;
+  localStorage.setItem(STRICT_KEY, strictAssets ? '1' : '0');
+  $('btnStrict').classList.toggle('on', strictAssets);
+  if (contract) {
+    try { await renderScene(contract, lastLabel); sendPlacementReport(contract); }
+    catch (err) { console.error('strict re-render failed', err); }
+  }
+  // after the re-render, so renderScene's "Ready" doesn't swallow the feedback
+  setNarration('Strict assets', strictAssets
+    ? 'ON — every GLB renders raw (scale 1.0, no re-centre, no fit), like the phone.'
+    : 'OFF — the viewer fits + re-centres GLBs for preview.');
+});
 $('btnIdentify').addEventListener('click', () => { identifyOn = !identifyOn; applyOverlayVisibility(); });
 $('btnControls').addEventListener('click', () => { controlsOn = !controlsOn; applyOverlayVisibility(); });
 $('btnLive').addEventListener('click', () => { liveOn = !liveOn; applyOverlayVisibility(); });
@@ -816,7 +946,7 @@ window.__dbg = () => ({
   panelVis: elements.map((e) => e.panel?.visible),
   lrKids: labelRenderer.domElement.children.length,
   lrInApp: labelRenderer.domElement.parentNode === document.getElementById('app'),
-  identifyOn, controlsOn,
+  identifyOn, controlsOn, strictAssets,
   tri: renderer.info.render.triangles, calls: renderer.info.render.calls, frames: window.__frames || 0,
 });
 window.__behave = (id, verb) => applyBehavior(id, verb);
@@ -827,6 +957,7 @@ window.__state = () => elements.map((e) => {
   let op = 1; e.group.traverse((o) => { if (o.isMesh && o.material && !Array.isArray(o.material)) op = o.material.opacity; });
   return { id: e.el.id, arch: e.nature?.archetype, spin: e.spinOn ? 1 : 0, att: +(e.att ?? 0).toFixed(2), glow: +(e.mats?.[0]?.emissiveIntensity ?? 0).toFixed(3),
            rotY: +e.group.rotation.y.toFixed(2), scale: +e.group.scale.x.toFixed(3),
+           renderScale: +(e.group.userData.renderScale ?? 1).toFixed(4), corrections: e.group.userData.corrections || [],
            pos: e.group.position.toArray().map((n) => +n.toFixed(2)), opacity: +op.toFixed(2) };
 });
 

@@ -24,7 +24,7 @@
 
   /* top bar */
   #topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 20;
-    display: flex; align-items: center; gap: 14px; padding: 10px 16px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 10px 16px;
     background: linear-gradient(180deg, rgba(8,8,12,0.92), rgba(8,8,12,0.0)); pointer-events: none; }
   #topbar > * { pointer-events: auto; }
   .brand { font-weight: 700; letter-spacing: 0.5px; font-size: 16px; }
@@ -127,6 +127,7 @@
   <button class="btn" id="btnBrain" title="Generate a live experience from the brain (/modular)">✦ Generate</button>
   <button class="btn" id="btnIdentify" title="Toggle identify / hitbox overlay (I)">⊞ Identify / Hitboxes</button>
   <button class="btn" id="btnControls" title="Object-local control panels (O)">⚙ Controls</button>
+  <button class="btn" id="btnStrict" title="Render every GLB raw — scale 1.0, no re-centre, no fit — so the PC reproduces phone failures. Persisted; default off.">▲ Strict assets (fail like the phone)</button>
   <button class="btn alt" id="btnLive" title="Toggle the sample 3D detection overlay (L)">◉ Detections</button>
   <button class="btn alt" id="btnCam" title="Live webcam → Gemini detection (C)">◎ Live cam</button>
   <button class="btn" id="btnStep" title="Step the attention track (Space)">▶ Story step</button>

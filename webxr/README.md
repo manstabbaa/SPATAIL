@@ -21,6 +21,7 @@ The client/dev surface for SPATAIL per the 2026 Master File pivot
 | `Live cam` · **C** | **Webcam → Gemini detector → boxes over the camera feed** (MF p28/p40). |
 | `Story step` · **Space** | Walks the scene's attention track (MF p13), narrating each beat. |
 | `✦ Generate` (prompt box) | **Live from the brain** — sends the prompt to `job_server /modular`, adapts the returned contract, and renders it (see below). |
+| `▲ Strict assets (fail like the phone)` | Renders **every GLB raw** — scale 1.0, no re-centre, no fit — so the PC reproduces phone failures instead of papering over them. Persisted in `localStorage` (`spatail.strictAssets`); default **off**. Toggling re-renders the current scene. |
 | click an object | Selects it (raycast) and shows its object-local control panel. |
 | `Enter XR` | Starts an immersive WebXR session on a headset browser. |
 
@@ -122,6 +123,55 @@ A subject the LLM composer resolves to a library asset renders the **real GLB**
 immediately (verified: "the planet earth" → `earth.glb`, 2,488 tris); a subject with
 no model yet renders a **placeholder box** and the brain queues an asset build
 (`generationJobId`) — poll `/jobs/{id}` and re-generate to pick up the finished GLB.
+
+### Real-scale contract (baked assets honored)
+
+`placeModel` branches on the per-asset real-scale contract that
+`asset_service.produce` stamps into the modular contract
+(`docs/xr/LIVE_BRAIN_SPEC.md`):
+
+- `assets[].realScaleBaked` — the GLB is **already metric with an authored pivot**:
+  rendered at **scale 1.0, never re-centred**, seated by mesh origin exactly like the
+  iOS client (the layout solver gives baked assets the surface point, not a
+  half-height-raised centre). A bad bake fails on the PC the same way it fails on
+  the phone.
+- `assets[].realSizeMeters` (no bake) — the longest dimension is fit to it. In
+  normal mode the mesh is then re-centred as a preview courtesy; in strict mode the
+  authored pivot is honored (fit, but no re-centre).
+- neither — normal mode fits + re-centres to `placement.sizeMeters` (the old
+  behavior); **strict mode renders it raw** (scale 1.0, no re-centre, no fit).
+
+### Honest whys
+
+The viewer **never presents client text as brain reasoning**. In the identify
+panel: **`Brain:`** shows the brain's `decisionTrace` verbatim when the contract
+carries it (spec §2.3) — `placement.decisionTrace` in the modular contract, or
+`sceneContract.placement.designSystem.decisionTrace` when the projection is
+present (the same dict, embedded) — and **`Web solver:`** shows
+this client's own resolution (e.g. `arc layout, baseY=0.78, slot 2/4`). Authored
+scenes keep their contract-authored `whyThisPlacement` under `Why here:`; the
+fabricated placement prose for live scenes is gone.
+
+### Placement report (client:"web")
+
+After the layout solver places a live `/modular` contract (and again after a Meshy
+hot-swap or a strict-mode re-render, since the final placements change), the viewer
+POSTs the spec §2.2 placement-report shape to `{brain}/placement-report` —
+fire-and-forget; failures are console-logged, rendering never waits on it:
+
+- `solverInputs` — anchor preference, scale mode, footprints with provenance
+  (`footprintSource` passed through; `library`/`default_guess` inferred when the
+  contract predates §2.3), and a `roomSummary` of the synthetic room as built
+  (table Ø1.5 m top at y 0.74, floor 8 m).
+- `plan` — per element: resolved position, yaw, applied scale, a geometric `fits`
+  check against the synthetic surfaces, and the `Web solver:` line as `reason`.
+- `finalPlacements` — per element: the rendered `worldTransform` (16 floats,
+  column-major), `renderScale`, and `corrections` describing exactly what the
+  client did to the asset (`re-centred to AABB centre`, `strict: raw render`,
+  `baked: rendered at scale 1.0…`, `meshy hot-swap`, …).
+
+The report lands in `studio/out/traces/{experienceId}.json` → `reports[]` and shows
+up in the brain's `GET /traces/view` attribution page next to the iOS client's.
 
 Run the brain (or use the `spatail-server` preview config):
 ```bash

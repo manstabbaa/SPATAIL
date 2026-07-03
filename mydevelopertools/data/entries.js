@@ -48,7 +48,7 @@ window.SPATAIL_LOG = [
     "why": "The rebuild landed compile-checked from the Mac; the PC is where the brain actually runs, so every new wire behavior had to be proven against real Ollama, Blender, Meshy, and a browser before the phone's live loop goes on air.",
     "tags": ["windows", "vision-engine", "setting-system", "meshy", "webxr", "traces", "bring-up"],
     "files": ["tools/start_spatail_servers.ps1", "public/assets/spatail-library/manifests/generated.json", "studio/out/traces/vision/"],
-    "commits": ["db8ee05", "b3a9329"]
+    "commits": ["56d850c", "b3a9329"]
   },
   {
     "id": "2026-07-02-repo-consolidation",

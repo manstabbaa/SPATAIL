@@ -8,7 +8,16 @@ struct RootView: View {
     @EnvironmentObject private var model: AppModel
     @EnvironmentObject private var uplink: VisionUplink
 
+    // Sever-proof chrome state (see LensView's note on the AttributeGraph
+    // cycle): fed by direct publisher subscriptions, not graph observation.
+    @State private var linkState: LinkState = .idle
+    @State private var overlayOn = false
+    @State private var askState: AppModel.AskState = .idle
+
     var body: some View {
+        #if DEBUG
+        let _ = Self._printChanges()
+        #endif
         ZStack {
             LensView()
                 .ignoresSafeArea()
@@ -20,7 +29,7 @@ struct RootView: View {
 
             VStack(spacing: 0) {
                 HStack(alignment: .top) {
-                    LinkStatusChip(state: uplink.state)
+                    LinkStatusChip(state: linkState)
                     Spacer()
                     toolbar
                 }
@@ -40,6 +49,9 @@ struct RootView: View {
         }
         .sheet(isPresented: $model.showLibrary) { LibraryView() }
         .sheet(isPresented: $model.showSettings) { SettingsView() }
+        .onReceive(uplink.$state) { linkState = $0 }
+        .onReceive(model.$showTruthOverlay) { overlayOn = $0 }
+        .onReceive(model.$askState) { askState = $0 }
         // Deferred out of the render transaction: start() mutates @Published
         // state (uplink.state, …) and doing that DURING the first view update
         // is what produced "AttributeGraph: cycle detected" and a severed,
@@ -53,7 +65,7 @@ struct RootView: View {
     private var toolbar: some View {
         HStack(spacing: SpatailSpace.s1) {
             SpatailIconButton(systemName: "eye", label: "Truth overlay",
-                              variant: .ghost, active: model.showTruthOverlay) {
+                              variant: .ghost, active: overlayOn) {
                 model.showTruthOverlay.toggle()
             }
             SpatailIconButton(systemName: "books.vertical", label: "Library",
@@ -73,7 +85,7 @@ struct RootView: View {
 
     @ViewBuilder
     private var askStatus: some View {
-        switch model.askState {
+        switch askState {
         case .idle:
             EmptyView()
         case .generating(let prompt):

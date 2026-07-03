@@ -29,11 +29,27 @@ struct LensView: View {
     @StateObject private var chips = LensChipsModel()
     @ObservedObject private var askScope = AskScope.shared
 
+    // SEVER-PROOF HUD STATE. Field sessions 2026-07-03: an AttributeGraph
+    // cycle (fires in the FIRST body pass, attribute 7336) severs the
+    // environment-observation edges — @Published changes stop re-rendering
+    // this view while every service runs. Until the cycling attribute is
+    // found (Self._printChanges below names it), everything ambient renders
+    // from local @State fed by DIRECT publisher subscriptions (.onReceive):
+    // value delivery that works even when observation invalidation doesn't.
+    @State private var pillCount = 0
+    @State private var pillPct = 0
+    @State private var overlayOn = false
+    @State private var linkState: LinkState = .idle
+    @State private var chipRows: [LensChipsModel.Chip] = []
+
     var body: some View {
+        #if DEBUG
+        let _ = Self._printChanges()
+        #endif
         ZStack {
             ARViewContainer(arView: hub.arView)
 
-            if model.showTruthOverlay {
+            if overlayOn {
                 TruthOverlayView()
             }
 
@@ -57,16 +73,26 @@ struct LensView: View {
                 print("[UI] Lens observing scanner \(scanner.tag)")
             }
         }
-        .onChange(of: scanner.surfaces.count) { _, n in
-            print("[UI] pill sees \(n) surfaces (scanner \(scanner.tag))")
+        .onReceive(scanner.$surfaces) { surfaces in
+            if surfaces.count != pillCount {
+                print("[UI] pill sees \(surfaces.count) surfaces (scanner \(scanner.tag))")
+            }
+            pillCount = surfaces.count
         }
+        .onReceive(scanner.$coveragePercent) { pillPct = Int($0.rounded()) }
+        .onReceive(model.$showTruthOverlay) { on in
+            if on != overlayOn { print("[UI] overlay toggle -> \(on)") }
+            overlayOn = on
+        }
+        .onReceive(uplink.$state) { linkState = $0 }
+        .onReceive(chips.$chips) { chipRows = $0 }
         .onDisappear { chips.detach() }
     }
 
     // MARK: Object chips
 
     private var chipsLayer: some View {
-        ForEach(chips.chips) { chip in
+        ForEach(chipRows) { chip in
             ObjectChip(chip: chip) { part in
                 askScope.target(objectId: chip.id, label: chip.label, part: part)
             }
@@ -85,9 +111,9 @@ struct LensView: View {
             // whole revealed room-box) honestly reads 0% early in a big space,
             // which looks broken while 13 surfaces exist (field report
             // 2026-07-03). "What has it found" beats "how much is left".
-            Text(scanner.surfaces.isEmpty
+            Text(pillCount == 0
                  ? "Scanning…"
-                 : "\(scanner.surfaces.count) surfaces · \(Int(scanner.coveragePercent.rounded()))%")
+                 : "\(pillCount) surfaces · \(pillPct)%")
                 .spatailType(.micro, weight: .medium)
                 .foregroundStyle(SpatailColor.paper)
 
@@ -107,7 +133,7 @@ struct LensView: View {
     }
 
     private var linkDot: Color {
-        switch uplink.state {
+        switch linkState {
         case .idle: return SpatailColor.textFaint
         case .connecting: return SpatailColor.statusWarning
         case .streaming: return SpatailColor.statusSuccess

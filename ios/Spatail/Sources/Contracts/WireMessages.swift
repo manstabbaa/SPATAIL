@@ -349,6 +349,10 @@ struct RoomUpdateEnvelope: Encodable {
     struct Payload: Encodable {
         var room: RoomContractWire
         var pose: PoseWire?
+        /// The user's active ask (spec §1.2) — scopes live replans to a question
+        /// so the brain can emit part-addressed targets. Absent (nil) clears any
+        /// held concept server-side: stale questions must not steer later plans.
+        var concept: String?
     }
     var type = "room.update"
     var payload: Payload

@@ -88,12 +88,17 @@ final class AppModel: ObservableObject {
             .store(in: &cancellables)
 
         // Experience deltas → runtime, ignored until room.update has gone out on
-        // THIS connection (spec §1.5 — the delta gate, actually enforced).
+        // THIS connection (spec §1.5), AND only while the user has an active ask.
+        // Content appears because it was asked for (MATTER: "why it appears"
+        // precedes appearance) — the live brain replans continuously, but an
+        // unprompted plan renders nothing. The Truth Overlay still reads the
+        // delta's fused/target directly off the uplink regardless.
         uplink.$lastExperienceDelta
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] delta in
-                guard let self, self.uplink.hasSentRoomThisConnection else { return }
+                guard let self, self.uplink.hasSentRoomThisConnection,
+                      self.liveConcept != nil else { return }
                 self.runtime.apply(delta: delta, arView: self.hub.arView,
                                    surfaces: self.scanner.surfaces,
                                    objects: self.registry.objects)
@@ -189,6 +194,14 @@ final class AppModel: ObservableObject {
         askHistory.removeAll { $0 == trimmed }
         askHistory.insert(trimmed, at: 0)
         if askHistory.count > 24 { askHistory.removeLast(askHistory.count - 24) }
+        // Scope the LIVE loop to this question too: the concept rides room.update
+        // so the PC brain plans for what was actually asked (and can emit a
+        // part-addressed target — the bottle-cap path). Also un-gates live
+        // delta content, which never renders without an active ask.
+        if uplink.state == .streaming {
+            liveConcept = trimmed
+            sendRoomSnapshot()
+        }
 
         Task { [weak self] in
             do {
@@ -220,13 +233,24 @@ final class AppModel: ObservableObject {
 
     func clearExperience() {
         runtime.clear()
+        // Clearing content also retires the question: the next room.update goes
+        // up without a concept, which clears it server-side too (spec §1.2).
+        if liveConcept != nil {
+            liveConcept = nil
+            if uplink.state == .streaming { sendRoomSnapshot() }
+        }
     }
 
     // MARK: Room uplink
 
+    /// The user's active ask, riding every room.update while set. Live delta
+    /// content is gated on this — nothing renders unprompted.
+    @Published private(set) var liveConcept: String?
+
     private func sendRoomSnapshot() {
         // Pose rides its own 2 Hz channel via FrameStreamer; nil here is correct.
-        uplink.sendRoom(surfaces: scanner.surfaces, objects: registry.objects, pose: nil)
+        uplink.sendRoom(surfaces: scanner.surfaces, objects: registry.objects,
+                        pose: nil, concept: liveConcept)
     }
 
     // MARK: Identity fusion

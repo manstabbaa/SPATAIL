@@ -256,13 +256,15 @@ final class VisionUplink: NSObject, ObservableObject {
     /// Send the current room truth: merged surfaces + tracked objects (+ pose,
     /// when the caller isn't already running the 2 Hz pose channel). Arms the
     /// §1.5 delta gate for this connection.
-    func sendRoom(surfaces: [RoomSurface], objects: [SpatailObject], pose: PoseWire?) {
+    func sendRoom(surfaces: [RoomSurface], objects: [SpatailObject], pose: PoseWire?,
+                  concept: String? = nil) {
         guard let sender = senderBox.value else { return }
         let room = RoomContractWire(surfaces: surfaces, objects: objects,
                                     roomId: roomId,
                                     device: UIDevice.current.model,
                                     lidar: Self.lidarAvailable)
-        let envelope = RoomUpdateEnvelope(payload: .init(room: room, pose: pose))
+        let envelope = RoomUpdateEnvelope(payload: .init(room: room, pose: pose,
+                                                         concept: concept))
         do {
             let data = try encoder.encode(envelope)
             guard let text = String(data: data, encoding: .utf8) else { return }

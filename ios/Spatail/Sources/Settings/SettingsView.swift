@@ -40,9 +40,21 @@ struct SettingsView: View {
 
     // MARK: Endpoints
 
+    @State private var hostShortcut = ""
+
     private var endpointsCard: some View {
         SettingsCard(eyebrow: "PC brain", title: "Endpoints") {
             VStack(alignment: .leading, spacing: SpatailSpace.s4) {
+                // The one field most people need: a host name fills both URLs.
+                HStack(alignment: .bottom, spacing: SpatailSpace.s2) {
+                    EndpointField(label: "PC host (fills both URLs)",
+                                  placeholder: "mansourspc or 192.168.1.160",
+                                  text: $hostShortcut)
+                    SpatailButton(title: "Apply", variant: .secondary) {
+                        settings.applyHost(hostShortcut)
+                    }
+                }
+
                 EndpointField(label: "Job server (HTTP)",
                               placeholder: SettingsStore.defaultJobServerURL,
                               text: $settings.jobServerURLString)

@@ -77,6 +77,21 @@ final class SettingsStore: ObservableObject {
         visionSocketURLString = Self.defaultVisionSocketURL
     }
 
+    /// One-field convenience: point BOTH endpoints at a PC hostname or IP
+    /// (Tailscale MagicDNS name like "mansourspc", or a LAN IP) on the
+    /// standard ports. Scheme prefixes and stray slashes are forgiven.
+    func applyHost(_ host: String) {
+        var h = host.trimmingCharacters(in: .whitespacesAndNewlines)
+        for prefix in ["http://", "https://", "ws://", "wss://"] where h.hasPrefix(prefix) {
+            h = String(h.dropFirst(prefix.count))
+        }
+        h = h.trimmingCharacters(in: CharacterSet(charactersIn: "/ "))
+        if let colon = h.firstIndex(of: ":") { h = String(h[..<colon]) }
+        guard !h.isEmpty else { return }
+        jobServerURLString = "http://\(h):8788"
+        visionSocketURLString = "ws://\(h):8798/v1/vision"
+    }
+
     // MARK: Normalization
 
     /// Trim, add the scheme when the user typed a bare host, require a host,

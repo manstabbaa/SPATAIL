@@ -67,6 +67,10 @@ final class LivePerceptionPipeline: ObservableObject {
     private let registry: ObjectRegistry
     private let surfacesProvider: () -> [RoomSurface]
     private var service: DetectionService
+    /// Perception v2 — the Form Engine. Mask-based sampling, multi-view fusion,
+    /// parametric fitting, transparency fallback. All off-main on its own
+    /// single-flight serial queue; results come back as immutable values.
+    private let formEngine = FormEngine()
 
     private static let consumerId = "perception.live-pipeline"
     private var running = false
@@ -92,6 +96,16 @@ final class LivePerceptionPipeline: ObservableObject {
         self.source = initial
         self.service = initial.makeService()
         debug.noteSource(service.sourceName)
+
+        // Form Engine results land on MAIN as immutable values → registry + debug.
+        formEngine.onResults = { [weak self] publication in
+            guard let self else { return }
+            self.registry.applyForms(publication.results, now: publication.timestamp)
+            self.debug.recordFormPass(maskMillis: publication.maskMillis,
+                                      degraded: publication.degraded,
+                                      resultCount: publication.results.count,
+                                      notes: publication.notes)
+        }
     }
 
     // MARK: Lifecycle
@@ -195,7 +209,16 @@ final class LivePerceptionPipeline: ObservableObject {
             }
         }
 
-        registry.ingest(resolvedList, now: frame.timestamp)
+        // Ingest with the rescue projector (prior-form objects match by image IoU
+        // when their world OBB is seated but the single-frame depth is garbage).
+        let liveCamera = frame.camera
+        let matches = registry.ingest(resolvedList, now: frame.timestamp,
+                                      projector: { Self.project(obb: $0, camera: liveCamera) })
+
+        // Perception v2: hand the frame + matched detections to the Form Engine
+        // (single-flight, off-main; drop-on-busy keeps the 1–2 Hz clock honest).
+        submitFormPass(resolved: resolvedList, matches: matches, frame: frame,
+                       interfaceOrientation: interfaceOrientation)
 
         debug.recordTick(sourceName: service.sourceName,
                          detections: detections,
@@ -203,6 +226,89 @@ final class LivePerceptionPipeline: ObservableObject {
                          inferenceMillis: inferenceMillis,
                          frameTimestamp: frame.timestamp,
                          error: errorText)
+    }
+
+    // MARK: Form Engine feed (main-side capture, background everything else)
+
+    private func submitFormPass(resolved: [ResolvedDetection],
+                                matches: [UUID: UUID],
+                                frame: ARFrame,
+                                interfaceOrientation: UIInterfaceOrientation) {
+        guard !resolved.isEmpty else { return }
+        // Stage 1 samples the SMOOTHED scene depth (temporal filtering suits
+        // accumulation); plain sceneDepth is the fallback carrier of the same maps.
+        guard let sceneDepth = frame.smoothedSceneDepth ?? frame.sceneDepth
+        else { return }   // no LiDAR → no form engine (raycast grid already ran)
+
+        let orientation = Self.cgOrientation(for: interfaceOrientation)
+        let camPos = frame.camera.transform.columns.3
+
+        var candidates: [FormEngine.Candidate] = []
+        for r in resolved {
+            guard let objectId = matches[r.detection.id] else { continue }
+            // Class label: adopted registry identity first, detector label second.
+            let label = registry.objects.first(where: { $0.id == objectId })?.label
+                ?? r.detection.label
+            let support = supportObservation(underBox: r.detection.box, frame: frame,
+                                             orientation: orientation,
+                                             interfaceOrientation: interfaceOrientation)
+            candidates.append(FormEngine.Candidate(objectId: objectId,
+                                                   sensorBox: r.detection.box,
+                                                   classLabel: label,
+                                                   measurementCenter: r.obb.center,
+                                                   support: support))
+        }
+        guard !candidates.isEmpty else { return }
+
+        let pass = FormEngine.Pass(capturedImage: frame.capturedImage,
+                                   depthMap: sceneDepth.depthMap,
+                                   confidenceMap: sceneDepth.confidenceMap,
+                                   intrinsics: frame.camera.intrinsics,
+                                   imageResolution: frame.camera.imageResolution,
+                                   cameraTransform: frame.camera.transform,
+                                   cameraPosition: SIMD3(camPos.x, camPos.y, camPos.z),
+                                   orientation: orientation,
+                                   timestamp: frame.timestamp,
+                                   candidates: candidates,
+                                   liveObjectIds: Set(registry.objects.map(\.id)))
+        formEngine.submit(pass)
+    }
+
+    /// Raycast the horizontal surface just under a detection's silhouette (upright-
+    /// space bottom-center) — the seat + range the transparency fallback scales
+    /// priors with. Main-actor (ARView raycast); one cheap cast per detection.
+    private func supportObservation(underBox box: CGRect, frame: ARFrame,
+                                    orientation: CGImagePropertyOrientation,
+                                    interfaceOrientation: UIInterfaceOrientation)
+        -> FormEngine.SupportObservation? {
+        let viewSize = hub.arView.bounds.size
+        guard viewSize.width > 1, viewSize.height > 1 else { return nil }
+
+        let upright = MaskProvider.uprightRect(fromSensor: box, orientation: orientation)
+        let uprightBottom = CGPoint(x: upright.midX,
+                                    y: min(upright.maxY + 0.02, 0.995))
+        let sensorPoint = MaskProvider.sensorPoint(fromUpright: uprightBottom,
+                                                   orientation: orientation)
+        let display = frame.displayTransform(for: interfaceOrientation,
+                                             viewportSize: viewSize)
+        let viewNorm = sensorPoint.applying(display)
+        guard (0...1).contains(viewNorm.x), (0...1).contains(viewNorm.y) else { return nil }
+        let screenPoint = CGPoint(x: viewNorm.x * viewSize.width,
+                                  y: viewNorm.y * viewSize.height)
+
+        let hit = hub.arView.raycast(from: screenPoint,
+                                     allowing: .existingPlaneGeometry,
+                                     alignment: .horizontal).first
+            ?? hub.arView.raycast(from: screenPoint,
+                                  allowing: .estimatedPlane,
+                                  alignment: .horizontal).first
+        guard let hit else { return nil }
+        let c = hit.worldTransform.columns.3
+        let world = SIMD3<Float>(c.x, c.y, c.z)
+        // Pinhole z-depth of the seat (silhouette scaling wants Z, not ray range).
+        let camSpace = frame.camera.transform.inverse * SIMD4<Float>(c.x, c.y, c.z, 1)
+        guard camSpace.z < -0.01 else { return nil }
+        return FormEngine.SupportObservation(point: world, zDepth: -camSpace.z)
     }
 
     // MARK: Identity-attach helpers (consumed by ObjectRegistry.applyIdentity)

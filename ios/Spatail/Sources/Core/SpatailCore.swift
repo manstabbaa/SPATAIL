@@ -71,15 +71,72 @@ public struct SpatailPart: Codable, Identifiable, Equatable, Sendable {
     /// Resolved world region, clamped inside the parent OBB.
     public var region: OrientedBox?
     public var confidence: Float
+    /// true when the region was MEASURED by the Form Engine (e.g. the cap found as a
+    /// radius step in the fitted revolution profile). A measured part supersedes the
+    /// §3 heuristic slice and VLM box resolution. Optional so old payloads decode
+    /// (nil reads as false) — additive, wire-safe.
+    public var measured: Bool?
 
     public init(id: UUID = UUID(), label: String, box: CGRect?, region: OrientedBox?,
-                confidence: Float) {
+                confidence: Float, measured: Bool? = nil) {
         self.id = id
         self.label = label
         self.box = box
         self.region = region
         self.confidence = confidence
+        self.measured = measured
     }
+
+    /// Convenience: nil-safe measured flag.
+    public var isMeasured: Bool { measured == true }
+}
+
+// MARK: - Object form (Perception v2 — the Form Engine)
+
+/// The parametric form of a measured object — what the Form Engine fitted (or, when
+/// depth collapsed under it, assumed from a class prior). Additive wire field on
+/// `room.update.objects[]` (spec §1.2 allows additive); existing consumers ignore it.
+public struct ObjectForm: Codable, Equatable, Sendable {
+    /// Geometry family the dimensions describe.
+    public enum Kind: String, Codable, Sendable {
+        /// Surface of revolution about the gravity axis (bottle, can, cup, …).
+        case revolution
+        /// Oriented box (yaw-only about gravity) — the boxy/unknown path.
+        case box
+    }
+
+    /// Provenance — HONEST tagging is mandatory: `.measured` means the dimensions
+    /// came from fused depth points; `.prior` means depth was unreliable (transparent
+    /// object) and the dimensions are class-prior constants, possibly silhouette-scaled.
+    public enum Source: String, Codable, Sendable {
+        case measured, prior
+    }
+
+    public var kind: Kind
+    /// Metres, keys as present: revolution → bodyDiameter, height (+ capDiameter,
+    /// capHeight when a cap step was found); box → width, depth, height.
+    public var dimensions: [String: Float]
+    public var source: Source
+    /// Fraction (0–1) of the azimuth arc around the object's gravity axis the camera
+    /// has observed it from — single-sided vs. surrounded observation.
+    public var arcCoverage: Float
+    /// Fit residual, metres (RMS radial error for revolution, RMS face distance for
+    /// box). 0 for priors — there is nothing measured to have a residual against.
+    public var residual: Float
+
+    public init(kind: Kind, dimensions: [String: Float], source: Source,
+                arcCoverage: Float, residual: Float) {
+        self.kind = kind
+        self.dimensions = dimensions
+        self.source = source
+        self.arcCoverage = arcCoverage
+        self.residual = residual
+    }
+
+    public var bodyDiameter: Float? { dimensions["bodyDiameter"] }
+    public var height: Float? { dimensions["height"] }
+    public var capDiameter: Float? { dimensions["capDiameter"] }
+    public var capHeight: Float? { dimensions["capHeight"] }
 }
 
 /// A persistent, world-anchored object instance: measured form (ARKit) fused with
@@ -92,18 +149,26 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
     public var obb: OrientedBox
     public var supportSurfaceId: String?
     public var parts: [SpatailPart]
+    /// Fitted parametric form (Form Engine) — nil until a fit lands. Additive wire
+    /// field: `room.update.objects[]` simply gains it (spec §1.2 allows additive).
+    public var form: ObjectForm?
     /// Debounce state — a candidate label must win twice (or conf ≥ 0.8) to be adopted.
     /// Property defaults required: these are excluded from CodingKeys (not wire fields),
     /// so Decodable synthesis needs them defaulted when decoding wire payloads.
     public var pendingLabel: String? = nil
     public var pendingCount: Int = 0
+    /// When the form was last fitted (device uptime clock) — freshness gate for the
+    /// registry's smoothing rules. Device-local, NOT a wire field.
+    public var formUpdatedAt: TimeInterval? = nil
     public var lastMeasuredAt: TimeInterval
     public var lastIdentifiedAt: TimeInterval?
 
     public init(id: UUID = UUID(), label: String? = nil, confidence: Float = 0,
                 obb: OrientedBox, supportSurfaceId: String? = nil,
-                parts: [SpatailPart] = [], pendingLabel: String? = nil,
-                pendingCount: Int = 0, lastMeasuredAt: TimeInterval,
+                parts: [SpatailPart] = [], form: ObjectForm? = nil,
+                pendingLabel: String? = nil,
+                pendingCount: Int = 0, formUpdatedAt: TimeInterval? = nil,
+                lastMeasuredAt: TimeInterval,
                 lastIdentifiedAt: TimeInterval? = nil) {
         self.id = id
         self.label = label
@@ -111,8 +176,10 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
         self.obb = obb
         self.supportSurfaceId = supportSurfaceId
         self.parts = parts
+        self.form = form
         self.pendingLabel = pendingLabel
         self.pendingCount = pendingCount
+        self.formUpdatedAt = formUpdatedAt
         self.lastMeasuredAt = lastMeasuredAt
         self.lastIdentifiedAt = lastIdentifiedAt
     }
@@ -123,8 +190,8 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        // pendingLabel/pendingCount are debounce internals — not wire fields.
-        case id, label, confidence, obb, supportSurfaceId, parts
+        // pendingLabel/pendingCount/formUpdatedAt are device internals — not wire fields.
+        case id, label, confidence, obb, supportSurfaceId, parts, form
         case lastMeasuredAt = "lastSeenAt"
         case lastIdentifiedAt
     }

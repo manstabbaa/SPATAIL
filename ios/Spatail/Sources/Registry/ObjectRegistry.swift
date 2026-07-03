@@ -50,6 +50,18 @@ final class ObjectRegistry: ObservableObject {
     private static let topSliceLabels: Set<String> = ["cap", "lid", "top"]
     /// Fraction of the parent's height the fallback slice occupies.
     private static let topSliceFraction: Float = 0.2
+    /// A fitted form older than this no longer pins the OBB (form engine stalled →
+    /// revert to plain grid smoothing rather than freeze a stale shape).
+    private static let formFreshnessSeconds: TimeInterval = 12
+    /// A fresh MEASURED form is not displaced by an incoming PRIOR for this long
+    /// (one occluded frame must not demote real measurements to guesses).
+    private static let measuredFormRetention: TimeInterval = 15
+    /// Image-IoU gate for the prior-object rescue match (world centers can't match
+    /// when depth under the object is garbage — the image still can).
+    private static let rescueIoU = 0.4
+    /// A single-frame measurement this far from a form-pinned OBB means the object
+    /// truly moved — drop the pinned form and track normally again.
+    private static let formJumpEscape: Float = 0.3
 
     // MARK: Published state
 
@@ -80,8 +92,16 @@ final class ObjectRegistry: ObservableObject {
 
     // MARK: - Measurement ingest (1–2 Hz)
 
-    func ingest(_ resolved: [ResolvedDetection], now: TimeInterval) {
+    /// Returns the detection-id → object-id matching, so the Form Engine can
+    /// accumulate each detection's masked points into the right object's cloud.
+    /// `projector` (world OBB → normalized current-frame rect) powers the rescue
+    /// match for prior-form objects: when depth under a transparent object is
+    /// garbage, world centers can't match — the image still can.
+    @discardableResult
+    func ingest(_ resolved: [ResolvedDetection], now: TimeInterval,
+                projector: ((OrientedBox) -> CGRect?)? = nil) -> [UUID: UUID] {
         var updated = objects
+        var matches: [UUID: UUID] = [:]
 
         // Greedy one-to-one matching, nearest pair first.
         struct Pair { let detectionIdx: Int; let objectIdx: Int; let distance: Float }
@@ -106,19 +126,45 @@ final class ObjectRegistry: ObservableObject {
 
             let r = resolved[pair.detectionIdx]
             var obj = updated[pair.objectIdx]
-            obj.obb = RegistryFusion.smooth(old: obj.obb, new: r.obb, alpha: Self.smoothing)
-            // Support surface refresh on ingest; keep the last known link when this
-            // measurement's taps missed the surface entirely.
-            if let support = r.supportSurfaceId { obj.supportSurfaceId = support }
-            obj.lastMeasuredAt = now
+            Self.fuse(measurement: r, into: &obj, now: now)
             updated[pair.objectIdx] = obj
+            matches[r.detection.id] = obj.id
+        }
+
+        // Rescue match (Form Engine stage 4): a PRIOR-form object's OBB is seated
+        // from the support raycast while the single-frame depth under it stays
+        // garbage — center gating would mint a duplicate every tick. Match by
+        // image-space IoU instead; never let the garbage OBB touch the seated one.
+        if let projector {
+            for (di, r) in resolved.enumerated() where !usedDetections.contains(di) {
+                var best: (objectIdx: Int, iou: Double)?
+                for (oi, obj) in updated.enumerated() where !usedObjects.contains(oi) {
+                    guard obj.form?.source == .prior,
+                          let at = obj.formUpdatedAt,
+                          now - at < Self.formFreshnessSeconds * 2,
+                          let rect = projector(obj.obb) else { continue }
+                    let iou = detectionIoU(r.detection.box, rect)
+                    if iou >= Self.rescueIoU, iou > (best?.iou ?? 0) {
+                        best = (oi, iou)
+                    }
+                }
+                guard let best else { continue }
+                usedDetections.insert(di)
+                usedObjects.insert(best.objectIdx)
+                var obj = updated[best.objectIdx]
+                obj.lastMeasuredAt = now       // seen — OBB stays prior-seated
+                updated[best.objectIdx] = obj
+                matches[r.detection.id] = obj.id
+            }
         }
 
         // Unmatched measurements mint new objects.
         for (di, r) in resolved.enumerated() where !usedDetections.contains(di) {
-            updated.append(SpatailObject(obb: r.obb,
-                                         supportSurfaceId: r.supportSurfaceId,
-                                         lastMeasuredAt: now))
+            let minted = SpatailObject(obb: r.obb,
+                                       supportSurfaceId: r.supportSurfaceId,
+                                       lastMeasuredAt: now)
+            updated.append(minted)
+            matches[r.detection.id] = minted.id
         }
 
         // Expiry — ~10 s unseen, unless pinned by a placed experience.
@@ -135,6 +181,109 @@ final class ObjectRegistry: ObservableObject {
         for obj in updated { syncAnchor(for: obj) }
 
         objects = updated   // single publish
+        return matches
+    }
+
+    /// One matched measurement → object update, honoring the fitted form:
+    ///   • fresh MEASURED form → smooth the CENTER only (reduced alpha; the profile
+    ///     owns extents/yaw — this replaces the light whole-OBB smoothing);
+    ///   • fresh PRIOR form → leave the seated OBB alone (single-frame depth under
+    ///     a transparent object is garbage by definition);
+    ///   • a big jump means the object truly moved → drop the pinned form, smooth
+    ///     normally (the Form Engine's cloud resets and refits).
+    private static func fuse(measurement r: ResolvedDetection,
+                             into obj: inout SpatailObject, now: TimeInterval) {
+        let formFresh = obj.form != nil
+            && obj.formUpdatedAt.map { now - $0 < formFreshnessSeconds } ?? false
+        let jumped = simd_distance(r.obb.center, obj.obb.center) > formJumpEscape
+
+        if formFresh, !jumped, let form = obj.form {
+            switch form.source {
+            case .measured:
+                let smoothed = RegistryFusion.smooth(old: obj.obb, new: r.obb,
+                                                     alpha: smoothing * 0.4)
+                obj.obb = OrientedBox(center: smoothed.center,
+                                      extents: obj.obb.extents,
+                                      yaw: obj.obb.yaw)
+            case .prior:
+                break
+            }
+        } else {
+            if jumped, obj.form != nil {
+                obj.form = nil
+                obj.formUpdatedAt = nil
+                obj.parts.removeAll { $0.isMeasured && $0.box == nil }
+            }
+            obj.obb = RegistryFusion.smooth(old: obj.obb, new: r.obb, alpha: smoothing)
+        }
+        // Support surface refresh on ingest; keep the last known link when this
+        // measurement's taps missed the surface entirely.
+        if let support = r.supportSurfaceId { obj.supportSurfaceId = support }
+        obj.lastMeasuredAt = now
+    }
+
+    // MARK: - Form ingest (Form Engine → registry, immutable results on main)
+
+    /// Fold fitted forms in. MEASURED forms replace the OBB with the profile-derived
+    /// one and carry the measured "cap" part (which supersedes the §3 heuristic
+    /// slice); PRIOR forms re-seat the OBB on the support surface. A fresh measured
+    /// form is never displaced by an incoming prior.
+    func applyForms(_ results: [FittedFormResult], now: TimeInterval) {
+        guard !results.isEmpty else { return }
+        var updated = objects
+        var changed = false
+
+        for result in results {
+            guard let idx = updated.firstIndex(where: { $0.id == result.objectId })
+            else { continue }
+            var obj = updated[idx]
+
+            if result.form.source == .prior,
+               let existing = obj.form, existing.source == .measured,
+               let at = obj.formUpdatedAt, now - at < Self.measuredFormRetention {
+                continue   // fresh measurement outranks a guess
+            }
+
+            obj.form = result.form
+            obj.formUpdatedAt = result.fittedAt
+            if let obb = result.obb { obj.obb = obb }
+
+            if let capRegion = result.capRegion {
+                upsertMeasuredCap(region: capRegion, into: &obj)
+            } else if result.form.source == .measured {
+                // A refit that finds NO cap step retires a previously measured cap
+                // (VLM-boxed parts fall back to normal identity resolution).
+                if let pi = obj.parts.firstIndex(where: {
+                    $0.isMeasured && Self.topSliceLabels.contains($0.label.lowercased())
+                }) {
+                    if obj.parts[pi].box == nil {
+                        obj.parts.remove(at: pi)
+                    } else {
+                        obj.parts[pi].measured = nil
+                    }
+                }
+            }
+
+            updated[idx] = obj
+            syncAnchor(for: obj)
+            changed = true
+        }
+
+        if changed { objects = updated }   // single publish
+    }
+
+    /// Keep part identity stable across refits (no id churn for SwiftUI/renderer).
+    private func upsertMeasuredCap(region: OrientedBox, into obj: inout SpatailObject) {
+        if let pi = obj.parts.firstIndex(where: {
+            Self.topSliceLabels.contains($0.label.lowercased())
+        }) {
+            obj.parts[pi].region = region
+            obj.parts[pi].measured = true
+            obj.parts[pi].confidence = max(obj.parts[pi].confidence, 0.9)
+        } else {
+            obj.parts.append(SpatailPart(label: "cap", box: nil, region: region,
+                                         confidence: 0.9, measured: true))
+        }
     }
 
     // MARK: - Identity attach (~1 Hz)
@@ -202,23 +351,37 @@ final class ObjectRegistry: ObservableObject {
             }
         }
 
-        // Parts → sub-regions of the primary object.
+        // Parts → sub-regions of the primary object. MEASURED parts (Form Engine —
+        // e.g. the cap found as a radius step in the fitted profile) survive every
+        // identity tick and SUPERSEDE the VLM box / §3 heuristic slice for the same
+        // part; only unmeasured labels resolve through the depth-grid path.
         if let pi = primaryObjectIdx, !parts.isEmpty {
             var parent = updated[pi]
-            parent.parts = parts.map { part in
+            let measured = parent.parts.filter(\.isMeasured)
+            var newParts = measured
+            for part in parts {
+                let partLabel = part.label.lowercased()
+                let superseded = measured.contains {
+                    let m = $0.label.lowercased()
+                    return m == partLabel
+                        || (Self.topSliceLabels.contains(m)
+                            && Self.topSliceLabels.contains(partLabel))
+                }
+                if superseded { continue }
                 let region: OrientedBox?
                 if let box = part.box, let raw = resolver(box) {
                     region = RegistryFusion.clamp(region: raw, into: parent.obb)
                 } else if part.box == nil,
-                          Self.topSliceLabels.contains(part.label.lowercased()) {
+                          Self.topSliceLabels.contains(partLabel) {
                     region = RegistryFusion.topSlice(of: parent.obb,
                                                      fraction: Self.topSliceFraction)
                 } else {
                     region = nil
                 }
-                return SpatailPart(label: part.label, box: part.box,
-                                   region: region, confidence: part.confidence)
+                newParts.append(SpatailPart(label: part.label, box: part.box,
+                                            region: region, confidence: part.confidence))
             }
+            parent.parts = newParts
             updated[pi] = parent
         }
 

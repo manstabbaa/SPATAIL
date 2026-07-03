@@ -79,6 +79,16 @@ final class PerceptionDebugModel: ObservableObject {
     /// Why each placed element landed where it did — pushed by the placement side.
     @Published private(set) var placementRationales: [String] = []
 
+    // Form Engine truth (Perception v2): the mask clock and per-object fit lines.
+    /// Wall-clock cost of the last Vision instance-mask request (nil = skipped).
+    @Published private(set) var lastMaskMillis: Double?
+    /// True while the engine has degraded to box masks (mask latency over budget).
+    @Published private(set) var formDegraded = false
+    /// Fits/priors emitted by the last form pass.
+    @Published private(set) var lastFormResultCount = 0
+    /// Terse per-candidate lines ("bottle: revolution fit, 4812 pts, 62% arc…").
+    @Published private(set) var lastFormNotes: [String] = []
+
     // Convenience read-outs for the overlay header.
     var resolvedCount: Int { lastOutcomes.filter(\.isResolved).count }
     var detectionCount: Int { lastDetections.count }
@@ -109,5 +119,14 @@ final class PerceptionDebugModel: ObservableObject {
     /// per-placement `reason` strings from the latest applied plan.
     func recordPlacementRationales(_ lines: [String]) {
         placementRationales = lines
+    }
+
+    /// Called once per completed Form Engine pass (on main, immutable summary).
+    func recordFormPass(maskMillis: Double?, degraded: Bool,
+                        resultCount: Int, notes: [String]) {
+        lastMaskMillis = maskMillis
+        formDegraded = degraded
+        lastFormResultCount = resultCount
+        lastFormNotes = notes
     }
 }

@@ -42,9 +42,10 @@ struct TruthOverlayView: View {
                     .position(label.point)
             }
 
-            // (b) object labels — "bottle · 0.91 · 1.2s"
+            // (b) object labels — "bottle · 0.91 · 1.2s" + measured dimensions
             ForEach(model.objectLabels) { label in
-                TruthTag(text: label.text, dot: label.dot, accent: label.accent)
+                TruthTag(text: label.text, dot: label.dot, accent: label.accent,
+                         sublines: label.sublines)
                     .position(label.point)
             }
 
@@ -98,24 +99,37 @@ struct TruthOverlayView: View {
 // MARK: - Pieces
 
 /// A tiny projected tag: color dot + monospaced-feel micro text on a dark pill.
+/// `sublines` carry the Form Engine's measured-dimension truth ("⌀ 63 · h 218 ·
+/// cap ⌀ 31 mm" / "measured · 62% arc") — the caliper-verification instrument.
 private struct TruthTag: View {
     let text: String
     let dot: Color
     let accent: Bool
+    var sublines: [String] = []
 
     var body: some View {
-        HStack(spacing: SpatailSpace.s1) {
-            Circle().fill(dot).frame(width: 6, height: 6)
-            Text(text)
-                .spatailType(.micro, weight: .medium)
-                .foregroundStyle(SpatailColor.paper)
-                .lineLimit(1)
+        VStack(alignment: .leading, spacing: 1) {
+            HStack(spacing: SpatailSpace.s1) {
+                Circle().fill(dot).frame(width: 6, height: 6)
+                Text(text)
+                    .spatailType(.micro, weight: .medium)
+                    .foregroundStyle(SpatailColor.paper)
+                    .lineLimit(1)
+            }
+            ForEach(sublines, id: \.self) { line in
+                Text(line)
+                    .spatailType(.micro)
+                    .foregroundStyle(SpatailColor.paper.opacity(0.82))
+                    .lineLimit(1)
+                    .padding(.leading, SpatailSpace.s1 + 6)
+            }
         }
         .padding(.horizontal, SpatailSpace.s2)
         .padding(.vertical, SpatailSpace.s1)
         .background(
-            Capsule().fill(accent ? SpatailColor.indigo500.opacity(0.78)
-                                  : SpatailColor.ink900.opacity(0.55))
+            RoundedRectangle(cornerRadius: SpatailRadius.sm, style: .continuous)
+                .fill(accent ? SpatailColor.indigo500.opacity(0.78)
+                             : SpatailColor.ink900.opacity(0.55))
         )
         .fixedSize()
     }
@@ -184,6 +198,8 @@ final class TruthOverlayModel: ObservableObject {
         var point: CGPoint
         var dot: Color
         var accent: Bool
+        /// Form Engine truth lines (dimensions + provenance); empty without a form.
+        var sublines: [String] = []
     }
 
     struct VLMBox: Identifiable, Equatable {
@@ -367,7 +383,8 @@ final class TruthOverlayModel: ObservableObject {
                 dot: accent ? TruthPalette.bound
                     : (object.label != nil ? TruthPalette.objectLabeled
                                            : TruthPalette.objectUnlabeled),
-                accent: accent))
+                accent: accent,
+                sublines: object.form.map(Self.formLines) ?? []))
         }
         if oLabels != objectLabels { objectLabels = oLabels }
 
@@ -392,5 +409,36 @@ final class TruthOverlayModel: ObservableObject {
             }
         }
         if boxes != vlmBoxes { vlmBoxes = boxes }
+    }
+
+    // MARK: Form Engine truth lines (the caliper-verification format)
+
+    /// "⌀ 63 · h 218 · cap ⌀ 31 mm" + "measured · 62% arc" / "prior — transparent?".
+    static func formLines(_ form: ObjectForm) -> [String] {
+        func mm(_ v: Float) -> String { "\(Int((v * 1000).rounded()))" }
+
+        var dims = ""
+        switch form.kind {
+        case .revolution:
+            if let d = form.bodyDiameter { dims = "⌀ \(mm(d))" }
+            if let h = form.height { dims += (dims.isEmpty ? "" : " · ") + "h \(mm(h))" }
+            if let cd = form.capDiameter { dims += " · cap ⌀ \(mm(cd))" }
+        case .box:
+            if let w = form.dimensions["width"], let d = form.dimensions["depth"],
+               let h = form.dimensions["height"] {
+                dims = "\(mm(w))×\(mm(d))×\(mm(h))"
+            }
+        }
+        guard !dims.isEmpty else { return [] }
+        dims += " mm"
+
+        let source: String
+        switch form.source {
+        case .measured:
+            source = "measured · \(Int((form.arcCoverage * 100).rounded()))% arc"
+        case .prior:
+            source = "prior — transparent?"
+        }
+        return [dims, source]
     }
 }

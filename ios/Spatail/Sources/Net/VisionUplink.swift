@@ -157,6 +157,16 @@ final class VisionUplink: NSObject, ObservableObject {
     /// Uplink frame counters for the truth overlay / settings HUD.
     var frameStats: (sent: Int, dropped: Int) { senderBox.value?.stats ?? (0, 0) }
 
+    /// Auto-reconnect (field report 2026-07-03: a mid-session "connection
+    /// abort" left the link dead until a manual Connect). While enabled, every
+    /// transition to .failed schedules a retry with exponential backoff
+    /// (1s → 30s cap, unlimited — the PC may come back minutes later). The
+    /// state stays HONEST throughout: red between attempts, amber during one.
+    @Published private(set) var reconnectAttempt = 0
+    private var autoReconnect = false
+    private var lastEndpoints: BrainEndpoints?
+    private var reconnectTask: Task<Void, Never>?
+
     // Connection identity. Every async callback carries the epoch it was born
     // under; a mismatch means connect()/disconnect() happened since — the
     // callback is from a dead connection and must not touch state. This is
@@ -187,6 +197,10 @@ final class VisionUplink: NSObject, ObservableObject {
     // MARK: Connect / disconnect
 
     func connect(_ endpoints: BrainEndpoints) {
+        reconnectTask?.cancel()
+        reconnectTask = nil
+        autoReconnect = true
+        lastEndpoints = endpoints
         teardownSocket()
         epoch += 1
         let myEpoch = epoch
@@ -210,12 +224,33 @@ final class VisionUplink: NSObject, ObservableObject {
     }
 
     /// Deliberate teardown — never surfaces as .failed (epoch bump invalidates
-    /// every callback the dying connection still owes us).
+    /// every callback the dying connection still owes us), and ends the
+    /// auto-reconnect loop: the user said stop.
     func disconnect() {
+        autoReconnect = false
+        reconnectTask?.cancel()
+        reconnectTask = nil
+        reconnectAttempt = 0
         teardownSocket()
         epoch += 1
         hasSentRoomThisConnection = false
         state = .idle
+    }
+
+    /// Schedule the next reconnect attempt. Called on every TRANSITION into
+    /// .failed; no-op when reconnect is off or already pending.
+    private func scheduleReconnect() {
+        guard autoReconnect, let endpoints = lastEndpoints,
+              reconnectTask == nil else { return }
+        reconnectAttempt += 1
+        let delay = min(pow(2.0, Double(reconnectAttempt - 1)), 30.0)
+        print("[VisionUplink] reconnect \(reconnectAttempt) in \(Int(delay))s")
+        reconnectTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+            guard let self, !Task.isCancelled, self.autoReconnect else { return }
+            self.reconnectTask = nil
+            if case .failed = self.state { self.connect(endpoints) }
+        }
     }
 
     private func teardownSocket() {
@@ -338,6 +373,7 @@ final class VisionUplink: NSObject, ObservableObject {
     fileprivate func socketDidOpen(_ task: URLSessionWebSocketTask) {
         guard task === socket else { return }             // stale connection
         if state == .connecting { state = .streaming }
+        reconnectAttempt = 0   // a real open resets the backoff ladder
     }
 
     fileprivate func socketDidClose(_ task: URLSessionWebSocketTask) {
@@ -350,6 +386,7 @@ final class VisionUplink: NSObject, ObservableObject {
         if consecutiveFailures >= Self.failureThreshold {
             if state != .failed(consecutiveFailures: consecutiveFailures) {
                 state = .failed(consecutiveFailures: consecutiveFailures)
+                scheduleReconnect()
             }
         } else if consecutiveFailures == 0, case .failed = state, !receiveSideDown {
             // Sends are landing again on the SAME socket (and the receive loop
@@ -364,5 +401,6 @@ final class VisionUplink: NSObject, ObservableObject {
         let failures = max(1, senderBox.value?.currentConsecutiveFailures ?? 1)
         state = .failed(consecutiveFailures: failures)
         print("[VisionUplink] link down: \(reason)")
+        scheduleReconnect()
     }
 }

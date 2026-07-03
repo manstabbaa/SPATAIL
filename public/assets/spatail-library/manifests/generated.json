@@ -1,6 +1,6 @@
 {
   "category": "generated",
-  "count": 131,
+  "count": 134,
   "assets": [
     {
       "assetId": "cube",
@@ -5580,6 +5580,145 @@
       "realSizeMeters": [
         0.04,
         0.18,
+        0.45
+      ]
+    },
+    {
+      "assetId": "rubber_duck",
+      "name": "Rubber Duck",
+      "category": "general",
+      "semanticTags": [
+        "rubber",
+        "duck"
+      ],
+      "path": "/assets/spatail-library/meshy/rubber_duck_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/rubber_duck_anim.usdz",
+      "scaleMeters": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.4,
+          0.4,
+          0.4
+        ]
+      },
+      "realSizeMeters": [
+        0.08,
+        0.08,
+        0.09
+      ]
+    },
+    {
+      "assetId": "sedan_car_with_its_hood_open",
+      "name": "Sedan Car With Its Hood Open",
+      "category": "environments",
+      "semanticTags": [
+        "sedan",
+        "car",
+        "with",
+        "its",
+        "hood",
+        "open"
+      ],
+      "path": "/assets/spatail-library/meshy/sedan_car_with_its_hood_open_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/sedan_car_with_its_hood_open_anim.usdz",
+      "scaleMeters": [
+        4.6,
+        1.5,
+        1.8
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          4.6,
+          1.5,
+          1.8
+        ]
+      },
+      "realSizeMeters": [
+        1.85,
+        1.85,
+        4.7
+      ]
+    },
+    {
+      "assetId": "rolling_tool_cart_with_drawers",
+      "name": "Rolling Tool Cart With Drawers",
+      "category": "environments",
+      "semanticTags": [
+        "rolling",
+        "tool",
+        "cart",
+        "with",
+        "drawers"
+      ],
+      "path": "/assets/spatail-library/meshy/rolling_tool_cart_with_drawers_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/rolling_tool_cart_with_drawers_anim.usdz",
+      "scaleMeters": [
+        0.75,
+        1.0,
+        0.5
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.75,
+          1.0,
+          0.5
+        ]
+      },
+      "realSizeMeters": [
+        0.7,
+        0.9,
         0.45
       ]
     }

@@ -71,7 +71,13 @@ struct LensView: View {
             Image(systemName: "viewfinder")
                 .imageScale(.small)
                 .foregroundStyle(SpatailColor.paper)
-            Text("Room \(Int(scanner.coveragePercent.rounded()))%")
+            // Surface count leads: the coverage ratio (mapped area over the
+            // whole revealed room-box) honestly reads 0% early in a big space,
+            // which looks broken while 13 surfaces exist (field report
+            // 2026-07-03). "What has it found" beats "how much is left".
+            Text(scanner.surfaces.isEmpty
+                 ? "Scanning…"
+                 : "\(scanner.surfaces.count) surfaces · \(Int(scanner.coveragePercent.rounded()))%")
                 .spatailType(.micro, weight: .medium)
                 .foregroundStyle(SpatailColor.paper)
 

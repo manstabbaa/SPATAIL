@@ -148,7 +148,8 @@ final class ExperienceRuntime: NSObject, ObservableObject {
     /// engine wiring decodes v0.8 payloads (rules/objectives/entities) out of it
     /// tolerantly, so a wire contract without them behaves exactly as before.
     func apply(contract: ModularContract, raw: Data? = nil, arView: ARView,
-               surfaces: [RoomSurface], objects: [SpatailObject]) {
+               surfaces: [RoomSurface], objects: [SpatailObject],
+               preferredTarget: PlacementTarget? = nil) {
         ensureAttached(to: arView)
         modelGeneration += 1
         let generation = modelGeneration
@@ -177,10 +178,24 @@ final class ExperienceRuntime: NSObject, ObservableObject {
         let scaleMode = Self.solverScaleMode(contract)
         let coverage = Float(contract.placement.maxSurfaceCoverage)
 
-        // ── target: registry object (tracked stream, degraded to placed) or room ──
+        // ── target: the ask's own object wins (Lens tap / prompt-noun match),
+        //    then the brain's contract anchoring, then room placement ──────────
+        let forcedTarget: PlacementTarget? = {
+            if let t = preferredTarget, case .room = t { return nil }
+            return preferredTarget
+        }()
         var pinned: Set<UUID> = []
         let layout: PlannedLayout?
-        if contract.anchoring.mode == "object",
+        if let forced = forcedTarget {
+            switch forced {
+            case .object(let o), .part(let o, _): pinned.insert(o.id)
+            case .room: break
+            }
+            layout = PlacementPlanner.planOnObject(target: forced,
+                                                   assets: reqs.map(\.req),
+                                                   primary: primary,
+                                                   coverage: coverage)
+        } else if contract.anchoring.mode == "object",
            let target = Self.anchorObject(for: contract.anchoring, in: objects) {
             pinned.insert(target.id)
             layout = PlacementPlanner.planOnObject(target: .object(target),

@@ -87,23 +87,13 @@ final class AppModel: ObservableObject {
             }
             .store(in: &cancellables)
 
-        // Experience deltas → runtime, ignored until room.update has gone out on
-        // THIS connection (spec §1.5), AND only while the user has an active ask.
-        // Content appears because it was asked for (MATTER: "why it appears"
-        // precedes appearance) — the live brain replans continuously, but an
-        // unprompted plan renders nothing. The Truth Overlay still reads the
-        // delta's fused/target directly off the uplink regardless.
-        uplink.$lastExperienceDelta
-            .compactMap { $0 }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] delta in
-                guard let self, self.uplink.hasSentRoomThisConnection,
-                      self.liveConcept != nil else { return }
-                self.runtime.apply(delta: delta, arView: self.hub.arView,
-                                   surfaces: self.scanner.surfaces,
-                                   objects: self.registry.objects)
-            }
-            .store(in: &cancellables)
+        // Live deltas carry the brain's BINDING (fused + target) — which the
+        // Truth Overlay reads straight off the uplink — but their CONTENT is
+        // the fusion brain's legacy demo lineage (edge/corner padding), not an
+        // answer to anything the user asked. It never renders. Content has
+        // exactly one source: the user's ask → /modular → runtime.apply,
+        // targeted at the registry object the ask names (field report
+        // 2026-07-03: foam-table demo rendering beside a bottle-cap ask).
 
         // Room snapshots: one as soon as the stream comes up, then throttled as
         // the scanner/registry evolve. Never per-frame (spec §1.1/§1.2).
@@ -203,6 +193,13 @@ final class AppModel: ObservableObject {
             sendRoomSnapshot()
         }
 
+        // Resolve the ask against the object map BEFORE the brain answers:
+        // a tapped chip (AskScope) wins; otherwise the prompt's nouns are
+        // matched against registry labels. "Placement is part of the meaning" —
+        // an ask about a thing the Lens can see lands ON that thing.
+        let target = resolveAskTarget(prompt: trimmed)
+        AskScope.shared.clear()
+
         Task { [weak self] in
             do {
                 let (contract, raw) = try await client.generateModularRaw(prompt: trimmed)
@@ -219,12 +216,59 @@ final class AppModel: ObservableObject {
                 self.runtime.apply(contract: contract, raw: raw,
                                    arView: self.hub.arView,
                                    surfaces: self.scanner.surfaces,
-                                   objects: self.registry.objects)
+                                   objects: self.registry.objects,
+                                   preferredTarget: target)
                 self.askState = .idle
             } catch {
                 self?.askState = .failed(message: error.localizedDescription)
             }
         }
+    }
+
+    /// Words that name sub-regions of an object — an ask mentioning one lands
+    /// on that part's region (registry part when resolved, §3 slice fallback).
+    private static let partLexicon = ["cap", "lid", "top", "handle", "spout",
+                                      "neck", "base", "bottom", "label", "button",
+                                      "screen", "wheel", "hood", "door"]
+
+    /// The ask's spatial target: the tapped chip's object first, else the
+    /// registry object whose label the prompt names. Nil → room placement.
+    private func resolveAskTarget(prompt: String) -> PlacementTarget? {
+        let p = prompt.lowercased()
+        let promptTokens = Set(p.split(whereSeparator: { !$0.isLetter }).map(String.init))
+        let partWord = Self.partLexicon.first { promptTokens.contains($0) }
+
+        func targetFor(_ obj: SpatailObject, partLabel: String?) -> PlacementTarget {
+            guard let label = partLabel else { return .object(obj) }
+            let part = obj.parts.first { $0.label.lowercased() == label }
+                ?? obj.parts.first { $0.label.lowercased().contains(label) }
+                ?? SpatailPart(label: label, box: nil, region: nil, confidence: 0)
+            return .part(obj, part)
+        }
+
+        // 1. Tapped chip (Lens → AskScope): explicit, always wins.
+        if let scope = AskScope.shared.scope,
+           let obj = registry.objects.first(where: { $0.id == scope.objectId }) {
+            return targetFor(obj, partLabel: scope.part?.lowercased() ?? partWord)
+        }
+
+        // 2. Prompt-noun match against the registry (the on-device object map):
+        //    most label tokens found in the prompt wins; ties break on label
+        //    confidence. "water bottle cap explanation" → the bottle it can see.
+        var best: (obj: SpatailObject, score: Int)?
+        for obj in registry.objects {
+            guard let label = obj.label?.lowercased() else { continue }
+            let labelTokens = label.split(whereSeparator: { !$0.isLetter })
+                .map(String.init).filter { $0.count > 2 }
+            guard !labelTokens.isEmpty else { continue }
+            let hits = labelTokens.filter { promptTokens.contains($0) }.count
+            guard hits > 0, hits * 2 >= labelTokens.count else { continue }
+            if best == nil || hits > best!.score
+                || (hits == best!.score && obj.confidence > best!.obj.confidence) {
+                best = (obj, hits)
+            }
+        }
+        return best.map { targetFor($0.obj, partLabel: partWord) }
     }
 
     func dismissAskFailure() {

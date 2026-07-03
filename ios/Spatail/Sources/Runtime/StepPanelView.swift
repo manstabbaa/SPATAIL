@@ -101,34 +101,15 @@ struct StepPanelView: View {
             .position(panelPosition(hud: hud, panelWidth: width, in: size))
     }
 
-    /// Pin beside the projected anchor per the contract's locus; settle to the
-    /// bottom (above the AskBar) when the anchor can't answer.
+    /// FIXED bottom dock, always. The panel used to chase a projected world
+    /// anchor across the screen — on device it wandered top-to-bottom with
+    /// every head move (field report 2026-07-03). Reading needs a stable
+    /// place; the 3D scene, not the panel, is what points at the object.
     private func panelPosition(hud: StepHUD, panelWidth: CGFloat,
                                in size: CGSize) -> CGPoint {
         let estimatedHeight: CGFloat = 180
-        let bottomRest = CGPoint(x: size.width / 2,
-                                 y: size.height - estimatedHeight / 2 - 148)
-        guard let p = projector.point else { return bottomRest }
-        var x: CGFloat
-        var y: CGFloat
-        switch hud.locus {
-        case "above_object":
-            x = p.x
-            y = p.y - estimatedHeight / 2 - 48
-        case "below_object":
-            x = p.x
-            y = p.y + estimatedHeight / 2 + 48
-        default:   // "beside_object" and friends: right of the anchor, flip left near the edge
-            let besideRight = p.x + panelWidth / 2 + 36
-            let besideLeft = p.x - panelWidth / 2 - 36
-            x = besideRight + panelWidth / 2 < size.width ? besideRight : besideLeft
-            y = p.y
-        }
-        x = min(max(x, panelWidth / 2 + SpatailSpace.s3),
-                size.width - panelWidth / 2 - SpatailSpace.s3)
-        y = min(max(y, estimatedHeight / 2 + WindowChrome.topInset + 56),
-                size.height - estimatedHeight / 2 - 148)
-        return CGPoint(x: x, y: y)
+        return CGPoint(x: size.width / 2,
+                       y: size.height - estimatedHeight / 2 - 148)
     }
 
     // MARK: engine HUD (score · objective · outcome · fire control)
@@ -195,17 +176,25 @@ private struct StepPanelCard: View {
                     .padding(.bottom, SpatailSpace.s2)
             }
 
-            if !hud.narration.isEmpty {
-                Text(hud.narration)
-                    .spatailType(.sm)
-                    .foregroundStyle(SpatailColor.paper.opacity(0.92))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            // Body content is capped and scrolls: a step with long narration +
+            // panels must stay a compact card, never a screen-filling sheet
+            // (field report 2026-07-03). Narration is spoken anyway.
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 0) {
+                    if !hud.narration.isEmpty {
+                        Text(hud.narration)
+                            .spatailType(.sm)
+                            .foregroundStyle(SpatailColor.paper.opacity(0.92))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
 
-            ForEach(Array(hud.panels.enumerated()), id: \.offset) { i, panel in
-                panelBlock(panel, index: i)
-                    .padding(.top, SpatailSpace.s3)
+                    ForEach(Array(hud.panels.enumerated()), id: \.offset) { i, panel in
+                        panelBlock(panel, index: i)
+                            .padding(.top, SpatailSpace.s3)
+                    }
+                }
             }
+            .frame(maxHeight: 150)
 
             HStack {
                 SpatailIconButton(systemName: "chevron.backward", label: "Previous step",

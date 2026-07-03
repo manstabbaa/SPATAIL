@@ -99,7 +99,7 @@ def _logic_for(modular: dict) -> dict:
 
 def to_scene_contract(modular: dict, *, brand: dict | None = None) -> dict:
     """Project the modular experience into a v0.6 Scene Contract. Pure + additive."""
-    return {
+    out = {
         "schemaVersion": SCHEMA,
         "experienceId": modular.get("experienceId"),
         "title": modular.get("title", "Experience"),
@@ -120,6 +120,12 @@ def to_scene_contract(modular: dict, *, brand: dict | None = None) -> dict:
         "generation": modular.get("generation"),
         "generationJobId": modular.get("generationJobId"),
     }
+    # THE SETTING LAW (staged context, studio/director/settings.py): the
+    # brain-composed setting rides the projection unchanged so every runtime
+    # stages the same world. Absent in AR / real-room context — additive.
+    if modular.get("setting"):
+        out["setting"] = modular["setting"]
+    return out
 
 
 if __name__ == "__main__":

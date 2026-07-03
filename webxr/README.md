@@ -21,6 +21,7 @@ The client/dev surface for SPATAIL per the 2026 Master File pivot
 | `Live cam` · **C** | **Webcam → Gemini detector → boxes over the camera feed** (MF p28/p40). |
 | `Story step` · **Space** | Walks the scene's attention track (MF p13), narrating each beat. |
 | `✦ Generate` (prompt box) | **Live from the brain** — sends the prompt to `job_server /modular`, adapts the returned contract, and renders it (see below). |
+| `◱ Staged setting` | The PC viewer is context-less, so `✦ Generate` POSTs `context: {"mode": "staged"}` by default — the brain composes a **setting** (see below). Toggle **off** to send `{"mode": "ar"}` for contract-only debugging (real-room context, no setting emitted). Persisted in `localStorage` (`spatail.stagedSetting`); default **on**. |
 | `▲ Strict assets (fail like the phone)` | Renders **every GLB raw** — scale 1.0, no re-centre, no fit — so the PC reproduces phone failures instead of papering over them. Persisted in `localStorage` (`spatail.strictAssets`); default **off**. Toggling re-renders the current scene. |
 | click an object | Selects it (raycast) and shows its object-local control panel. |
 | `Enter XR` | Starts an immersive WebXR session on a headset browser. |
@@ -152,6 +153,75 @@ this client's own resolution (e.g. `arc layout, baseY=0.78, slot 2/4`). Authored
 scenes keep their contract-authored `whyThisPlacement` under `Why here:`; the
 fabricated placement prose for live scenes is gone.
 
+### Staged setting (the setting law)
+
+**The setting law (canon):** placement is computed against **context** — the real
+room when there is one (AR), a **brain-composed setting** when there isn't
+(staged). `POST /modular` gains an optional `"context": {"mode": "staged" | "ar"}`;
+`"ar"` (or absent) = real-room context, no setting emitted; `"staged"` = the brain
+composes the setting. The PC viewer has no real room, so `✦ Generate` sends
+`"staged"` by default (the `◱ Staged setting` toggle turns it off for
+contract-only debugging).
+
+The contract gains an additive, optional `setting` block (metres, world space,
+ground plane at y=0):
+
+```jsonc
+"setting": {
+  "id": "garage-v8-001",
+  "why": "<one sentence: why this setting fits the question>",
+  "elements": [
+    { "id": "car", "subject": "sedan car with its hood open",
+      "assetPath": "/assets/… .glb OR null", "generationJobId": "<job id> OR null",
+      "footprintMeters": [w, h, d],
+      "pose": { "position": [x, y, z], "yawDeg": 0 } }        // position = SEAT POINT on the ground
+  ],
+  "experienceAnchor": { "elementId": "car", "name": "engine_bay",
+                        "position": [x, y, z], "yawDeg": 0 },
+  "ground": { "kind": "floor", "sizeMeters": [8, 8] },
+  "ambiance": { "style": "3d-pastel", "light": "soft-day" }
+}
+```
+
+How the viewer renders it (`renderSetting` in `viewer.js`):
+
+- **Ground** — a subtle plane sized from `setting.ground`, with a soft edge line.
+  The synthetic table hides while a setting is active (the setting IS the context);
+  `ambiance.light: "soft-day"` lifts the hemisphere light a touch.
+- **Elements** — each renders at its pose (`pose.position` is the seat point; the
+  footprint box sits ON it, yawed by `yawDeg`). Elements with an `assetPath` load
+  the GLB, fit its longest dimension to the footprint's longest, and seat it on the
+  ground (setting elements are context dressing, not the asset-debug surface the
+  strict toggle targets).
+- **Pending elements** (`assetPath` null) render an **honest materializing field**:
+  the viewer's voxel/particle spawn-in treatment, made persistent, inside the
+  reserved footprint bounds, with a floating label
+  **"materializing — generating on the brain"** — **never a fake solid stand-in**.
+  The label's sub-line says whether a brain job exists (`generationJobId` null =
+  generation unavailable, footprint reserved only).
+- **Generation** — pending elements with a `generationJobId` poll `/jobs/{id}`
+  through the same machinery as experience assets (several polls can run at once;
+  loading a new scene cancels all of them) and **hot-swap** the field for the real
+  GLB when it lands, re-sending the placement report.
+- **Experience anchoring** — when the setting carries an `experienceAnchor`, the
+  experience's layout origin moves to that anchor: for live `/modular` scenes the
+  layout solver resolves **anchor-local** (baseY 0 — the anchor supplies the
+  height) and the viewer maps positions to world at the anchor's position/yaw; for
+  authored scenes, `spatialElements[].placement.position` is authored
+  **anchor-local** and mapped the same way. The engine lands IN the engine bay,
+  not on the abstract grid.
+- **Identify** — the setting gets its own panel entry whose `Brain:` line shows
+  `setting.why` verbatim (honesty rule: brain text is never blended with client
+  text), and every setting element gets an entry tagged **setting element** with
+  its footprint, pose, and job status.
+
+**Demo scene:** `scenes/engine_in_car.json` (first in the picker, loads by
+default) — the `v8_engine` experience wrapped in a garage setting: the car is
+pending (footprint 4.6×1.5×1.8 m, no job — reserved footprint only), the tool cart
+is pending, and the engine experience anchors at the `engine_bay` anchor at the
+front of the car (y 0.9). The founder sees the materializing car field with the
+correctly-anchored engine floating in the bay before the PC ever generates a car.
+
 ### Placement report (client:"web")
 
 After the layout solver places a live `/modular` contract (and again after a Meshy
@@ -161,8 +231,11 @@ fire-and-forget; failures are console-logged, rendering never waits on it:
 
 - `solverInputs` — anchor preference, scale mode, footprints with provenance
   (`footprintSource` passed through; `library`/`default_guess` inferred when the
-  contract predates §2.3), and a `roomSummary` of the synthetic room as built
-  (table Ø1.5 m top at y 0.74, floor 8 m).
+  contract predates §2.3), and a `roomSummary` of the context the solver actually
+  placed against: the synthetic room as built (table Ø1.5 m top at y 0.74, floor
+  8 m) — or, for staged scenes, the brain-composed setting's ground (plus a
+  `setting` echo of the id/anchor/ground), never both. The `fits` check runs
+  against the setting ground when staged.
 - `plan` — per element: resolved position, yaw, applied scale, a geometric `fits`
   check against the synthetic surfaces, and the `Web solver:` line as `reason`.
 - `finalPlacements` — per element: the rendered `worldTransform` (16 floats,

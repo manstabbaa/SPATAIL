@@ -62,6 +62,7 @@
     color: var(--ink-dim); }
   .tag.intent { color: #cdc6ff; background: rgba(91,75,230,0.18); }
   .tag.live { color: #06231d; background: var(--accent-2); }
+  .tag.setting { color: #ffd9a0; background: rgba(230,162,60,0.18); }
   .idrow .why { margin-top: 6px; font-size: 11px; color: var(--ink-dim); line-height: 1.4; display: none; }
   .idrow.active .why { display: block; }
 
@@ -72,6 +73,8 @@
   .label3d .li { color: var(--accent-2); }
   .label3d .sz { color: var(--ink-dim); font-variant-numeric: tabular-nums; }
   .label3d.live { border-color: var(--accent-2); }
+  .label3d.pending { border-color: var(--warn); }
+  .label3d .mat { color: var(--warn); font-weight: 600; }
 
   /* bottom status / attention bar */
   #statusbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 15;
@@ -125,6 +128,7 @@
   <select class="btn" id="sceneSelect" title="Sample scene"></select>
   <input class="btn" id="brainPrompt" placeholder="ask the brain… e.g. how a pendulum works" />
   <button class="btn" id="btnBrain" title="Generate a live experience from the brain (/modular)">✦ Generate</button>
+  <button class="btn" id="btnStaged" title="The PC viewer is context-less: ON sends context {mode:'staged'} with ✦ Generate so the brain composes a setting. OFF sends {mode:'ar'} — contract-only debugging. Persisted; default on.">◱ Staged setting</button>
   <button class="btn" id="btnIdentify" title="Toggle identify / hitbox overlay (I)">⊞ Identify / Hitboxes</button>
   <button class="btn" id="btnControls" title="Object-local control panels (O)">⚙ Controls</button>
   <button class="btn" id="btnStrict" title="Render every GLB raw — scale 1.0, no re-centre, no fit — so the PC reproduces phone failures. Persisted; default off.">▲ Strict assets (fail like the phone)</button>

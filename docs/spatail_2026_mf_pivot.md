@@ -282,3 +282,48 @@ kind-change + confidence + dwell, detached from the inference loop).
    return as a requirement.
 5. **Part-level anchors in the contract:** extend the scene contract so a placement can
    target `{objectId, part}` — the wire-level counterpart of the bottle-cap test.
+
+### 6f. THE SETTING LAW — context-first placement (adopted 2026-07-03)
+
+**Placement is computed against context — the real room when there is one (AR), a
+brain-composed setting when there isn't (staged).** An experience never floats in a
+void: ask about a V8 with no room scanned and the answer arrives in a garage, the
+car's hood open, the experience anchored at the engine bay.
+
+- **Request:** `POST /modular` gains optional `"context": {"mode": "staged" | "ar"}`.
+  `"ar"` (or absent) = real-room context, **no setting emitted**; `"staged"` = the
+  brain composes the setting.
+- **Response:** the contract gains an optional, additive `setting` block —
+  `id` · `why` (one sentence: why this setting fits the question) · `elements[]`
+  (subject, `assetPath` or `generationJobId`, `footprintMeters`, pose) ·
+  `experienceAnchor` (the layout origin, optionally a named site on an element — the
+  engine bay, the wire cousin of the bottle-cap test) · `ground` · `ambiance`.
+  Metres, world space, ground at y=0. Full normative shape:
+  `docs/spatail_engine_spec.md` §3.2.
+- **Pending is honest:** an element whose asset is still generating (or unavailable)
+  renders as a clearly-labeled materializing spawn-in field at its footprint bounds —
+  never a fake solid object.
+- **"Random but contextual" = seeded variation per experience.** The setting `id`
+  seeds composition: the same experience re-renders the same setting; different
+  experiences get contextual variety — contextual, never arbitrary.
+
+### 6g. THE SPATAIL ENGINE (adopted 2026-07-03)
+
+The engine now has a canonical spec: **`docs/spatail_engine_spec.md`**. Identity: a
+**contract-driven runtime** — the brain authors data in closed vocabularies, the
+engine executes it, the brain never emits code. One spec, two backends: the Swift
+`SpatailEngineCore` + `SpatailEngineRealityKit` (headless-tested) and the WebXR
+viewer runtime (the de-facto second backend, with named convergence duties).
+Subsystems: kits (12-experience taxonomy; `ExplainerKit` + `ShooterKit` built, the
+rest land in lockstep with brain emissions), staging (§6f), placement intents,
+trigger VM, aliveness natures, materialization. Includes the growth model and the
+"why not Unity/Unreal" answer.
+
+### 6h. ML POSTURE (adopted 2026-07-03)
+
+Stated in **`docs/spatail_engine_spec.md` §6**: already-ML (VLM identity+parts,
+on-device Vision/CoreML, iOS 27 Create ML reference-object tracking); next-when-
+triggered (a synthetic-data factory rendering labeled scenes from our GLB library,
+and a learned placement re-ranker over the trace corpus — each with its explicit
+trigger); non-goals for now (end-to-end learned placement, RL) because the
+rule-based system is inspectable via `decisionTrace` and works.

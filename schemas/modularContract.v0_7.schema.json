@@ -110,6 +110,7 @@
       }
     },
     "generationJobId": { "type": "string" },
+    "setting":         { "$ref": "#/$defs/setting" },
     "sceneContract":   { "type": "object" },
     "schemaValidation": {
       "type": "object",
@@ -122,6 +123,70 @@
     "traceUrl": { "type": "string" }
   },
   "$defs": {
+    "setting": {
+      "description": "The setting law (studio/director/settings.py): a brain-composed staged context, attached ONLY when the request carries context.mode == 'staged' (AR / absent => the real room is the context, no setting). Metres, world space, ground plane at y=0. Additive + optional.",
+      "type": "object",
+      "required": ["id", "why", "elements", "experienceAnchor", "ground", "ambiance"],
+      "properties": {
+        "id":  { "type": "string", "minLength": 1 },
+        "why": { "type": "string" },
+        "elements": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/settingElement" }
+        },
+        "experienceAnchor": {
+          "type": "object",
+          "required": ["elementId", "name", "position", "yawDeg"],
+          "properties": {
+            "elementId": { "type": ["string", "null"] },
+            "name":      { "type": "string" },
+            "position":  { "type": "array", "items": { "type": "number" },
+                            "minItems": 3, "maxItems": 3 },
+            "yawDeg":    { "type": "number" }
+          }
+        },
+        "ground": {
+          "type": "object",
+          "required": ["kind", "sizeMeters"],
+          "properties": {
+            "kind":       { "type": "string" },
+            "sizeMeters": { "type": "array", "items": { "type": "number" },
+                             "minItems": 2, "maxItems": 2 }
+          }
+        },
+        "ambiance": {
+          "type": "object",
+          "required": ["style", "light"],
+          "properties": {
+            "style": { "type": "string" },
+            "light": { "type": "string" }
+          }
+        }
+      }
+    },
+    "settingElement": {
+      "description": "One staged prop. assetPath null + generationJobId set => generating on the PC (client polls /jobs/{id} and hot-swaps); both null => pending with a reserved footprint only — the client renders a clearly-labeled materializing spawn-in field at footprintMeters bounds, NEVER a fake solid object. assetPath is never a placeholder.",
+      "type": "object",
+      "required": ["id", "subject", "assetPath", "generationJobId",
+                   "footprintMeters", "pose"],
+      "properties": {
+        "id":              { "type": "string", "minLength": 1 },
+        "subject":         { "type": "string", "minLength": 1 },
+        "assetPath":       { "type": ["string", "null"] },
+        "generationJobId": { "type": ["string", "null"] },
+        "footprintMeters": { "type": "array", "items": { "type": "number" },
+                              "minItems": 3, "maxItems": 3 },
+        "pose": {
+          "type": "object",
+          "required": ["position", "yawDeg"],
+          "properties": {
+            "position": { "type": "array", "items": { "type": "number" },
+                           "minItems": 3, "maxItems": 3 },
+            "yawDeg":   { "type": "number" }
+          }
+        }
+      }
+    },
     "anchoring": {
       "type": "object",
       "required": ["mode", "fallback"],

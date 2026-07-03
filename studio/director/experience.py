@@ -138,7 +138,8 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
                              summary: str | None = None, experience_id: str | None = None,
                              use_llm: bool = True, library=None,
                              tracked: bool = False, reference_object_url: str | None = None,
-                             tracked_object_id: str | None = None) -> dict:
+                             tracked_object_id: str | None = None,
+                             context_mode: str | None = None) -> dict:
     eng = RepresentationEngine()
     plan, manifest = eng.run(subject_hint or input_text, experience_id=experience_id)
     lib = library if library is not None else _load_library()
@@ -169,7 +170,7 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
                                  tracked_object_id=tracked_object_id)
 
     phase0 = [a["id"] for a in assets if a["status"] != "placeholder"][:3]
-    return {
+    out = {
         "schemaVersion": SCHEMA,
         "experienceId": plan.experienceId,
         "title": (plan.subject or "Experience").strip().title(),
@@ -192,12 +193,26 @@ def build_modular_experience(input_text: str, *, kind: str = "text", subject_hin
         "progressive": {"firstInteractiveMsBudget": 800, "phase0Assets": phase0,
                         "needsGeneration": [a["id"] for a in assets if a["status"] == "placeholder"]},
     }
+    # THE SETTING LAW (canon): placement is computed against context — the real
+    # room when there is one (AR), a brain-composed setting when there isn't.
+    # context_mode "staged" => compose + attach the setting block (additive);
+    # "ar"/absent => real-room context, NO setting emitted. Defensive: a setting
+    # fault must never take down the always-on /modular spine.
+    if (context_mode or "").strip().lower() == "staged":
+        try:
+            import settings as _settings
+            out["setting"] = _settings.compose_setting(
+                understanding, plan.experienceId, library=lib, use_llm=use_llm)
+        except Exception as _se:  # noqa: BLE001
+            print(f"[director] setting compose skip: {_se!r}"[:200])
+    return out
 
 
 def build_from_image(image_bytes: bytes, *, mime: str = "image/jpeg", note: str = "",
                      question: str = "", use_llm: bool = True, library=None,
                      tracked: bool = False, reference_object_url: str | None = None,
-                     tracked_object_id: str | None = None) -> dict:
+                     tracked_object_id: str | None = None,
+                     context_mode: str | None = None) -> dict:
     """Phone photo + question -> Gemini mechanism brief -> the modular experience.
 
     Adds a `generation` block (the Blender mechanism brief Gemini authored + the
@@ -209,7 +224,8 @@ def build_from_image(image_bytes: bytes, *, mime: str = "image/jpeg", note: str 
     c = build_modular_experience(b["prompt"], kind="image", subject_hint=b["subject"],
                                  summary=b["summary"], use_llm=use_llm, library=library,
                                  tracked=tracked, reference_object_url=reference_object_url,
-                                 tracked_object_id=tracked_object_id)
+                                 tracked_object_id=tracked_object_id,
+                                 context_mode=context_mode)
     c["source"]["vision"] = b
     primary = next((a["id"] for a in c["assets"] if a.get("role") == "primary_object"),
                    (c["assets"][0]["id"] if c["assets"] else "hero"))

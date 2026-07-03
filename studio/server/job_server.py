@@ -33,6 +33,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import socket
 import sys
 import threading
@@ -469,6 +470,17 @@ class Handler(BaseHTTPRequestHandler):
             "tracked_object_id": (data.get("trackedObjectId") or "").strip() or None,
             "reference_object_url": (data.get("referenceObjectUrl") or "").strip() or None,
         }
+        # THE SETTING LAW (canon): placement is computed against context — the
+        # real room when there is one (AR), a brain-composed setting when there
+        # isn't. Optional body key {"context": {"mode": "staged" | "ar"}}:
+        # "staged" => the director composes + attaches the setting block;
+        # "ar" (or absent) => real-room context, NO setting emitted.
+        ctx = data.get("context")
+        context_mode = (str(ctx.get("mode") or "").strip().lower()
+                        if isinstance(ctx, dict) else "")
+        if context_mode not in ("staged", "ar"):
+            context_mode = "ar"
+        tracked_kw["context_mode"] = context_mode
         try:
             import sys as _sys
             _d = str(ROOT / "studio" / "director")
@@ -550,6 +562,36 @@ class Handler(BaseHTTPRequestHandler):
                 contract["generationJobId"] = gid
                 print(f"[modular] queued asset build {gid} for {gen.get('subject')!r}: "
                       f"{gen['brief'][:90]!r}", flush=True)
+            # Staged-setting props (the setting law): every setting element that
+            # missed the library gets a REAL asset build in this process — the
+            # client polls /jobs/{id} and hot-swaps the labeled materializing
+            # spawn-in field for the finished model. assetPath stays null until
+            # then (NEVER a fake solid object). The produced prop registers into
+            # the library under its subject slug, so settings COMPOUND too.
+            setting = contract.get("setting") or {}
+            for el in (setting.get("elements") or [])[:6]:
+                if (not isinstance(el, dict) or el.get("assetPath")
+                        or el.get("generationJobId")):
+                    continue
+                subj = str(el.get("subject") or "").strip()
+                if not subj:
+                    continue
+                sid = "gen_" + uuid.uuid4().hex[:8]
+                slug = re.sub(r"[^a-z0-9]+", "_", subj.lower()).strip("_")[:48] or "prop"
+                with _LOCK:
+                    _JOBS[sid] = {"id": sid, "status": "queued", "stage": "queued",
+                                  "message": None, "prompt": subj, "mode": "object",
+                                  "client": "modular-setting", "created": time.time(),
+                                  "session": data.get("session") or self.client_address[0],
+                                  "usdz": None, "metadata": None,
+                                  "asset": {"assetId": slug, "subject": subj,
+                                            "scaleMeters": el.get("footprintMeters"),
+                                            "category": "environments",
+                                            "assetRequirements": None}}
+                _QUEUE.put(sid)
+                el["generationJobId"] = sid
+                print(f"[modular] queued setting prop {sid} "
+                      f"({el.get('id')!r}): {subj!r}", flush=True)
             # Attach the v0.6 Scene Contract (content/placement/brand/logic) additively
             # so newer phones get the game-manager trigger graph; old builds ignore it.
             try:

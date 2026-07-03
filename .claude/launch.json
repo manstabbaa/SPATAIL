@@ -9,6 +9,13 @@
       "autoPort": false
     },
     {
+      "name": "spatail-webxr-py3",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8765"],
+      "port": 8765,
+      "autoPort": false
+    },
+    {
       "name": "spatail-detector",
       "runtimeExecutable": "python",
       "runtimeArgs": ["webxr/live/detector_server.py", "--port", "8766"],

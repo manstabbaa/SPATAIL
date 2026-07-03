@@ -15,6 +15,14 @@
 //                            render at 1.0 seated by their authored pivot
 //   • Placement report     — POSTs what the web solver actually did back to the brain
 //                            (LIVE_BRAIN_SPEC §2.2, client:"web") after a live /modular render
+//   • Staged setting       — the setting law: placement is computed against context —
+//                            the real room when there is one (AR), a brain-composed
+//                            setting when there isn't. The PC viewer is context-less,
+//                            so ✦ Generate POSTs context {mode:"staged"} (toggleable)
+//                            and renders the contract's additive `setting` block:
+//                            ground + posed elements; PENDING elements render an honest
+//                            materializing field at their reserved footprint — NEVER a
+//                            fake solid — and hot-swap when their brain job lands.
 // ----------------------------------------------------------------------------
 
 import * as THREE from 'three';
@@ -66,11 +74,12 @@ controls.maxDistance = 12; controls.minDistance = 0.3;
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 const key = new THREE.DirectionalLight(0xffffff, 2.0); key.position.set(3, 6, 4); scene.add(key);
-scene.add(new THREE.HemisphereLight(0xbfc4ff, 0x202028, 0.6));
+const hemi = new THREE.HemisphereLight(0xbfc4ff, 0x202028, 0.6); scene.add(hemi);
 
 const overlayGroup = new THREE.Group(); overlayGroup.name = '__overlay'; scene.add(overlayGroup);
 const liveGroup = new THREE.Group(); liveGroup.name = '__live'; scene.add(liveGroup);
 const panelGroup = new THREE.Group(); panelGroup.name = '__panels'; scene.add(panelGroup);
+const settingGroup = new THREE.Group(); settingGroup.name = '__setting'; scene.add(settingGroup);
 const clock = new THREE.Clock();
 
 // ---------------------------------------------------------------- the "room"
@@ -82,7 +91,7 @@ const clock = new THREE.Clock();
   floor.rotation.x = -Math.PI / 2; room.add(floor);
   const table = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.78, 0.74, 48),
     new THREE.MeshStandardMaterial({ color: 0x20202c, roughness: 0.6, metalness: 0.05 }));
-  table.position.y = 0.37; room.add(table);
+  table.name = '__table'; table.position.y = 0.37; room.add(table);
   scene.add(room);
 })();
 
@@ -101,6 +110,11 @@ const effects = [];
 // PC reproduces phone failures instead of papering over them. Persisted; default OFF.
 const STRICT_KEY = 'spatail.strictAssets';
 let strictAssets = localStorage.getItem(STRICT_KEY) === '1';
+// Staged setting: the PC viewer is context-less, so ✦ Generate asks the brain to
+// compose a setting (POST /modular context {mode:"staged"}). Persisted; default ON.
+// OFF sends {mode:"ar"} — contract-only debugging, no setting emitted.
+const STAGED_KEY = 'spatail.stagedSetting';
+let stagedSetting = localStorage.getItem(STAGED_KEY) !== '0';
 
 // ---------------------------------------------------------------- helpers
 function box3From(center, size) {
@@ -191,6 +205,198 @@ function spawnIn(group, box, color, delay) {
     },
     done() { setGroupOpacity(group, 1); scene.remove(points); geo.dispose(); mat.dispose(); },
   });
+}
+
+// ---------------------------------------------------------------- staged setting (the setting law)
+// Placement is computed against context — the real room when there is one (AR), a
+// brain-composed setting when there isn't (staged). The contract's additive `setting`
+// block renders here: a subtle ground sized from setting.ground, elements at their
+// poses (pose.position is the SEAT POINT on the ground; footprint box sits ON it),
+// and PENDING elements (assetPath null) as an honest, clearly-labelled materializing
+// spawn-in field at the reserved footprint bounds — NEVER a fake solid stand-in.
+const SETTING_COLOR = 0xe6a23c;
+let settingElements = [];   // [{se, holder, box, helper, field, label, labelStatus, pending, row}]
+let settingFields = [];     // persistent materializing fields, animated in tick()
+
+// the persistent variant of the spawn-in materialization: particles keep rising
+// through the reserved footprint until the real asset lands (or forever, if
+// generation is unavailable) — the thing visibly does NOT exist yet.
+function materializeField(holder, fp) {
+  const [w, h, d] = fp;
+  const N = Math.max(180, Math.min(900, Math.round(w * h * d * 260)));
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const pos = new Float32Array(N * 3), spd = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    pos[i * 3] = rnd(-w / 2, w / 2); pos[i * 3 + 1] = rnd(0, h); pos[i * 3 + 2] = rnd(-d / 2, d / 2);
+    spd[i] = rnd(0.05, 0.22);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const mat = new THREE.PointsMaterial({ color: SETTING_COLOR, size: 0.014, transparent: true, opacity: 0.7, depthWrite: false });
+  const points = new THREE.Points(geo, mat); holder.add(points);
+  const field = {
+    update(dt, now) {
+      for (let i = 0; i < N; i++) {
+        let y = pos[i * 3 + 1] + spd[i] * dt;
+        if (y > h) { y -= h; pos[i * 3] = rnd(-w / 2, w / 2); pos[i * 3 + 2] = rnd(-d / 2, d / 2); }
+        pos[i * 3 + 1] = y;
+      }
+      geo.attributes.position.needsUpdate = true;
+      mat.opacity = 0.5 + 0.25 * Math.sin(now * 1.8);
+    },
+    dispose() {
+      holder.remove(points); geo.dispose(); mat.dispose();
+      const i = settingFields.indexOf(field); if (i >= 0) settingFields.splice(i, 1);
+    },
+  };
+  settingFields.push(field);
+  return field;
+}
+
+// setting elements are context dressing (not the asset-debug surface the strict
+// toggle targets): fit the longest dimension to the footprint's longest, centre
+// on XZ, seat the mesh's min-Y on the ground at the pose.
+function seatFitToFootprint(inner, fp) {
+  const bb = new THREE.Box3().setFromObject(inner);
+  const size = new THREE.Vector3(); bb.getSize(size);
+  const s = Math.max(...fp) / (Math.max(size.x, size.y, size.z) || 1);
+  inner.scale.setScalar(s);
+  const bb2 = new THREE.Box3().setFromObject(inner);
+  const c = new THREE.Vector3(); bb2.getCenter(c);
+  inner.position.x -= c.x; inner.position.z -= c.z; inner.position.y -= bb2.min.y;
+  return s;
+}
+
+function addSettingIdRow(name, tagsHtml, whyHtml, focusBox) {
+  const row = document.createElement('div'); row.className = 'idrow';
+  row.innerHTML =
+    `<div class="name"><span class="swatch" style="background:${hex(SETTING_COLOR)}"></span>${esc(name)}</div>` +
+    `<div class="tags">${tagsHtml}</div><div class="why">${whyHtml}</div>`;
+  row.addEventListener('click', () => {
+    for (const r of Array.from($('idlist').children)) r.classList.remove('active');
+    row.classList.add('active');
+    if (focusBox) { const c = new THREE.Vector3(); focusBox.getCenter(c); controls.target.copy(c); }
+  });
+  $('idlist').appendChild(row); return row;
+}
+
+async function renderSetting(setting, base) {
+  for (const f of settingFields.slice()) f.dispose();
+  for (const s of settingElements) s.row?.remove();
+  settingElements = [];
+  settingGroup.clear();   // CSS2D labels drop their DOM on 'removed'
+  const table = scene.getObjectByName('__table');
+  if (table) table.visible = !setting;   // the setting IS the context; the synthetic table yields
+  hemi.intensity = (setting && setting.ambiance && setting.ambiance.light === 'soft-day') ? 0.85 : 0.6;
+  if (!setting) return;
+
+  // ground — subtle, sized from setting.ground (metres, plane at y=0)
+  const gs = ((setting.ground || {}).sizeMeters || [8, 8]).slice(0, 2);
+  const groundGeo = new THREE.PlaneGeometry(gs[0], gs[1]);
+  const ground = new THREE.Mesh(groundGeo,
+    new THREE.MeshStandardMaterial({ color: 0x181822, roughness: 0.92, metalness: 0.02 }));
+  ground.rotation.x = -Math.PI / 2; ground.position.y = 0.0015; settingGroup.add(ground);
+  const edge = new THREE.LineSegments(new THREE.EdgesGeometry(groundGeo),
+    new THREE.LineBasicMaterial({ color: 0x3a3a52, transparent: true, opacity: 0.65 }));
+  edge.rotation.x = -Math.PI / 2; edge.position.y = 0.003; settingGroup.add(edge);
+
+  // identify: the setting itself — the brain's "why" verbatim under Brain: (honesty rule)
+  addSettingIdRow(`Setting · ${setting.id || 'staged'}`,
+    `<span class="tag setting">setting</span>` +
+    ((setting.ambiance || {}).style ? `<span class="tag">${esc(setting.ambiance.style)}</span>` : '') +
+    ((setting.ambiance || {}).light ? `<span class="tag">${esc(setting.ambiance.light)}</span>` : ''),
+    (setting.why ? `<b>Brain:</b> ${esc(setting.why)}<br>` : '') +
+    `<b>Ground:</b> ${(setting.ground || {}).kind || 'floor'} ${gs[0]}×${gs[1]} m`,
+    box3From([0, 0.02, 0], [gs[0], 0.04, gs[1]]));
+
+  for (const se of setting.elements || []) {
+    const fp = (se.footprintMeters || [1, 1, 1]).slice(0, 3);
+    const pose = se.pose || {}; const pp = pose.position || [0, 0, 0]; const yawDeg = pose.yawDeg || 0;
+    const holder = new THREE.Group();
+    holder.name = '__setting_' + (se.id || 'el');
+    holder.position.set(pp[0], pp[1], pp[2]);
+    holder.rotation.y = THREE.MathUtils.degToRad(yawDeg);
+    settingGroup.add(holder);
+    // world AABB (yaw-approximate) for framing + identify focus
+    const box = box3From([pp[0], pp[1] + fp[1] / 2, pp[2]], fp);
+    const helper = new THREE.Box3Helper(
+      new THREE.Box3(new THREE.Vector3(-fp[0] / 2, 0, -fp[2] / 2), new THREE.Vector3(fp[0] / 2, fp[1], fp[2] / 2)),
+      SETTING_COLOR);
+    helper.material.transparent = true; helper.material.opacity = 0.35; helper.material.depthTest = false;
+    holder.add(helper);
+    const s = { se, holder, box, helper, field: null, label: null, labelStatus: null, pending: !se.assetPath, row: null };
+
+    if (se.assetPath) {
+      // a real context asset at its pose, footprint honoured (fit + seat on the ground)
+      try {
+        const url = se.assetPath.startsWith('http') ? se.assetPath : base + se.assetPath;
+        const gltf = await loader.loadAsync(url);
+        seatFitToFootprint(gltf.scene, fp);
+        holder.add(gltf.scene);
+        spawnIn(holder, box, SETTING_COLOR, 0.05);
+        s.label = makeLabel(`<b>${esc(se.subject || se.id)}</b><br><span class="sz">setting element</span>`);
+      } catch (err) {
+        console.error('setting element failed', se.id, err);
+        s.pending = true;   // fall back to the honest reserved-footprint treatment
+        s.field = materializeField(holder, fp);
+        s.label = makeLabel(`<b>${esc(se.subject || se.id)}</b><br><span class="mat">asset failed to load — footprint reserved</span>`, 'pending');
+      }
+    } else {
+      // PENDING: the materializing field at the reserved footprint. The sub-line says
+      // whether a brain job exists (assetPath null + generationJobId null = generation
+      // unavailable — footprint reserved only).
+      s.field = materializeField(holder, fp);
+      const status = se.generationJobId ? `job ${esc(se.generationJobId)}` : 'footprint reserved · no generation job';
+      const matLine = se.generationJobId
+        ? 'materializing — generating on the brain'
+        : 'materializing — awaiting generation (unavailable)';
+      s.label = makeLabel(`<b>${esc(se.subject || se.id)}</b>` +
+        `<br><span class="mat">${matLine}</span>` +
+        `<br><span class="sz js">${status}</span>`, 'pending');
+      s.labelStatus = s.label.element.querySelector('.js');
+    }
+    s.label.position.set(0, fp[1] + 0.12, 0);
+    holder.add(s.label);
+    s.row = addSettingIdRow(se.subject || se.id,
+      `<span class="tag setting">setting element</span>` +
+      `<span class="tag">${se.assetPath ? 'asset' : (se.generationJobId ? 'generating' : 'reserved')}</span>`,
+      `<b>Footprint:</b> ${fp.map((n) => (+n).toFixed(2)).join('×')} m` +
+      `<br><b>Pose:</b> [${pp.map((n) => +(+n).toFixed(2)).join(', ')}] · yaw ${yawDeg}°` +
+      (se.generationJobId ? `<br><b>Job:</b> ${esc(se.generationJobId)}` : ''),
+      box);
+    settingElements.push(s);
+
+    // asset being generated on the PC: poll /jobs/{id} and hot-swap on completion
+    if (!se.assetPath && se.generationJobId) {
+      pollGeneration(se.generationJobId, se.id, {
+        swap: swapSettingGlb,
+        status: (t) => {
+          if (s.labelStatus) s.labelStatus.textContent = t;
+          $('hint').textContent = `setting/${se.id} · ${t}`;
+        },
+      });
+    }
+  }
+}
+
+async function swapSettingGlb(seId, url) {
+  const s = settingElements.find((x) => x.se.id === seId);
+  if (!s) return;
+  const gltf = await loader.loadAsync(url);
+  if (s.field) s.field.dispose();
+  s.field = null;
+  seatFitToFootprint(gltf.scene, (s.se.footprintMeters || [1, 1, 1]).slice(0, 3));
+  s.holder.add(gltf.scene);
+  s.pending = false;
+  s.se.assetPath = url;   // record reality: a re-render keeps the real mesh, no re-poll
+  s.label.element.innerHTML = `<b>${esc(s.se.subject || s.se.id)}</b><br><span class="sz">setting element · generated</span>`;
+  s.label.element.classList.remove('pending');
+  s.labelStatus = null;
+  const tag = s.row && s.row.querySelectorAll('.tag')[1];
+  if (tag) tag.textContent = 'asset';
+  spawnIn(s.holder, s.box, SETTING_COLOR, 0);
+  applyOverlayVisibility();
+  sendPlacementReport(contract);   // the staged context changed — re-report (append-only)
 }
 
 // ---------------------------------------------------------------- living entities (MF p38–p43)
@@ -365,6 +571,7 @@ async function loadScene(url) {
 }
 
 async function renderScene(c, label) {
+  genSession++;   // a new scene invalidates every in-flight generation poll
   for (const e of elements) { scene.remove(e.group); overlayGroup.remove(e.helper); overlayGroup.remove(e.label); panelGroup.remove(e.panel); }
   elements = []; $('idlist').innerHTML = '';
   lastLabel = label || c.title || '';
@@ -376,7 +583,28 @@ async function renderScene(c, label) {
     `<b>${contract.title || contract.experienceId || 'Scene'}</b> · ${contract.experienceType || contract.detectedDomain?.name || ''}` +
     (contract.sourcePrompt ? `<br>“${contract.sourcePrompt}”` : '');
 
-  const els = contract.spatialElements || [];
+  // the setting law: staged contracts carry a brain-composed setting (real-room AR
+  // contracts don't). Render it first so the experience lands IN the context.
+  await renderSetting(contract.setting || null, contract.glbBase || '');
+
+  // experience anchoring: when the setting carries an experienceAnchor, the layout
+  // origin moves to that anchor — element placements are anchor-LOCAL and are mapped
+  // to world here (rotate by the anchor's yaw, then translate to its position).
+  // Copies, never mutation: a re-render of the same contract must not double-apply.
+  const anch = (contract.setting || {}).experienceAnchor;
+  const hasAnchor = !!(anch && Array.isArray(anch.position));
+  const aYawDeg = hasAnchor ? (anch.yawDeg || 0) : 0;
+  const aYaw = THREE.MathUtils.degToRad(aYawDeg), cy = Math.cos(aYaw), sy = Math.sin(aYaw);
+  const anchored = (p) => [
+    anch.position[0] + p[0] * cy + p[2] * sy,
+    anch.position[1] + p[1],
+    anch.position[2] - p[0] * sy + p[2] * cy];
+  const els = (contract.spatialElements || []).map((el) => {
+    if (!hasAnchor) return el;
+    const pl = el.placement || {};
+    const r = pl.rotationDeg || [0, 0, 0];
+    return { ...el, placement: { ...pl, position: anchored(pl.position || [0, 0, 0]), rotationDeg: [r[0], r[1] + aYawDeg, r[2]] } };
+  });
   // compute scene centroid for explode
   const cen = new THREE.Vector3();
   els.forEach((el) => cen.add(new THREE.Vector3(...(el.placement.position || [0, 0.9, 0]))));
@@ -437,7 +665,7 @@ async function renderScene(c, label) {
       addIdRow({ ...el, title: (el.title || el.id) + ' (load failed)' }, 0xe6a23c);
     }
   }
-  $('idcount').textContent = elements.length;
+  $('idcount').textContent = elements.length + settingElements.length;
   applyOverlayVisibility(); frameScene();
 }
 
@@ -466,6 +694,13 @@ function applyOverlayVisibility() {
     e.helper.visible = identifyOn; e.label.visible = identifyOn;
     if (e.panel) e.panel.visible = controlsOn || e.el.id === activeId;
   }
+  for (const s of settingElements) {
+    // pending footprint bounds + "materializing" label are part of the honest render
+    // treatment — always shown; loaded setting elements follow the identify toggle.
+    const show = s.pending || identifyOn;
+    if (s.helper) s.helper.visible = show;
+    if (s.label) s.label.visible = show;
+  }
   $('identify').classList.toggle('show', identifyOn);
   $('btnIdentify').classList.toggle('on', identifyOn);
   $('btnControls').classList.toggle('on', controlsOn);
@@ -476,6 +711,7 @@ function applyOverlayVisibility() {
 
 function focusElement(id) {
   activeId = id;
+  for (const r of Array.from($('idlist').children)) r.classList.remove('active');
   for (const e of elements) e.row?.classList.toggle('active', e.el.id === id);
   const e = elById(id); if (!e) return;
   const c = new THREE.Vector3(); e.box.getCenter(c); controls.target.copy(c);
@@ -484,6 +720,7 @@ function focusElement(id) {
 
 function frameScene() {
   const box = new THREE.Box3(); for (const e of elements) box.union(e.box);
+  for (const s of settingElements) if (s.box) box.union(s.box);   // frame the whole staged tableau
   if (box.isEmpty()) return;
   const c = new THREE.Vector3(); box.getCenter(c); const s = new THREE.Vector3(); box.getSize(s);
   const r = Math.max(s.x, s.y, s.z); controls.target.copy(c);
@@ -667,7 +904,13 @@ function brainToWebScene(c, brainBase) {
     footprintSource: a.footprintSource ||
       ((a.realSizeMeters || fp[a.id] || a.scaleMeters) ? 'library' : 'default_guess'),
   }));
-  const baseY = anchor === 'floor' ? 0.02 : anchor === 'wall' ? 1.3 : TABLE_TOP;
+  // staged contracts carry a brain-composed setting; when its experienceAnchor is
+  // usable, the layout resolves ANCHOR-LOCAL (baseY 0 — the anchor supplies the
+  // height) and renderScene maps it to world at the anchor's position/yaw.
+  const setting = c.setting || null;
+  const sAnchor = setting && setting.experienceAnchor;
+  const hasSettingAnchor = !!(sAnchor && Array.isArray(sAnchor.position));
+  const baseY = hasSettingAnchor ? 0 : (anchor === 'floor' ? 0.02 : anchor === 'wall' ? 1.3 : TABLE_TOP);
   const pos = resolveLayout(items, layout, baseY);
   // honesty: whatever the brain said travels verbatim (decisionTrace → "Brain:");
   // what THIS client resolved is labelled "Web solver:" — never blended.
@@ -686,6 +929,7 @@ function brainToWebScene(c, brainBase) {
     whyThisRepresentation: u.summary || '',
     brainTrace,
     webSolver: `${layout} layout, baseY=${baseY}, slot ${i + 1}/${items.length}` +
+      (hasSettingAnchor ? `, anchored to setting:${sAnchor.name || sAnchor.elementId || setting.id || 'anchor'}` : '') +
       (a.baked ? ', seat-by-origin (baked)' : ''),
   }));
   const seq = c.sequence || [];
@@ -699,6 +943,8 @@ function brainToWebScene(c, brainBase) {
     detectedDomain: { name: u.domain || 'general', confidence: 'medium', source: c.composer || 'brain' },
     experienceType: u.intent ? cap(u.intent) : (c.composer || 'Experience'),
     glbBase: brainBase, spatialElements, attentionPlan, primaryId,
+    // the brain's setting travels verbatim; renderScene stages it + applies the anchor
+    setting: setting || undefined,
     // inputs the web solver worked from — reported back via POST /placement-report
     solver: {
       anchor, layout, baseY,
@@ -707,6 +953,12 @@ function brainToWebScene(c, brainBase) {
       // as scale.maxSurfaceCoverage (same knob). Absent in both → JSON drops undefined.
       coverage: pl.coverage ?? (ds.scale || {}).maxSurfaceCoverage,
       footprints: items.map((a) => ({ assetId: a.id, meters: a.size, source: a.footprintSource })),
+      setting: hasSettingAnchor ? {
+        id: setting.id || null,
+        anchor: { name: sAnchor.name || null, elementId: sAnchor.elementId ?? null,
+          position: sAnchor.position, yawDeg: sAnchor.yawDeg || 0 },
+        groundMeters: ((setting.ground || {}).sizeMeters || [8, 8]).slice(0, 2),
+      } : undefined,
     },
   };
 }
@@ -717,6 +969,10 @@ function brainToWebScene(c, brainBase) {
 function sendPlacementReport(web) {
   const sv = web && web.solver; if (!sv) return;   // only scenes resolved from a live /modular contract
   const fitsOn = (p, size) => {
+    if (sv.setting && sv.setting.groundMeters) {       // staged: the setting IS the room
+      const g = sv.setting.groundMeters;
+      return Math.abs(p[0]) + size[0] / 2 <= g[0] / 2 && Math.abs(p[2]) + size[2] / 2 <= g[1] / 2;
+    }
     const reach = Math.hypot(p[0], p[2]) + Math.max(size[0], size[2]) / 2;
     if (sv.anchor === 'table') return reach <= 0.75;   // the built room's table radius
     if (sv.anchor === 'floor') return reach <= 4;      // the built room's floor radius
@@ -732,10 +988,16 @@ function sendPlacementReport(web) {
       scaleMode: sv.scaleMode,
       coverage: sv.coverage,
       footprints: sv.footprints,
-      roomSummary: { surfaces: [                       // the synthetic room, as built
-        { kind: 'table', sizeMeters: [1.5, 1.5], y: 0.74 },
-        { kind: 'floor', sizeMeters: [8, 8], y: 0 },
-      ] },
+      // staged: the brain-composed setting is the context this solver placed against;
+      // otherwise the synthetic room, as built. Never both — that's the setting law.
+      setting: sv.setting,                             // undefined drops from JSON
+      roomSummary: sv.setting
+        ? { staged: true, settingId: sv.setting.id,
+            surfaces: [{ kind: 'floor', sizeMeters: sv.setting.groundMeters, y: 0 }] }
+        : { surfaces: [
+            { kind: 'table', sizeMeters: [1.5, 1.5], y: 0.74 },
+            { kind: 'floor', sizeMeters: [8, 8], y: 0 },
+          ] },
     },
     plan: {
       anchor: sv.anchor,
@@ -764,29 +1026,37 @@ function sendPlacementReport(web) {
 // Poll a Meshy generation job and hot-swap the placeholder for the real mesh when
 // it lands. The brain runs the full Meshy pipeline (asset_service.produce) and
 // streams 9 determinate stages via /jobs/{id}; we surface them and spawn the GLB in.
-let genToken = 0;
-async function pollGeneration(jobId, targetElId) {
-  const myToken = ++genToken;
+// Several polls can run at once (staged-setting elements + the experience asset), so
+// cancellation is per-SCENE: renderScene bumps genSession, which ends every poll.
+// opts: { swap: (targetId, url) => Promise, status: (text) => void } — defaults are
+// the experience-asset swap and the global hint line.
+let genSession = 0;
+async function pollGeneration(jobId, targetElId, opts) {
+  const o = opts || {};
+  const put = o.status || ((t) => { $('hint').textContent = t; });
+  const doSwap = o.swap || swapElementGlb;
+  const mySession = genSession;
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  while (genToken === myToken) {
+  while (genSession === mySession) {
     let j;
     try { j = await (await fetch(BRAIN_URL + '/jobs/' + jobId)).json(); }
-    catch (e) { $('hint').textContent = `gen poll failed: ${e.message}`; return; }
+    catch (e) { put(`gen poll failed: ${e.message}`); return; }
+    if (genSession !== mySession) return;   // scene changed while the fetch was in flight
     if (j.status === 'queued') {
-      $('hint').textContent = `Meshy queued${j.queuePosition ? ` (${j.queuePosition} ahead)` : ''} · ${jobId}`;
+      put(`Meshy queued${j.queuePosition ? ` (${j.queuePosition} ahead)` : ''} · ${jobId}`);
     } else if (j.status === 'done') {
       if (j.glb_url) {
-        $('hint').textContent = `Meshy mesh ready — spawning in`;
-        try { await swapElementGlb(targetElId, j.glb_url.startsWith('http') ? j.glb_url : BRAIN_URL + j.glb_url); } catch (e) { console.error('swap failed', e); }
-        $('hint').textContent = `Meshy asset live · ${jobId}`;
-      } else { $('hint').textContent = `gen done (no GLB) · ${jobId}`; }
+        put(`Meshy mesh ready — spawning in`);
+        try { await doSwap(targetElId, j.glb_url.startsWith('http') ? j.glb_url : BRAIN_URL + j.glb_url); } catch (e) { console.error('swap failed', e); }
+        put(`Meshy asset live · ${jobId}`);
+      } else { put(`gen done (no GLB) · ${jobId}`); }
       return;
     } else if (j.status === 'error' || j.status === 'failed') {
-      $('hint').textContent = `Meshy generation failed: ${j.message || ''}`; return;
+      put(`Meshy generation failed: ${j.message || ''}`); return;
     } else {
       const pct = j.percent != null ? ` · ${j.percent}%` : '';
       const k = j.stageTotal ? ` (${j.stageIndex || 0}/${j.stageTotal})` : '';
-      $('hint').textContent = `Meshy: ${j.stage || j.status}${k}${pct}`;
+      put(`Meshy: ${j.stage || j.status}${k}${pct}`);
     }
     await sleep(1600);
   }
@@ -824,23 +1094,30 @@ async function generateFromBrain() {
   try {
     const res = await fetch(BRAIN_URL + '/modular', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kind: 'text', text: prompt, use_llm: true }),
+      // the setting law, request side: the PC viewer has no real room, so it asks
+      // for a staged setting by default; the toggle sends "ar" for contract-only
+      // debugging (real-room context, no setting emitted).
+      body: JSON.stringify({ kind: 'text', text: prompt, use_llm: true,
+        context: { mode: stagedSetting ? 'staged' : 'ar' } }),
     });
     if (!res.ok) throw new Error('brain ' + res.status);
     const c = await res.json();
     if (c.error) throw new Error(c.error);
     liveGroup.clear(); detections = [];
     const web = brainToWebScene(c, BRAIN_URL);
-    await renderScene(web, c.title);
+    await renderScene(web, c.title);   // stages web.setting + starts its element polls
     sendPlacementReport(web);
     const placeholders = (c.assets || []).filter((a) => !a.glbUrl).length;
+    const settingGen = c.setting ? (c.setting.elements || []).filter((s) => !s.assetPath && s.generationJobId).length : 0;
     $('hint').textContent = `live from brain · ${c.composer || ''}` +
+      (c.setting ? ` · staged setting “${c.setting.id || ''}”` : '') +
       (placeholders ? ` · ${placeholders} asset(s) generating via Meshy` : '') +
+      (settingGen ? ` · ${settingGen} setting element(s) materializing` : '') +
       (c.generationJobId ? ` · job ${c.generationJobId}` : '');
     loadingEl.classList.add('hide');
     // If the brain queued a Meshy build for a missing asset, poll it and hot-swap.
+    // (renderScene already bumped genSession, ending any prior scene's polls.)
     if (c.generationJobId) pollGeneration(c.generationJobId, web.primaryId);
-    else { genToken++; }   // cancel any prior poll
   } catch (e) {
     loadingEl.innerHTML = `<div class="err">Brain request failed.<br>${e.message}<br><br>Start it: <code>python studio/server/job_server.py --port 8788</code><br>or pass <code>?brain=http://host:port</code>.</div>`;
     console.error(e);
@@ -863,6 +1140,15 @@ $('btnStrict').addEventListener('click', async () => {
   setNarration('Strict assets', strictAssets
     ? 'ON — every GLB renders raw (scale 1.0, no re-centre, no fit), like the phone.'
     : 'OFF — the viewer fits + re-centres GLBs for preview.');
+});
+$('btnStaged').classList.toggle('on', stagedSetting);
+$('btnStaged').addEventListener('click', () => {
+  stagedSetting = !stagedSetting;
+  localStorage.setItem(STAGED_KEY, stagedSetting ? '1' : '0');
+  $('btnStaged').classList.toggle('on', stagedSetting);
+  setNarration('Staged setting', stagedSetting
+    ? 'ON — ✦ Generate sends context {mode:"staged"}: the brain composes a setting for the context-less PC viewer.'
+    : 'OFF — ✦ Generate sends context {mode:"ar"}: contract only, no setting (debugging).');
 });
 $('btnIdentify').addEventListener('click', () => { identifyOn = !identifyOn; applyOverlayVisibility(); });
 $('btnControls').addEventListener('click', () => { controlsOn = !controlsOn; applyOverlayVisibility(); });
@@ -915,6 +1201,8 @@ function tick() {
     const t = Math.min(1, (now - fx.start) / fx.dur); fx.update(t);
     if (t >= 1) { fx.done(); effects.splice(i, 1); }
   }
+  // staged-setting materializing fields (persistent, honest "not built yet")
+  for (const f of settingFields) f.update(dt, now);
   // living entities: breathe, idle, notice the user, express by intent
   updateFocus(now);
   updateLife(dt, now);
@@ -946,8 +1234,20 @@ window.__dbg = () => ({
   panelVis: elements.map((e) => e.panel?.visible),
   lrKids: labelRenderer.domElement.children.length,
   lrInApp: labelRenderer.domElement.parentNode === document.getElementById('app'),
-  identifyOn, controlsOn, strictAssets,
+  identifyOn, controlsOn, strictAssets, stagedSetting,
+  settingEls: settingElements.length, settingFields: settingFields.length,
   tri: renderer.info.render.triangles, calls: renderer.info.render.calls, frames: window.__frames || 0,
+});
+window.__setting = () => ({
+  anchor: (contract && contract.setting && contract.setting.experienceAnchor) || null,
+  tableVisible: (scene.getObjectByName('__table') || {}).visible ?? null,
+  elements: settingElements.map((s) => ({
+    id: s.se.id, subject: s.se.subject, pending: s.pending,
+    jobId: s.se.generationJobId || null, assetPath: s.se.assetPath || null,
+    footprint: s.se.footprintMeters, pos: s.holder.position.toArray().map((n) => +n.toFixed(2)),
+    yawDeg: +THREE.MathUtils.radToDeg(s.holder.rotation.y).toFixed(1),
+    labelVis: !!(s.label && s.label.visible), helperVis: !!(s.helper && s.helper.visible),
+  })),
 });
 window.__behave = (id, verb) => applyBehavior(id, verb);
 window.__select = (id) => focusElement(id);

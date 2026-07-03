@@ -35,6 +35,9 @@ stable, real scale.
   iOS Swift is ACTIVE — the old "frozen reference" rule is dead. `ios/SpatailEngine/` is the
   tested, platform-agnostic contract-runtime package the app consumes. `xcode-select` points
   at CLT on this Mac, so prefix builds with `DEVELOPER_DIR=/Applications/Xcode.app`.
+- The engine's normative spec is **`docs/spatail_engine_spec.md`** — THE SPATAIL ENGINE: one
+  contract-driven runtime, two backends (Swift `ios/SpatailEngine` + the WebXR viewer), covering
+  kits, the setting law, placement intents, triggers, aliveness, materialization, ML posture.
 - The **PC brain stays live and is built ON, never rebuilt**: job server (`studio/server/`,
   :8787/8788), vision engine (`pipeline/server/`, ws :8798 / debug :8799), fusion brain
   (`pipeline/spatail/`), Blender spine (`studio/`), Meshy + vision QA (`studio/meshy/`,

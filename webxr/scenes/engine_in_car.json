@@ -1,0 +1,132 @@
+{
+  "_comment": "Staged-setting demo: the v8_engine experience wrapped in a brain-composed garage setting. The car does not exist yet (assetPath null, generationJobId null) so the viewer renders an honest materializing field at its reserved footprint — never a fake solid. spatialElements positions are ANCHOR-LOCAL: the viewer maps them to world at setting.experienceAnchor (position/yaw), so the engine lands IN the engine bay.",
+  "schemaVersion": "0.2.0-spatail-web",
+  "experienceId": "exp_engine_in_car",
+  "title": "V8 Engine — in the car (staged garage)",
+  "sourcePrompt": "Explain the V8 engine of this car",
+  "detectedDomain": { "name": "mechanical", "confidence": "high", "source": "intent-classifier" },
+  "experienceType": "Inspection",
+  "setting": {
+    "id": "garage-v8-001",
+    "why": "An engine is best understood in the machine it powers — a garage with the car's hood open stages the V8 where it actually lives.",
+    "elements": [
+      {
+        "id": "car",
+        "subject": "sedan car with its hood open",
+        "assetPath": null,
+        "generationJobId": null,
+        "footprintMeters": [4.6, 1.5, 1.8],
+        "pose": { "position": [0, 0, 0], "yawDeg": 0 }
+      },
+      {
+        "id": "tool_cart",
+        "subject": "mechanic's tool cart",
+        "assetPath": null,
+        "generationJobId": null,
+        "footprintMeters": [0.75, 0.9, 0.5],
+        "pose": { "position": [1.7, 0, 1.35], "yawDeg": -25 }
+      }
+    ],
+    "experienceAnchor": { "elementId": "car", "name": "engine_bay", "position": [1.55, 0.9, 0], "yawDeg": 0 },
+    "ground": { "kind": "floor", "sizeMeters": [8, 8] },
+    "ambiance": { "style": "3d-pastel", "light": "soft-day" }
+  },
+  "spatialElements": [
+    {
+      "id": "engine_block",
+      "title": "V8 engine block",
+      "intent": "inspect",
+      "representationMode": "three_d_model",
+      "scaleMode": "tabletop_scale",
+      "anchorStrategy": "world_anchor",
+      "attentionBehavior": "active_focus",
+      "priority": 1,
+      "asset": { "glbUrl": "/public/assets/spatail-library/mechanical/engine_block_simplified.glb" },
+      "placement": { "kind": "setting_anchor", "position": [0, 0.1, 0], "rotationDeg": [0, 25, 0], "sizeMeters": [0.5, 0.42, 0.5] },
+      "affordances": ["rotate", "explode", "isolate", "label", "animate"],
+      "whyThisRepresentation": "The user wants to understand how parts work together, so the whole assembly is shown as a manipulable 3D model rather than a diagram.",
+      "whyThisPlacement": "Anchored in the car's engine bay (setting anchor engine_bay) so the V8 is inspected where it actually sits in the machine."
+    },
+    {
+      "id": "piston",
+      "title": "Piston (×4 of 8)",
+      "intent": "explain",
+      "representationMode": "exploded_view",
+      "scaleMode": "enlarged_detail",
+      "anchorStrategy": "relative_to_target",
+      "attentionBehavior": "on_demand",
+      "priority": 2,
+      "asset": { "glbUrl": "/public/assets/spatail-library/mechanical/piston.glb" },
+      "placement": { "kind": "above_target", "position": [-0.34, 0.38, 0.16], "rotationDeg": [0, 0, 0], "sizeMeters": [0.12, 0.18, 0.12] },
+      "affordances": ["isolate", "animate", "label"],
+      "whyThisRepresentation": "Pulled out as an exploded part so its motion can be isolated and explained on its own.",
+      "whyThisPlacement": "Floated above-left of the block over the open bay, anchored relative to the block so it reads as 'a part of this engine'."
+    },
+    {
+      "id": "crankshaft",
+      "title": "Crankshaft",
+      "intent": "simulate",
+      "representationMode": "three_d_model",
+      "scaleMode": "enlarged_detail",
+      "anchorStrategy": "relative_to_target",
+      "attentionBehavior": "on_demand",
+      "priority": 3,
+      "asset": { "glbUrl": "/public/assets/spatail-library/mechanical/crankshaft.glb" },
+      "placement": { "kind": "above_target", "position": [0, -0.04, 0.4], "rotationDeg": [0, 0, 0], "sizeMeters": [0.5, 0.1, 0.1] },
+      "affordances": ["rotate", "animate", "isolate"],
+      "whyThisRepresentation": "Shown as a model that can spin, because the point is to simulate how reciprocating pistons become rotation.",
+      "whyThisPlacement": "Brought to the front lip of the engine bay at the user's eye-line so the rotation is easy to read."
+    },
+    {
+      "id": "camshaft",
+      "title": "Camshaft",
+      "intent": "simulate",
+      "representationMode": "three_d_model",
+      "scaleMode": "enlarged_detail",
+      "anchorStrategy": "relative_to_target",
+      "attentionBehavior": "on_demand",
+      "priority": 4,
+      "asset": { "glbUrl": "/public/assets/spatail-library/mechanical/camshaft.glb" },
+      "placement": { "kind": "above_target", "position": [0, 0.44, -0.18], "rotationDeg": [0, 0, 0], "sizeMeters": [0.44, 0.08, 0.08] },
+      "affordances": ["rotate", "animate"],
+      "whyThisRepresentation": "A simple rotating model is enough to show valve timing.",
+      "whyThisPlacement": "Placed above and behind the block, the position it occupies in a real engine."
+    },
+    {
+      "id": "spark_plug",
+      "title": "Spark plug (×8)",
+      "intent": "explain",
+      "representationMode": "highlighted_target",
+      "scaleMode": "enlarged_detail",
+      "anchorStrategy": "relative_to_target",
+      "attentionBehavior": "on_demand",
+      "priority": 5,
+      "asset": { "glbUrl": "/public/assets/spatail-library/mechanical/spark_plug.glb" },
+      "placement": { "kind": "above_target", "position": [0.36, 0.3, 0.0], "rotationDeg": [0, 0, 0], "sizeMeters": [0.05, 0.15, 0.05] },
+      "affordances": ["isolate", "label"],
+      "whyThisRepresentation": "Highlighted as a small target part because it is the ignition point being called out.",
+      "whyThisPlacement": "Floated to the right of the block as a callout, anchored to the assembly."
+    },
+    {
+      "id": "controls_panel",
+      "title": "Inspection controls",
+      "intent": "explain",
+      "representationMode": "wall_dashboard",
+      "scaleMode": "compact_panel",
+      "anchorStrategy": "user_relative",
+      "attentionBehavior": "persistent_context",
+      "priority": 6,
+      "placement": { "kind": "right_of_user", "position": [0.95, 0.2, 0.2], "rotationDeg": [0, -40, 0], "sizeMeters": [0.5, 0.34, 0.02] },
+      "affordances": ["select", "scroll", "confirm"],
+      "whyThisRepresentation": "A 2D control panel (object-local UI) hosts explode/rotate/isolate toggles for the assembly.",
+      "whyThisPlacement": "Placed to the right of the user (body-local locus of control), off the car's nose, so controls are reachable without occluding the engine."
+    }
+  ],
+  "attentionPlan": [
+    { "step": 1, "focusElementId": "engine_block", "narration": "This is the V8 that lives under this car's hood — staged in the engine bay while the car itself materializes. Let's take it apart." },
+    { "step": 2, "focusElementId": "piston", "narration": "Each piston is pushed down by combustion. There are eight." },
+    { "step": 3, "focusElementId": "crankshaft", "narration": "The crankshaft turns that up-and-down motion into rotation." },
+    { "step": 4, "focusElementId": "camshaft", "narration": "The camshaft times when each valve opens and closes." },
+    { "step": 5, "focusElementId": "spark_plug", "narration": "Spark plugs ignite the fuel-air mixture at the top of each cylinder." }
+  ]
+}

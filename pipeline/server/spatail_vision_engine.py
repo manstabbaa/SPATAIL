@@ -49,6 +49,7 @@ import asyncio
 import base64
 import json
 import logging
+import math
 import os
 import re
 import time
@@ -146,6 +147,9 @@ class IdentifyResult:
     parts: list[dict[str, Any]] = field(default_factory=list)
     # Capture/ingest time (epoch seconds) of the frame this identity describes.
     frame_timestamp: float | None = None
+    # (width, height) of the identified frame — the pixel space the VLM's raw
+    # boxes were normalized out of. None when the header couldn't be parsed.
+    frame_size: tuple[int, int] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -156,6 +160,7 @@ class IdentifyResult:
             "model": self.model,
             "parts": self.parts,
             "frameTimestamp": self.frame_timestamp,
+            "frameSize": list(self.frame_size) if self.frame_size else None,
         }
 
 
@@ -163,6 +168,13 @@ class IdentifyResult:
 # VLM adapter — OpenAI-compatible vision chat (NIM / Ollama / vLLM)
 # ────────────────────────────────────────────────────────────────────────
 
+# Boxes are requested in PIXEL [x1, y1, x2, y2], not normalized [x, y, w, h]:
+# grounding-capable VLMs (Qwen2.5-VL) are trained to emit absolute pixel
+# corner coordinates and simply ignore a "respond normalized" instruction —
+# observed live: 766/766 plans came back in pixels, and a warm qwen2.5vl:3b
+# echoed xyxy even when asked for xywh. Ask for what the model actually does;
+# the engine knows the frame size (_image_size) and converts server-side.
+# _clean_box still accepts 0..1 xywh replies from models that do obey.
 _IDENTIFY_PROMPT = (
     "You are the vision system of an AR teaching app. Look at the image and "
     "identify the single most prominent real-world OBJECT the user is pointing "
@@ -171,12 +183,13 @@ _IDENTIFY_PROMPT = (
     '{"primary": "<short noun, e.g. \\"car engine air filter\\">", '
     '"confidence": <0..1>, '
     '"alternatives": [{"label": "<noun>", "confidence": <0..1>}], '
-    '"box": [x, y, w, h], '
-    '"parts": [{"label": "<part noun, e.g. \\"cap\\">", "box": [x, y, w, h]}] }\n'
-    "box is the normalized bounding box of the primary object in 0..1 "
-    "(origin top-left); use null if unsure. parts lists the primary object's "
-    "visible sub-parts (cap, lid, handle, button, …) with boxes in the same "
-    "0..1 space; use [] if unsure. Keep labels concrete and specific."
+    '"box": [x1, y1, x2, y2], '
+    '"parts": [{"label": "<part noun, e.g. \\"cap\\">", "box": [x1, y1, x2, y2]}] }\n'
+    "box is the bounding box of the primary object in image pixels — "
+    "[left, top, right, bottom] corner coordinates, origin top-left; use null "
+    "if unsure. parts lists the primary object's visible sub-parts (cap, lid, "
+    "handle, button, …) with boxes in the same pixel space; use [] if unsure. "
+    "Keep labels concrete and specific."
 )
 
 
@@ -198,6 +211,8 @@ class VLMAdapter:
         self.max_tokens = max_tokens
 
     async def identify(self, jpeg: bytes, http: ClientSession) -> IdentifyResult:
+        # The pixel space the VLM will echo boxes in — needed to normalize them.
+        frame_size = _image_size(jpeg)
         data_url = "data:image/jpeg;base64," + base64.b64encode(jpeg).decode("ascii")
         body = {
             "model": self.model,
@@ -234,18 +249,23 @@ class VLMAdapter:
             if isinstance(exc, asyncio.TimeoutError):
                 reason = f"timeout after {latency}ms (--vlm-timeout {self.timeout_s:g}s)"
             log.warning(f"VLM call failed in {latency}ms: {reason}")
-            return IdentifyResult([], None, f"<error: {reason}>", latency, self.model)
+            return IdentifyResult([], None, f"<error: {reason}>", latency, self.model,
+                                  frame_size=frame_size)
 
         latency = int((time.monotonic() - t0) * 1000)
-        dets, primary, parts = _parse_identify_json(text)
-        return IdentifyResult(dets, primary, text, latency, self.model, parts=parts)
+        dets, primary, parts = _parse_identify_json(text, frame_size)
+        return IdentifyResult(dets, primary, text, latency, self.model, parts=parts,
+                              frame_size=frame_size)
 
 
-def _parse_identify_json(text: str) -> tuple[list[Detection], str | None, list[dict[str, Any]]]:
+def _parse_identify_json(text: str, frame_size: tuple[int, int] | None = None,
+                         ) -> tuple[list[Detection], str | None, list[dict[str, Any]]]:
     """Best-effort extraction of detections from a chat VLM reply.
 
     VLMs wrap JSON in code fences or prose; pull the first {...} blob. If it
     can't be parsed at all, fall back to treating the whole reply as one label.
+    frame_size is the (width, height) of the frame the VLM saw — pixel-space
+    boxes are normalized against it (see _clean_box).
     """
     blob = None
     fence = re.search(r"\{.*\}", text, re.DOTALL)
@@ -264,17 +284,17 @@ def _parse_identify_json(text: str) -> tuple[list[Detection], str | None, list[d
         dets.append(Detection(
             label=str(primary),
             confidence=float(blob.get("confidence", 0.0) or 0.0),
-            box=_clean_box(blob.get("box")),
+            box=_clean_box(blob.get("box"), frame_size),
         ))
     for alt in (blob.get("alternatives") or []):
         if isinstance(alt, dict) and alt.get("label"):
             dets.append(Detection(label=str(alt["label"]),
                                   confidence=float(alt.get("confidence", 0.0) or 0.0),
-                                  box=_clean_box(alt.get("box"))))
-    return dets, (str(primary) if primary else None), _clean_parts(blob.get("parts"))
+                                  box=_clean_box(alt.get("box"), frame_size)))
+    return dets, (str(primary) if primary else None), _clean_parts(blob.get("parts"), frame_size)
 
 
-def _clean_parts(raw: Any) -> list[dict[str, Any]]:
+def _clean_parts(raw: Any, frame_size: tuple[int, int] | None = None) -> list[dict[str, Any]]:
     """Sub-parts of the primary object (spec §1.3). The VLM is free-form here —
     anything that isn't {label[, box, confidence]} is dropped so a creative
     reply can never break identification."""
@@ -287,7 +307,8 @@ def _clean_parts(raw: Any) -> list[dict[str, Any]]:
         label = item.get("label")
         if not isinstance(label, str) or not label.strip():
             continue
-        part: dict[str, Any] = {"label": label.strip()[:80], "box": _clean_box(item.get("box"))}
+        part: dict[str, Any] = {"label": label.strip()[:80],
+                                "box": _clean_box(item.get("box"), frame_size)}
         conf = item.get("confidence")
         if isinstance(conf, (int, float)):
             part["confidence"] = round(max(0.0, min(1.0, float(conf))), 3)
@@ -297,18 +318,93 @@ def _clean_parts(raw: Any) -> list[dict[str, Any]]:
     return parts
 
 
-def _clean_box(box: Any) -> list[float] | None:
+def _clean_box(box: Any, frame_size: tuple[int, int] | None = None) -> list[float] | None:
+    """Coerce a VLM box into the wire contract: normalized [x, y, w, h] in
+    0..1, origin top-left (WireMessages.swift / the debug overlay both assume
+    this space).
+
+    Grounding VLMs echo boxes in the pixel space of the frame they saw, as
+    [x1, y1, x2, y2] corners — that is what they are trained on and what the
+    prompt now asks for — so pixel boxes are converted + normalized against
+    frame_size (with an [x, y, w, h] fallback when the corner reading is
+    geometrically impossible). Boxes already in 0..1 are treated as the wire's
+    xywh and pass through. A pixel box with no known frame size is dropped
+    rather than misleading the overlay/brain; a degenerate (zero-area) box is
+    dropped rather than clamped into existence.
+    """
     if not isinstance(box, (list, tuple)) or len(box) != 4:
         return None
     try:
         vals = [float(v) for v in box]
     except (TypeError, ValueError):
         return None
-    # Heuristic: if values look like pixels (>1.5), we can't normalize without
-    # the source size, so drop rather than mislead the overlay.
-    if any(v > 1.5 for v in vals):
+    if not all(math.isfinite(v) for v in vals):
         return None
-    return vals
+    x, y, w, h = vals
+    if all(v <= 1.5 for v in vals):
+        # already normalized 0..1 — read as the wire's [x, y, w, h], unless it
+        # provably was [x1, y1, x2, y2] (the xywh reading escapes the unit
+        # square while the corner reading is a valid box)
+        if (x + w > 1.05 or y + h > 1.05) and w > x and h > y:
+            w, h = w - x, h - y
+    elif frame_size:
+        fw, fh = frame_size
+        # pixel space: corners first (the prompt's format), xywh as fallback
+        x1, y1, x2, y2 = vals
+        if x2 > x1 and y2 > y1:
+            x, y, w, h = x1, y1, x2 - x1, y2 - y1
+        # else keep the xywh reading — a model that echoed width/height
+        x, y, w, h = x / fw, y / fh, w / fw, h / fh
+    else:
+        return None
+    # clamp into the unit square (VLMs run a few px past the edge)
+    x = min(max(x, 0.0), 1.0)
+    y = min(max(y, 0.0), 1.0)
+    w = min(max(w, 0.0), 1.0 - x)
+    h = min(max(h, 0.0), 1.0 - y)
+    if w <= 0.0 or h <= 0.0:
+        return None
+    return [round(v, 4) for v in (x, y, w, h)]
+
+
+def _image_size(data: bytes) -> tuple[int, int] | None:
+    """(width, height) from a JPEG/PNG header — no image libs (the engine's
+    deps are deliberately just websockets+aiohttp; the browser does all the
+    real decoding). JPEG: scan markers for a SOFn frame header. PNG: IHDR.
+    Returns None on anything unrecognizable — callers treat that as "pixel
+    boxes can't be normalized", never as an error."""
+    # PNG — the test feeder sends .png files as-is
+    if data[:8] == b"\x89PNG\r\n\x1a\n" and len(data) >= 24 and data[12:16] == b"IHDR":
+        w = int.from_bytes(data[16:20], "big")
+        h = int.from_bytes(data[20:24], "big")
+        return (w, h) if w > 0 and h > 0 else None
+    # JPEG — SOF0/1/2/… carry [precision u8][height u16][width u16]
+    if data[:2] != b"\xff\xd8":
+        return None
+    i = 2
+    n = len(data)
+    while i + 9 <= n:
+        if data[i] != 0xFF:
+            i += 1
+            continue
+        marker = data[i + 1]
+        if marker == 0xFF:                      # fill byte
+            i += 1
+            continue
+        if marker in (0x01, 0xD8) or 0xD0 <= marker <= 0xD7:   # standalone
+            i += 2
+            continue
+        if marker == 0xDA:                      # start of scan — SOF was missed
+            return None
+        seg_len = int.from_bytes(data[i + 2:i + 4], "big")
+        if seg_len < 2:
+            return None
+        if 0xC0 <= marker <= 0xCF and marker not in (0xC4, 0xC8, 0xCC):
+            h = int.from_bytes(data[i + 5:i + 7], "big")
+            w = int.from_bytes(data[i + 7:i + 9], "big")
+            return (w, h) if w > 0 and h > 0 else None
+        i += 2 + seg_len
+    return None
 
 
 # Mirrors labelToSurfaceKind() in pipeline/spatail/surface_fusion.js — the
@@ -945,7 +1041,7 @@ async function tick(){
    $('conf').textContent=(c*100).toFixed(0)+'%';
    $('raw').textContent=r.rawText||'';
    size();cx.clearRect(0,0,cv.width,cv.height);
-   cx.lineWidth=3;cx.font='16px system-ui';
+   cx.lineWidth=3;cx.font='16px system-ui';cx.setLineDash([]);
    for(const d of r.detections){
     if(!d.box)continue;
     const[x,y,w,h]=d.box,X=x*cv.width,Y=y*cv.height,W=w*cv.width,H=h*cv.height;
@@ -954,6 +1050,17 @@ async function tick(){
     const tw=cx.measureText(t).width;cx.fillRect(X,Y-20,tw+10,20);
     cx.fillStyle='#06210f';cx.fillText(t,X+5,Y-5);
    }
+   // parts of the primary (spec §1.3) — same normalized space, dashed
+   cx.lineWidth=2;cx.font='13px system-ui';cx.setLineDash([6,4]);
+   for(const p of (r.parts||[])){
+    if(!p.box)continue;
+    const[x,y,w,h]=p.box,X=x*cv.width,Y=y*cv.height,W=w*cv.width,H=h*cv.height;
+    cx.strokeStyle='#ffb347';cx.strokeRect(X,Y,W,H);
+    cx.fillStyle='#ffb347';const t=p.label;
+    const tw=cx.measureText(t).width;cx.fillRect(X,Y+H,tw+8,17);
+    cx.fillStyle='#2b1a02';cx.fillText(t,X+4,Y+H+13);
+   }
+   cx.setLineDash([]);
   }
  }catch(e){$('conn').className='dot';}
  // bust the cache so the <img> pulls the newest frame

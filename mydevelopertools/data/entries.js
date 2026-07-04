@@ -28,6 +28,28 @@
  */
 window.SPATAIL_LOG = [
   {
+    "id": "2026-07-04-vlm-box-normalization",
+    "date": "2026-07-04",
+    "title": "Vision engine stops throwing away the VLM's boxes — pixel grounding survives to the wire",
+    "category": "fix",
+    "status": "in-progress",
+    "area": "PC brain / vision engine",
+    "summary": "_clean_box dropped every pixel-space box the VLM returned (766/766 live plans had box: null), so the fusion brain never got pixel grounding; the engine now reads the frame size from the JPEG header and normalizes boxes to the wire contract — built and e2e-verified on a branch, deployment held for founder go-ahead.",
+    "details": [
+      "Root cause: grounding VLMs (qwen2.5vl) echo absolute pixel corner coordinates no matter what space the prompt asks for, and _clean_box dropped any box with values > 1.5 — identification.box and parts[].box were null in essentially every plan on 2026-07-03/04.",
+      "_image_size(): dependency-free JPEG SOF / PNG IHDR header parse gives (width, height) for every uplinked frame; identify() threads it into _parse_identify_json → _clean_box / _clean_parts.",
+      "Pixel boxes now normalize to the wire's 0..1 [x, y, w, h] (origin top-left — exactly what WireMessages.swift and the :8799 overlay already assumed); already-normalized replies pass through; results clamp to the unit square; degenerate boxes drop.",
+      "The identify prompt now asks for pixel [x1, y1, x2, y2] — qwen's native grounding format (a warm 3b echoed xyxy even when asked for xywh); the parser reads corners first with an xywh fallback when the corner reading is geometrically impossible.",
+      "IdentifyResult carries frameSize on the wire for attribution; the :8799 debug overlay draws parts[].box dashed so part-level grounding (the bottle-cap case) is visible over Parsec.",
+      "Verified: 34 parser/header unit checks; end-to-end on an isolated test instance (:18798/:18799 — live engine untouched): synthetic bottle frame over the WS uplink → box [0.4069, 0.2875, 0.275, 0.5229] non-null in vision.identification and state.json (raw VLM reply was pixel xyxy [293, 276, 491, 778]), room.update → experience.delta, and the plan trace carries the box through brainInput.identification.",
+      "NOT deployed to the live engine: the founder is mid-diagnosis on placement attribution and a silent behavior change would contaminate live-session evidence. Open follow-up: surface_fusion.js / plan_from_room.js still never READ boxes — teaching the brain to use the grounding (ray-through-box instead of bare camera ray) is the next step."
+    ],
+    "why": "Without boxes every plan fell back to 'camera ray pierced <surface>' — the leading brain-side explanation for experiences landing near-but-not-on the identified object (the water-bottle-cap sessions).",
+    "tags": ["vision-engine", "vlm", "grounding", "qwen2.5vl", "traces", "bottle-cap-test"],
+    "files": ["pipeline/server/spatail_vision_engine.py"],
+    "commits": ["3676843"]
+  },
+  {
     "id": "2026-07-03-pc-bringup-rebuild",
     "date": "2026-07-03",
     "title": "PC brain live on the rebuild — the setting loop verified end to end",

@@ -1,6 +1,6 @@
 {
   "category": "generated",
-  "count": 136,
+  "count": 137,
   "assets": [
     {
       "assetId": "cube",
@@ -5818,6 +5818,50 @@
         0.03,
         0.018,
         0.03
+      ]
+    },
+    {
+      "assetId": "headphone_speakers",
+      "name": "Headphone Speakers",
+      "category": "general_knowledge",
+      "semanticTags": [
+        "headphone",
+        "speakers"
+      ],
+      "path": "/assets/spatail-library/meshy/headphone_speakers_anim.glb",
+      "usdzPath": "/assets/spatail-library/meshy/headphone_speakers_anim.usdz",
+      "scaleMeters": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "pivot": "center_bottom",
+      "placementTypes": [
+        "table",
+        "floor"
+      ],
+      "representationUses": [
+        "real_scale_placement",
+        "part_to_whole_explanation"
+      ],
+      "supportsHighlight": true,
+      "supportsTransparency": true,
+      "supportsAnimation": true,
+      "fallbackPrimitive": "cube",
+      "qualityLevel": "generated",
+      "license": "internal_generated",
+      "assetState": "generated",
+      "boundingBoxMeters": {
+        "size": [
+          0.1,
+          0.1,
+          0.1
+        ]
+      },
+      "realSizeMeters": [
+        0.18,
+        0.2,
+        0.08
       ]
     }
   ]

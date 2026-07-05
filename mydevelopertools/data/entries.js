@@ -32,9 +32,9 @@ window.SPATAIL_LOG = [
     "date": "2026-07-04",
     "title": "Vision engine stops throwing away the VLM's boxes — pixel grounding survives to the wire",
     "category": "fix",
-    "status": "in-progress",
+    "status": "shipped",
     "area": "PC brain / vision engine",
-    "summary": "_clean_box dropped every pixel-space box the VLM returned (766/766 live plans had box: null), so the fusion brain never got pixel grounding; the engine now reads the frame size from the JPEG header and normalizes boxes to the wire contract — built and e2e-verified on a branch, deployment held for founder go-ahead.",
+    "summary": "_clean_box dropped every pixel-space box the VLM returned (766/766 live plans had box: null), so the fusion brain never got pixel grounding; the engine now reads the frame size from the JPEG header and normalizes boxes to the wire contract — DEPLOYED to the live engine 2026-07-05 on founder go-ahead and re-verified live.",
     "details": [
       "Root cause: grounding VLMs (qwen2.5vl) echo absolute pixel corner coordinates no matter what space the prompt asks for, and _clean_box dropped any box with values > 1.5 — identification.box and parts[].box were null in essentially every plan on 2026-07-03/04.",
       "_image_size(): dependency-free JPEG SOF / PNG IHDR header parse gives (width, height) for every uplinked frame; identify() threads it into _parse_identify_json → _clean_box / _clean_parts.",
@@ -42,7 +42,7 @@ window.SPATAIL_LOG = [
       "The identify prompt now asks for pixel [x1, y1, x2, y2] — qwen's native grounding format (a warm 3b echoed xyxy even when asked for xywh); the parser reads corners first with an xywh fallback when the corner reading is geometrically impossible.",
       "IdentifyResult carries frameSize on the wire for attribution; the :8799 debug overlay draws parts[].box dashed so part-level grounding (the bottle-cap case) is visible over Parsec.",
       "Verified: 34 parser/header unit checks; end-to-end on an isolated test instance (:18798/:18799 — live engine untouched): synthetic bottle frame over the WS uplink → box [0.4069, 0.2875, 0.275, 0.5229] non-null in vision.identification and state.json (raw VLM reply was pixel xyxy [293, 276, 491, 778]), room.update → experience.delta, and the plan trace carries the box through brainInput.identification.",
-      "NOT deployed to the live engine: the founder is mid-diagnosis on placement attribution and a silent behavior change would contaminate live-session evidence. Open follow-up: surface_fusion.js / plan_from_room.js still never READ boxes — teaching the brain to use the grounding (ray-through-box instead of bare camera ray) is the next step."
+      "DEPLOYED 2026-07-05 on founder go-ahead: fast-forward merged to claude/nice-wilbur-28fc94 on C:\\SPATAIL_MAX, live engine restarted (same flags: qwen2.5vl:3b, timeout 8s, llama.cpp :8098) and re-verified live — synthetic bottle over the real :8798 uplink → box [0.4028, 0.2302, 0.2083, 0.5865] (raw pixel xyxy [290, 221, 440, 784]) in vision.identification AND state.json, frameSize [720, 960], plan trace carries the box through brainInput.identification. Deploy-time finds: an orphaned ollama runner held a duplicate qwen2.5vl:3b (~1.8 GB, keep-alive ∞) and starved the 8 GB card into VLM timeouts — unloaded via keep_alive:0; engine now launches via tools/brain_panel/launch_vision_engine.cmd logging to studio/out/logs/vision_engine_live.log (AppData\\Roaming\\SPATAIL is unreachable from service-spawned processes on this PC). Open follow-up unchanged: surface_fusion.js / plan_from_room.js still never READ boxes — teaching the brain to use the grounding (ray-through-box instead of bare camera ray) is the next step."
     ],
     "why": "Without boxes every plan fell back to 'camera ray pierced <surface>' — the leading brain-side explanation for experiences landing near-but-not-on the identified object (the water-bottle-cap sessions).",
     "tags": ["vision-engine", "vlm", "grounding", "qwen2.5vl", "traces", "bottle-cap-test"],

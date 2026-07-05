@@ -86,10 +86,15 @@ export function toBrainRoom(json) {
 /** Pull a pose out of a protocol userPose / pose payload, if present. */
 export function toBrainPose(p) {
   if (!p || !Array.isArray(p.position) || !Array.isArray(p.forward)) return null;
-  return {
+  const pose = {
     position: p.position.map((v) => num(v)),
     forward: p.forward.map((v) => num(v)),
   };
+  // Device-fixed up (spec §1.1 pose.update) — the box-grounding camera view
+  // model maps image axes exactly with it (image right = up). Optional;
+  // absent on legacy/synthetic poses, where an upright hold is assumed.
+  if (Array.isArray(p.up) && p.up.length >= 3) pose.up = p.up.map((v) => num(v));
+  return pose;
 }
 
 function normalOf(s) {

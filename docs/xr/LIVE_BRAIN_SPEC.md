@@ -92,6 +92,10 @@ Replan fires only when ALL hold:
 - **dwell**: the same binding held for `SPATAIL_REPLAN_DWELL` (default 2) consecutive
   identifications.
 
+The gate's object scoring is LOCKSTEP with the brain's `matchNounToObject()` —
+containment after adjective stripping, exact > containment, label-confidence tie-break,
+**plus the §1.6 box-IoU bonus** — so the id the gate binds is the id the plan binds.
+
 Replans run as a **detached asyncio task** (the existing `_plan_lock` serializes them);
 the identification downlink never blocks on the brain. VLM timeout default drops to 8 s.
 
@@ -99,6 +103,52 @@ the identification downlink never blocks on the brain. VLM timeout default drops
 
 The phone ignores `experience.delta` until it has sent a `room.update` on the *current*
 connection (the rule §10 documents; now actually implemented).
+
+### 1.6 Box grounding — the brain CONSUMES the VLM's boxes (additive)
+
+`identification.detections[].box` and `identification.parts[].box` are normalized 0..1
+`[x, y, w, h]`, origin top-left, in the streamed frame's image space;
+`identification.frameSize` is that frame's `[width, height]` in pixels. The brain uses
+them — placement no longer rides the raw camera-forward ray alone.
+
+**Camera view model.** The wire carries no intrinsics. The phone streams frames
+`.oriented(.right)` (FrameStreamer.swift) — the sensor-landscape buffer rotated into a
+portrait JPEG — and both that rotation and the pose's axes are device-fixed, so image
+axes map onto the pose EXACTLY, however the phone is held:
+
+```
+image right (+u) = pose.up          (camera +Y column)
+image down  (+v) = forward × up     (camera +X column)
+```
+
+The LONG image edge gets an assumed field of view — default **67°** (≈ ARKit wide
+camera), knob `SPATAIL_CAMERA_FOV_LONG` — and the short edge follows from
+`frameSize`'s aspect (3:4 portrait assumed when `frameSize` is absent). The engine
+stamps the value into `brainInput.camera: {"fovLongEdgeDegrees": 67.0}` so persisted
+traces replay under the FOV they were planned with. Poses without `up`
+(legacy/synthetic) fall back to assuming an upright portrait hold.
+
+Consumption, in `surface_fusion.js` / `plan_from_room.js`:
+
+1. **Box-refined gaze** — the placement ray runs through the PRIMARY detection box's
+   center instead of the camera forward; the forward ray is the fallback when the
+   refined ray misses every candidate surface. This is the fix for
+   "camera ray pierced the table 40 cm from the bottle" (the near-but-not-on class).
+2. **Box-grounded object binding** — label-matched `room.objects` candidates earn
+   `BOX_IOU_WEIGHT (2.0) × IoU(projected OBB footprint, detection box)` on top of the
+   §1.4 lockstep score, so of two same-noun objects the brain binds the one the VLM
+   actually boxed. Object bindings also gain `fused.hitPoint` — the ray through the box
+   center intersected with the bound OBB.
+3. **Part anchor bias** — a part-addressed target (§1.2 concept naming a part) gains
+   `anchor: {point: [x,y,z], method, partBox}` when the part carries a box:
+   `method: "part_box_ray"` (ray through the part box's center strikes the bound OBB)
+   or `"part_box_relative"` (part's position relative to the primary box mapped onto
+   the OBB: image-down → height, image-right → lateral). No box → the bare
+   `{objectId, part}` target, resolved on device per §3, unchanged.
+
+Every box-driven step is written to `fused.decisionTrace: [string]` in the plan (and
+rides the `experience.delta` untouched) — a plan influenced by a box SAYS so. All
+fields additive; clients decode tolerantly.
 
 ## 2. Job server additions (`http://<pc>:8787|8788`)
 
@@ -110,6 +160,9 @@ connection (the rule §10 documents; now actually implemented).
 - Every fusion replan appends `studio/out/traces/vision/{session}/plan_{NNNN}.json` →
   `{"planVersion", "trigger", "brainInput", "plan"}` — `brainInput` is byte-identical to
   what `plan_from_room.js --stdin` accepts, so any archived plan replays offline.
+  `brainInput` carries `{room, pose?, identification?, concept?, camera?}`; the plan's
+  `fused` may carry `hitPoint` + `decisionTrace` and its `target` may carry `anchor`
+  (§1.6) — all additive.
 
 ### 2.2 Endpoints
 

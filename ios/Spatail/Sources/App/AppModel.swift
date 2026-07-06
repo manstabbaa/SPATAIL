@@ -48,6 +48,10 @@ final class AppModel: ObservableObject {
     @Published private(set) var askState: AskState = .idle
     /// Session-local, newest first — surfaced by the Library sheet.
     @Published private(set) var askHistory: [String] = []
+    /// Perception honesty for the ask flow (v3 §7): what the focus pass learned
+    /// ("keyboard — blue keys, English") or what the user should do ("Move
+    /// closer…"). Cleared on the next ask.
+    @Published private(set) var askGuidance: String?
 
     private var cancellables: Set<AnyCancellable> = []
     private var started = false
@@ -246,8 +250,12 @@ final class AppModel: ObservableObject {
         // an ask about a thing the Lens can see lands ON that thing.
         let target = resolveAskTarget(prompt: trimmed)
         AskScope.shared.clear()
+        askGuidance = nil
 
         Task { [weak self] in
+            // Question-driven evidence FIRST (v3 §7): the ask decides what to
+            // look at; the brain then plans against the enriched registry.
+            await self?.runEvidencePass(prompt: trimmed, target: target)
             do {
                 let (contract, raw) = try await client.generateModularRaw(prompt: trimmed)
                 guard let self else { return }
@@ -395,8 +403,71 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// The evidence pass (v3 §7): dossier-fresh → answer instantly, zero
+    /// perception; else a focus pass with the question riding along, bounded to
+    /// ~3.5 s so the brain ask stays snappy; honest guidance when the target
+    /// isn't lookable from recent keyframes.
+    private func runEvidencePass(prompt: String, target: PlacementTarget?) async {
+        let spec = AskPlanner.evidenceSpec(for: prompt)
+        guard spec.wantsEvidence else { return }
+        let targetObject: SpatailObject?
+        switch target {
+        case .object(let o): targetObject = o
+        case .part(let o, _): targetObject = o
+        default: targetObject = nil
+        }
+        guard let obj = targetObject else { return }
+
+        let now = ProcessInfo.processInfo.systemUptime
+        if AskPlanner.dossierAnswers(obj, wanted: spec.wantedAttributes, now: now) {
+            askGuidance = AskPlanner.dossierLine(label: obj.label,
+                                                 attributes: obj.attributes)
+            return   // the dossier already answers — zero perception
+        }
+
+        askGuidance = "Looking closer at the \(obj.label ?? "object")…"
+        let failure: FocusService.FocusFailure? = await withCheckedContinuation { cont in
+            let resumed = NetBox(false)
+            let finish: (FocusService.FocusFailure?) -> Void = { f in
+                let first = resumed.withLock { done -> Bool in
+                    if done { return false }
+                    done = true
+                    return true
+                }
+                if first { cont.resume(returning: f) }
+            }
+            focus.requestFocus(objectId: obj.id, question: prompt,
+                               wanted: spec.wantedAttributes.isEmpty
+                                   ? nil : spec.wantedAttributes,
+                               completion: finish)
+            Task { @MainActor in
+                try? await Task.sleep(
+                    nanoseconds: UInt64(AskPlanner.focusWaitSeconds * 1_000_000_000))
+                finish(.timedOut)
+            }
+        }
+
+        switch failure {
+        case nil:
+            // A late-but-landed result still enriched the registry (handle()
+            // is independent of this wait) — read the refreshed truth.
+            let refreshed = registry.object(for: obj.id)
+            askGuidance = uplink.lastFocusResult?.answer
+                ?? AskPlanner.dossierLine(label: refreshed?.label ?? obj.label,
+                                          attributes: refreshed?.attributes)
+        case .tooSmallInView:
+            askGuidance = "Move closer to the \(obj.label ?? "object") so I can look at it."
+        case .timedOut, .notStreaming, .objectGone:
+            askGuidance = nil     // nothing learned; the brain ask proceeds anyway
+        }
+    }
+
     func dismissAskFailure() {
         if case .failed = askState { askState = .idle }
+    }
+
+    func clearAskGuidance() {
+        askGuidance = nil
     }
 
     func clearExperience() {

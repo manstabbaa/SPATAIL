@@ -12,5 +12,6 @@ DEVELOPER_DIR=${DEVELOPER_DIR:-/Applications/Xcode.app} swiftc -O \
   Sources/Perception/KeyframeMath.swift \
   Sources/Registry/RegistryFusionMath.swift \
   Sources/Registry/RegistryCoherence.swift \
+  Sources/Ask/AskPlanner.swift \
   Harness/main.swift -o "${TMPDIR:-/tmp}/form_harness"
 "${TMPDIR:-/tmp}/form_harness"

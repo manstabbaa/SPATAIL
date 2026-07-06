@@ -32,6 +32,9 @@ struct AskBar: View {
             if generation.progress != nil {
                 GenerationProgressView()
             }
+            if let guidance = model.askGuidance {
+                guidanceLine(guidance)
+            }
             if let scope = askScope.scope {
                 scopeToken(scope)
             }
@@ -40,6 +43,28 @@ struct AskBar: View {
         .onChange(of: askScope.focusNonce) { _, _ in
             focused = true
         }
+    }
+
+    // MARK: Guidance — what the focus pass learned / what the user should do
+
+    /// v3 §7 perception honesty: "keyboard — blue keys, English" or "Move
+    /// closer to the keyboard so I can look at it." Tap to dismiss.
+    private func guidanceLine(_ text: String) -> some View {
+        HStack(spacing: SpatailSpace.s2) {
+            Image(systemName: "eye")
+                .imageScale(.small)
+                .foregroundStyle(SpatailColor.indigo300)
+            Text(text)
+                .spatailType(.sm)
+                .foregroundStyle(SpatailColor.paper)
+                .lineLimit(2)
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, SpatailSpace.s3)
+        .padding(.vertical, SpatailSpace.s2)
+        .spatailGlass(tone: .dark, radius: SpatailRadius.pill)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .onTapGesture { model.clearAskGuidance() }
     }
 
     // MARK: Scope token — the ask is aimed at a real object
@@ -132,6 +157,12 @@ struct AskBar: View {
             lines.append(idLine)
             if let surface = object.supportSurfaceId {
                 lines.append("Support surface: \(surface).")
+            }
+            // The dossier rides along (v3 §5) — the brain designs against what
+            // the thing actually looks like.
+            if let dossier = AskPlanner.dossierLine(label: object.label,
+                                                    attributes: object.attributes) {
+                lines.append("Known appearance: \(dossier).")
             }
         }
         var anchor = "Anchor the experience to this object"

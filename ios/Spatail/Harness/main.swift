@@ -957,5 +957,64 @@ do {
           "outside the footprint → no cluster evidence")
 }
 
+// MARK: 15. Ask planner — evidence specs + dossier freshness
+
+do {
+    print("[15] ask planner (PERCEPTION_V3 §7)")
+
+    let keys = AskPlanner.evidenceSpec(
+        for: "what language are the letters on my keyboard?")
+    check(keys.wantedAttributes.contains("language")
+            && keys.wantedAttributes.contains("textContent"),
+          "language ask wants language + text", "\(keys.wantedAttributes)")
+    check(keys.isQuestion, "reads as a question")
+
+    let color = AskPlanner.evidenceSpec(for: "make something matching the couch color")
+    check(color.wantedAttributes == ["colors"], "color ask wants colors",
+          "\(color.wantedAttributes)")
+
+    let geometry = AskPlanner.evidenceSpec(for: "put a lamp on the armrest edge")
+    check(geometry.needsGeometry, "edge/armrest ask needs geometry")
+    check(geometry.wantedAttributes.isEmpty, "no dossier fields for pure placement")
+    check(!geometry.wantsEvidence, "pure placement asks skip the focus pass")
+
+    let plain = AskPlanner.evidenceSpec(for: "explain the water cycle")
+    check(!plain.isQuestion && plain.wantedAttributes.isEmpty,
+          "imperative topic ask wants no evidence")
+
+    // Dossier freshness: answers only when every wanted field is present + fresh.
+    var keyboard = makeObject(label: "keyboard", confidence: 0.9,
+                              center: SIMD3(0, 0.75, -1),
+                              extents: SIMD3(0.36, 0.03, 0.13),
+                              firstSeenAt: 1, lastMeasuredAt: 100)
+    keyboard.attributes = ObjectAttributes(colors: ["blue", "black"],
+                                           textContent: ["QWERTY"],
+                                           language: "English")
+    keyboard.attributesUpdatedAt = 95
+    check(AskPlanner.dossierAnswers(keyboard, wanted: ["language", "textContent"],
+                                    now: 100),
+          "fresh dossier answers the language ask")
+    check(!AskPlanner.dossierAnswers(keyboard, wanted: ["brand"], now: 100),
+          "missing field → dossier does not answer")
+    check(!AskPlanner.dossierAnswers(keyboard, wanted: ["language"], now: 200),
+          "stale dossier does not answer")
+
+    let line = AskPlanner.dossierLine(label: keyboard.label,
+                                      attributes: keyboard.attributes)
+    check(line == "keyboard — blue/black · “QWERTY” · English",
+          "dossier line reads like the founder's acceptance case",
+          line ?? "nil")
+
+    // Dossier merge semantics (v3 §5): union bounded, newest-first, no thrash.
+    var dossier = ObjectAttributes(colors: ["blue"])
+    dossier.merge(ObjectAttributes(colors: ["Blue", "black"], language: "English"))
+    check(dossier.colors == ["Blue", "black"], "case-insensitive union, newest kept",
+          "\(dossier.colors ?? [])")
+    check(dossier.language == "English", "scalar filled")
+    dossier.merge(ObjectAttributes(brand: "Keychron"))
+    check(dossier.language == "English" && dossier.brand == "Keychron",
+          "later merge keeps earlier scalars")
+}
+
 print("\n\(passed) passed, \(failed) failed")
 exit(failed == 0 ? 0 : 1)

@@ -517,5 +517,240 @@ do {
     } else { check(false, "cap slice produced") }
 }
 
+// MARK: 10. Local identity — on-device detector labels (the weaker source)
+
+do {
+    print("[10] attachLocalLabel (fills empty identity, never fights the VLM)")
+
+    // (a) fills EMPTY identity after 2 agreeing ticks, not 1.
+    var obj = makeObject(center: SIMD3(0, 0, 0), extents: SIMD3(0.1, 0.2, 0.1),
+                         firstSeenAt: 1, lastMeasuredAt: 1)
+    RegistryFusion.attachLocalLabel("Water Bottle", confidence: 0.4, at: 1, into: &obj)
+    check(obj.label == nil && obj.pendingLabel == "Water Bottle",
+          "tick 1 → pending, not adopted")
+    RegistryFusion.attachLocalLabel("Water Bottle", confidence: 0.45, at: 2, into: &obj)
+    check(obj.label == "Water Bottle", "tick 2 → adopted")
+
+    // (b) instant adopt at high confidence.
+    var quick = makeObject(center: SIMD3(1, 0, 0), extents: SIMD3(0.1, 0.2, 0.1),
+                           firstSeenAt: 1, lastMeasuredAt: 1)
+    RegistryFusion.attachLocalLabel("Cat", confidence: 0.9, at: 1, into: &quick)
+    check(quick.label == "Cat", "conf ≥ 0.8 → instant adopt")
+
+    // (c) same-label re-confirm refreshes freshness, keeps best confidence.
+    RegistryFusion.attachLocalLabel("cat", confidence: 0.5, at: 5, into: &quick)
+    check(quick.label == "Cat" && quick.confidence == 0.9
+          && quick.lastIdentifiedAt == 5,
+          "re-confirm refreshes freshness, keeps max confidence")
+
+    // (d) NEVER dethrones a different held label.
+    var held = makeObject(label: "coke bottle", confidence: 0.6,
+                          center: SIMD3(2, 0, 0), extents: SIMD3(0.1, 0.2, 0.1),
+                          firstSeenAt: 1, lastMeasuredAt: 1)
+    RegistryFusion.attachLocalLabel("Water Bottle", confidence: 0.95, at: 2, into: &held)
+    RegistryFusion.attachLocalLabel("Water Bottle", confidence: 0.95, at: 3, into: &held)
+    check(held.label == "coke bottle" && held.pendingLabel == nil,
+          "different held label untouched, no pending pollution")
+
+    // (e) never evicts a DIFFERENT pending candidate — the VLM's debounce
+    // progress survives local ticks and still flips identity.
+    var contested = makeObject(center: SIMD3(3, 0, 0), extents: SIMD3(0.1, 0.2, 0.1),
+                               firstSeenAt: 1, lastMeasuredAt: 1)
+    RegistryFusion.debounce(label: "espresso machine", confidence: 0.6,
+                            at: 1, into: &contested)                    // VLM tick 1
+    RegistryFusion.attachLocalLabel("Coffee Maker", confidence: 0.5,
+                                    at: 2, into: &contested)            // local tick
+    check(contested.pendingLabel == "espresso machine" && contested.pendingCount == 1,
+          "local tick leaves the VLM's pending candidate alone")
+    RegistryFusion.debounce(label: "espresso machine", confidence: 0.6,
+                            at: 3, into: &contested)                    // VLM tick 2
+    check(contested.label == "espresso machine", "VLM debounce completes past local ticks")
+
+    // (f) after a LOCAL adoption, a different VLM label still wins via debounce.
+    var localFirst = makeObject(center: SIMD3(4, 0, 0), extents: SIMD3(0.1, 0.2, 0.1),
+                                firstSeenAt: 1, lastMeasuredAt: 1)
+    RegistryFusion.attachLocalLabel("Bottle", confidence: 0.4, at: 1, into: &localFirst)
+    RegistryFusion.attachLocalLabel("Bottle", confidence: 0.4, at: 2, into: &localFirst)
+    check(localFirst.label == "Bottle", "local label adopted first")
+    RegistryFusion.debounce(label: "olive oil bottle", confidence: 0.6,
+                            at: 3, into: &localFirst)                   // VLM tick 1
+    RegistryFusion.attachLocalLabel("Bottle", confidence: 0.4, at: 4, into: &localFirst)
+    check(localFirst.pendingLabel == "olive oil bottle",
+          "held-label local re-confirm keeps the VLM candidate pending")
+    RegistryFusion.debounce(label: "olive oil bottle", confidence: 0.6,
+                            at: 5, into: &localFirst)                   // VLM tick 2
+    check(localFirst.label == "olive oil bottle", "VLM replaces the local label")
+}
+
+// MARK: 11. Entity layer v3 — class-scaled merge, adjacency, supported-by
+
+do {
+    print("[11] entity layer v3 (PERCEPTION_V3 §0/§1)")
+
+    // (a) the founder's couch, verbatim: two `couch · 0.95` halves —
+    // 1470×868×621 and 1401×681×625 mm, centers ~1.05 m apart. Bottle-scale
+    // gates could never merge these; the class gate (couch: 1.2 m) must.
+    let halfA = makeObject(label: "couch", confidence: 0.95,
+                           center: SIMD3(0.00, 0.43, -2.0),
+                           extents: SIMD3(1.470, 0.868, 0.621),
+                           firstSeenAt: 1, lastMeasuredAt: 10)
+    let halfB = makeObject(label: "couch", confidence: 0.95,
+                           center: SIMD3(1.05, 0.34, -2.0),
+                           extents: SIMD3(1.401, 0.681, 0.625),
+                           firstSeenAt: 2, lastMeasuredAt: 10)
+    check(RegistryCoherence.shouldMerge(halfA, halfB),
+          "two half-couches merge via the class gate")
+    let (couchMerged, couchAliases) = RegistryCoherence.mergePass([halfA, halfB])
+    check(couchMerged.count == 1, "one couch survives", "\(couchMerged.count)")
+    check(couchAliases[halfB.id] == halfA.id,
+          "older half survives (stability tiebreak)")
+
+    // (b) adjacency: same class, centers BEYOND the gate, footprints nearly
+    // touching (gap 0.15 m ≤ 15 % of class length 2.0 m) → still one thing.
+    let fragA = makeObject(label: "sofa", confidence: 0.9,
+                           center: SIMD3(0, 0.4, 0),
+                           extents: SIMD3(1.4, 0.8, 0.9),
+                           firstSeenAt: 1, lastMeasuredAt: 10)
+    let fragB = makeObject(label: "couch", confidence: 0.9,      // alias token
+                           center: SIMD3(1.55, 0.4, 0),
+                           extents: SIMD3(1.4, 0.8, 0.9),
+                           firstSeenAt: 2, lastMeasuredAt: 10)
+    check(RegistryCoherence.sharedClassToken(fragA, fragB) == "couch",
+          "sofa/couch normalize to one class token")
+    check(RegistryCoherence.shouldMerge(fragA, fragB),
+          "adjacent same-class fragments merge (gap ≤ 15 % class length)")
+
+    // (c) stacked same-class boxes with NO vertical overlap stay apart.
+    let lower = makeObject(label: "shelf", confidence: 0.9,
+                           center: SIMD3(0, 0.2, 1), extents: SIMD3(0.9, 0.3, 0.35),
+                           firstSeenAt: 1, lastMeasuredAt: 10)
+    let upper = makeObject(label: "shelf", confidence: 0.9,
+                           center: SIMD3(0, 0.9, 1), extents: SIMD3(0.9, 0.3, 0.35),
+                           firstSeenAt: 2, lastMeasuredAt: 10)
+    check(!RegistryCoherence.shouldMerge(lower, upper),
+          "stacked shelf levels still don't merge")
+
+    // (d) the laundry pile: unlabeled textile-hinted box ON the couch seat —
+    // v2's center gate would have swallowed it; v3 links it as a CHILD.
+    let couch = makeObject(label: "couch", confidence: 0.95,
+                           center: SIMD3(0, 0.45, 0), extents: SIMD3(2.0, 0.9, 0.9),
+                           firstSeenAt: 1, lastMeasuredAt: 10)
+    var laundry = makeObject(center: SIMD3(0.15, 0.635, 0.05),   // bottom at seat
+                             extents: SIMD3(0.555, 0.37, 0.216),
+                             firstSeenAt: 3, lastMeasuredAt: 10)
+    laundry.classHint = "Textile"
+    check(RegistryCoherence.isChild(laundry, of: couch), "laundry qualifies as child")
+    var linked = [couch, laundry]
+    RegistryCoherence.assignSupportLinks(&linked)
+    check(linked[1].parentId == couch.id, "support pass links laundry → couch")
+    check(!RegistryCoherence.shouldMerge(linked[0], linked[1]),
+          "parent/child pair never merges")
+    let (afterMerge, _) = RegistryCoherence.mergePass(linked)
+    check(afterMerge.count == 2, "merge pass preserves the child",
+          "\(afterMerge.count)")
+
+    // (e) child follows a merged-away parent to the survivor.
+    var childOfB = makeObject(center: SIMD3(1.0, 0.87, -2.0),
+                              extents: SIMD3(0.4, 0.2, 0.3),
+                              firstSeenAt: 3, lastMeasuredAt: 10)
+    childOfB.parentId = halfB.id
+    let (survived, aliases2) = RegistryCoherence.mergePass([halfA, halfB, childOfB])
+    check(survived.count == 2, "couch halves merged, child kept")
+    if let child = survived.first(where: { $0.id == childOfB.id }) {
+        check(child.parentId == aliases2[halfB.id],
+              "child repointed to the surviving couch")
+    } else {
+        check(false, "child survived the merge pass")
+    }
+
+    // (f) display: unlabeled children stay internal; parents outrank children.
+    var display = [couch, laundry]
+    display[1].parentId = couch.id
+    display[1].established = true            // established BUT unlabeled child
+    RegistryCoherence.assignDisplayWorthiness(&display)
+    check(display[0].displayWorthy, "parent couch displays")
+    check(!display[1].displayWorthy, "unlabeled child stays internal (+N on it)")
+    display[1].label = "shirt"
+    RegistryCoherence.assignDisplayWorthiness(&display)
+    check(display[1].displayWorthy, "labeled child earns its own chip")
+
+    // (g) priors sanity: token normalization + scale class.
+    check(FormPriors.furnitureToken(for: "Brown Leather Couch") == "couch",
+          "token match inside a longer label")
+    check(FormPriors.scaleClass(for: "water bottle") == .small,
+          "bottles stay small-tier")
+    check(FormPriors.scaleClass(for: "sofa") == .furniture, "sofa is furniture-tier")
+}
+
+// MARK: 12. Keyframe math — timestamp-true projection/backprojection + motion
+
+do {
+    print("[12] keyframe math (PERCEPTION_V3 §6)")
+
+    // Camera at origin looking down -Z (identity transform), 1920×1440 frame.
+    let intrinsics = simd_float3x3(SIMD3<Float>(1500, 0, 0),
+                                   SIMD3<Float>(0, 1500, 0),
+                                   SIMD3<Float>(960, 720, 1))
+    let resolution = CGSize(width: 1920, height: 1440)
+    let pose = matrix_identity_float4x4
+    let obb = OrientedBox(center: SIMD3(0, 0, -2), extents: SIMD3(0.4, 0.4, 0.4), yaw: 0)
+
+    // (a) projection: centered box → centered rect of the right size.
+    let rect = KeyframeGeometry.projectRect(obb: obb, cameraTransform: pose,
+                                            intrinsics: intrinsics,
+                                            imageResolution: resolution)
+    check(rect != nil, "projectRect produced")
+    if let rect {
+        check(approx(Float(rect.midX), 0.5, tol: 0.01), "rect centered X",
+              "\(rect.midX)")
+        check(approx(Float(rect.midY), 0.5, tol: 0.01), "rect centered Y",
+              "\(rect.midY)")
+        check(approx(Float(rect.width), 0.174, tol: 0.02), "rect width",
+              "\(rect.width)")
+
+        // (b) round trip: flat depth at 2 m under that rect → world OBB back
+        // at the object (fronto-parallel plane: thin in Z by construction).
+        let grid = DepthGrid(width: 256, height: 192,
+                             depths: [Float16](repeating: Float16(2.0),
+                                               count: 256 * 192),
+                             confidences: nil)
+        let back = KeyframeGeometry.backprojectBox(rect, depth: grid,
+                                                   cameraTransform: pose,
+                                                   intrinsics: intrinsics,
+                                                   imageResolution: resolution)
+        check(back != nil, "backprojectBox produced")
+        if let back {
+            check(approx(back.center.z, -2.0, tol: 0.03), "backprojected depth",
+                  "\(back.center.z)")
+            check(approx(back.center.x, 0, tol: 0.05)
+                    && approx(back.center.y, 0, tol: 0.05),
+                  "backprojected center on-axis")
+            check(back.extents.x > 0.25 && back.extents.x < 0.5,
+                  "backprojected width sane", "\(back.extents.x)")
+        }
+    }
+
+    // (c) behind the camera → nil.
+    let behind = OrientedBox(center: SIMD3(0, 0, 2), extents: SIMD3(0.4, 0.4, 0.4),
+                             yaw: 0)
+    check(KeyframeGeometry.projectRect(obb: behind, cameraTransform: pose,
+                                       intrinsics: intrinsics,
+                                       imageResolution: resolution) == nil,
+          "behind-camera box projects to nil")
+
+    // (d) motion gate: still → not blocked; a fast pan → blocked.
+    let still = MotionGate.measure(previous: pose, current: pose, dt: 0.1)
+    check(!still.blocked, "still camera passes the gate")
+    let c = cos(Float(0.12)), s = sin(Float(0.12))
+    let panned = simd_float4x4(SIMD4<Float>(c, 0, -s, 0),
+                               SIMD4<Float>(0, 1, 0, 0),
+                               SIMD4<Float>(s, 0, c, 0),
+                               SIMD4<Float>(0, 0, 0, 1))
+    let pan = MotionGate.measure(previous: pose, current: panned, dt: 0.1)
+    check(approx(pan.angularVelocity, 1.2, tol: 0.05), "angular velocity measured",
+          "\(pan.angularVelocity)")
+    check(pan.blocked, "fast pan blocked")
+}
+
 print("\n\(passed) passed, \(failed) failed")
 exit(failed == 0 ? 0 : 1)

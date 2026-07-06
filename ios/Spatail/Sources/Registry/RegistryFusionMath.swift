@@ -46,6 +46,44 @@ enum RegistryFusion {
         }
     }
 
+    /// One ON-DEVICE detector tick against one object. Local labels are the WEAKER
+    /// identity source: they fill an EMPTY identity through the same debounce
+    /// (instant at high confidence) and re-confirm an equal held label — but they
+    /// never dethrone a different held label and never evict a different pending
+    /// candidate (the VLM flips identity through `debounce`; a local tick must not
+    /// reset its progress).
+    static func attachLocalLabel(_ candidate: String, confidence: Float,
+                                 at timestamp: TimeInterval,
+                                 into obj: inout SpatailObject) {
+        func adopt() {
+            obj.label = candidate
+            obj.confidence = confidence
+            obj.lastIdentifiedAt = timestamp
+            obj.pendingLabel = nil
+            obj.pendingCount = 0
+        }
+
+        if let current = obj.label {
+            if current.caseInsensitiveCompare(candidate) == .orderedSame {
+                obj.confidence = max(obj.confidence, confidence)
+                obj.lastIdentifiedAt = timestamp
+            }
+            return
+        }
+        if let pending = obj.pendingLabel {
+            guard pending.caseInsensitiveCompare(candidate) == .orderedSame else { return }
+            obj.pendingCount += 1
+            if obj.pendingCount >= debounceTicks || confidence >= instantAdoptConfidence {
+                adopt()
+            }
+        } else if confidence >= instantAdoptConfidence {
+            adopt()
+        } else {
+            obj.pendingLabel = candidate
+            obj.pendingCount = 1
+        }
+    }
+
     // MARK: OBB smoothing
 
     /// Light exponential smoothing of center/extents; yaw blended along the shortest

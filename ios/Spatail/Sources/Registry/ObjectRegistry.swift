@@ -38,8 +38,15 @@ final class ObjectRegistry: ObservableObject {
     private static let matchBaseDistance: Float = 0.15
     /// …or half the mean extent, whichever is larger.
     private static let matchExtentFactor: Float = 0.5
-    /// Seconds unseen before an unpinned LABELED-or-FORMED object expires.
-    private static let expirySeconds: TimeInterval = 10
+    /// Expiry (v3 §6 — ghost culling): the clock only ticks while an object is
+    /// VISIBLE yet unmatched. A couch behind the user persists (up to an
+    /// absolute memory bound); a ghost box in plain view dies fast. Established
+    /// objects tolerate many visible misses — the ambient detector legitimately
+    /// rotates its attention between things in frame.
+    private static let candidateMissLimit = 5
+    private static let establishedMissLimit = 20
+    private static let candidateAbsoluteExpiry: TimeInterval = 30
+    private static let establishedAbsoluteExpiry: TimeInterval = 90
     /// Bound on the merged-id alias memory (hysteresis; oldest dropped first).
     private static let aliasCapacity = 256
     /// Blend weight of the NEW measurement when smoothing an existing object.
@@ -204,6 +211,7 @@ final class ObjectRegistry: ObservableObject {
                 if obj.seenStreak >= RegistryCoherence.establishTicks {
                     obj.established = true
                 }
+                Self.applyDetectorLabel(r.detection, into: &obj, now: now)
                 updated[best.objectIdx] = obj
                 matches[r.detection.id] = obj.id
             }
@@ -215,31 +223,58 @@ final class ObjectRegistry: ObservableObject {
             updated[oi].seenStreak = 0
         }
 
+        // Visibility clock (v3 §6): matched objects are trivially visible; an
+        // UNMATCHED object that projects into this frame accrues a miss — the
+        // ghost-culling signal. Miss-counting needs an active detector (an
+        // empty pass must not decay everything) and a projector to test with.
+        for oi in updated.indices {
+            if usedObjects.contains(oi) {
+                updated[oi].lastVisibleAt = now
+                updated[oi].missedWhileVisible = 0
+            } else if !resolved.isEmpty, let projector,
+                      projector(updated[oi].obb) != nil {
+                updated[oi].lastVisibleAt = now
+                updated[oi].missedWhileVisible += 1
+            }
+        }
+
         // Unmatched measurements mint new objects (streak 1, birth-stamped).
+        // Detector labels: SEMANTIC ones seed the identity debounce (the VLM
+        // still outranks via re-debounce); HINTS condition without displaying.
         for (di, r) in resolved.enumerated() where !usedDetections.contains(di) {
-            let minted = SpatailObject(obb: r.obb,
+            var minted = SpatailObject(obb: r.obb,
                                        supportSurfaceId: r.supportSurfaceId,
                                        seenStreak: 1,
                                        firstSeenAt: now,
                                        lastMeasuredAt: now)
+            Self.applyDetectorLabel(r.detection, into: &minted, now: now)
             updated.append(minted)
             matches[r.detection.id] = minted.id
         }
+
+        // Supported-by pass BEFORE the merge pass (v3 §0): the laundry pile on
+        // the couch becomes a CHILD — never a merge candidate the class-scaled
+        // gates could swallow.
+        RegistryCoherence.assignSupportLinks(&updated)
 
         // Scene Coherence merge pass — the backstop that guarantees ONE object
         // per physical thing (duplicate minting on garbage depth is already
         // reduced by the rescue match above; this closes the rest).
         matches = runMergePass(on: &updated, matches: matches)
 
-        // Expiry — labeled/formed objects keep the spec-§3 ~10 s; unlabeled
-        // no-form candidates go in 5 s; pinned (through aliases) are exempt.
+        // Expiry (v3 §6): ghost-dead when visible-and-missing too long;
+        // forgotten only past the absolute bound. Pinned (through aliases)
+        // are exempt. Looking away never expires the couch.
         let pinned = effectivePinnedIds()
         var expired: [UUID] = []
         updated.removeAll { obj in
-            let limit = (obj.label == nil && obj.form == nil)
-                ? RegistryCoherence.unlabeledExpirySeconds : Self.expirySeconds
-            let stale = now - obj.lastMeasuredAt > limit
-            let drop = stale && !pinned.contains(obj.id)
+            guard !pinned.contains(obj.id) else { return false }
+            let candidate = obj.label == nil && obj.form == nil
+            let ghostDead = obj.missedWhileVisible
+                >= (candidate ? Self.candidateMissLimit : Self.establishedMissLimit)
+            let forgotten = now - obj.lastMeasuredAt
+                > (candidate ? Self.candidateAbsoluteExpiry : Self.establishedAbsoluteExpiry)
+            let drop = ghostDead || forgotten
             if drop { expired.append(obj.id) }
             return drop
         }
@@ -308,9 +343,32 @@ final class ObjectRegistry: ObservableObject {
         // Support surface refresh on ingest; keep the last known link when this
         // measurement's taps missed the surface entirely.
         if let support = r.supportSurfaceId { obj.supportSurfaceId = support }
+        applyDetectorLabel(r.detection, into: &obj, now: now)
         obj.lastMeasuredAt = now
         obj.seenStreak += 1
         if obj.seenStreak >= RegistryCoherence.establishTicks { obj.established = true }
+    }
+
+    /// v3 §5 — what a detector label is worth. SEMANTIC labels (display-
+    /// allowlisted taxonomy at real confidence) fill EMPTY identity through the
+    /// weaker local-label debounce — they never dethrone a held label or evict a
+    /// VLM candidate's progress (the phone must understand its context without
+    /// the PC; the VLM outranks via `debounce`). HINT labels ("machine",
+    /// "textile") only fill `classHint` — priors/gates/templates conditioning —
+    /// never `label`, never the wire, never a chip.
+    private static let genericDetectorLabels: Set<String> = ["object"]
+
+    private static func applyDetectorLabel(_ detection: Detection2D,
+                                           into obj: inout SpatailObject,
+                                           now: TimeInterval) {
+        guard let label = detection.label, !label.isEmpty,
+              !genericDetectorLabels.contains(label.lowercased()) else { return }
+        if detection.isSemanticLabel {
+            RegistryFusion.attachLocalLabel(label, confidence: detection.confidence,
+                                            at: now, into: &obj)
+        } else if obj.classHint == nil {
+            obj.classHint = label
+        }
     }
 
     // MARK: - Form ingest (Form Engine → registry, immutable results on main)
@@ -366,7 +424,9 @@ final class ObjectRegistry: ObservableObject {
         guard changed else { return }
 
         // A fitted/prior-seated OBB can land on top of a duplicate the center
-        // gate missed — the coherence pass also runs after applyForms.
+        // gate missed — the coherence passes also run after applyForms
+        // (support first, v3 §0: fresh extents can change who contains whom).
+        RegistryCoherence.assignSupportLinks(&updated)
         _ = runMergePass(on: &updated, matches: [:])
         RegistryCoherence.assignDisplayWorthiness(&updated)
         for obj in updated { syncAnchor(for: obj) }

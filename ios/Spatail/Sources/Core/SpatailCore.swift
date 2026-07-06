@@ -139,6 +139,64 @@ public struct ObjectForm: Codable, Equatable, Sendable {
     public var capHeight: Float? { dimensions["capHeight"] }
 }
 
+// MARK: - Object attributes (Perception v3 §5 — the entity dossier)
+
+/// Accumulated rich identity — what the VLM has LEARNED about this thing over
+/// time ("blue keys, English QWERTY"), beyond the label. Additive wire field on
+/// `room.update.objects[]` and `vision.identification`/`vision.focus.result`
+/// payloads (LIVE_BRAIN_SPEC §5.1/§5.3). Every field optional by design.
+public struct ObjectAttributes: Codable, Equatable, Sendable {
+    public var colors: [String]?
+    public var materials: [String]?
+    public var textContent: [String]?
+    public var language: String?
+    public var brand: String?
+    public var state: String?
+
+    public init(colors: [String]? = nil, materials: [String]? = nil,
+                textContent: [String]? = nil, language: String? = nil,
+                brand: String? = nil, state: String? = nil) {
+        self.colors = colors
+        self.materials = materials
+        self.textContent = textContent
+        self.language = language
+        self.brand = brand
+        self.state = state
+    }
+
+    public var isEmpty: Bool {
+        (colors?.isEmpty ?? true) && (materials?.isEmpty ?? true)
+            && (textContent?.isEmpty ?? true) && language == nil
+            && brand == nil && state == nil
+    }
+
+    /// Bound on accumulated list fields — the dossier is a summary, not a log.
+    public static let maxListEntries = 6
+
+    /// Fold newer observations in: lists union (newest kept, bounded, case-
+    /// insensitive dedup), scalars overwrite when the newcomer says something.
+    public mutating func merge(_ newer: ObjectAttributes) {
+        func union(_ old: [String]?, _ new: [String]?) -> [String]? {
+            guard let new, !new.isEmpty else { return old }
+            var seen = Set<String>()
+            var out: [String] = []
+            for v in new + (old ?? []) {
+                let key = v.lowercased().trimmingCharacters(in: .whitespaces)
+                guard !key.isEmpty, seen.insert(key).inserted else { continue }
+                out.append(v)
+                if out.count >= Self.maxListEntries { break }
+            }
+            return out.isEmpty ? nil : out
+        }
+        colors = union(colors, newer.colors)
+        materials = union(materials, newer.materials)
+        textContent = union(textContent, newer.textContent)
+        language = newer.language ?? language
+        brand = newer.brand ?? brand
+        state = newer.state ?? state
+    }
+}
+
 /// A persistent, world-anchored object instance: measured form (ARKit) fused with
 /// identity (VLM). Wire-aligned with `room.update.objects[]` (spec §1.2).
 public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
@@ -152,6 +210,12 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
     /// Fitted parametric form (Form Engine) — nil until a fit lands. Additive wire
     /// field: `room.update.objects[]` simply gains it (spec §1.2 allows additive).
     public var form: ObjectForm?
+    /// Supported-by relation (v3 §0): the object this one rests ON/IN (laundry
+    /// pile → couch, mug → table). Children keep their own OBB/identity and are
+    /// NEVER merge candidates against their parent. Additive wire field.
+    public var parentId: UUID?
+    /// The entity dossier (v3 §5) — accumulated rich identity. Additive wire field.
+    public var attributes: ObjectAttributes?
     /// Debounce state — a candidate label must win twice (or conf ≥ 0.8) to be adopted.
     /// Property defaults required: these are excluded from CodingKeys (not wire fields),
     /// so Decodable synthesis needs them defaulted when decoding wire payloads.
@@ -176,16 +240,30 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
     /// When this object was first minted (device uptime clock) — merge-pass
     /// survivor stability ("older id wins" ties). Device-local, NOT a wire field.
     public var firstSeenAt: TimeInterval? = nil
+    /// Taxonomy HINT (v3 §5): a coarse classifier word ("couch", "textile") that
+    /// conditions priors/gates/templates but is NEVER displayed, never adopted as
+    /// `label`, never rides the wire. Device-local.
+    public var classHint: String? = nil
+    /// When the dossier last changed (device uptime clock). Device-local.
+    public var attributesUpdatedAt: TimeInterval? = nil
+    /// Last tick this object's OBB projected into the camera frustum, and how
+    /// many consecutive ticks it was visible yet unmatched by any measurement —
+    /// the ghost-culling clock (v3 §6: expiry only ticks while visible).
+    /// Device-local, NOT wire fields.
+    public var lastVisibleAt: TimeInterval? = nil
+    public var missedWhileVisible: Int = 0
     public var lastMeasuredAt: TimeInterval
     public var lastIdentifiedAt: TimeInterval?
 
     public init(id: UUID = UUID(), label: String? = nil, confidence: Float = 0,
                 obb: OrientedBox, supportSurfaceId: String? = nil,
                 parts: [SpatailPart] = [], form: ObjectForm? = nil,
+                parentId: UUID? = nil, attributes: ObjectAttributes? = nil,
                 pendingLabel: String? = nil,
                 pendingCount: Int = 0, formUpdatedAt: TimeInterval? = nil,
                 seenStreak: Int = 0, established: Bool = false,
                 displayWorthy: Bool = false, firstSeenAt: TimeInterval? = nil,
+                classHint: String? = nil,
                 lastMeasuredAt: TimeInterval,
                 lastIdentifiedAt: TimeInterval? = nil) {
         self.id = id
@@ -195,6 +273,8 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
         self.supportSurfaceId = supportSurfaceId
         self.parts = parts
         self.form = form
+        self.parentId = parentId
+        self.attributes = attributes
         self.pendingLabel = pendingLabel
         self.pendingCount = pendingCount
         self.formUpdatedAt = formUpdatedAt
@@ -202,6 +282,7 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
         self.established = established
         self.displayWorthy = displayWorthy
         self.firstSeenAt = firstSeenAt
+        self.classHint = classHint
         self.lastMeasuredAt = lastMeasuredAt
         self.lastIdentifiedAt = lastIdentifiedAt
     }
@@ -213,8 +294,10 @@ public struct SpatailObject: Codable, Identifiable, Equatable, Sendable {
 
     private enum CodingKeys: String, CodingKey {
         // pendingLabel/pendingCount/formUpdatedAt/seenStreak/established/
-        // displayWorthy/firstSeenAt are device internals — not wire fields.
+        // displayWorthy/firstSeenAt/classHint/attributesUpdatedAt/lastVisibleAt/
+        // missedWhileVisible are device internals — not wire fields.
         case id, label, confidence, obb, supportSurfaceId, parts, form
+        case parentId, attributes                       // v3 §5.1 additive
         case lastMeasuredAt = "lastSeenAt"
         case lastIdentifiedAt
     }
@@ -226,6 +309,13 @@ public enum DetectionSourceKind: String, Codable, Sendable {
     case appleVision, coreML, vlm
 }
 
+/// How much a detection's label is worth (v3 §5): `semantic` labels may be
+/// displayed/adopted; `hint` labels (coarse taxonomy words like "textile",
+/// "machine") only condition priors, gates and templates — never identity.
+public enum DetectionLabelKind: String, Codable, Sendable {
+    case semantic, hint
+}
+
 /// A 2D detection in normalized image space, before spatial resolution.
 public struct Detection2D: Codable, Identifiable, Equatable, Sendable {
     public var id: UUID
@@ -235,16 +325,22 @@ public struct Detection2D: Codable, Identifiable, Equatable, Sendable {
     public var box: CGRect
     public var source: DetectionSourceKind
     public var frameTimestamp: TimeInterval
+    /// nil (legacy) reads as `.semantic`.
+    public var labelKind: DetectionLabelKind?
 
     public init(id: UUID = UUID(), label: String?, confidence: Float, box: CGRect,
-                source: DetectionSourceKind, frameTimestamp: TimeInterval) {
+                source: DetectionSourceKind, frameTimestamp: TimeInterval,
+                labelKind: DetectionLabelKind? = nil) {
         self.id = id
         self.label = label
         self.confidence = confidence
         self.box = box
         self.source = source
         self.frameTimestamp = frameTimestamp
+        self.labelKind = labelKind
     }
+
+    public var isSemanticLabel: Bool { (labelKind ?? .semantic) == .semantic }
 }
 
 /// A detection after depth-grid resolution: measured 3D form (spec §3).

@@ -1,22 +1,29 @@
 // RegistryCoherence.swift — the Scene Coherence pass, pure math.
 //
-// The field report behind this (founder, live Truth Overlay session): the registry
+// The field report behind this (founder, live Truth Overlay sessions): the registry
 // minted DUPLICATE objects — several boxes per real thing, and asks could bind to an
-// offset duplicate. This file is the backstop that guarantees ONE object per physical
-// thing, plus the shared "display-worthy" definition and the generic named-slice
-// geometry (part-level asks on arbitrary objects — the headphones-speaker fix).
+// offset duplicate. The 2026-07-05 couch session sharpened it: TWO `couch · 0.95`
+// objects of ~1.4 m each on one couch, because every gate was bottle-scale. This
+// file is the backstop that guarantees ONE object per physical thing at EVERY
+// scale, plus the shared "display-worthy" definition and part-region geometry.
 //
-//   • mergePass    — deduplicate overlapping objects; deterministic survivor
-//                    selection; the loser's identity/parts/form are absorbed and its
-//                    id → survivor alias is returned (hysteresis: merges never
-//                    oscillate because the loser is gone and later references
-//                    resolve through the alias).
+// Perception v3 §0 — the three relations, evaluated in this order:
+//   • assignSupportLinks — supported-by FIRST (laundry pile → couch child):
+//                    contained-and-much-smaller objects become CHILDREN
+//                    (parentId), keep their own identity, and are never merge
+//                    candidates against their parent.
+//   • mergePass    — same-entity: v2 gates (XZ IoU / bottle-scale centers) PLUS
+//                    class-scaled center gates and same-class ADJACENCY (two
+//                    couch fragments whose footprints nearly touch are one
+//                    couch). Deterministic survivor; loser absorbed; loser →
+//                    survivor alias returned (hysteresis: merges never
+//                    oscillate because the loser is gone).
+//   • part-of      — assembly primitives, fitted by FormFitter (v3 §3), never
+//                    separate registry objects. affordanceSlice/namedSlice
+//                    resolve placement regions against them on demand.
 //   • assignDisplayWorthiness — the ONE definition Lens chips, overlay boxes and
-//                    ask-matching all share (labeled OR measured-form OR ≥3
-//                    consecutive ticks; capped at 12).
-//   • namedSlice   — on-demand sub-OBB slices (top/base/left_side/right_side/
-//                    front/back) so EVERY object answers part asks even without
-//                    VLM part boxes. Never precomputed into the wire payload.
+//                    ask-matching all share; parents outrank children; unlabeled
+//                    children stay internal (they render as "+N on it").
 //
 // Foundation + simd ONLY — no ARKit — the exact shipped logic runs in the
 // off-device harness (spec §0 law 5: if you can't see what it saw, it doesn't ship).
@@ -40,6 +47,28 @@ enum RegistryCoherence {
     /// Center-distance branch requires compatible heights: vertical overlap of the
     /// smaller box above this fraction.
     static let centerVerticalOverlapMin: Float = 0.5
+
+    // MARK: v3 merge tunables (class-scaled association — PERCEPTION_V3 §0/§1)
+
+    /// Same-class adjacency: two fragments merge when their XZ footprints are
+    /// within this fraction of the class LENGTH of touching.
+    static let adjacencyGapFraction: Float = 0.15
+    /// …with at least this much floor under the fraction (m).
+    static let adjacencyGapMin: Float = 0.10
+
+    // MARK: v3 support tunables (supported-by children — PERCEPTION_V3 §0)
+
+    /// A child's XZ footprint must be at least this contained in the parent's.
+    static let childFootprintContainment: Float = 0.7
+    /// A child's volume must be at most this fraction of the parent's.
+    static let childVolumeFraction: Float = 0.25
+    /// Unlabeled-vs-unlabeled linking is more cautious (no class evidence).
+    static let unlabeledChildVolumeFraction: Float = 0.15
+    /// Vertical band: child bottom from (parent bottom − slack) up to
+    /// (parent top + seatSlack) — laundry ON a couch seat sits INSIDE the
+    /// parent's vertical span; a mug on a table sits just above its top.
+    static let childBottomSlack: Float = 0.05
+    static let childTopSlack: Float = 0.10
 
     // MARK: Display tunables
 
@@ -131,23 +160,140 @@ enum RegistryCoherence {
         return output
     }
 
+    // MARK: - Footprint geometry (v3 — containment + gaps)
+
+    /// Fraction of `inner`'s XZ footprint area inside `outer`'s (0–1).
+    static func footprintContainment(of inner: OrientedBox,
+                                     in outer: OrientedBox) -> Float {
+        let innerArea = inner.extents.x * inner.extents.z
+        guard innerArea > 0 else { return 0 }
+        let inter = polygonArea(clip(subject: xzCorners(inner), by: xzCorners(outer)))
+        return inter / innerArea
+    }
+
+    /// Minimum XZ distance between two footprints — 0 when they intersect.
+    /// (Vertex-to-edge minimum both ways: exact for non-intersecting convex
+    /// polygons.)
+    static func xzGap(_ a: OrientedBox, _ b: OrientedBox) -> Float {
+        let pa = xzCorners(a), pb = xzCorners(b)
+        if polygonArea(clip(subject: pa, by: pb)) > 0 { return 0 }
+        var best = Float.greatestFiniteMagnitude
+        for i in 0..<pa.count {
+            let a0 = pa[i], a1 = pa[(i + 1) % pa.count]
+            for j in 0..<pb.count {
+                let b0 = pb[j], b1 = pb[(j + 1) % pb.count]
+                best = min(best, pointToSegment(a0, b0, b1))
+                best = min(best, pointToSegment(a1, b0, b1))
+                best = min(best, pointToSegment(b0, a0, a1))
+                best = min(best, pointToSegment(b1, a0, a1))
+            }
+        }
+        return best
+    }
+
+    private static func pointToSegment(_ p: SIMD2<Float>, _ s0: SIMD2<Float>,
+                                       _ s1: SIMD2<Float>) -> Float {
+        let d = s1 - s0
+        let len2 = simd_length_squared(d)
+        guard len2 > 1e-12 else { return simd_distance(p, s0) }
+        let t = max(0, min(1, simd_dot(p - s0, d) / len2))
+        return simd_distance(p, s0 + d * t)
+    }
+
     // MARK: - Merge decision
 
-    /// Two objects are the same physical thing when their OBBs overlap in XZ with
-    /// IoU ≥ 0.4 (some vertical overlap required — shelf levels stay apart), OR
-    /// their centers are within max(0.12 m, 0.5 × the smaller mean extent) at
-    /// compatible heights (vertical overlap > 50 %).
+    /// The furniture class token BOTH objects name (label first, hint second) —
+    /// nil when they disagree or either names none. Deliberately two-sided: a
+    /// labeled couch and an UNLABELED fragment do not same-class merge (the
+    /// fragment might be the laundry on it); unlabeled fragments reach the couch
+    /// through IoU, a matching hint, or the mesh-cluster evidence path.
+    static func sharedClassToken(_ a: SpatailObject, _ b: SpatailObject) -> String? {
+        guard let ta = FormPriors.furnitureToken(for: a.label ?? a.classHint),
+              let tb = FormPriors.furnitureToken(for: b.label ?? b.classHint),
+              ta == tb else { return nil }
+        return ta
+    }
+
+    /// Two objects are the same physical thing when (v2) their OBBs overlap in XZ
+    /// with IoU ≥ 0.4 (some vertical overlap — shelf levels stay apart), OR their
+    /// centers are within max(0.12 m, 0.5 × smaller mean extent) at compatible
+    /// heights; PLUS (v3, the couch fix) same-CLASS observations within the class
+    /// gate, or with XZ footprints within 15 % of the class length of touching.
+    /// Supported-by pairs never merge — they are different things by definition.
     static func shouldMerge(_ a: SpatailObject, _ b: SpatailObject) -> Bool {
+        if a.parentId == b.id || b.parentId == a.id { return false }
+
         let v = verticalOverlapRatio(a.obb, b.obb)
         if v > iouVerticalOverlapMin, xzIoU(a.obb, b.obb) >= xzIoUThreshold {
             return true
         }
+
+        // Class-scaled association (v3 §1): bottle-scale center gates fragment
+        // anything bigger than ~0.3 m; the class says how big "same place" is.
+        if v > iouVerticalOverlapMin, let token = sharedClassToken(a, b),
+           let prior = FormPriors.furniture[token] {
+            let dx = a.obb.center.x - b.obb.center.x
+            let dz = a.obb.center.z - b.obb.center.z
+            if sqrt(dx * dx + dz * dz) <= prior.gate { return true }
+            if xzGap(a.obb, b.obb)
+                <= max(adjacencyGapMin, adjacencyGapFraction * prior.length) {
+                return true
+            }
+        }
+
         guard v > centerVerticalOverlapMin else { return false }
         let dx = a.obb.center.x - b.obb.center.x
         let dz = a.obb.center.z - b.obb.center.z
         let gate = max(centerBaseDistance,
                        centerExtentFactor * min(a.obb.meanExtent, b.obb.meanExtent))
         return sqrt(dx * dx + dz * dz) <= gate
+    }
+
+    // MARK: - Supported-by links (v3 §0 — runs BEFORE the merge pass)
+
+    /// True when `child` rests on / is contained in `parent`: much smaller,
+    /// footprint inside, bottom within the parent's vertical band, and not the
+    /// same class (same-class pairs are merge candidates, never parent/child).
+    static func isChild(_ child: SpatailObject, of parent: SpatailObject) -> Bool {
+        guard child.id != parent.id else { return false }
+        if sharedClassToken(child, parent) != nil { return false }
+        let parentVolume = parent.obb.volume
+        let volumeCap = (child.label == nil && parent.label == nil
+                         && parent.classHint == nil)
+            ? unlabeledChildVolumeFraction : childVolumeFraction
+        guard parentVolume > 0, child.obb.volume <= volumeCap * parentVolume
+        else { return false }
+        let childBottom = child.obb.bottomY
+        let parentTop = parent.obb.center.y + parent.obb.extents.y / 2
+        guard childBottom >= parent.obb.bottomY - childBottomSlack,
+              childBottom <= parentTop + childTopSlack else { return false }
+        return footprintContainment(of: child.obb, in: parent.obb)
+            >= childFootprintContainment
+    }
+
+    /// Clear stale links, then link each unparented candidate to the SMALLEST
+    /// qualifying parent (the mug links to the tray on the table, not the table).
+    /// One level deep — children of children stay unlinked (bounded semantics).
+    static func assignSupportLinks(_ objects: inout [SpatailObject]) {
+        let byId = Dictionary(uniqueKeysWithValues: objects.map { ($0.id, $0) })
+        for i in objects.indices {
+            guard let pid = objects[i].parentId else { continue }
+            if byId[pid].map({ isChild(objects[i], of: $0) }) != true {
+                objects[i].parentId = nil
+            }
+        }
+        for i in objects.indices where objects[i].parentId == nil {
+            var best: (id: UUID, volume: Float)?
+            for j in objects.indices where i != j {
+                let parent = objects[j]
+                guard parent.parentId == nil,
+                      isChild(objects[i], of: parent) else { continue }
+                if best == nil || parent.obb.volume < best!.volume {
+                    best = (parent.id, parent.obb.volume)
+                }
+            }
+            objects[i].parentId = best?.id
+        }
     }
 
     /// Survivor ordering: labeled beats unlabeled; measured form beats prior beats
@@ -213,6 +359,16 @@ enum RegistryCoherence {
         if survivor.supportSurfaceId == nil {
             survivor.supportSurfaceId = loser.supportSurfaceId
         }
+        // v3 carry-alongs: hint, parent link, dossier (survivor's fields win).
+        if survivor.classHint == nil { survivor.classHint = loser.classHint }
+        if survivor.parentId == nil { survivor.parentId = loser.parentId }
+        if let loserAttrs = loser.attributes {
+            var merged = loserAttrs
+            if let sa = survivor.attributes { merged.merge(sa) }
+            survivor.attributes = merged.isEmpty ? nil : merged
+            survivor.attributesUpdatedAt = max(survivor.attributesUpdatedAt ?? 0,
+                                               loser.attributesUpdatedAt ?? 0)
+        }
         survivor.seenStreak = max(survivor.seenStreak, loser.seenStreak)
         survivor.established = survivor.established || loser.established
         survivor.lastMeasuredAt = max(survivor.lastMeasuredAt, loser.lastMeasuredAt)
@@ -254,20 +410,30 @@ enum RegistryCoherence {
             while let next = aliases[final] { final = next }
             aliases[loser] = final
         }
+        // Children follow a merged-away parent to the survivor (v3 §0); a link
+        // that would now point at itself dissolves.
+        for i in objs.indices {
+            if let pid = objs[i].parentId, let survivor = aliases[pid] {
+                objs[i].parentId = survivor == objs[i].id ? nil : survivor
+            }
+        }
         return (objs, aliases)
     }
 
     // MARK: - Display worthiness (the ONE shared definition)
 
     /// Eligible = labeled OR fitted form OR established by ≥ `establishTicks`
-    /// consecutive ingest ticks. At most `displayCap` are flagged, ranked labeled
-    /// first, then label confidence, then recency. Everything else stays internal:
-    /// no chip, no overlay box, no ask binding, no wire.
+    /// consecutive ingest ticks — EXCEPT unlabeled children (v3 §0), which stay
+    /// internal and surface only as the parent's "+N on it". At most `displayCap`
+    /// are flagged, ranked parents first, then labeled, then label confidence,
+    /// then recency. Everything else: no chip, no overlay box, no ask binding,
+    /// no wire.
     static func assignDisplayWorthiness(_ objects: inout [SpatailObject]) {
         var eligible: [Int] = []
         for i in objects.indices {
             objects[i].displayWorthy = false
             let o = objects[i]
+            if o.parentId != nil, o.label == nil { continue }
             if o.label != nil || o.form != nil || o.established
                 || o.seenStreak >= establishTicks {
                 eligible.append(i)
@@ -275,6 +441,8 @@ enum RegistryCoherence {
         }
         let ranked = eligible.sorted { i, j in
             let a = objects[i], b = objects[j]
+            let ap = a.parentId == nil, bp = b.parentId == nil
+            if ap != bp { return ap }
             let al = a.label != nil, bl = b.label != nil
             if al != bl { return al }
             if a.confidence != b.confidence { return a.confidence > b.confidence }

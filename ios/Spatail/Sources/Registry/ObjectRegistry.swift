@@ -88,6 +88,11 @@ final class ObjectRegistry: ObservableObject {
     /// loser id → survivor id. The pipeline repoints Form Engine clouds with it.
     var onObjectsMerged: (([UUID: UUID]) -> Void)?
 
+    /// LiDAR mesh-classification clusters (v3 §2) — same-entity evidence for the
+    /// merge pass. AppModel points this at the room scanner; nil/empty = no
+    /// cluster evidence (tests, no-LiDAR devices).
+    var furnitureClustersProvider: (() -> [FurnitureCluster])?
+
     // MARK: Merge hysteresis (Scene Coherence pass)
 
     /// Loser → survivor memory, chain-collapsed, bounded. A re-detection, pin,
@@ -295,7 +300,13 @@ final class ObjectRegistry: ObservableObject {
     /// fused clouds follow the survivor. Returns the repointed matches.
     private func runMergePass(on updated: inout [SpatailObject],
                               matches: [UUID: UUID]) -> [UUID: UUID] {
-        let (mergedObjects, aliases) = RegistryCoherence.mergePass(updated)
+        // Mesh-cluster same-entity evidence (v3 §2) rides alongside shouldMerge.
+        let clusters = furnitureClustersProvider?() ?? []
+        let alsoMerge: ((SpatailObject, SpatailObject) -> Bool)? = clusters.isEmpty
+            ? nil
+            : { RegistryCoherence.sameClusterEvidence($0, $1, clusters: clusters) }
+        let (mergedObjects, aliases) = RegistryCoherence.mergePass(updated,
+                                                                   alsoMerge: alsoMerge)
         guard !aliases.isEmpty else { return matches }
         updated = mergedObjects
         recordAliases(aliases)
@@ -454,6 +465,90 @@ final class ObjectRegistry: ObservableObject {
             obj.parts.append(SpatailPart(label: "cap", box: nil, region: region,
                                          confidence: 0.9, measured: true))
         }
+    }
+
+    // MARK: - Native furniture ingest (RoomPlan — v3 §2)
+
+    /// One native furniture assertion: Apple's RoomPlan model saying "there is a
+    /// sofa HERE, this big". Identity is semantic; geometry is a strong prior
+    /// (`.roomplan`), never allowed to displace fresh measured form.
+    struct NativeFurniture {
+        let label: String
+        let obb: OrientedBox
+        let confidence: Float
+    }
+
+    /// Fold RoomPlan's furniture set in. Matching an existing object adopts the
+    /// label (local-label path — the VLM still outranks) and snaps geometry to
+    /// the model's box unless a fresh MEASURED form owns it; unmatched furniture
+    /// mints established entities directly (the model has been watching longer
+    /// than one detector tick).
+    func ingestNativeFurniture(_ furniture: [NativeFurniture], now: TimeInterval) {
+        guard !furniture.isEmpty else { return }
+        var updated = objects
+
+        for native in furniture {
+            let gate = max(0.5 * native.obb.meanExtent,
+                           FormPriors.furniturePrior(for: native.label)?.gate ?? 0.3)
+            let matchIdx = updated.indices.filter { idx in
+                let obj = updated[idx]
+                guard RegistryCoherence.verticalOverlapRatio(obj.obb, native.obb)
+                        > RegistryCoherence.iouVerticalOverlapMin else { return false }
+                let dx = obj.obb.center.x - native.obb.center.x
+                let dz = obj.obb.center.z - native.obb.center.z
+                return sqrt(dx * dx + dz * dz) <= gate
+                    || RegistryCoherence.xzIoU(obj.obb, native.obb) >= 0.3
+            }.min { a, b in
+                simd_distance(updated[a].obb.center, native.obb.center)
+                    < simd_distance(updated[b].obb.center, native.obb.center)
+            }
+
+            let roomplanForm = ObjectForm(
+                kind: .box,
+                dimensions: ["width": max(native.obb.extents.x, native.obb.extents.z),
+                             "depth": min(native.obb.extents.x, native.obb.extents.z),
+                             "height": native.obb.extents.y],
+                source: .roomplan, arcCoverage: 0, residual: 0)
+
+            if let idx = matchIdx {
+                var obj = updated[idx]
+                RegistryFusion.attachLocalLabel(native.label,
+                                                confidence: native.confidence,
+                                                at: now, into: &obj)
+                if obj.classHint == nil { obj.classHint = native.label }
+                let measuredFresh = obj.form?.source == .measured
+                    && obj.formUpdatedAt.map { now - $0 < Self.formFreshnessSeconds }
+                        ?? false
+                if !measuredFresh {
+                    obj.obb = native.obb
+                    obj.form = roomplanForm
+                    obj.formUpdatedAt = now
+                }
+                obj.lastMeasuredAt = now
+                obj.established = true
+                updated[idx] = obj
+            } else {
+                var minted = SpatailObject(obb: native.obb,
+                                           form: roomplanForm,
+                                           established: true,
+                                           firstSeenAt: now,
+                                           classHint: native.label,
+                                           lastMeasuredAt: now)
+                minted.formUpdatedAt = now
+                RegistryFusion.attachLocalLabel(native.label,
+                                                confidence: native.confidence,
+                                                at: now, into: &minted)
+                updated.append(minted)
+            }
+        }
+
+        // Native boxes can bridge fragments the gates missed — full coherence.
+        RegistryCoherence.assignSupportLinks(&updated)
+        _ = runMergePass(on: &updated, matches: [:])
+        RegistryCoherence.assignDisplayWorthiness(&updated)
+        for obj in updated { syncAnchor(for: obj) }
+
+        objects = updated   // single publish
     }
 
     // MARK: - Identity attach (~1 Hz)

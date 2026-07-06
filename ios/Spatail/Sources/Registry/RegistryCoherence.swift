@@ -383,18 +383,58 @@ enum RegistryCoherence {
         }
     }
 
+    /// Same-cluster evidence (v3 §2): two comparable-size objects whose centers
+    /// fall inside ONE furniture mesh cluster are the same physical thing —
+    /// the LiDAR classification says "this whole region is seating". The volume
+    /// guard keeps items ON the furniture (the laundry pile, whose footprint is
+    /// also inside the seat cluster) from being swallowed: they are an order of
+    /// magnitude smaller and reach the couch as CHILDREN, never merges.
+    static let clusterMargin: Float = 0.15
+    static let clusterVolumeRatioMin: Float = 0.25
+    static let clusterMinFaces = 60
+    static let clusterMinArea: Float = 0.2
+
+    static func sameClusterEvidence(_ a: SpatailObject, _ b: SpatailObject,
+                                    clusters: [FurnitureCluster]) -> Bool {
+        if a.parentId == b.id || b.parentId == a.id { return false }
+        guard verticalOverlapRatio(a.obb, b.obb) > iouVerticalOverlapMin
+        else { return false }
+        let va = a.obb.volume, vb = b.obb.volume
+        guard va > 0, vb > 0, min(va, vb) / max(va, vb) >= clusterVolumeRatioMin
+        else { return false }
+        // A labeled non-seating/non-slab thing never cluster-merges (a "lamp"
+        // standing on the seat cluster's rug edge is not couch).
+        for obj in [a, b] {
+            if let token = FormPriors.furnitureToken(for: obj.label ?? obj.classHint),
+               let prior = FormPriors.furniture[token],
+               prior.template == .box { return false }
+        }
+        return clusters.contains { cluster in
+            cluster.faceCount >= clusterMinFaces
+                && cluster.footprintArea >= clusterMinArea
+                && cluster.containsXZ(a.obb.center, expandedBy: clusterMargin)
+                && cluster.containsXZ(b.obb.center, expandedBy: clusterMargin)
+        }
+    }
+
     /// One full merge pass: repeatedly collapse the first mergeable pair until the
     /// set is stable (each merge strictly shrinks the set — always terminates).
     /// Returns the merged set plus a CHAIN-COLLAPSED loser → survivor alias map.
-    static func mergePass(_ objects: [SpatailObject])
+    /// `alsoMerge` injects extra same-entity evidence (mesh clusters — v3 §2)
+    /// on top of `shouldMerge`.
+    static func mergePass(_ objects: [SpatailObject],
+                          alsoMerge: ((SpatailObject, SpatailObject) -> Bool)? = nil)
         -> (objects: [SpatailObject], aliases: [UUID: UUID]) {
         var objs = objects
         var aliases: [UUID: UUID] = [:]
+        func sameEntity(_ a: SpatailObject, _ b: SpatailObject) -> Bool {
+            shouldMerge(a, b) || (alsoMerge?(a, b) ?? false)
+        }
         var merged = true
         while merged {
             merged = false
             outer: for i in 0..<objs.count {
-                for j in (i + 1)..<objs.count where shouldMerge(objs[i], objs[j]) {
+                for j in (i + 1)..<objs.count where sameEntity(objs[i], objs[j]) {
                     let iSurvives = survives(objs[i], over: objs[j])
                     let s = iSurvives ? i : j
                     let l = iSurvives ? j : i

@@ -41,6 +41,14 @@ final class SettingsStore: ObservableObject {
         willSet { objectWillChange.send() }
     }
 
+    /// RoomPlan furniture entities (v3 §2) — Apple's furniture model sharing the
+    /// AR session. Default ON where supported; the runtime degradation watch
+    /// stops it (and notes it) if the shared session loses smoothed depth.
+    @AppStorage("spatail.perception.roomplan")
+    var roomPlanEnabled: Bool = true {
+        willSet { objectWillChange.send() }
+    }
+
     init() {
         migrateLegacyKeysIfNeeded()
     }

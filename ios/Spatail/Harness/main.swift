@@ -900,5 +900,62 @@ do {
     } else { check(false, "table has a top primitive") }
 }
 
+// MARK: 14. Mesh-cluster evidence — same-entity through the seat cluster
+
+do {
+    print("[14] mesh-cluster evidence (PERCEPTION_V3 §2)")
+
+    // One seat cluster spanning the whole couch footprint.
+    let seatCluster = FurnitureCluster(kind: .seat,
+                                       xzMin: SIMD2(-1.2, -2.5),
+                                       xzMax: SIMD2(1.2, -1.6),
+                                       yMin: 0.05, yMax: 0.85, faceCount: 900)
+
+    // Two UNLABELED fragments (no class token — the same-class branch can't
+    // help), centers 1.1 m apart, both inside the cluster.
+    let fragA = makeObject(center: SIMD3(-0.55, 0.4, -2.0),
+                           extents: SIMD3(1.0, 0.7, 0.8),
+                           firstSeenAt: 1, lastMeasuredAt: 10)
+    let fragB = makeObject(center: SIMD3(0.55, 0.4, -2.0),
+                           extents: SIMD3(1.0, 0.7, 0.8),
+                           firstSeenAt: 2, lastMeasuredAt: 10)
+    check(!RegistryCoherence.shouldMerge(fragA, fragB),
+          "unlabeled fragments alone don't merge (no class evidence)")
+    check(RegistryCoherence.sameClusterEvidence(fragA, fragB,
+                                                clusters: [seatCluster]),
+          "the seat cluster says they are one thing")
+    let (merged, _) = RegistryCoherence.mergePass([fragA, fragB], alsoMerge: {
+        RegistryCoherence.sameClusterEvidence($0, $1, clusters: [seatCluster])
+    })
+    check(merged.count == 1, "cluster evidence merges them", "\(merged.count)")
+
+    // The laundry-sized box inside the same cluster does NOT cluster-merge
+    // (volume ratio guard) — it reaches the couch as a CHILD instead.
+    let laundry = makeObject(center: SIMD3(0.1, 0.55, -2.0),
+                             extents: SIMD3(0.5, 0.3, 0.25),
+                             firstSeenAt: 3, lastMeasuredAt: 10)
+    check(!RegistryCoherence.sameClusterEvidence(fragA, laundry,
+                                                 clusters: [seatCluster]),
+          "small stuff on the seat never cluster-merges")
+
+    // A labeled BOX-template thing (a TV on a stand inside the footprint)
+    // never cluster-merges either.
+    let tv = makeObject(label: "tv", confidence: 0.9,
+                        center: SIMD3(0.0, 0.45, -1.8),
+                        extents: SIMD3(1.0, 0.6, 0.7),
+                        firstSeenAt: 4, lastMeasuredAt: 10)
+    check(!RegistryCoherence.sameClusterEvidence(fragA, tv,
+                                                 clusters: [seatCluster]),
+          "labeled box-class things are exempt from cluster merges")
+
+    // Outside the cluster → no evidence.
+    let elsewhere = makeObject(center: SIMD3(3.0, 0.4, -2.0),
+                               extents: SIMD3(1.0, 0.7, 0.8),
+                               firstSeenAt: 5, lastMeasuredAt: 10)
+    check(!RegistryCoherence.sameClusterEvidence(fragA, elsewhere,
+                                                 clusters: [seatCluster]),
+          "outside the footprint → no cluster evidence")
+}
+
 print("\n\(passed) passed, \(failed) failed")
 exit(failed == 0 ? 0 : 1)

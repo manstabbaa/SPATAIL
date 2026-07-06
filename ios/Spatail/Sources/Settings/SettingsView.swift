@@ -15,6 +15,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: SpatailSpace.s5) {
                 header
                 endpointsCard
+                perceptionCard
                 statusCard
                 vlmNoteCard
             }
@@ -34,6 +35,38 @@ struct SettingsView: View {
             Spacer()
             SpatailIconButton(systemName: "xmark", label: "Close", variant: .outline) {
                 dismiss()
+            }
+        }
+    }
+
+    // MARK: Perception (v3)
+
+    private var perceptionCard: some View {
+        SettingsCard(eyebrow: "How it sees", title: "Perception") {
+            VStack(alignment: .leading, spacing: SpatailSpace.s3) {
+                Toggle(isOn: $settings.roomPlanEnabled) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("RoomPlan furniture")
+                            .spatailType(.sm)
+                            .foregroundStyle(SpatailColor.textStrong)
+                        Text(RoomPlanService.isSupported
+                             ? "Apple's furniture model seeds couch/table/bed entities (needs LiDAR)."
+                             : "Not supported on this device.")
+                            .spatailType(.xs)
+                            .foregroundStyle(SpatailColor.textMuted)
+                    }
+                }
+                .disabled(!RoomPlanService.isSupported)
+                if let reason = model.roomPlan.stoppedReason {
+                    HStack(spacing: SpatailSpace.s2) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                        Text("RoomPlan: \(reason)").spatailType(.xs)
+                    }
+                    .foregroundStyle(SpatailColor.statusDanger)
+                }
+                Text("Restart the app after changing this — RoomPlan shares the live AR session.")
+                    .spatailType(.xs)
+                    .foregroundStyle(SpatailColor.textMuted)
             }
         }
     }

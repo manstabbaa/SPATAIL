@@ -41,6 +41,11 @@ final class RoomScannerService: NSObject, ObservableObject {
     /// No LiDAR: plane area vs. the same estimate from plane extents.
     @Published private(set) var coveragePercent: Double = 0
 
+    /// Furniture-classified mesh regions (v3 §2) — same-entity evidence for the
+    /// registry's merge pass. EVIDENCE ONLY per canon: clusters group and
+    /// propose extent; dimensions come from fused depth, never the mesh.
+    @Published private(set) var furnitureClusters: [FurnitureCluster] = []
+
     /// True when the device reconstructs a classified LiDAR mesh (spec §1.2 source).
     /// Instance tag — the 2026-07-03 field sessions showed the console's
     /// scanner publishing surfaces while the UI's scanner showed none. Every
@@ -305,11 +310,12 @@ final class RoomScannerService: NSObject, ObservableObject {
 
         let anchors = Array(meshAnchors.values)
         meshQueue.async { [weak self] in
-            let snapshot = Self.extractMeshSnapshot(anchors)   // heavy, background
+            let (snapshot, clusters) = Self.extractMeshSnapshot(anchors)   // heavy, background
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.meshPassBusy.set(false)
                 if let snapshot { self.meshSnapshot = snapshot }
+                self.furnitureClusters = clusters
                 self.updateCoverage()
             }
         }
@@ -358,14 +364,28 @@ final class RoomScannerService: NSObject, ObservableObject {
         return Double(min(1, mappedArea / implied)) * 100
     }
 
-    /// Background-only: walk every mesh anchor's triangles, summing area and
-    /// growing the world bbox. Immutable output; anchors' geometry buffers are
-    /// read once, nothing is retained.
-    nonisolated private static func extractMeshSnapshot(_ anchors: [ARMeshAnchor]) -> MeshSnapshot? {
-        guard !anchors.isEmpty else { return nil }
+    /// Background-only: walk every mesh anchor's triangles, summing area,
+    /// growing the world bbox, AND bucketing furniture-classified faces
+    /// (.seat/.table) into 0.4 m XZ cells for the cluster pass (v3 §2).
+    /// Immutable output; anchors' geometry buffers are read once, nothing is
+    /// retained.
+    nonisolated private static func extractMeshSnapshot(_ anchors: [ARMeshAnchor])
+        -> (MeshSnapshot?, [FurnitureCluster]) {
+        guard !anchors.isEmpty else { return (nil, []) }
         var total: Float = 0
         var lo = SIMD3<Float>(repeating: .greatestFiniteMagnitude)
         var hi = SIMD3<Float>(repeating: -.greatestFiniteMagnitude)
+
+        // Per-class cell accumulators (0.4 m XZ grid).
+        struct CellStats {
+            var faceCount = 0
+            var xzMin = SIMD2<Float>(repeating: .greatestFiniteMagnitude)
+            var xzMax = SIMD2<Float>(repeating: -.greatestFiniteMagnitude)
+            var yMin = Float.greatestFiniteMagnitude
+            var yMax = -Float.greatestFiniteMagnitude
+        }
+        let cellSize: Float = 0.4
+        var cells: [SurfaceKind: [SIMD2<Int32>: CellStats]] = [.seat: [:], .table: [:]]
 
         for anchor in anchors {
             let geometry = anchor.geometry
@@ -379,6 +399,24 @@ final class RoomScannerService: NSObject, ObservableObject {
             let indexBase = faces.buffer.contents()
             let bytesPerIndex = faces.bytesPerIndex
             let transform = anchor.transform
+
+            // Per-face classification source (one uint8 per face) when present.
+            var classifyAt: ((Int) -> SurfaceKind?)?
+            if let classification = geometry.classification,
+               classification.format == .uchar,     // one MTL uchar per face
+               classification.count == faces.count {
+                let base = classification.buffer.contents() + classification.offset
+                let stride = classification.stride
+                classifyAt = { face in
+                    let raw = base.advanced(by: face * stride)
+                        .assumingMemoryBound(to: UInt8.self).pointee
+                    switch ARMeshClassification(rawValue: Int(raw)) {
+                    case .seat: return .seat
+                    case .table: return .table
+                    default: return nil
+                    }
+                }
+            }
 
             func vertex(_ index: Int) -> SIMD3<Float> {
                 let p = vertexBase + index * vertexStride
@@ -401,10 +439,62 @@ final class RoomScannerService: NSObject, ObservableObject {
                 total += simd_length(simd_cross(b - a, c - a)) / 2
                 lo = simd_min(lo, simd_min(a, simd_min(b, c)))
                 hi = simd_max(hi, simd_max(a, simd_max(b, c)))
+
+                if let classifyAt, let kind = classifyAt(f) {
+                    let centroid = (a + b + c) / 3
+                    let key = SIMD2<Int32>(Int32(floor(centroid.x / cellSize)),
+                                           Int32(floor(centroid.z / cellSize)))
+                    var stats = cells[kind]?[key] ?? CellStats()
+                    stats.faceCount += 1
+                    stats.xzMin = simd_min(stats.xzMin, SIMD2(centroid.x, centroid.z))
+                    stats.xzMax = simd_max(stats.xzMax, SIMD2(centroid.x, centroid.z))
+                    stats.yMin = min(stats.yMin, centroid.y)
+                    stats.yMax = max(stats.yMax, centroid.y)
+                    cells[kind]?[key] = stats
+                }
             }
         }
-        guard total > 0, lo.x < hi.x else { return nil }
-        return MeshSnapshot(totalAreaM2: total, bboxMin: lo, bboxMax: hi)
+        guard total > 0, lo.x < hi.x else { return (nil, []) }
+
+        // Connected components over 8-adjacent cells per class → clusters.
+        var clusters: [FurnitureCluster] = []
+        for (kind, grid) in cells where !grid.isEmpty {
+            var unvisited = Set(grid.keys)
+            while let seed = unvisited.first {
+                unvisited.remove(seed)
+                var stack = [seed]
+                var faceCount = 0
+                var xzMin = SIMD2<Float>(repeating: .greatestFiniteMagnitude)
+                var xzMax = SIMD2<Float>(repeating: -.greatestFiniteMagnitude)
+                var yMin = Float.greatestFiniteMagnitude
+                var yMax = -Float.greatestFiniteMagnitude
+                while let cell = stack.popLast() {
+                    guard let stats = grid[cell] else { continue }
+                    faceCount += stats.faceCount
+                    xzMin = simd_min(xzMin, stats.xzMin)
+                    xzMax = simd_max(xzMax, stats.xzMax)
+                    yMin = min(yMin, stats.yMin)
+                    yMax = max(yMax, stats.yMax)
+                    for dx in Int32(-1)...1 {
+                        for dz in Int32(-1)...1 where dx != 0 || dz != 0 {
+                            let neighbor = SIMD2<Int32>(cell.x + dx, cell.y + dz)
+                            if unvisited.remove(neighbor) != nil {
+                                stack.append(neighbor)
+                            }
+                        }
+                    }
+                }
+                let cluster = FurnitureCluster(kind: kind, xzMin: xzMin,
+                                               xzMax: xzMax, yMin: yMin,
+                                               yMax: yMax, faceCount: faceCount)
+                if cluster.faceCount >= RegistryCoherence.clusterMinFaces,
+                   cluster.footprintArea >= RegistryCoherence.clusterMinArea {
+                    clusters.append(cluster)
+                }
+            }
+        }
+
+        return (MeshSnapshot(totalAreaM2: total, bboxMin: lo, bboxMax: hi), clusters)
     }
 }
 

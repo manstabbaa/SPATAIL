@@ -26,6 +26,7 @@ final class AppModel: ObservableObject {
     let scanner: RoomScannerService
     let registry: ObjectRegistry
     let pipeline: LivePerceptionPipeline
+    let roomPlan: RoomPlanService
     let uplink: VisionUplink
     let streamer: FrameStreamer
     let runtime: ExperienceRuntime
@@ -70,6 +71,13 @@ final class AppModel: ObservableObject {
                                                surfacesProvider: { [weak scanner] in
                                                    scanner?.surfaces ?? []
                                                })
+        self.roomPlan = RoomPlanService()
+
+        // Mesh-classification clusters (v3 §2) — same-entity evidence for the
+        // merge pass, straight off the scanner's background mesh walk.
+        registry.furnitureClustersProvider = { [weak scanner] in
+            scanner?.furnitureClusters ?? []
+        }
 
         hub.addSessionDelegate(scanner)
         brainClient = settings.endpoints.map(BrainClient.init)
@@ -138,6 +146,15 @@ final class AppModel: ObservableObject {
         runtime.onPinnedObjectsChanged = { [weak self] pinned in
             self?.registry.pinnedObjectIds = pinned
         }
+
+        // RoomPlan furniture → registry (v3 §2): Apple's model asserting
+        // "sofa HERE, this big" lands as high-prior entities.
+        roomPlan.onFurniture = { [weak self] furniture in
+            guard let self else { return }
+            let now = self.hub.currentFrame?.timestamp
+                ?? ProcessInfo.processInfo.systemUptime
+            self.registry.ingestNativeFurniture(furniture, now: now)
+        }
     }
 
     // MARK: Lifecycle
@@ -148,6 +165,21 @@ final class AppModel: ObservableObject {
         started = true
         WindowChrome.prime()   // window exists post-transaction; bodies read the cache
         pipeline.start()
+        // RoomPlan on the SHARED session (v3 §2) — gated on support + Settings,
+        // with the degradation watch: if smoothed depth stops arriving, RoomPlan
+        // loses (the Form Engine's measurements outrank Apple's convenience).
+        if settings.roomPlanEnabled, RoomPlanService.isSupported {
+            roomPlan.start(arSession: hub.arView.session)
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(nanoseconds: 6_000_000_000)
+                guard let self, self.roomPlan.running else { return }
+                if let frame = self.hub.currentFrame,
+                   frame.smoothedSceneDepth == nil, frame.sceneDepth == nil {
+                    self.roomPlan.stop(reason:
+                        "shared session lost scene depth — Form Engine outranks")
+                }
+            }
+        }
         connectBrain()
     }
 

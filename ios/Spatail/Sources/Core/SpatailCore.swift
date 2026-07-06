@@ -60,6 +60,41 @@ public struct RoomSurface: Codable, Identifiable, Equatable, Sendable {
     }
 }
 
+// MARK: - Furniture clusters (v3 §2 — mesh-classification evidence)
+
+/// A connected region of LiDAR mesh faces sharing a furniture classification
+/// (.seat / .table). EVIDENCE ONLY, per canon: clusters group and propose
+/// extent — dimensions always come from fused depth, never from the mesh.
+/// Device-local (never rides the wire).
+public struct FurnitureCluster: Equatable, Sendable {
+    public var kind: SurfaceKind          // .seat or .table
+    public var xzMin: SIMD2<Float>
+    public var xzMax: SIMD2<Float>
+    public var yMin: Float
+    public var yMax: Float
+    public var faceCount: Int
+
+    public init(kind: SurfaceKind, xzMin: SIMD2<Float>, xzMax: SIMD2<Float>,
+                yMin: Float, yMax: Float, faceCount: Int) {
+        self.kind = kind
+        self.xzMin = xzMin
+        self.xzMax = xzMax
+        self.yMin = yMin
+        self.yMax = yMax
+        self.faceCount = faceCount
+    }
+
+    public var footprintArea: Float {
+        max(xzMax.x - xzMin.x, 0) * max(xzMax.y - xzMin.y, 0)
+    }
+
+    /// XZ containment with a margin (the cluster is a proposal, not a survey).
+    public func containsXZ(_ p: SIMD3<Float>, expandedBy margin: Float) -> Bool {
+        p.x >= xzMin.x - margin && p.x <= xzMax.x + margin
+            && p.z >= xzMin.y - margin && p.z <= xzMax.y + margin
+    }
+}
+
 // MARK: - Objects (the registry's currency)
 
 /// A named sub-region of an object ("cap", "handle") — LIVE_BRAIN_SPEC §3 Parts.

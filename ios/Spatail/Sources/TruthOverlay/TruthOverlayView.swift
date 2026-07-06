@@ -60,7 +60,14 @@ struct TruthOverlayView: View {
             .padding(.horizontal, SpatailSpace.s4)
             .padding(.bottom, SpatailSpace.s10 + SpatailSpace.s5) // clear the AskBar
         }
-        .allowsHitTesting(false)   // pure instrument — never eats a tap
+        .allowsHitTesting(false)   // pure instrument — never eats a tap…
+        // …except the altitude switch (v3 §9): Entities ⇄ Debug. Applied AFTER
+        // allowsHitTesting(false) so this one control stays tappable.
+        .overlay(alignment: .topTrailing) {
+            modeSwitch
+                .padding(.top, SpatailSpace.s10 + SpatailSpace.s8)
+                .padding(.trailing, SpatailSpace.s4)
+        }
         .onAppear {
             // Deferred: attach's @Published sinks emit synchronously with the
             // current value — mutating observed state during the update
@@ -70,6 +77,26 @@ struct TruthOverlayView: View {
             }
         }
         .onDisappear { model.detach() }
+    }
+
+    /// Entities (default, one chip per thing) ⇄ Debug (the full firehose).
+    private var modeSwitch: some View {
+        Button {
+            model.setMode(model.mode == .entities ? .debug : .entities)
+        } label: {
+            HStack(spacing: SpatailSpace.s1) {
+                Image(systemName: model.mode == .entities
+                      ? "square.3.layers.3d.down.right" : "ladybug")
+                    .imageScale(.small)
+                Text(model.mode == .entities ? "Entities" : "Debug")
+                    .spatailType(.micro, weight: .medium)
+            }
+            .foregroundStyle(SpatailColor.paper)
+            .padding(.horizontal, SpatailSpace.s2 + 2)
+            .padding(.vertical, SpatailSpace.s1 + 2)
+            .background(Capsule().fill(SpatailColor.ink900.opacity(0.55)))
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: Legend (the color code, same palette the 3D lines use)
@@ -228,6 +255,15 @@ final class TruthOverlayModel: ObservableObject {
         var version: Int
     }
 
+    /// v3 §9 — the overlay's two altitudes. ENTITIES (default): one chip per
+    /// parent thing, children roll up as "+N on it", assembly primitives carry
+    /// the form, only walkable surfaces outline, no detection exhaust. DEBUG:
+    /// the full firehose, exactly the old instrument.
+    enum OverlayMode {
+        case entities, debug
+    }
+
+    @Published private(set) var mode: OverlayMode = .entities
     @Published private(set) var surfaceLabels: [ProjectedLabel] = []
     @Published private(set) var objectLabels: [ProjectedLabel] = []
     @Published private(set) var vlmBoxes: [VLMBox] = []
@@ -239,6 +275,15 @@ final class TruthOverlayModel: ObservableObject {
     /// The curated surface list the renderer AND the label tick both draw —
     /// one filter, applied once per scanner publish.
     private var shownSurfaces: [RoomSurface] = []
+    /// Raw scanner truth, kept so a mode switch re-curates without a republish.
+    private var lastRawSurfaces: [RoomSurface] = []
+
+    func setMode(_ newMode: OverlayMode) {
+        guard mode != newMode else { return }
+        mode = newMode
+        applySurfaces(lastRawSurfaces)
+        if newMode == .entities { vlmBoxes = [] }
+    }
 
     private let renderer = TruthOverlayRenderer()
     private var cancellables: Set<AnyCancellable> = []
@@ -347,7 +392,13 @@ final class TruthOverlayModel: ObservableObject {
     }
 
     private func applySurfaces(_ surfaces: [RoomSurface]) {
-        let shown = Self.curatedSurfaces(surfaces)
+        lastRawSurfaces = surfaces
+        // ENTITIES mode narrows further: only the surfaces things sit on
+        // (floor/table/seat) keep their outlines; the rest stay counted.
+        let curated = Self.curatedSurfaces(surfaces)
+        let shown = mode == .debug
+            ? curated
+            : curated.filter { Self.alwaysDrawnKinds.contains($0.kind) }
         shownSurfaces = shown
         hiddenSurfaceCount = surfaces.count - shown.count
         renderer.update(surfaces: shown)
@@ -395,24 +446,27 @@ final class TruthOverlayModel: ObservableObject {
         let bounds = arView.bounds
         guard bounds.width > 1, bounds.height > 1 else { return }
 
-        // (a) surface labels at the boundary centroid — CURATED list only
+        // (a) surface labels at the boundary centroid — CURATED list only.
+        // ENTITIES mode: outlines stay (walkable kinds), the label spam goes.
         var sLabels: [ProjectedLabel] = []
-        for surface in shownSurfaces {
-            guard !surface.boundary.isEmpty else { continue }
-            var centroid = surface.boundary.reduce(SIMD3<Float>(0, 0, 0), +)
-            centroid /= Float(surface.boundary.count)
-            centroid.y = surface.y + 0.02
-            guard let p = arView.project(centroid),
-                  p.x > -40, p.x < bounds.width + 40,
-                  p.y > -40, p.y < bounds.height + 40 else { continue }
-            let accent = surface.id == boundSurfaceId
-            sLabels.append(ProjectedLabel(
-                id: surface.id,
-                text: String(format: "%@ · %.2f · %.1fm²",
-                             surface.kind.rawValue, surface.confidence, surface.areaM2),
-                point: p,
-                dot: accent ? TruthPalette.bound : TruthPalette.color(for: surface.kind),
-                accent: accent))
+        if mode == .debug {
+            for surface in shownSurfaces {
+                guard !surface.boundary.isEmpty else { continue }
+                var centroid = surface.boundary.reduce(SIMD3<Float>(0, 0, 0), +)
+                centroid /= Float(surface.boundary.count)
+                centroid.y = surface.y + 0.02
+                guard let p = arView.project(centroid),
+                      p.x > -40, p.x < bounds.width + 40,
+                      p.y > -40, p.y < bounds.height + 40 else { continue }
+                let accent = surface.id == boundSurfaceId
+                sLabels.append(ProjectedLabel(
+                    id: surface.id,
+                    text: String(format: "%@ · %.2f · %.1fm²",
+                                 surface.kind.rawValue, surface.confidence, surface.areaM2),
+                    point: p,
+                    dot: accent ? TruthPalette.bound : TruthPalette.color(for: surface.kind),
+                    accent: accent))
+            }
         }
         if sLabels != surfaceLabels { surfaceLabels = sLabels }
 
@@ -423,8 +477,17 @@ final class TruthOverlayModel: ObservableObject {
         // The ask/experience binding: the delta's fused object OR any pinned
         // object (a placed ask pins its target) gets the accent treatment.
         let pinnedIds = Set(registry.pinnedObjectIds.map(registry.canonicalId))
+        // ENTITIES mode: children roll up under the parent as "+N on it"
+        // instead of their own chips (the boxes still draw — they're real).
+        var childCounts: [UUID: Int] = [:]
+        if mode == .entities {
+            for object in registry.objects {
+                if let pid = object.parentId { childCounts[pid, default: 0] += 1 }
+            }
+        }
         var oLabels: [ProjectedLabel] = []
         for object in registry.objects where object.displayWorthy {
+            if mode == .entities, object.parentId != nil { continue }
             guard let p = arView.project(object.obb.center),
                   p.x > -40, p.x < bounds.width + 40,
                   p.y > -40, p.y < bounds.height + 40 else { continue }
@@ -432,6 +495,17 @@ final class TruthOverlayModel: ObservableObject {
             var text = "\(object.label ?? "unlabeled") · \(String(format: "%.2f", object.confidence))"
             if let age = object.identificationAge(now: now), age >= 0, age < 3600 {
                 text += String(format: " · %.1fs", age)
+            }
+            var sublines = object.form.map(Self.formLines) ?? []
+            if mode == .entities {
+                if let dossier = AskPlanner.dossierLine(label: nil,
+                                                        attributes: object.attributes),
+                   let stripped = dossier.split(separator: "—").last {
+                    sublines.append(stripped.trimmingCharacters(in: .whitespaces))
+                }
+                if let count = childCounts[object.id], count > 0 {
+                    sublines.append("+\(count) on it")
+                }
             }
             oLabels.append(ProjectedLabel(
                 id: object.id.uuidString,
@@ -441,13 +515,15 @@ final class TruthOverlayModel: ObservableObject {
                     : (object.label != nil ? TruthPalette.objectLabeled
                                            : TruthPalette.objectUnlabeled),
                 accent: accent,
-                sublines: object.form.map(Self.formLines) ?? []))
+                sublines: sublines))
         }
         if oLabels != objectLabels { objectLabels = oLabels }
 
-        // (d) last VLM detections, aspect-fill corrected, aged out after 4 s
+        // (d) last VLM detections, aspect-fill corrected, aged out after 4 s —
+        // detection exhaust is DEBUG-mode only (v3 §9).
         var boxes: [VLMBox] = []
-        if let identification = lastIdentification,
+        if mode == .debug,
+           let identification = lastIdentification,
            let receivedAt = identificationReceivedAt,
            Date().timeIntervalSince(receivedAt) < Self.vlmBoxLifetime {
             let orientation = WindowChrome.interfaceOrientation

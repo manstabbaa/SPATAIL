@@ -190,20 +190,42 @@ final class TruthOverlayRenderer {
 
         // Visual hierarchy: bound/pinned = accent + thickest; labeled = bright;
         // unlabeled-but-displayed = dimmer AND thinner (still honest, less loud).
+        // An ASSEMBLY (v3 §3) inverts it: the primitives carry the real form,
+        // so they draw bright and the outer OBB drops to a whisper.
         let labeled = object.label != nil
+        let assembly = object.form?.kind == .assembly
+            ? (object.form?.primitives ?? []) : []
         let color: Color = bound ? TruthPalette.bound
             : (labeled ? TruthPalette.objectLabeled : TruthPalette.objectUnlabeled)
-        let uiColor = bound || labeled
-            ? UIColor(color)
-            : UIColor(color).withAlphaComponent(0.55)
-        let material = UnlitMaterial(color: uiColor)
-        let thickness: Float = bound ? 0.007 : (labeled ? 0.0035 : 0.0025)
+        let outerAlpha: CGFloat = !assembly.isEmpty && !bound
+            ? 0.3 : (bound || labeled ? 1 : 0.55)
+        let material = UnlitMaterial(color: UIColor(color).withAlphaComponent(outerAlpha))
+        let thickness: Float = bound ? 0.007
+            : (!assembly.isEmpty ? 0.0018 : (labeled ? 0.0035 : 0.0025))
 
         for edge in Self.boxEdges(extents: object.obb.extents,
                                   center: .zero,
                                   thickness: thickness,
                                   material: material) {
             container.addChild(edge)
+        }
+
+        // Assembly primitives — seat/backrest/armrests traced as their own
+        // wireframes in the parent's local frame (primitives share its yaw).
+        if !assembly.isEmpty {
+            let primColor: Color = bound ? TruthPalette.bound : TruthPalette.partRegion
+            let primMaterial = UnlitMaterial(color: UIColor(primColor))
+            let inverseYaw = simd_quatf(angle: -object.obb.yaw,
+                                        axis: SIMD3<Float>(0, 1, 0))
+            for primitive in assembly {
+                let localCenter = inverseYaw.act(primitive.obb.center - object.obb.center)
+                for edge in Self.boxEdges(extents: primitive.obb.extents,
+                                          center: localCenter,
+                                          thickness: bound ? 0.005 : 0.0035,
+                                          material: primMaterial) {
+                    container.addChild(edge)
+                }
+            }
         }
 
         // Part regions — resolved sub-OBBs, drawn in the parent's local frame.
@@ -285,7 +307,13 @@ final class TruthOverlayRenderer {
             guard let r = p.region else { continue }
             parts += "\(p.label)\(Int(r.center.y * 200))\(Int(r.extents.y * 200))"
         }
+        // Assembly refits must rebuild — primitives carry geometry of their own.
+        var form = o.form.map { "\($0.kind.rawValue)\($0.source.rawValue)" } ?? "·"
+        for primitive in o.form?.primitives ?? [] {
+            form += "\(primitive.name)\(Int(primitive.obb.center.y * 200))" +
+                    "\(Int(primitive.obb.extents.y * 200))"
+        }
         return "\(Int(e.x * 200))|\(Int(e.y * 200))|\(Int(e.z * 200))|" +
-               "\(o.label ?? "·")|\(parts)|\(bound)"
+               "\(o.label ?? "·")|\(parts)|\(form)|\(bound)"
     }
 }

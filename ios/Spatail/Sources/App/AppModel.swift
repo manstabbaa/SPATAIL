@@ -246,10 +246,18 @@ final class AppModel: ObservableObject {
     private static let extraPartWords = ["spout", "neck", "label", "button",
                                          "hood", "door"]
 
+    /// Affordance words (v3 §4) — resolved FORM-AWARE against the assembly
+    /// (seat slab top, armrest top, front edge, center patch) with honest
+    /// geometric fallbacks. RegistryCoherence.affordanceSlice owns these.
+    private static let affordanceWords = ["seat", "cushion", "backrest",
+                                          "armrest", "arm", "edge", "center",
+                                          "centre", "middle"]
+
     /// Words that name sub-regions of an object — an ask mentioning one lands
-    /// on that part's region (registry part, named slice, or solver fallback).
+    /// on that part's region (registry part, affordance, named slice, or
+    /// solver fallback).
     private static let partLexicon: [String] =
-        Array(sliceLexicon.keys) + extraPartWords
+        Array(sliceLexicon.keys) + extraPartWords + affordanceWords
 
     /// The ask's spatial target: the tapped chip's object first, else the
     /// registry object whose label the prompt names. Nil → room placement.
@@ -304,6 +312,15 @@ final class AppModel: ObservableObject {
             let c = $0.camera.transform.columns.3
             return SIMD3(c.x, c.y, c.z)
         }
+
+        // Affordances first (v3 §4): "on the armrest" / "on the edge" /
+        // "center it" resolve against the fitted assembly when one exists.
+        if let region = RegistryCoherence.affordanceSlice(ask, of: obj,
+                                                          cameraPosition: cameraPosition) {
+            return .part(obj, SpatailPart(label: ask, box: nil, region: region,
+                                          confidence: 0))
+        }
+
         switch Self.sliceLexicon[ask] {
         case .named(let slice):
             let region = RegistryCoherence.namedSlice(slice, of: obj.obb,

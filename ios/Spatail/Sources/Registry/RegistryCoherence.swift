@@ -311,9 +311,13 @@ enum RegistryCoherence {
         return a.id.uuidString < b.id.uuidString
     }
 
+    /// Geometry provenance ranking (v3 §2): measured beats roomplan beats prior
+    /// beats nothing — RoomPlan is a trained furniture model's assertion,
+    /// stronger than a class-table guess, weaker than fused depth.
     private static func formRank(_ o: SpatailObject) -> Int {
         switch o.form?.source {
-        case .measured: return 2
+        case .measured: return 3
+        case .roomplan: return 2
         case .prior:    return 1
         case nil:       return 0
         }
@@ -521,5 +525,154 @@ enum RegistryCoherence {
         default:
             return nil
         }
+    }
+
+    // MARK: - Placement affordances (v3 §4 — form-aware landing regions)
+
+    /// Ask-side words → canonical affordance names.
+    private static let affordanceAliases: [String: String] = [
+        "seat": "seat", "cushion": "seat", "seat_top": "seat",
+        "backrest": "backrest_top", "backrest_top": "backrest_top",
+        "arm": "armrest", "armrest": "armrest",
+        "armrest_left": "armrest_left", "armrest_right": "armrest_right",
+        "edge": "front_edge", "front_edge": "front_edge",
+        "center": "center", "middle": "center", "centre": "center",
+    ]
+
+    /// Resolve a placement affordance against an object: assembly primitives
+    /// FIRST (the seat slab's top, the armrest's top — real form), honest
+    /// geometric fallbacks when no assembly exists yet. nil = not an affordance
+    /// word (callers fall through to `namedSlice` / the solver's whole-OBB path).
+    ///
+    /// NOTE on fallbacks: `namedSlice` front/back run along the MAJOR axis and
+    /// left/right along the MINOR — right for phones and headphones, wrong for
+    /// wide furniture (a couch's "front edge" is a DEPTH-side strip; its
+    /// armrests are MAJOR-axis ends). The furniture-shaped strips below are the
+    /// affordance-correct fallbacks; `namedSlice` stays byte-compatible with
+    /// the §3 solver and is not touched.
+    static func affordanceSlice(_ rawName: String, of object: SpatailObject,
+                                cameraPosition: SIMD3<Float>? = nil) -> OrientedBox? {
+        let lowered = rawName.lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let name = affordanceAliases[lowered] else { return nil }
+        let form = object.form
+
+        switch name {
+        case "seat":
+            if let seat = form?.primitive(named: "seat") {
+                return RegistryFusion.topSlice(of: seat.obb, fraction: 0.2)
+            }
+            return RegistryFusion.topSlice(of: object.obb, fraction: 0.2)
+
+        case "backrest_top":
+            if let back = form?.primitive(named: "backrest") {
+                return RegistryFusion.topSlice(of: back.obb, fraction: 0.15)
+            }
+            // No assembly: the far depth-side strip of the top (the rear).
+            return depthStrip(of: object.obb, nearSide: false,
+                              cameraPosition: cameraPosition)
+
+        case "armrest", "armrest_left", "armrest_right":
+            let left = form?.primitive(named: "armrest_left")
+            let right = form?.primitive(named: "armrest_right")
+            var pick: ObjectForm.Primitive?
+            switch name {
+            case "armrest_left": pick = left
+            case "armrest_right": pick = right
+            default:
+                switch (left, right) {
+                case let (l?, r?):
+                    if let cam = cameraPosition {
+                        pick = simd_distance_squared(cam, l.obb.center)
+                            <= simd_distance_squared(cam, r.obb.center) ? l : r
+                    } else { pick = l }
+                case let (l?, nil): pick = l
+                case let (nil, r?): pick = r
+                default: pick = nil
+                }
+            }
+            if let pick {
+                return RegistryFusion.topSlice(of: pick.obb, fraction: 0.25)
+            }
+            // No assembly: a MAJOR-axis end strip of the top.
+            return majorEndStrip(of: object.obb,
+                                 side: name == "armrest_right" ? 1 : -1,
+                                 cameraPosition: name == "armrest" ? cameraPosition : nil)
+
+        case "front_edge":
+            let base = form?.primitive(named: "seat")?.obb
+                ?? form?.primitive(named: "top")?.obb
+                ?? object.obb
+            return depthStrip(of: base, nearSide: true,
+                              cameraPosition: cameraPosition)
+
+        case "center":
+            let base = form?.primitive(named: "seat")?.obb
+                ?? form?.primitive(named: "top")?.obb
+                ?? object.obb
+            let top = RegistryFusion.topSlice(of: base, fraction: 0.2)
+            return OrientedBox(center: top.center,
+                               extents: SIMD3(max(base.extents.x * 0.4, 0.02),
+                                              top.extents.y,
+                                              max(base.extents.z * 0.4, 0.02)),
+                               yaw: top.yaw)
+
+        default:
+            return nil
+        }
+    }
+
+    /// A DEPTH-side strip of a box's top surface: top 20 % slice narrowed to the
+    /// outer 15 % of the MINOR horizontal axis — near side (facing the camera)
+    /// or far side. This is a couch's front edge / rear rim.
+    static func depthStrip(of box: OrientedBox, nearSide: Bool,
+                           cameraPosition: SIMD3<Float>?) -> OrientedBox {
+        let top = RegistryFusion.topSlice(of: box, fraction: 0.2)
+        let alongX = box.extents.x > box.extents.z        // major on X?
+        let minorExtent = alongX ? box.extents.z : box.extents.x
+        let strip = max(minorExtent * 0.15, 0.02)
+        let off = (minorExtent - strip) / 2
+        let c = cos(box.yaw), s = sin(box.yaw)
+        // World direction of +minor: local (0,0,1) → (s, 0, c); local (1,0,0) → (c, 0, −s).
+        let dir: SIMD3<Float> = alongX ? SIMD3(s, 0, c) : SIMD3(c, 0, -s)
+        var sign: Float = 1
+        if let cam = cameraPosition {
+            let plus = top.center + dir * off
+            let minus = top.center - dir * off
+            let plusNearer = simd_distance_squared(cam, plus)
+                <= simd_distance_squared(cam, minus)
+            sign = (plusNearer == nearSide) ? 1 : -1
+        }
+        let center = top.center + dir * (sign * off)
+        let extents = SIMD3<Float>(alongX ? box.extents.x : strip,
+                                   top.extents.y,
+                                   alongX ? strip : box.extents.z)
+        return OrientedBox(center: center, extents: extents, yaw: box.yaw)
+    }
+
+    /// A MAJOR-axis end strip of a box's top surface — the armrest fallback.
+    /// `side` −1/+1 picks the end; a camera position (when given) overrides it
+    /// with the nearer end.
+    static func majorEndStrip(of box: OrientedBox, side: Float,
+                              cameraPosition: SIMD3<Float>?) -> OrientedBox {
+        let top = RegistryFusion.topSlice(of: box, fraction: 0.25)
+        let alongX = box.extents.x > box.extents.z
+        let majorExtent = alongX ? box.extents.x : box.extents.z
+        let strip = min(max(majorExtent * 0.15, 0.12), 0.30)
+        let off = (majorExtent - strip) / 2
+        let c = cos(box.yaw), s = sin(box.yaw)
+        let dir: SIMD3<Float> = alongX ? SIMD3(c, 0, -s) : SIMD3(s, 0, c)
+        var sign = side >= 0 ? Float(1) : Float(-1)
+        if let cam = cameraPosition {
+            let plus = top.center + dir * off
+            let minus = top.center - dir * off
+            sign = simd_distance_squared(cam, plus)
+                <= simd_distance_squared(cam, minus) ? 1 : -1
+        }
+        let center = top.center + dir * (sign * off)
+        let extents = SIMD3<Float>(alongX ? strip : box.extents.x,
+                                   top.extents.y,
+                                   alongX ? box.extents.z : strip)
+        return OrientedBox(center: center, extents: extents, yaw: box.yaw)
     }
 }

@@ -18,15 +18,35 @@ final class FormPointCloud {
 
     // MARK: Tunables
 
-    /// Voxel edge (m). 4 mm ≈ the useful resolution of upsampled iPhone dToF.
+    /// Voxel edge (m). 4 mm ≈ the useful resolution of upsampled iPhone dToF —
+    /// the SMALL-tier default. Furniture (v3 §3) uses a coarser tier: 4 mm
+    /// voxels capped at 20 k can't span a couch.
     static let voxelSize: Float = 0.004
     /// Hard cap on stored voxels; beyond it the OLDEST voxels are evicted.
     static let maxPoints = 20_000
     /// Azimuth histogram bins (10° each) around the gravity axis.
     static let azimuthBins = 36
     /// A new measurement center this far from the cloud's running center means the
-    /// object MOVED — the accumulated cloud is stale and resets.
+    /// object MOVED — the accumulated cloud is stale and resets. Furniture tiers
+    /// pass a class-scaled distance: half-couch detections legitimately report
+    /// centers ~0.7 m apart and must not reset the accumulation.
     static let resetJumpDistance: Float = 0.25
+
+    // MARK: Tier configuration (instance — v3 §3)
+
+    let voxelSize: Float
+    let maxPoints: Int
+    let resetJumpDistance: Float
+
+    /// Small-object tier by default; the Form Engine passes the furniture tier
+    /// (2 cm voxels, 30 k cap, class-scaled reset) for furniture-scale classes.
+    init(voxelSize: Float = FormPointCloud.voxelSize,
+         maxPoints: Int = FormPointCloud.maxPoints,
+         resetJumpDistance: Float = FormPointCloud.resetJumpDistance) {
+        self.voxelSize = voxelSize
+        self.maxPoints = maxPoints
+        self.resetJumpDistance = resetJumpDistance
+    }
 
     // MARK: Storage
 
@@ -81,13 +101,13 @@ final class FormPointCloud {
 
         // Object moved → stale cloud, start over (also clears arc coverage:
         // the old viewing arc no longer describes the new pose).
-        if count > 0, simd_distance(centroid, measurementCenter) > Self.resetJumpDistance {
+        if count > 0, simd_distance(centroid, measurementCenter) > resetJumpDistance {
             reset()
         }
 
         for p in points {
             guard p.x.isFinite, p.y.isFinite, p.z.isFinite else { continue }
-            let key = Self.voxelKey(p)
+            let key = voxelKey(p)
             stampCounter += 1
             if var entry = voxels[key] {
                 // Re-touched voxel: refresh point + stamp (kept fresh vs eviction).
@@ -133,7 +153,7 @@ final class FormPointCloud {
     /// only when its stamp still matches the stored voxel's).
     private func enforceCap() {
         var head = 0
-        while count > Self.maxPoints, head < evictionRing.count {
+        while count > maxPoints, head < evictionRing.count {
             let (key, stamp) = evictionRing[head]
             head += 1
             guard let entry = voxels[key], entry.stamp == stamp else { continue }
@@ -153,7 +173,7 @@ final class FormPointCloud {
 
     /// 21-bit signed quantized coordinates packed into one Int64 key
     /// (±2^20 voxels × 4 mm ≈ ±4.2 km — beyond any room).
-    private static func voxelKey(_ p: SIMD3<Float>) -> Int64 {
+    private func voxelKey(_ p: SIMD3<Float>) -> Int64 {
         let ix = Int64(floor(p.x / voxelSize)) & 0x1F_FFFF
         let iy = Int64(floor(p.y / voxelSize)) & 0x1F_FFFF
         let iz = Int64(floor(p.z / voxelSize)) & 0x1F_FFFF

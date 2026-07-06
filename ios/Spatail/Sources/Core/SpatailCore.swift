@@ -103,18 +103,34 @@ public struct ObjectForm: Codable, Equatable, Sendable {
         case revolution
         /// Oriented box (yaw-only about gravity) — the boxy/unknown path.
         case box
+        /// Named primitive set (v3 §3): seat + backrest + armrests for a couch,
+        /// top + base for a table — the form placement affordances read.
+        case assembly
     }
 
     /// Provenance — HONEST tagging is mandatory: `.measured` means the dimensions
     /// came from fused depth points; `.prior` means depth was unreliable (transparent
-    /// object) and the dimensions are class-prior constants, possibly silhouette-scaled.
+    /// object) and the dimensions are class-prior constants, possibly silhouette-
+    /// scaled; `.roomplan` means Apple's RoomPlan furniture model asserted the box
+    /// (v3 §2 — a strong prior, still not a measurement).
     public enum Source: String, Codable, Sendable {
-        case measured, prior
+        case measured, prior, roomplan
+    }
+
+    /// One named part of an assembly, world space, parent-yaw-aligned.
+    public struct Primitive: Codable, Equatable, Sendable {
+        public var name: String          // "seat" | "backrest" | "armrest_left" | …
+        public var obb: OrientedBox
+
+        public init(name: String, obb: OrientedBox) {
+            self.name = name
+            self.obb = obb
+        }
     }
 
     public var kind: Kind
     /// Metres, keys as present: revolution → bodyDiameter, height (+ capDiameter,
-    /// capHeight when a cap step was found); box → width, depth, height.
+    /// capHeight when a cap step was found); box/assembly → width, depth, height.
     public var dimensions: [String: Float]
     public var source: Source
     /// Fraction (0–1) of the azimuth arc around the object's gravity axis the camera
@@ -123,14 +139,23 @@ public struct ObjectForm: Codable, Equatable, Sendable {
     /// Fit residual, metres (RMS radial error for revolution, RMS face distance for
     /// box). 0 for priors — there is nothing measured to have a residual against.
     public var residual: Float
+    /// Assembly parts (v3 §3) — nil for revolution/box forms. Additive wire field.
+    public var primitives: [Primitive]?
 
     public init(kind: Kind, dimensions: [String: Float], source: Source,
-                arcCoverage: Float, residual: Float) {
+                arcCoverage: Float, residual: Float,
+                primitives: [Primitive]? = nil) {
         self.kind = kind
         self.dimensions = dimensions
         self.source = source
         self.arcCoverage = arcCoverage
         self.residual = residual
+        self.primitives = primitives
+    }
+
+    /// The named assembly primitive, when this form carries one.
+    public func primitive(named name: String) -> Primitive? {
+        primitives?.first { $0.name == name }
     }
 
     public var bodyDiameter: Float? { dimensions["bodyDiameter"] }

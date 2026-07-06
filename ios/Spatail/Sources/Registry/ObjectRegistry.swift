@@ -319,11 +319,19 @@ final class ObjectRegistry: ObservableObject {
                              into obj: inout SpatailObject, now: TimeInterval) {
         let formFresh = obj.form != nil
             && obj.formUpdatedAt.map { now - $0 < formFreshnessSeconds } ?? false
-        let jumped = simd_distance(r.obb.center, obj.obb.center) > formJumpEscape
+        // Jump-escape scales with the class (v3 §1): a half-couch detection
+        // legitimately lands ~0.7 m from the couch center — that is a partial
+        // view, not the couch moving.
+        let jumpGate = max(Self.formJumpEscape,
+                           (FormPriors.furniturePrior(for: obj.label ?? obj.classHint)?
+                               .length ?? 0) * 0.5)
+        let jumped = simd_distance(r.obb.center, obj.obb.center) > jumpGate
 
         if formFresh, !jumped, let form = obj.form {
             switch form.source {
-            case .measured:
+            case .measured, .roomplan:
+                // The profile/model owns extents+yaw; measurements only nudge
+                // the center.
                 let smoothed = RegistryFusion.smooth(old: obj.obb, new: r.obb,
                                                      alpha: smoothing * 0.4)
                 obj.obb = OrientedBox(center: smoothed.center,

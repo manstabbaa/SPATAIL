@@ -480,7 +480,7 @@ final class TruthOverlayModel: ObservableObject {
             if let d = form.bodyDiameter { dims = "⌀ \(mm(d))" }
             if let h = form.height { dims += (dims.isEmpty ? "" : " · ") + "h \(mm(h))" }
             if let cd = form.capDiameter { dims += " · cap ⌀ \(mm(cd))" }
-        case .box:
+        case .box, .assembly:
             if let w = form.dimensions["width"], let d = form.dimensions["depth"],
                let h = form.dimensions["height"] {
                 dims = "\(mm(w))×\(mm(d))×\(mm(h))"
@@ -488,6 +488,10 @@ final class TruthOverlayModel: ObservableObject {
         }
         guard !dims.isEmpty else { return [] }
         dims += " mm"
+        // Assemblies also say WHAT was decomposed — the v3 §3 truth line.
+        if form.kind == .assembly, let prims = form.primitives, !prims.isEmpty {
+            dims += " · \(prims.count) parts"
+        }
 
         let source: String
         switch form.source {
@@ -495,6 +499,8 @@ final class TruthOverlayModel: ObservableObject {
             source = "measured · \(Int((form.arcCoverage * 100).rounded()))% arc"
         case .prior:
             source = "prior — transparent?"
+        case .roomplan:
+            source = "roomplan — Apple furniture model"
         }
         return [dims, source]
     }

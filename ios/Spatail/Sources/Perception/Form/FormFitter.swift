@@ -60,11 +60,17 @@ enum FormFitter {
 
     // MARK: - Entry: class-conditioned fit of a fused cloud
 
-    /// Fit a fused, voxel-downsampled cloud. Revolution classes get the profile fit
-    /// (falling back to the box fit when the cloud isn't a revolution solid);
-    /// boxy/unknown classes go straight to the box fit. nil = not enough data yet.
+    /// Fit a fused, voxel-downsampled cloud. Furniture classes try the ASSEMBLY
+    /// fit first (v3 §3 — seat/backrest/armrests, top/base); revolution classes
+    /// get the profile fit; everything falls back to the box fit when its
+    /// preferred decomposition isn't supported by the points yet.
     static func fit(points: [SIMD3<Float>], classLabel: String?,
                     arcCoverage: Float) -> Fit? {
+        if let furniture = FormPriors.furniturePrior(for: classLabel),
+           let assembly = assemblyFit(points: points, template: furniture.template,
+                                      arcCoverage: arcCoverage) {
+            return assembly
+        }
         if FormPriors.revolutionClass(for: classLabel) != nil {
             if let fit = revolutionFit(points: points, arcCoverage: arcCoverage) {
                 return fit
@@ -250,6 +256,261 @@ enum FormFitter {
                         yaw: 0)
         }
         return Fit(form: form, obb: obb, capRegion: nil)
+    }
+
+    // MARK: - (c) Assembly fit (v3 §3 — furniture-scale compound form)
+
+    /// Fewer fused points than this → no assembly yet (keep accumulating; the
+    /// box fit still runs so the entity keeps a live OBB meanwhile).
+    static let minAssemblyPoints = 600
+    /// Assemblies need a real footprint — smaller things fit better as one box.
+    static let minAssemblyFootprint: Float = 0.5
+    /// Height-histogram bin (m) for the seat/top-level search.
+    static let assemblyBinSize: Float = 0.025
+    /// The seat surface must land in this band above the base (absolute metres —
+    /// real couch seats sit ~0.35–0.50 m up).
+    static let seatBand: ClosedRange<Float> = 0.20...0.70
+    /// Point-mass thresholds for emitting raised parts.
+    static let backrestMinFraction: Float = 0.08
+    static let armrestMinFraction: Float = 0.02
+
+    /// Class-templated decomposition of a furniture-scale cloud into named
+    /// primitives. nil = template doesn't decompose / not enough structure yet
+    /// (caller falls through to the box fit — never a worse result than v2).
+    static func assemblyFit(points: [SIMD3<Float>],
+                            template: FormPriors.AssemblyTemplate,
+                            arcCoverage: Float) -> Fit? {
+        guard template == .seating || template == .slabTop else { return nil }
+        guard points.count >= minAssemblyPoints else { return nil }
+        // Percentile trim (1–99 % per axis), NOT the MAD trim: furniture is
+        // deliberately multi-modal — a table is a dense top plus sparse legs,
+        // and MAD would amputate the legs (then the height guard kills the fit).
+        let trimmed = percentileTrim(points)
+        guard trimmed.count >= minAssemblyPoints / 2,
+              let overall = OrientedBoxFitter.fit(points: trimmed),
+              max(overall.extents.x, overall.extents.z) >= minAssemblyFootprint,
+              overall.extents.y >= 0.25
+        else { return nil }
+
+        // Local frame: u along the MAJOR horizontal axis (length), w along the
+        // minor (depth), b up from the base. World→local matches
+        // RegistryFusion.clamp: lx = c·dx − s·dz, lz = s·dx + c·dz.
+        let alongX = overall.extents.x >= overall.extents.z
+        let length = alongX ? overall.extents.x : overall.extents.z
+        let depth = alongX ? overall.extents.z : overall.extents.x
+        let height = overall.extents.y
+        let c = cos(overall.yaw), s = sin(overall.yaw)
+        var local: [SIMD3<Float>] = []          // (u, b, w)
+        local.reserveCapacity(trimmed.count)
+        for p in trimmed {
+            let dx = p.x - overall.center.x, dz = p.z - overall.center.z
+            let lx = c * dx - s * dz
+            let lz = s * dx + c * dz
+            local.append(SIMD3(alongX ? lx : lz, p.y - overall.bottomY,
+                               alongX ? lz : lx))
+        }
+
+        // Height histogram → the dominant horizontal band (seat / tabletop).
+        let binCount = max(Int(ceil(height / assemblyBinSize)), 1)
+        var bins = [Int](repeating: 0, count: binCount)
+        for p in local {
+            bins[min(max(Int(p.y / assemblyBinSize), 0), binCount - 1)] += 1
+        }
+
+        let dims: [String: Float] = ["width": length, "depth": depth,
+                                     "height": height]
+        /// Local boxes actually emitted — the residual is measured against
+        /// THESE surfaces (a point on the seat is a hit, not interior error).
+        var localBoxes: [(u: ClosedRange<Float>, b: ClosedRange<Float>,
+                          w: ClosedRange<Float>)] = []
+
+        /// Local (u, b, w) box → world Primitive, parent-yaw-aligned.
+        func primitive(_ name: String, u: ClosedRange<Float>,
+                       b: ClosedRange<Float>, w: ClosedRange<Float>)
+            -> ObjectForm.Primitive {
+            localBoxes.append((u, b, w))
+            let lu = (u.lowerBound + u.upperBound) / 2
+            let lw = (w.lowerBound + w.upperBound) / 2
+            let lx = alongX ? lu : lw
+            let lz = alongX ? lw : lu
+            let center = SIMD3<Float>(
+                overall.center.x + c * lx + s * lz,
+                overall.bottomY + (b.lowerBound + b.upperBound) / 2,
+                overall.center.z - s * lx + c * lz)
+            let du = u.upperBound - u.lowerBound
+            let dw = w.upperBound - w.lowerBound
+            let extents = SIMD3<Float>(alongX ? du : dw,
+                                       b.upperBound - b.lowerBound,
+                                       alongX ? dw : du)
+            return ObjectForm.Primitive(
+                name: name, obb: OrientedBox(center: center, extents: extents,
+                                             yaw: overall.yaw))
+        }
+
+        switch template {
+        case .seating:
+            // Seat level: peak bin inside the absolute seat band, grown upward
+            // while neighbors hold ≥ half the peak (the seat surface is the
+            // densest horizontal band; backrest points above are sparser).
+            let lo = Int(seatBand.lowerBound / assemblyBinSize)
+            let hi = min(Int(seatBand.upperBound / assemblyBinSize), binCount - 1)
+            guard lo <= hi else { return nil }
+            var peak = lo
+            for i in lo...hi where bins[i] > bins[peak] { peak = i }
+            guard bins[peak] >= max(local.count / 33, 8) else { return nil }
+            var topBin = peak
+            while topBin + 1 <= hi, bins[topBin + 1] >= bins[peak] / 2 { topBin += 1 }
+            let seatTop = Float(topBin + 1) * assemblyBinSize
+            guard seatBand.contains(seatTop), seatTop < height - 0.03
+            else { return nil }   // nothing above the "seat" → it's a box/ottoman
+
+            let above = local.filter { $0.y > seatTop + 0.05 }
+            var primitives: [ObjectForm.Primitive] = []
+            let armWidth = min(max(0.15 * length, 0.12), 0.30)
+
+            // Backrest: the raised mass hugs ONE long side. Judged on the
+            // INTERIOR span only (armrest ends excluded) — arm mass at the ends
+            // would dilute the mean toward zero and hide a real backrest.
+            var backSign: Float = 0
+            var backThickness: Float = 0
+            let interiorAbove = above.filter { abs($0.x) <= length / 2 - armWidth }
+            if Float(interiorAbove.count) >= backrestMinFraction * Float(local.count) {
+                let meanW = interiorAbove.map(\.z).reduce(0, +)
+                    / Float(interiorAbove.count)
+                if abs(meanW) >= 0.10 * depth {
+                    backSign = meanW >= 0 ? 1 : -1
+                    backThickness = min(max(0.3 * depth, 0.15), 0.4)
+                    let wOuter = backSign > 0 ? depth / 2 : -depth / 2
+                    let wInner = wOuter - backSign * backThickness
+                    primitives.append(primitive("backrest",
+                                                u: -length / 2...length / 2,
+                                                b: 0...height,
+                                                w: min(wOuter, wInner)...max(wOuter, wInner)))
+                }
+            }
+
+            // Armrests: raised mass at the MAJOR-axis ends, outside the backrest.
+            func armTop(_ side: Float) -> Float? {
+                let candidates = above.filter {
+                    side * $0.x > length / 2 - armWidth
+                        && (backSign == 0 || backSign * $0.z < depth / 2 - backThickness)
+                }
+                guard Float(candidates.count)
+                        >= armrestMinFraction * Float(local.count) else { return nil }
+                let bs = candidates.map(\.y).sorted()
+                let top = percentile(bs, 0.90)
+                return top > seatTop + 0.05 ? min(top, height) : nil
+            }
+            var leftArm = false, rightArm = false
+            if let top = armTop(-1) {
+                leftArm = true
+                primitives.append(primitive("armrest_left",
+                                            u: -length / 2...(-length / 2 + armWidth),
+                                            b: 0...top, w: -depth / 2...depth / 2))
+            }
+            if let top = armTop(1) {
+                rightArm = true
+                primitives.append(primitive("armrest_right",
+                                            u: (length / 2 - armWidth)...length / 2,
+                                            b: 0...top, w: -depth / 2...depth / 2))
+            }
+
+            // Seat slab: between the armrests, in front of the backrest.
+            let seatU0 = leftArm ? -length / 2 + armWidth : -length / 2
+            let seatU1 = rightArm ? length / 2 - armWidth : length / 2
+            let seatW0: Float = backSign > 0 ? -depth / 2 : (backSign < 0 ? -depth / 2 + backThickness : -depth / 2)
+            let seatW1: Float = backSign > 0 ? depth / 2 - backThickness : depth / 2
+            guard seatU1 > seatU0 + 0.05, seatW1 > seatW0 + 0.05 else { return nil }
+            primitives.insert(primitive("seat", u: seatU0...seatU1,
+                                        b: 0...seatTop, w: seatW0...seatW1),
+                              at: 0)
+
+            let form = ObjectForm(kind: .assembly, dimensions: dims,
+                                  source: .measured, arcCoverage: arcCoverage,
+                                  residual: rmsToBoxes(local, localBoxes),
+                                  primitives: primitives)
+            return Fit(form: form, obb: overall, capRegion: nil)
+
+        case .slabTop:
+            // Tabletop: densest band in the UPPER half, grown downward.
+            let lo = max(Int(0.5 * height / assemblyBinSize), 0)
+            guard lo <= binCount - 1 else { return nil }
+            var peak = lo
+            for i in lo..<binCount where bins[i] > bins[peak] { peak = i }
+            guard bins[peak] >= max(local.count / 25, 10) else { return nil }
+            var bottomBin = peak
+            while bottomBin - 1 >= lo, bins[bottomBin - 1] >= bins[peak] / 2 {
+                bottomBin -= 1
+            }
+            let slabBottom = Float(bottomBin) * assemblyBinSize
+            guard slabBottom >= 0.4 * height else { return nil }   // not a slab-on-legs
+
+            let primitives = [
+                primitive("top", u: -length / 2...length / 2,
+                          b: slabBottom...height, w: -depth / 2...depth / 2),
+                primitive("base", u: -length / 2...length / 2,
+                          b: 0...slabBottom, w: -depth / 2...depth / 2),
+            ]
+            let form = ObjectForm(kind: .assembly, dimensions: dims,
+                                  source: .measured, arcCoverage: arcCoverage,
+                                  residual: rmsToBoxes(local, localBoxes),
+                                  primitives: primitives)
+            return Fit(form: form, obb: overall, capRegion: nil)
+
+        default:
+            return nil
+        }
+    }
+
+    /// Per-axis 1–99 % percentile trim (+1 cm slack) — straggler removal that
+    /// keeps deliberate multi-modal structure (table legs, backrest tops).
+    private static func percentileTrim(_ points: [SIMD3<Float>]) -> [SIMD3<Float>] {
+        guard points.count >= 20 else { return points }
+        let xs = points.map(\.x).sorted()
+        let ys = points.map(\.y).sorted()
+        let zs = points.map(\.z).sorted()
+        let x0 = percentile(xs, 0.01) - 0.01, x1 = percentile(xs, 0.99) + 0.01
+        let y0 = percentile(ys, 0.01) - 0.01, y1 = percentile(ys, 0.99) + 0.01
+        let z0 = percentile(zs, 0.01) - 0.01, z1 = percentile(zs, 0.99) + 0.01
+        return points.filter {
+            $0.x >= x0 && $0.x <= x1 && $0.y >= y0 && $0.y <= y1
+                && $0.z >= z0 && $0.z <= z1
+        }
+    }
+
+    /// RMS distance of local (u, b, w) points to the NEAREST emitted primitive's
+    /// surface — the honest "how well does the assembly explain the cloud"
+    /// number (a point on the seat is a hit, not interior error).
+    private static func rmsToBoxes(
+        _ local: [SIMD3<Float>],
+        _ boxes: [(u: ClosedRange<Float>, b: ClosedRange<Float>,
+                   w: ClosedRange<Float>)]) -> Float {
+        guard !local.isEmpty, !boxes.isEmpty else { return 0 }
+        var sum: Float = 0
+        for p in local {
+            var best = Float.greatestFiniteMagnitude
+            for box in boxes {
+                let cu = (box.u.lowerBound + box.u.upperBound) / 2
+                let cb = (box.b.lowerBound + box.b.upperBound) / 2
+                let cw = (box.w.lowerBound + box.w.upperBound) / 2
+                let hu = (box.u.upperBound - box.u.lowerBound) / 2
+                let hb = (box.b.upperBound - box.b.lowerBound) / 2
+                let hw = (box.w.upperBound - box.w.lowerBound) / 2
+                let du = abs(p.x - cu) - hu
+                let db = abs(p.y - cb) - hb
+                let dw = abs(p.z - cw) - hw
+                let d: Float
+                if du <= 0, db <= 0, dw <= 0 {
+                    d = min(-du, -db, -dw)             // inside → nearest face
+                } else {
+                    let ou = max(du, 0), ob = max(db, 0), ow = max(dw, 0)
+                    d = sqrt(ou * ou + ob * ob + ow * ow)
+                }
+                best = min(best, d)
+            }
+            sum += best * best
+        }
+        return sqrt(sum / Float(local.count))
     }
 
     // MARK: - Small robust-statistics helpers (pure)

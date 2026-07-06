@@ -59,6 +59,12 @@ final class FormEngine {
     static let maxCandidatesPerPass = 5
     /// Max masked sample points fed to the cloud per detection per frame.
     static let maxSamplesPerDetection = 700
+    /// Furniture-scale detections carry more surface — sample denser (v3 §3).
+    static let maxSamplesPerFurnitureDetection = 900
+    /// Furniture cloud tier: 2 cm voxels (4 mm capped at 20 k can't span a
+    /// couch), higher cap, class-scaled reset (set per class at creation).
+    static let furnitureVoxelSize: Float = 0.02
+    static let furnitureMaxPoints = 30_000
 
     // MARK: Inputs (built on MAIN, consumed on the form queue)
 
@@ -222,13 +228,16 @@ final class FormEngine {
             }
             guard let mask else { continue }
 
+            let isFurniture = FormPriors.scaleClass(for: candidate.classLabel)
+                == .furniture
             guard let sample = DepthSampler.sampleMasked(
                 mask: mask, depthMap: pass.depthMap,
                 confidenceMap: pass.confidenceMap,
                 intrinsics: pass.intrinsics,
                 imageResolution: pass.imageResolution,
                 cameraTransform: pass.cameraTransform,
-                maxPoints: Self.maxSamplesPerDetection) else { continue }
+                maxPoints: isFurniture ? Self.maxSamplesPerFurnitureDetection
+                                       : Self.maxSamplesPerDetection) else { continue }
 
             let label = candidate.classLabel ?? "object"
 
@@ -270,11 +279,19 @@ final class FormEngine {
             }
 
             // ── Stage 2: accumulate into the object's fused cloud ──
-            let cloud = clouds[candidate.objectId] ?? {
-                let c = FormPointCloud()
+            // Tier by class (v3 §3). An object identified as furniture AFTER its
+            // cloud was born small-tier upgrades once — the accumulation resets,
+            // which is correct: the small tier physically couldn't hold a couch.
+            var cloud = clouds[candidate.objectId] ?? {
+                let c = Self.makeCloud(for: candidate.classLabel)
                 clouds[candidate.objectId] = c
                 return c
             }()
+            if isFurniture, cloud.voxelSize < Self.furnitureVoxelSize {
+                cloud = Self.makeCloud(for: candidate.classLabel)
+                clouds[candidate.objectId] = cloud
+                notes.append("\(label): cloud upgraded to the furniture tier")
+            }
             cloud.insert(points: sample.points, viewpoint: pass.cameraPosition,
                          measurementCenter: candidate.measurementCenter,
                          now: pass.timestamp)
@@ -311,6 +328,18 @@ final class FormEngine {
         clouds = clouds.filter { id, cloud in
             live.contains(id) && now - cloud.lastTouchedAt < Self.cloudIdleExpirySeconds
         }
+    }
+
+    /// Cloud tier by class (v3 §3): furniture gets coarse voxels, a higher cap,
+    /// and a class-scaled reset distance — half-couch detections legitimately
+    /// report centers ~0.7 m apart and must not reset the accumulation.
+    private static func makeCloud(for classLabel: String?) -> FormPointCloud {
+        guard let prior = FormPriors.furniturePrior(for: classLabel) else {
+            return FormPointCloud()
+        }
+        return FormPointCloud(voxelSize: furnitureVoxelSize,
+                              maxPoints: furnitureMaxPoints,
+                              resetJumpDistance: max(0.6, 0.5 * prior.length))
     }
 
     // MARK: Geometry helpers (queue side)

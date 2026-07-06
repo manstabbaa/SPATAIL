@@ -752,5 +752,153 @@ do {
     check(pan.blocked, "fast pan blocked")
 }
 
+// MARK: 13. Assembly fit — couch → seat/backrest/armrests, table → top/base
+
+do {
+    print("[13] assembly fit (PERCEPTION_V3 §3/§4)")
+
+    // Synthetic couch: 2.0 × 0.9 × 0.8 m at yaw 0.35, center (1, 0.4, −2).
+    // Local frame: u along length, w along depth (+w = rear), b up from base.
+    // Seat 0.45 m; backrest w ∈ [0.18, 0.45] to full height; armrests at the
+    // u-ends to 0.62 m; a front skirt face. ~2.6 k points, 4 mm noise.
+    let cYaw: Float = 0.35
+    let cCos = cos(cYaw), cSin = sin(cYaw)
+    let couchCenter = SIMD3<Float>(1, 0.4, -2)
+    func couchWorld(u: Float, b: Float, w: Float) -> SIMD3<Float> {
+        SIMD3(couchCenter.x + cCos * u + cSin * w,
+              b,                                        // bottom at y = 0
+              couchCenter.z - cSin * u + cCos * w)
+    }
+    var couchPts: [SIMD3<Float>] = []
+    for _ in 0..<900 {   // seat surface (the dense horizontal band)
+        let u = Float.random(in: -0.70...0.70, using: &rng)
+        let w = Float.random(in: -0.45...0.18, using: &rng)
+        couchPts.append(couchWorld(u: u, b: 0.45 + gauss(0.004), w: w))
+    }
+    for _ in 0..<500 {   // backrest inner face + top
+        let u = Float.random(in: -1.0...1.0, using: &rng)
+        if Bool.random(using: &rng) {
+            let b = Float.random(in: 0.45...0.80, using: &rng)
+            couchPts.append(couchWorld(u: u, b: b, w: 0.18 + gauss(0.004)))
+        } else {
+            let w = Float.random(in: 0.18...0.45, using: &rng)
+            couchPts.append(couchWorld(u: u, b: 0.80 + gauss(0.004), w: w))
+        }
+    }
+    for side in [Float(-1), 1] {   // armrests: outer band, tops at 0.62
+        for _ in 0..<220 {
+            let u = side * Float.random(in: 0.72...1.0, using: &rng)
+            if Bool.random(using: &rng) {
+                let w = Float.random(in: -0.45...0.18, using: &rng)
+                couchPts.append(couchWorld(u: u, b: 0.62 + gauss(0.004), w: w))
+            } else {
+                let b = Float.random(in: 0.45...0.62, using: &rng)
+                couchPts.append(couchWorld(u: u, b: b, w: -0.45 + gauss(0.004)))
+            }
+        }
+    }
+    for _ in 0..<300 {   // front skirt (base → seat)
+        let u = Float.random(in: -0.7...0.7, using: &rng)
+        let b = Float.random(in: 0.02...0.45, using: &rng)
+        couchPts.append(couchWorld(u: u, b: b, w: -0.45 + gauss(0.004)))
+    }
+
+    let couchFit = FormFitter.fit(points: couchPts, classLabel: "couch",
+                                  arcCoverage: 0.25)
+    check(couchFit != nil, "couch fit produced")
+    if let fit = couchFit {
+        check(fit.form.kind == .assembly, "kind == assembly", "\(fit.form.kind)")
+        check(fit.form.source == .measured, "source == measured")
+        let prims = fit.form.primitives ?? []
+        let names = Set(prims.map(\.name))
+        check(names.contains("seat"), "seat primitive", "\(names)")
+        check(names.contains("backrest"), "backrest primitive", "\(names)")
+        check(names.contains("armrest_left") && names.contains("armrest_right"),
+              "both armrests", "\(names)")
+        if let seat = fit.form.primitive(named: "seat") {
+            let top = seat.obb.center.y + seat.obb.extents.y / 2
+            check(approx(top, 0.45, tol: 0.06), "seat top ≈ 0.45 m", "\(top)")
+        }
+        if let back = fit.form.primitive(named: "backrest") {
+            let top = back.obb.center.y + back.obb.extents.y / 2
+            check(approx(top, 0.80, tol: 0.06), "backrest top ≈ 0.80 m", "\(top)")
+        }
+        check(approx(fit.form.dimensions["width"] ?? -1, 2.0, tol: 0.12),
+              "length ≈ 2.0 m", "\(fit.form.dimensions["width"] ?? -1)")
+        check(fit.form.residual < 0.05, "assembly residual sane",
+              "\(fit.form.residual)")
+
+        // Affordances against the fitted assembly (v3 §4).
+        var couchObj = makeObject(label: "couch", confidence: 0.95,
+                                  center: fit.obb?.center ?? couchCenter,
+                                  extents: fit.obb?.extents ?? SIMD3(2, 0.8, 0.9),
+                                  yaw: fit.obb?.yaw ?? cYaw,
+                                  firstSeenAt: 1, lastMeasuredAt: 10)
+        couchObj.form = fit.form
+        if let seatRegion = RegistryCoherence.affordanceSlice("seat", of: couchObj) {
+            let top = seatRegion.center.y + seatRegion.extents.y / 2
+            check(approx(top, 0.45, tol: 0.07), "seat affordance lands on seat top",
+                  "\(top)")
+        } else { check(false, "seat affordance resolves") }
+        // Camera near the LEFT end → plain "armrest" picks the left one.
+        let camNearLeft = couchWorld(u: -1.4, b: 1.2, w: -1.2)
+        if let arm = RegistryCoherence.affordanceSlice("armrest", of: couchObj,
+                                                       cameraPosition: camNearLeft),
+           let leftArm = fit.form.primitive(named: "armrest_left"),
+           let rightArm = fit.form.primitive(named: "armrest_right") {
+            let dLeft = simd_distance(arm.center, leftArm.obb.center)
+            let dRight = simd_distance(arm.center, rightArm.obb.center)
+            check(dLeft < dRight, "armrest affordance picks the nearer arm")
+            let top = arm.center.y + arm.extents.y / 2
+            check(approx(top, 0.62, tol: 0.07), "armrest affordance at arm top",
+                  "\(top)")
+        } else { check(false, "armrest affordance resolves") }
+        // Front edge: strip on the CAMERA side of the seat's depth axis.
+        let camFront = couchWorld(u: 0, b: 1.0, w: -2.0)
+        if let edge = RegistryCoherence.affordanceSlice("edge", of: couchObj,
+                                                        cameraPosition: camFront) {
+            check(simd_distance(edge.center, camFront)
+                    < simd_distance(couchObj.obb.center, camFront),
+                  "front edge lands on the camera side")
+        } else { check(false, "edge affordance resolves") }
+        if let center = RegistryCoherence.affordanceSlice("middle", of: couchObj) {
+            check(center.extents.x < couchObj.obb.extents.x * 0.6,
+                  "center patch is a patch, not the whole top")
+        } else { check(false, "center affordance resolves") }
+    }
+
+    // Sparse cloud → no assembly; falls back to the plain box fit.
+    let sparse = Array(couchPts.prefix(150))
+    if let fallback = FormFitter.fit(points: sparse, classLabel: "couch",
+                                     arcCoverage: 0.1) {
+        check(fallback.form.kind == .box, "sparse couch falls back to box",
+              "\(fallback.form.kind)")
+    } else { check(false, "sparse couch still fits a box") }
+
+    // Synthetic table: 1.4 × 0.8 × 0.74, dense top at 0.74, four legs.
+    var tablePts: [SIMD3<Float>] = []
+    for _ in 0..<800 {
+        let x = Float.random(in: -0.7...0.7, using: &rng)
+        let z = Float.random(in: -0.4...0.4, using: &rng)
+        tablePts.append(SIMD3(3 + x, 0.74 + gauss(0.004), 1 + z))
+    }
+    for lx in [Float(-0.63), 0.63] {
+        for lz in [Float(-0.33), 0.33] {
+            for _ in 0..<60 {
+                let b = Float.random(in: 0.02...0.70, using: &rng)
+                tablePts.append(SIMD3(3 + lx + gauss(0.006), b, 1 + lz + gauss(0.006)))
+            }
+        }
+    }
+    let tableFit = FormFitter.fit(points: tablePts, classLabel: "table",
+                                  arcCoverage: 0.3)
+    check(tableFit?.form.kind == .assembly, "table → assembly",
+          "\(String(describing: tableFit?.form.kind))")
+    if let top = tableFit?.form.primitive(named: "top") {
+        let bottom = top.obb.center.y - top.obb.extents.y / 2
+        check(bottom > 0.5, "tabletop slab starts high", "\(bottom)")
+    } else { check(false, "table has a top primitive") }
+}
+
 print("\n\(passed) passed, \(failed) failed")
 exit(failed == 0 ? 0 : 1)

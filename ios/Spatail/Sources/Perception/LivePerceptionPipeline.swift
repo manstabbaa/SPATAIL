@@ -15,12 +15,16 @@
 // means a slow inference can never stack resolution work either (drop-on-busy).
 //
 // The pipeline also owns the two identity-attach helpers the registry consumes
-// (spec §3 identity attach — wired by AppModel):
-//   • `projector(for:)` — world OBB → normalized rect in the CURRENT frame's captured-
-//     image space via ARCamera.projectPoint (current-frame projection is the spec's
-//     intent: objects don't move; a tiny ring buffer of recent (timestamp, camera)
-//     pairs picks the nearest pose when the identified frame is slightly stale).
-//   • `resolvePartBox(_:)` — depth-grid a VLM part box against the current frame.
+// (spec §3 identity attach — wired by AppModel), TIMESTAMP-TRUE since v3 (§6):
+//   • `projector(for:)` — world OBB → normalized rect in the IDENTIFIED frame's
+//     captured-image space: exact ring pose when fresh, else the KeyframeStore's
+//     stored pose (a result 3 s late still projects into the frame it describes),
+//     else the live camera as the last resort.
+//   • `resolvePartBox(_:frameTimestamp:)` — depth-grid a VLM part box against the
+//     identified frame's OWN stored depth+pose; current frame only as fallback.
+//
+// v3 also gates the tick on camera motion (MotionGate): blurred frames mint
+// ghost boxes and poison identity — they are skipped, not ingested.
 
 import Foundation
 import ARKit
@@ -60,6 +64,16 @@ final class LivePerceptionPipeline: ObservableObject {
     }
     /// Trimmed observable snapshot for the Truth Overlay (W6).
     let debug = PerceptionDebugModel()
+
+    /// Perception v3 §6 — short-term visual memory: (pose, intrinsics, depth,
+    /// upright JPEG) keyframes. Late VLM results bind to these by timestamp;
+    /// focus passes crop from them. Owned here because this is where frames flow.
+    let keyframes = KeyframeStore()
+
+    /// Tolerances for timestamp-true lookups: a keyframe within this of the
+    /// requested timestamp is "the frame that was seen".
+    private static let keyframeProjectTolerance: TimeInterval = 2.5
+    private static let keyframeResolveTolerance: TimeInterval = 1.0
 
     // MARK: Wiring
 
@@ -142,12 +156,34 @@ final class LivePerceptionPipeline: ObservableObject {
     private func tick(_ frame: ARFrame) {
         guard running else { return }
 
+        // Camera motion vs the previous tick's pose — measured BEFORE this frame
+        // joins the ring. Feeds both the gate and the keyframe preference.
+        let motion: MotionGate.Measure
+        if let previous = cameraRing.last, frame.timestamp > previous.timestamp {
+            motion = MotionGate.measure(previous: previous.camera.transform,
+                                        current: frame.camera.transform,
+                                        dt: frame.timestamp - previous.timestamp)
+        } else {
+            motion = MotionGate.Measure(angularVelocity: 0, linearVelocity: 0)
+        }
+
         // Always feed the pose ring — projections want poses even on dropped ticks.
         recordCamera(frame)
 
-        guard !cycleInFlight else { return }   // previous cycle still running → drop
-
         let interfaceOrientation = currentInterfaceOrientation()
+
+        // Visual memory: the store self-throttles (~2 Hz), prefers sharp frames,
+        // and holds at most one frame's buffers off-main (single-flight).
+        keyframes.consider(frame: frame,
+                           orientation: Self.cgOrientation(for: interfaceOrientation),
+                           motion: motion)
+
+        // Motion gate (v3 §6): a blurred or untracked frame mints ghosts —
+        // skip detection entirely; the ring/keyframes above still advanced.
+        if case .normal = frame.camera.trackingState {} else { return }
+        guard !motion.blocked else { return }
+
+        guard !cycleInFlight else { return }   // previous cycle still running → drop
         cycleCounter += 1
         let input = DetectionInput(pixelBuffer: frame.capturedImage,
                                    orientation: Self.cgOrientation(for: interfaceOrientation),
@@ -321,24 +357,38 @@ final class LivePerceptionPipeline: ObservableObject {
 
     /// A closure projecting a world OBB into the identified frame's normalized
     /// captured-image space (top-left origin) — the space `vision.identification`
-    /// boxes live in. Uses the ring pose nearest `frameTimestamp`, else the live
-    /// camera (current-frame projection: objects don't move, poses barely matter).
+    /// boxes live in. Timestamp-true (v3 §6): exact ring pose when fresh, else
+    /// the keyframe pose nearest `frameTimestamp` (late answers project into the
+    /// frame they describe, even mid-pan), else the live camera as last resort.
     func projector(for frameTimestamp: TimeInterval) -> (OrientedBox) -> CGRect? {
-        var camera: ARCamera?
         if let nearest = cameraRing.min(by: {
             abs($0.timestamp - frameTimestamp) < abs($1.timestamp - frameTimestamp)
         }), abs(nearest.timestamp - frameTimestamp) <= Self.maxPoseAge {
-            camera = nearest.camera
+            let cam = nearest.camera
+            return { obb in Self.project(obb: obb, camera: cam) }
         }
-        camera = camera ?? hub.currentFrame?.camera
-
-        guard let cam = camera else { return { _ in nil } }
+        if let kf = keyframes.nearest(to: frameTimestamp,
+                                      tolerance: Self.keyframeProjectTolerance) {
+            return { obb in kf.projectRect(obb: obb) }
+        }
+        guard let cam = hub.currentFrame?.camera else { return { _ in nil } }
         return { obb in Self.project(obb: obb, camera: cam) }
     }
 
-    /// Depth-resolve a VLM part box (normalized captured-image space) against the
-    /// CURRENT frame into a world OBB. Returns nil when nothing usable is in view.
-    func resolvePartBox(_ box: CGRect) -> OrientedBox? {
+    /// Depth-resolve a VLM part box (normalized captured-image space) into a world
+    /// OBB. Timestamp-true (v3 §6): resolved against the identified frame's OWN
+    /// stored depth+pose when a keyframe covers it; the CURRENT frame only as the
+    /// fallback. Returns nil when nothing usable is in view either way.
+    func resolvePartBox(_ box: CGRect, frameTimestamp: TimeInterval? = nil) -> OrientedBox? {
+        if let ts = frameTimestamp,
+           let kf = keyframes.nearest(to: ts, tolerance: Self.keyframeResolveTolerance),
+           let depth = kf.depth,
+           let obb = KeyframeGeometry.backprojectBox(box, depth: depth,
+                                                     cameraTransform: kf.cameraTransform,
+                                                     intrinsics: kf.intrinsics,
+                                                     imageResolution: kf.imageResolution) {
+            return obb
+        }
         guard let frame = hub.currentFrame else { return nil }
         return SpatialResolver().resolveBox(box,
                                             frame: frame,

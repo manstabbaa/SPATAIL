@@ -389,7 +389,7 @@ final class AppModel: ObservableObject {
                                parts: parts,
                                frameTimestamp: ts,
                                projector: pipeline.projector(for: ts),
-                               resolver: { pipeline.resolvePartBox($0) })
+                               resolver: { pipeline.resolvePartBox($0, frameTimestamp: ts) })
     }
 
     /// Wire boxes are [x, y, w, h] normalized, origin top-left (spec §1.3).

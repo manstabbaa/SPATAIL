@@ -176,3 +176,49 @@ Codable types every module shares: `SurfaceKind`, `OrientedBox`, `RoomSurface`,
 `SpatailPart`, `SpatailObject`, `Detection2D`, `ResolvedDetection`, `BrainEndpoints`.
 Modules do not redefine these; wire Codables in `Sources/Contracts/` map to/from them
 only where legacy field names differ.
+
+## 5. Perception v3 additions (2026-07-05 — see `PERCEPTION_V3.md`)
+
+All additive; old peers ignore unknown fields/messages. Normative details live in
+`docs/xr/PERCEPTION_V3.md` §8.
+
+### 5.1 `room.update.objects[]` extensions (phone → PC)
+
+- `parentId` — supported-by relation (laundry pile → couch). Children stay flat in
+  the list with their own OBB/identity.
+- `attributes` — `{colors[], materials[], textContent[], language, brand, state}`,
+  the entity dossier (all fields optional).
+- `form.kind` gains `"assembly"`; `form.primitives` = `[{name, obb}]` (world-space
+  named primitives: seat/backrest/armrest_left/…); `form.source` gains `"roomplan"`.
+
+### 5.2 `vision.focus` (phone → PC) / `vision.focus.result` (PC → phone)
+
+Question-driven perception: a hi-res crop of ONE object + what's wanted from it.
+
+```json
+{"type": "vision.focus", "payload": {
+  "requestId": "f-…", "objectId": "<registry uuid>",
+  "question": "what language are the keys?",
+  "wanted": ["textContent", "language", "colors"],
+  "jpegBase64": "…", "frameTimestamp": 1783036800.123 }}
+```
+
+```json
+{"type": "vision.focus.result", "payload": {
+  "requestId": "f-…", "objectId": "<uuid>", "label": "mechanical keyboard",
+  "confidence": 0.92,
+  "attributes": {"colors": ["blue", "black"], "language": "English",
+                  "textContent": ["QWERTY"]},
+  "answer": "The keycaps are labeled in English.",
+  "parts": [{"label": "escape key", "box": [x1, y1, x2, y2]}],
+  "latencyMs": 1400, "model": "qwen2.5-vl" }}
+```
+
+Focus `parts[].box` / any boxes are in the CROP's pixel space (xyxy corners, same
+convention as §1.3) — the phone converts back through the crop rect it sent.
+Delivered ONLY to the requesting socket. One focus in flight per phone;
+latest-wins per object.
+
+### 5.3 `vision.identification` extension (PC → phone)
+
+`payload.attributes` — the primary object's dossier fields, same shape as §5.1.

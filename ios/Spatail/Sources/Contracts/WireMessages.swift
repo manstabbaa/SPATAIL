@@ -71,6 +71,8 @@ struct IdentificationWire: Decodable, Equatable {
     let confidence: Double?
     let detections: [Detection]
     let parts: [Part]?
+    /// The PRIMARY object's dossier fields (v3 §5 / LIVE_BRAIN_SPEC §5.3).
+    let attributes: ObjectAttributes?
     /// Capture/ingest time (epoch seconds, PC clock) of the identified frame.
     let frameTimestamp: Double?
     let latencyMs: Int?
@@ -78,7 +80,7 @@ struct IdentificationWire: Decodable, Equatable {
     let rawText: String?
 
     enum K: String, CodingKey {
-        case primary, confidence, detections, parts, frameTimestamp
+        case primary, confidence, detections, parts, attributes, frameTimestamp
         case latencyMs, latency, model, rawText
     }
 
@@ -112,9 +114,62 @@ struct IdentificationWire: Decodable, Equatable {
         }
         parts = (try? c.decode([Part].self, forKey: .parts))?
             .filter { !$0.label.isEmpty }
+        attributes = try? c.decode(ObjectAttributes.self, forKey: .attributes)
         frameTimestamp = try? c.decode(Double.self, forKey: .frameTimestamp)
         latencyMs = (try? c.decode(Int.self, forKey: .latencyMs))
                  ?? (try? c.decode(Int.self, forKey: .latency))
+        model = try? c.decode(String.self, forKey: .model)
+        rawText = try? c.decode(String.self, forKey: .rawText)
+    }
+}
+
+// MARK: - vision.focus / vision.focus.result (v3 §7, LIVE_BRAIN_SPEC §5.2)
+
+/// Phone → PC: a hi-res crop of ONE object + what's wanted from it.
+struct FocusRequestEnvelope: Encodable {
+    struct Payload: Encodable {
+        var requestId: String
+        var objectId: String
+        var question: String?
+        var wanted: [String]?
+        var jpegBase64: String
+        /// Opaque trace stamp (ARKit uptime of the crop's keyframe) — the phone
+        /// binds the RESULT by requestId, not by this.
+        var frameTimestamp: Double?
+    }
+    var type = "vision.focus"
+    var payload: Payload
+}
+
+/// PC → phone: the focused answer. Boxes are normalized to the CROP the phone
+/// sent — converted back through the crop rect phone-side. Tolerant decode.
+struct FocusResultWire: Decodable, Equatable {
+    let requestId: String?
+    let objectId: String?
+    let label: String?
+    let confidence: Double?
+    let attributes: ObjectAttributes?
+    let answer: String?
+    let parts: [IdentificationWire.Part]?
+    let latencyMs: Int?
+    let model: String?
+    let rawText: String?
+
+    enum K: String, CodingKey {
+        case requestId, objectId, label, confidence, attributes, answer
+        case parts, latencyMs, model, rawText
+    }
+    init(from d: Decoder) throws {
+        let c = try d.container(keyedBy: K.self)
+        requestId = try? c.decode(String.self, forKey: .requestId)
+        objectId = try? c.decode(String.self, forKey: .objectId)
+        label = try? c.decode(String.self, forKey: .label)
+        confidence = try? c.decode(Double.self, forKey: .confidence)
+        attributes = try? c.decode(ObjectAttributes.self, forKey: .attributes)
+        answer = try? c.decode(String.self, forKey: .answer)
+        parts = (try? c.decode([IdentificationWire.Part].self, forKey: .parts))?
+            .filter { !$0.label.isEmpty }
+        latencyMs = try? c.decode(Int.self, forKey: .latencyMs)
         model = try? c.decode(String.self, forKey: .model)
         rawText = try? c.decode(String.self, forKey: .rawText)
     }

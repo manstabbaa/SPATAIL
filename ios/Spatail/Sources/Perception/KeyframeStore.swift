@@ -158,12 +158,19 @@ final class KeyframeStore: @unchecked Sendable {
 
     // MARK: Crops (call from a background queue — decodes JPEG)
 
+    /// One cut crop: the JPEG plus the normalized UPRIGHT rect it actually
+    /// covers — the space a focus result's crop-relative boxes map back through.
+    struct Crop {
+        let jpeg: Data
+        let uprightRect: CGRect
+    }
+
     /// Cut an upright hi-res JPEG crop of a normalized SENSOR-space rect from a
     /// keyframe (margin expands the rect; output re-encoded at q0.8).
     /// nil when the crop lands off-image or is too small to be useful.
     static func cropJPEG(from keyframe: Keyframe, sensorRect: CGRect,
                          marginFraction: CGFloat = 0.15,
-                         minCropSide: CGFloat = 48) -> Data? {
+                         minCropSide: CGFloat = 48) -> Crop? {
         // Sensor → upright normalized space (the JPEG is stored upright).
         let upright = MaskProvider.uprightRect(fromSensor: sensorRect,
                                                orientation: keyframe.orientation)
@@ -191,7 +198,11 @@ final class KeyframeStore: @unchecked Sendable {
             kCGImageDestinationLossyCompressionQuality: 0.8,
         ] as CFDictionary)
         guard CGImageDestinationFinalize(dest) else { return nil }
-        return out as Data
+        // The rect the PIXELS actually cover (post-rounding/clamping).
+        let covered = CGRect(x: pixelRect.minX / w, y: pixelRect.minY / h,
+                             width: pixelRect.width / w,
+                             height: pixelRect.height / h)
+        return Crop(jpeg: out as Data, uprightRect: covered)
     }
 
     // MARK: Encode side (queue-confined)

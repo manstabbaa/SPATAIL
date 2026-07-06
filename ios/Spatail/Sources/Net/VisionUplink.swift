@@ -149,6 +149,8 @@ final class VisionUplink: NSObject, ObservableObject {
     @Published private(set) var state: LinkState = .idle
     @Published private(set) var lastIdentification: IdentificationWire?
     @Published private(set) var lastExperienceDelta: ExperienceDeltaWire?
+    /// Focused answer for a crop this phone sent (v3 §7) — requester-only wire.
+    @Published private(set) var lastFocusResult: FocusResultWire?
 
     /// The §1.5 delta gate: experience.delta is meaningless until the brain
     /// has THIS connection's room. Set in sendRoom, cleared on connect/disconnect.
@@ -363,9 +365,33 @@ final class VisionUplink: NSObject, ObservableObject {
                 }
                 lastExperienceDelta = env.payload
             }
+        case "vision.focus.result":
+            if let env = try? decoder.decode(WireEnvelope<FocusResultWire>.self,
+                                             from: data) {
+                lastFocusResult = env.payload
+            }
         default:
             break   // future message types are additive; ignore, don't die
         }
+    }
+
+    // MARK: Uplink — vision.focus (v3 §7; main-actor, small + rare)
+
+    /// Send a hi-res crop of one object with a question / wanted-attribute list.
+    /// Text-channel JSON (base64 crop) — crops are ≤ a few hundred KB and rare.
+    func sendFocus(requestId: String, objectId: UUID, question: String?,
+                   wanted: [String]?, jpeg: Data, frameTimestamp: TimeInterval?) {
+        guard let sender = senderBox.value else { return }
+        let envelope = FocusRequestEnvelope(payload: .init(
+            requestId: requestId,
+            objectId: objectId.uuidString.lowercased(),
+            question: question,
+            wanted: wanted,
+            jpegBase64: jpeg.base64EncodedString(),
+            frameTimestamp: frameTimestamp))
+        guard let data = try? encoder.encode(envelope),
+              let text = String(data: data, encoding: .utf8) else { return }
+        sender.sendText(text)
     }
 
     // MARK: Honest state transitions

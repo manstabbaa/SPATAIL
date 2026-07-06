@@ -27,6 +27,7 @@ final class AppModel: ObservableObject {
     let registry: ObjectRegistry
     let pipeline: LivePerceptionPipeline
     let roomPlan: RoomPlanService
+    let focus: FocusService
     let uplink: VisionUplink
     let streamer: FrameStreamer
     let runtime: ExperienceRuntime
@@ -72,6 +73,8 @@ final class AppModel: ObservableObject {
                                                    scanner?.surfaces ?? []
                                                })
         self.roomPlan = RoomPlanService()
+        self.focus = FocusService(pipeline: pipeline, registry: registry,
+                                  uplink: uplink)
 
         // Mesh-classification clusters (v3 §2) — same-entity evidence for the
         // merge pass, straight off the scanner's background mesh walk.
@@ -105,11 +108,22 @@ final class AppModel: ObservableObject {
 
         // Room snapshots: one as soon as the stream comes up, then throttled as
         // the scanner/registry evolve. Never per-frame (spec §1.1/§1.2).
+        // The focus lane (v3 §7) follows the same streaming state.
         uplink.$state
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 if state == .streaming { self?.sendRoomSnapshot() }
+                self?.focus.setStreaming(state == .streaming)
+            }
+            .store(in: &cancellables)
+
+        // Focus results → the entity dossier (requester-only wire).
+        uplink.$lastFocusResult
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] result in
+                self?.focus.handle(result: result)
             }
             .store(in: &cancellables)
 
@@ -436,6 +450,7 @@ final class AppModel: ObservableObject {
                                confidence: Float(wire.confidence ?? 0),
                                detections: detections,
                                parts: parts,
+                               primaryAttributes: wire.attributes,
                                frameTimestamp: ts,
                                projector: pipeline.projector(for: ts),
                                resolver: { pipeline.resolvePartBox($0, frameTimestamp: ts) })

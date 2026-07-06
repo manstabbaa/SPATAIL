@@ -562,6 +562,7 @@ final class ObjectRegistry: ObservableObject {
                        confidence: Float,
                        detections: [Detection2D],
                        parts: [(label: String, box: CGRect?, confidence: Float)],
+                       primaryAttributes: ObjectAttributes? = nil,
                        frameTimestamp: TimeInterval,
                        projector: @escaping (OrientedBox) -> CGRect?,
                        resolver: @escaping (CGRect) -> OrientedBox?) {
@@ -616,43 +617,96 @@ final class ObjectRegistry: ObservableObject {
             }
         }
 
-        // Parts → sub-regions of the primary object. MEASURED parts (Form Engine —
-        // e.g. the cap found as a radius step in the fitted profile) survive every
-        // identity tick and SUPERSEDE the VLM box / §3 heuristic slice for the same
-        // part; only unmeasured labels resolve through the depth-grid path.
-        if let pi = primaryObjectIdx, !parts.isEmpty {
+        // Parts + dossier land on the PRIMARY object (spec §1.3: parts/attributes
+        // describe the primary).
+        if let pi = primaryObjectIdx {
             var parent = updated[pi]
-            let measured = parent.parts.filter(\.isMeasured)
-            var newParts = measured
-            for part in parts {
-                let partLabel = part.label.lowercased()
-                let superseded = measured.contains {
-                    let m = $0.label.lowercased()
-                    return m == partLabel
-                        || (Self.topSliceLabels.contains(m)
-                            && Self.topSliceLabels.contains(partLabel))
-                }
-                if superseded { continue }
-                let region: OrientedBox?
-                if let box = part.box, let raw = resolver(box) {
-                    region = RegistryFusion.clamp(region: raw, into: parent.obb)
-                } else if part.box == nil,
-                          Self.topSliceLabels.contains(partLabel) {
-                    region = RegistryFusion.topSlice(of: parent.obb,
-                                                     fraction: Self.topSliceFraction)
-                } else {
-                    region = nil
-                }
-                newParts.append(SpatailPart(label: part.label, box: part.box,
-                                            region: region, confidence: part.confidence))
+            if !parts.isEmpty {
+                Self.mergeIdentifiedParts(parts, into: &parent, resolver: resolver)
             }
-            parent.parts = newParts
+            if let primaryAttributes, !primaryAttributes.isEmpty {
+                var dossier = parent.attributes ?? ObjectAttributes()
+                dossier.merge(primaryAttributes)
+                parent.attributes = dossier
+                parent.attributesUpdatedAt = frameTimestamp
+            }
             updated[pi] = parent
         }
 
         // Label adoption flips display eligibility — reassign before publishing.
         RegistryCoherence.assignDisplayWorthiness(&updated)
 
+        objects = updated   // single publish
+    }
+
+    /// Parts → sub-regions of a parent object. MEASURED parts (Form Engine —
+    /// e.g. the cap found as a radius step in the fitted profile) survive every
+    /// identity tick and SUPERSEDE the VLM box / §3 heuristic slice for the same
+    /// part; only unmeasured labels resolve through the depth-grid path.
+    private static func mergeIdentifiedParts(
+        _ parts: [(label: String, box: CGRect?, confidence: Float)],
+        into parent: inout SpatailObject,
+        resolver: (CGRect) -> OrientedBox?) {
+        let measured = parent.parts.filter(\.isMeasured)
+        var newParts = measured
+        for part in parts {
+            let partLabel = part.label.lowercased()
+            let superseded = measured.contains {
+                let m = $0.label.lowercased()
+                return m == partLabel
+                    || (Self.topSliceLabels.contains(m)
+                        && Self.topSliceLabels.contains(partLabel))
+            }
+            if superseded { continue }
+            let region: OrientedBox?
+            if let box = part.box, let raw = resolver(box) {
+                region = RegistryFusion.clamp(region: raw, into: parent.obb)
+            } else if part.box == nil,
+                      Self.topSliceLabels.contains(partLabel) {
+                region = RegistryFusion.topSlice(of: parent.obb,
+                                                 fraction: Self.topSliceFraction)
+            } else {
+                region = nil
+            }
+            newParts.append(SpatailPart(label: part.label, box: part.box,
+                                        region: region, confidence: part.confidence))
+        }
+        parent.parts = newParts
+    }
+
+    // MARK: - Focus results (v3 §7 — one object, deep identity)
+
+    /// Fold a `vision.focus.result` into ONE object: label through the full VLM
+    /// debounce, dossier merged, parts resolved through the caller's
+    /// (keyframe-true) resolver. Alias-aware — a result for a merged-away id
+    /// lands on the survivor.
+    func applyFocusResult(objectId: UUID,
+                          label: String?, confidence: Float,
+                          attributes: ObjectAttributes?,
+                          parts: [(label: String, box: CGRect?, confidence: Float)],
+                          now: TimeInterval,
+                          resolver: (CGRect) -> OrientedBox?) {
+        let target = canonicalId(objectId)
+        guard let idx = objects.firstIndex(where: { $0.id == target }) else { return }
+        var updated = objects
+        var obj = updated[idx]
+
+        if let label, !label.isEmpty {
+            RegistryFusion.debounce(label: label, confidence: confidence,
+                                    at: now, into: &obj)
+        }
+        if let attributes, !attributes.isEmpty {
+            var dossier = obj.attributes ?? ObjectAttributes()
+            dossier.merge(attributes)
+            obj.attributes = dossier
+            obj.attributesUpdatedAt = now
+        }
+        if !parts.isEmpty {
+            Self.mergeIdentifiedParts(parts, into: &obj, resolver: resolver)
+        }
+
+        updated[idx] = obj
+        RegistryCoherence.assignDisplayWorthiness(&updated)
         objects = updated   // single publish
     }
 

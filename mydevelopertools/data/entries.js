@@ -28,6 +28,31 @@
  */
 window.SPATAIL_LOG = [
   {
+    "id": "2026-07-05-perception-v3-entity-layer",
+    "date": "2026-07-05",
+    "title": "Perception v3 — the entity layer: one couch, real form, rich identity, timestamp-true placement",
+    "category": "feature",
+    "status": "in-progress",
+    "area": "iOS / Spatail + PC brain / vision engine",
+    "summary": "Answered the founder's couch/keyboard field report end to end: class-scaled merging + supported-by children collapse furniture fragments into ONE entity, the Form Engine decomposes it into seat/backrest/armrests with placement affordances, taxonomy junk ('machine', 'textile') is demoted to hints while VLM focus passes build a per-entity dossier ('blue keys, English QWERTY'), and a KeyframeStore makes every late VLM answer bind to the exact frame it describes. Built on branch claude/perception-v3 atop the deployed 8bff679; awaiting on-device run.",
+    "details": [
+      "Diagnosis from the founder's Truth Overlay screenshots (2026-07-05): two 'couch · 0.95' halves (1470/1401 mm) that bottle-scale gates (0.12 m) could never merge; raw VNClassify labels (Textile/Bedding/Wood Processed) surfacing as identity; every object stuck at 3% arc because fragmentation split the fused clouds; ghost boxes minted during motion-blurred pans; a laundry pile that must be a CHILD of the couch, not a merge candidate.",
+      "Entity layer (spec §0/§1): FormPriors furniture table (class length/gate/template, sofa→couch aliasing); RegistryCoherence gains class-gate + same-class-adjacency merge branches, assignSupportLinks (contained-and-much-smaller → parentId child, runs BEFORE every merge pass, never merges), children follow merged-away parents through the alias map; display worthiness rolls unlabeled children up under the parent.",
+      "Native evidence (spec §2): the scanner's mesh walk buckets .seat/.table faces into clusters — same-cluster comparable-size objects merge even unlabeled (volume-ratio + box-class guards protect the laundry and a TV); NEW RoomPlanService shares the hub ARSession (iOS 17) and ingests CapturedRoom furniture as .roomplan-provenance entities (rank: measured > roomplan > prior). Degradation watch stops RoomPlan if the shared session loses scene depth.",
+      "Compound form + affordances (spec §3/§4): ObjectForm gains kind=assembly with named primitives; FormFitter.assemblyFit decomposes seating (seat band histogram + interior backrest evidence + armrest end masses) and slabTop templates from a new 2 cm/30 k furniture cloud tier with class-scaled reset; residual measured against EMITTED primitive surfaces; affordanceSlice resolves seat/backrest_top/armrest_*/front_edge/center form-aware with furniture-correct fallbacks; ask lexicon routes seat/cushion/armrest/edge/center.",
+      "Semantic depth (spec §5): detector labels get honest worth — allowlisted taxonomy ≥0.4 conf is SEMANTIC via the weaker local-label debounce (folds in nice-bardeen's uncommitted phone-deployed work), everything else is a HINT (classHint conditions, never displays); ObjectAttributes dossier (colors/materials/textContent/language/brand/state) rides room.update additively.",
+      "Focus passes (spec §7): engine grows vision.focus/vision.focus.result (question-conditioned crop identify, single-flight, latest-wins per object, requester-only reply, crops normalized against crop pixel size; ambient prompt now also returns primary attributes; max_tokens 450; WS max_size 16 MB); phone FocusService round-robins the stalest entity every ~5 s with 1920-px keyframe crops and runs ask-priority passes; AskPlanner turns prompts into evidence specs, answers from a fresh dossier for free, and surfaces honest guidance ('Move closer to the keyboard…') in the AskBar.",
+      "Timestamp-true placement (spec §6): KeyframeStore (pose+intrinsics+depth copy+upright 1920px JPEG, ~2 Hz, byte/count-capped, sharp-frame preference); projector falls ring→keyframe→live; VLM part boxes resolve against the identified keyframe's OWN depth+pose (KeyframeGeometry, pure); the detect tick is motion-gated (MotionGate on VIO pose deltas — the founder's 'gyro' idea done with ARKit's fused transforms); expiry is visibility-aware (ghosts in view die in ~5 misses, the couch behind you persists).",
+      "Truth Overlay (spec §9): default ENTITIES altitude — one chip per parent ('+N on it' rollup, dossier on the chip), assembly primitives traced bright over a whisper OBB, only walkable surface outlines; DEBUG switch keeps the full firehose.",
+      "Verified: off-device harness grown to 161 checks (sections 11–15: founder-verbatim couch merge, laundry child, cluster evidence, synthetic couch→4 primitives + affordance landings, keyframe projection round-trips, motion gate, ask planner) — 161/161; engine test_vision_engine_parse.py 70/70 dep-free (stub-injects websockets/aiohttp); app compiles clean per slice; SpatailEngine 3/3.",
+      "NOT yet verified on hardware: RoomPlan session-sharing behavior, live focus-pass round-trip against the Windows engine, and the two acceptance scenes (couch → one chip with assembly; 'what language are my keyboard keys?' → focus answer). Phone was not reachable from the Mac this session."
+    ],
+    "why": "Spatial placement needs the FORM of what you place on (edges, seats, centers) and asks need real context ('keyboard with blue keys, English') — a bag of anonymous boxes and a 1,300-class taxonomy can never carry either. PERCEPTION_V3.md is the spec; LIVE_BRAIN_SPEC §5 the wire.",
+    "tags": ["perception", "entity-layer", "form-engine", "roomplan", "keyframes", "dossier", "focus-pass", "couch-test"],
+    "files": ["docs/xr/PERCEPTION_V3.md", "ios/Spatail/Sources/Registry/RegistryCoherence.swift", "ios/Spatail/Sources/Perception/Form/FormFitter.swift", "ios/Spatail/Sources/Perception/KeyframeStore.swift", "ios/Spatail/Sources/Perception/FocusService.swift", "ios/Spatail/Sources/Room/RoomPlanService.swift", "pipeline/server/spatail_vision_engine.py"],
+    "commits": ["9bbd302", "2f07a58", "9f5f124", "561f2c4", "7d41594", "9a361ea", "4944ba6", "2f24125", "25620ed"]
+  },
+  {
     "id": "2026-07-04-vlm-box-normalization",
     "date": "2026-07-04",
     "title": "Vision engine stops throwing away the VLM's boxes — pixel grounding survives to the wire",

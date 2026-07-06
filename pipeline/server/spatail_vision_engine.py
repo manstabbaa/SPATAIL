@@ -93,6 +93,17 @@ REPLAN_DWELL_ENV = "SPATAIL_REPLAN_DWELL"
 REPLAN_MIN_CONF_DEFAULT = 0.55
 REPLAN_DWELL_DEFAULT = 2
 
+# Camera view model (LIVE_BRAIN_SPEC §1.6 box grounding): the wire carries no
+# intrinsics, so the LONG image edge gets an assumed field of view. Shared
+# with the node brain — the value rides in brainInput.camera so persisted
+# traces replay with the FOV they were planned under.
+CAMERA_FOV_ENV = "SPATAIL_CAMERA_FOV_LONG"
+CAMERA_FOV_DEFAULT = 67.0
+
+# The projected-IoU bonus a label-matched object earns in the binding score.
+# LOCKSTEP: mirrors BOX_IOU_WEIGHT in pipeline/spatail/surface_fusion.js.
+BOX_IOU_WEIGHT = 2.0
+
 
 def _env_float(name: str, default: float) -> float:
     raw = os.environ.get(name)
@@ -455,6 +466,127 @@ def _normalize_noun(text: Any) -> str:
     return " ".join(kept or words)
 
 
+# Mirrors cameraViewFromPose() / projectObbToImageRect() / boxIoU() in
+# surface_fusion.js — the replan gate must score object candidates with the
+# SAME box-IoU bonus the brain applies, or the gate would bind a different
+# object than the plan (spec §1.4 lockstep). The phone streams frames
+# `.oriented(.right)` (device-fixed portrait), so image right = pose.up and
+# image down = forward × up, exactly, however the phone is held.
+
+def _v3(raw: Any) -> list[float] | None:
+    if not isinstance(raw, (list, tuple)) or len(raw) < 3:
+        return None
+    try:
+        v = [float(raw[0]), float(raw[1]), float(raw[2])]
+    except (TypeError, ValueError):
+        return None
+    return v if all(math.isfinite(x) for x in v) else None
+
+
+def _norm3(v: list[float]) -> list[float] | None:
+    l = math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
+    return [v[0] / l, v[1] / l, v[2] / l] if l > 1e-9 else None
+
+
+def _camera_view(pose: Any, frame_size: Any, fov_long_deg: float) -> dict | None:
+    if not isinstance(pose, dict):
+        return None
+    origin = _v3(pose.get("position"))
+    forward = _v3(pose.get("forward"))
+    if origin is None or forward is None:
+        return None
+    forward = _norm3(forward)
+    if forward is None:
+        return None
+    right = _v3(pose.get("up"))
+    if right is None:
+        # no device-fixed up: assume an upright portrait hold — image right =
+        # cross(forward, worldUp). Straight up/down gaze has no roll cue → the
+        # orthogonalize+normalize below collapses to None and there is no view.
+        right = [-forward[2], 0.0, forward[0]]
+    # orthogonalize against forward, then normalize
+    d = right[0] * forward[0] + right[1] * forward[1] + right[2] * forward[2]
+    right = _norm3([right[i] - forward[i] * d for i in range(3)])
+    if right is None:
+        return None
+    down = _norm3([
+        forward[1] * right[2] - forward[2] * right[1],
+        forward[2] * right[0] - forward[0] * right[2],
+        forward[0] * right[1] - forward[1] * right[0],
+    ])
+    if down is None:
+        return None
+    tan_long = math.tan(math.radians(fov_long_deg) / 2)
+    fw, fh = (3.0, 4.0)
+    if (isinstance(frame_size, (list, tuple)) and len(frame_size) >= 2
+            and isinstance(frame_size[0], (int, float)) and frame_size[0] > 0
+            and isinstance(frame_size[1], (int, float)) and frame_size[1] > 0):
+        fw, fh = float(frame_size[0]), float(frame_size[1])
+    long_edge = max(fw, fh)
+    return {
+        "origin": origin, "forward": forward, "right": right, "down": down,
+        "tanU": tan_long * (fw / long_edge), "tanV": tan_long * (fh / long_edge),
+    }
+
+
+def _project_obb_rect(view: dict, obb: Any) -> list[float] | None:
+    """Normalized [x, y, w, h] rect of the OBB's projected corners (clamped to
+    the unit square), or None when the object is entirely behind the camera."""
+    if not isinstance(obb, dict):
+        return None
+    center = _v3(obb.get("center")) or [0.0, 0.0, 0.0]
+    extents = _v3(obb.get("extents")) or [0.0, 0.0, 0.0]
+    yaw = obb.get("yaw")
+    yaw = float(yaw) if isinstance(yaw, (int, float)) and math.isfinite(yaw) else 0.0
+    cos, sin = math.cos(yaw), math.sin(yaw)
+    lo_u = lo_v = math.inf
+    hi_u = hi_v = -math.inf
+    seen = 0
+    for sx in (-1.0, 1.0):
+        for sy in (-1.0, 1.0):
+            for sz in (-1.0, 1.0):
+                x, z = sx * extents[0] / 2, sz * extents[2] / 2
+                corner = [
+                    center[0] + x * cos + z * sin,
+                    center[1] + sy * extents[1] / 2,
+                    center[2] - x * sin + z * cos,
+                ]
+                d = [corner[i] - view["origin"][i] for i in range(3)]
+                zc = sum(d[i] * view["forward"][i] for i in range(3))
+                if zc <= 1e-6:
+                    continue
+                u = 0.5 + sum(d[i] * view["right"][i] for i in range(3)) / (zc * view["tanU"]) / 2
+                v = 0.5 + sum(d[i] * view["down"][i] for i in range(3)) / (zc * view["tanV"]) / 2
+                seen += 1
+                lo_u, hi_u = min(lo_u, u), max(hi_u, u)
+                lo_v, hi_v = min(lo_v, v), max(hi_v, v)
+    if seen == 0:
+        return None
+    x = min(max(lo_u, 0.0), 1.0)
+    y = min(max(lo_v, 0.0), 1.0)
+    w = min(max(hi_u, 0.0), 1.0) - x
+    h = min(max(hi_v, 0.0), 1.0) - y
+    if w <= 0.0 or h <= 0.0:
+        return None
+    return [x, y, w, h]
+
+
+def _box_iou(a: Any, b: Any) -> float:
+    for box in (a, b):
+        if (not isinstance(box, (list, tuple)) or len(box) != 4
+                or not all(isinstance(v, (int, float)) and math.isfinite(v) for v in box)
+                or box[2] <= 0 or box[3] <= 0):
+            return 0.0
+    ix = max(a[0], b[0])
+    iy = max(a[1], b[1])
+    iw = min(a[0] + a[2], b[0] + b[2]) - ix
+    ih = min(a[1] + a[3], b[1] + b[3]) - iy
+    if iw <= 0 or ih <= 0:
+        return 0.0
+    inter = iw * ih
+    return inter / (a[2] * a[3] + b[2] * b[3] - inter)
+
+
 # ────────────────────────────────────────────────────────────────────────
 # Vision engine — frame ingest + single-flight VLM worker + observability
 # ────────────────────────────────────────────────────────────────────────
@@ -508,6 +640,9 @@ class VisionEngine:
         # ("surface"|"object", value) tuples; None = nothing bound yet.
         self.replan_min_conf = _env_float(REPLAN_MIN_CONF_ENV, REPLAN_MIN_CONF_DEFAULT)
         self.replan_dwell = max(1, _env_int(REPLAN_DWELL_ENV, REPLAN_DWELL_DEFAULT))
+        # box-grounding camera model (spec §1.6) — shared with the node brain
+        # via brainInput.camera so persisted traces replay under the same FOV
+        self.camera_fov_long = _env_float(CAMERA_FOV_ENV, CAMERA_FOV_DEFAULT)
         self._last_planned_binding: tuple | None = None
         self._pending_binding: tuple | None = None
         self._pending_count = 0
@@ -566,7 +701,10 @@ class VisionEngine:
                 # owner still being connected — a room with no live owner must
                 # never drive a replan.
                 if result.primary:
-                    binding = self._binding_for(result.primary)
+                    binding = self._binding_for(
+                        result.primary,
+                        box=(result.detections[0].box if result.detections else None),
+                        frame_size=result.frame_size)
                     if binding == self._pending_binding:
                         self._pending_count += 1
                     else:
@@ -625,19 +763,26 @@ class VisionEngine:
         self._last_replan_trigger = None
         log.info(f"room state cleared ({reason})")
 
-    def _binding_for(self, label: Any) -> tuple | None:
+    def _binding_for(self, label: Any, box: Any = None,
+                     frame_size: Any = None) -> tuple | None:
         """The identity a plan is bound to (spec §1.4) — objects-first: a
         tracked object whose label matches the VLM noun wins over the mapped
         surface kind, so re-wordings of the same thing never replan. Match
-        semantics mirror matchNounToObject() in surface_fusion.js (containment
-        after adjective stripping; exact match outranks containment, then the
-        device's label confidence breaks ties) so the gate binds the same
-        object id the brain will."""
+        semantics mirror matchNounToObject()/nounObjectScores() in
+        surface_fusion.js (containment after adjective stripping; exact match
+        outranks containment; the device's label confidence breaks ties; and —
+        box grounding, spec §1.6 — label-matched candidates earn
+        BOX_IOU_WEIGHT × IoU between their projected OBB footprint and the
+        primary detection box) so the gate binds the same object id the brain
+        will, including when two same-noun objects are in the room and the
+        box says which one is being looked at."""
         if not label:
             return None
         noun = _normalize_noun(label)
         best: tuple | None = None  # (score, object id)
         if noun:
+            view = _camera_view(self._pose, frame_size, self.camera_fov_long) \
+                if box is not None else None
             for obj in self._objects:
                 if not isinstance(obj, dict) or not obj.get("id"):
                     continue
@@ -647,6 +792,9 @@ class VisionEngine:
                 conf = obj.get("confidence")
                 score = ((2.0 if noun == have else 1.0)
                          + (float(conf) if isinstance(conf, (int, float)) else 0.0))
+                if view is not None and isinstance(obj.get("obb"), dict):
+                    rect = _project_obb_rect(view, obj["obb"])
+                    score += BOX_IOU_WEIGHT * (_box_iou(rect, box) if rect else 0.0)
                 if best is None or score > best[0]:
                     best = (score, str(obj["id"]))
         if best is not None:
@@ -772,24 +920,39 @@ class VisionEngine:
         if ident is None and self._result and self._result.primary \
                 and not self._result.raw_text.startswith("<error"):
             # Same identification shape the phone gets (spec §1.3): parts ride
-            # along so the brain can emit a part-addressed target, and
-            # frameTimestamp keeps the persisted brainInput replayable as-is.
+            # along so the brain can emit a part-addressed target,
+            # frameTimestamp keeps the persisted brainInput replayable as-is,
+            # and frameSize gives the brain's camera view model the frame's
+            # aspect (spec §1.6 box grounding).
             ident = {
                 "primary": self._result.primary,
                 "detections": [d.to_dict() for d in self._result.detections],
                 "parts": self._result.parts,
                 "frameTimestamp": self._result.frame_timestamp,
+                "frameSize": (list(self._result.frame_size)
+                              if self._result.frame_size else None),
             }
         # The binding this plan will be bound to — captured now, against the
         # objects the plan is actually computed from (spec §1.4). It is marked
         # in-flight until this task finishes so the worker gate can't queue a
         # duplicate replan of the same binding while the brain is thinking.
-        planned_binding = self._binding_for((ident or {}).get("primary"))
+        # The primary detection box rides into the score so the gate lands on
+        # the same object the brain's box-grounded fusion will (spec §1.6).
+        ident_dets = (ident or {}).get("detections") or []
+        planned_binding = self._binding_for(
+            (ident or {}).get("primary"),
+            box=(ident_dets[0].get("box") if isinstance(ident_dets[0], dict) else None)
+                if ident_dets else None,
+            frame_size=(ident or {}).get("frameSize"))
         # room.objects is the ONE objects channel (plan_from_room.js reads
-        # {room, pose?, identification?, concept?}); _handle_control already
-        # attached objects[] to the held room.
+        # {room, pose?, identification?, concept?, camera?}); _handle_control
+        # already attached objects[] to the held room.
         brain_input_obj = {
             "room": self._room, "pose": self._pose, "identification": ident,
+            # spec §1.6: the assumed long-edge FOV is part of the plan's
+            # provenance — persisted traces replay under the FOV they were
+            # planned with, not whatever the env says at replay time.
+            "camera": {"fovLongEdgeDegrees": self.camera_fov_long},
         }
         if self._concept:
             brain_input_obj["concept"] = self._concept

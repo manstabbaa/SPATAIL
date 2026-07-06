@@ -28,6 +28,35 @@
  */
 window.SPATAIL_LOG = [
   {
+    "id": "2026-07-05-brain-consumes-boxes",
+    "date": "2026-07-05",
+    "title": "The fusion brain CONSUMES the VLM's boxes — gaze, object binding, and part anchors are box-grounded",
+    "category": "feature",
+    "status": "in-progress",
+    "area": "PC brain / fusion",
+    "summary": "surface_fusion.js / plan_from_room.js now read identification boxes: the placement ray runs through the detection box center (not bare camera forward), same-noun objects are disambiguated by projected-footprint IoU, part boxes bias the anchor onto the part's world position, and every box-driven step lands in fused.decisionTrace — the consumption half of the near-but-not-on fix, on-branch behind the same founder gate as the producer half.",
+    "details": [
+      "Camera view model with NO new wire fields: frames are streamed .oriented(.right) (device-fixed portrait), so image right = pose.up and image down = forward × up EXACTLY, however the phone is held; the long image edge gets an assumed 67° FOV (SPATAIL_CAMERA_FOV_LONG; brainInput.camera pins it into every trace) and the short edge follows from identification.frameSize's aspect.",
+      "Box-refined gaze: the surface ray casts through the primary box's center and only falls back to camera forward when the refined ray misses — the fix for 'camera ray pierced the table 40 cm from the bottle'.",
+      "Box-grounded object binding: label-matched room.objects earn BOX_IOU_WEIGHT (2.0) × IoU(projected OBB rect, detection box); the seen bottle now beats the confident-but-behind-you bottle. Mirrored bit-for-bit into the engine's _binding_for replan gate (rects agree to 15 decimals across JS/Python), so §1.4 lockstep holds.",
+      "Part anchor bias: a part-addressed target gains anchor {point, method, partBox} — ray through the part box striking the bound OBB (part_box_ray), else the part's position relative to the primary box mapped onto the OBB (part_box_relative). Object bindings also gain fused.hitPoint.",
+      "Found + fixed live-wire bug: room.update sends concept as the user's ask STRING, and plan_from_room.js spread it into character keys — a part-addressed target could NEVER fire from the phone's Ask flow. Strings now normalize to {prompt}.",
+      "Attribution: every box-driven step is a fused.decisionTrace line riding the experience.delta; LIVE_BRAIN_SPEC gains §1.6 documenting all additive contract fields (frameSize + camera in brainInput, hitPoint/decisionTrace/anchor in the plan).",
+      "Verified: 38-check test_box_grounding.mjs + 27-check legacy suite green; 13-check Python gate mirror green; full-loop engine e2e over the WS uplink (debugIdentification, no VLM) shows the delta carrying decisionTrace + a cap anchor at y 0.94 on a 0.96-top bottle; ALL 782 archived brainInput traces replay with identical bindings (0 regressions), and the 10 box-carrying ones now emit decisionTrace — the real air-conditioner trace binds with projected IoU 0.69 and a box-ray hitPoint exactly on the OBB top face, validating the assumed-FOV camera model against live data."
+    ],
+    "why": "The producer half (2026-07-04) made boxes exist on the wire; the brain still placed by 'camera ray pierced <surface>' — the confirmed brain-side root cause of experiences landing near-but-not-on the identified object (the water-bottle-cap sessions). This is the half that makes the grounding steer placement.",
+    "tags": ["fusion-brain", "grounding", "boxes", "placement", "decision-trace", "bottle-cap-test", "lockstep"],
+    "files": [
+      "pipeline/spatail/surface_fusion.js",
+      "pipeline/spatail/plan_from_room.js",
+      "pipeline/spatail/room_contract_adapter.js",
+      "pipeline/server/spatail_vision_engine.py",
+      "pipeline/spatail/tests/test_box_grounding.mjs",
+      "pipeline/server/tests/test_box_binding_gate.py",
+      "docs/xr/LIVE_BRAIN_SPEC.md"
+    ]
+  },
+  {
     "id": "2026-07-04-vlm-box-normalization",
     "date": "2026-07-04",
     "title": "Vision engine stops throwing away the VLM's boxes — pixel grounding survives to the wire",

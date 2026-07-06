@@ -145,6 +145,10 @@ class IdentifyResult:
     model: str
     # Sub-parts of the primary object ({label, box?, confidence?}) — spec §1.3.
     parts: list[dict[str, Any]] = field(default_factory=list)
+    # Dossier of the primary object (LIVE_BRAIN_SPEC §5.3), already wire-shaped
+    # by _clean_attributes: {colors[], materials[], textContent[], language,
+    # brand, state} — only fields the VLM was confident about survive.
+    attributes: dict[str, Any] | None = None
     # Capture/ingest time (epoch seconds) of the frame this identity describes.
     frame_timestamp: float | None = None
     # (width, height) of the identified frame — the pixel space the VLM's raw
@@ -159,6 +163,7 @@ class IdentifyResult:
             "latencyMs": self.latency_ms,
             "model": self.model,
             "parts": self.parts,
+            "attributes": self.attributes,
             "frameTimestamp": self.frame_timestamp,
             "frameSize": list(self.frame_size) if self.frame_size else None,
         }
@@ -184,13 +189,75 @@ _IDENTIFY_PROMPT = (
     '"confidence": <0..1>, '
     '"alternatives": [{"label": "<noun>", "confidence": <0..1>}], '
     '"box": [x1, y1, x2, y2], '
-    '"parts": [{"label": "<part noun, e.g. \\"cap\\">", "box": [x1, y1, x2, y2]}] }\n'
+    '"parts": [{"label": "<part noun, e.g. \\"cap\\">", "box": [x1, y1, x2, y2]}], '
+    '"attributes": {"colors": ["<color>"], "materials": ["<material>"], '
+    '"text_content": ["<visible text>"], "language": "<language of that text>", '
+    '"brand": "<brand>", "state": "<open/closed/on/off/…>"} }\n'
     "box is the bounding box of the primary object in image pixels — "
     "[left, top, right, bottom] corner coordinates, origin top-left; use null "
     "if unsure. parts lists the primary object's visible sub-parts (cap, lid, "
     "handle, button, …) with boxes in the same pixel space; use [] if unsure. "
-    "Keep labels concrete and specific."
+    "attributes describes the PRIMARY object only (PERCEPTION_V3 dossier) — "
+    "include ONLY the fields you are confident about from what is visible and "
+    "omit the rest. Keep labels concrete and specific."
 )
+
+
+# Focus-pass prompt (PERCEPTION_V3 §7, LIVE_BRAIN_SPEC §5.2) — the crop is ONE
+# already-tracked object at close range, so identity comes first (the registry
+# label may be shallow), then the wanted dossier fields, then the user's
+# question answered from what is actually visible. Boxes stay pixel xyxy like
+# the ambient prompt — the engine normalizes against the CROP via _clean_box.
+_FOCUS_ATTR_KEYS = ("colors", "materials", "text_content", "language", "brand", "state")
+_FOCUS_LIST_KEYS = frozenset(("colors", "materials", "text_content"))
+
+
+def _focus_prompt(question=None, wanted=None) -> str:
+    """Pure prompt builder for a vision.focus pass. `wanted` arrives in wire
+    camelCase (LIVE_BRAIN_SPEC §5.2); unknown names are dropped (their reply
+    keys would not survive _clean_attributes anyway); empty/absent wanted
+    requests the full dossier shape."""
+    keys: list[str] = []
+    for name in (wanted if isinstance(wanted, (list, tuple)) else []):
+        if not isinstance(name, str):
+            continue
+        key = name.strip()
+        key = "text_content" if key in ("textContent", "text_content") else key
+        if key in _FOCUS_ATTR_KEYS and key not in keys:
+            keys.append(key)
+    if not keys:
+        keys = list(_FOCUS_ATTR_KEYS)
+    attr_shape = ", ".join(
+        f'"{k}": [".."]' if k in _FOCUS_LIST_KEYS else f'"{k}": ".."' for k in keys)
+    fields = [
+        '"primary": "<short specific noun, brand/model if readable>"',
+        '"confidence": <0..1>',
+        '"attributes": {%s}' % attr_shape,
+    ]
+    q = None
+    if isinstance(question, str) and question.strip():
+        # one line, no double quotes — the question is embedded in the prompt
+        q = " ".join(question.split()).replace('"', "'")[:200]
+    if q:
+        fields.append('"answer": "<one sentence>"')
+    fields.append('"parts": [{"label": "<part noun>", "box": [x1, y1, x2, y2]}]')
+    prompt = (
+        "This is a close-up crop of ONE real-world object. Identify the object "
+        "in this close-up crop — a short, specific noun. "
+        "Respond with ONLY a JSON object, no prose, of the form:\n"
+        "{" + ", ".join(fields) + " }\n"
+        "attributes: include ONLY the listed fields you are confident about "
+        "from what is visible; omit the rest. parts lists the object's visible "
+        "sub-parts with boxes in image pixels — [left, top, right, bottom] "
+        "corner coordinates, origin top-left; use [] if unsure."
+    )
+    if q:
+        prompt += (
+            f" answer holds a one-sentence answer to the question “{q}”, "
+            "grounded ONLY in what is visible in this image; if the image "
+            "cannot answer it, say so briefly."
+        )
+    return prompt
 
 
 class VLMAdapter:
@@ -202,7 +269,10 @@ class VLMAdapter:
 
     def __init__(self, base_url: str, model: str, api_key: str | None = None,
                  prompt: str = _IDENTIFY_PROMPT, timeout_s: float = 8.0,
-                 max_tokens: int = 300):
+                 max_tokens: int = 450):
+        # 450 tokens (was 300): the attributes dossier rides the same reply
+        # (PERCEPTION_V3 §8) — 300 was sized for primary+parts alone and would
+        # truncate mid-JSON with the dossier added.
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.api_key = api_key
@@ -210,7 +280,11 @@ class VLMAdapter:
         self.timeout_s = timeout_s
         self.max_tokens = max_tokens
 
-    async def identify(self, jpeg: bytes, http: ClientSession) -> IdentifyResult:
+    async def identify(self, jpeg: bytes, http: ClientSession,
+                       prompt: str | None = None) -> IdentifyResult:
+        # `prompt` overrides the ambient identify prompt per-call — focus
+        # passes (LIVE_BRAIN_SPEC §5.2) send a question-conditioned one; the
+        # reply shape stays parseable by the same machinery.
         # The pixel space the VLM will echo boxes in — needed to normalize them.
         frame_size = _image_size(jpeg)
         data_url = "data:image/jpeg;base64," + base64.b64encode(jpeg).decode("ascii")
@@ -221,7 +295,7 @@ class VLMAdapter:
             "messages": [{
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": self.prompt},
+                    {"type": "text", "text": prompt or self.prompt},
                     {"type": "image_url", "image_url": {"url": data_url}},
                 ],
             }],
@@ -253,14 +327,16 @@ class VLMAdapter:
                                   frame_size=frame_size)
 
         latency = int((time.monotonic() - t0) * 1000)
-        dets, primary, parts = _parse_identify_json(text, frame_size)
+        dets, primary, parts, attrs = _parse_identify_json(text, frame_size)
         return IdentifyResult(dets, primary, text, latency, self.model, parts=parts,
-                              frame_size=frame_size)
+                              attributes=attrs, frame_size=frame_size)
 
 
 def _parse_identify_json(text: str, frame_size: tuple[int, int] | None = None,
-                         ) -> tuple[list[Detection], str | None, list[dict[str, Any]]]:
-    """Best-effort extraction of detections from a chat VLM reply.
+                         ) -> tuple[list[Detection], str | None,
+                                    list[dict[str, Any]], dict[str, Any] | None]:
+    """Best-effort extraction of (detections, primary, parts, attributes) from
+    a chat VLM reply.
 
     VLMs wrap JSON in code fences or prose; pull the first {...} blob. If it
     can't be parsed at all, fall back to treating the whole reply as one label.
@@ -274,9 +350,10 @@ def _parse_identify_json(text: str, frame_size: tuple[int, int] | None = None,
             blob = json.loads(fence.group(0))
         except json.JSONDecodeError:
             blob = None
-    if blob is None:
+    if blob is None or not isinstance(blob, dict):
         label = text.strip().strip(".")[:80]
-        return ([Detection(label=label, confidence=0.3)] if label else []), (label or None), []
+        return (([Detection(label=label, confidence=0.3)] if label else []),
+                (label or None), [], None)
 
     dets: list[Detection] = []
     primary = blob.get("primary") or blob.get("label")
@@ -291,7 +368,9 @@ def _parse_identify_json(text: str, frame_size: tuple[int, int] | None = None,
             dets.append(Detection(label=str(alt["label"]),
                                   confidence=float(alt.get("confidence", 0.0) or 0.0),
                                   box=_clean_box(alt.get("box"), frame_size)))
-    return dets, (str(primary) if primary else None), _clean_parts(blob.get("parts"), frame_size)
+    return (dets, (str(primary) if primary else None),
+            _clean_parts(blob.get("parts"), frame_size),
+            _clean_attributes(blob.get("attributes")))
 
 
 def _clean_parts(raw: Any, frame_size: tuple[int, int] | None = None) -> list[dict[str, Any]]:
@@ -316,6 +395,74 @@ def _clean_parts(raw: Any, frame_size: tuple[int, int] | None = None) -> list[di
         if len(parts) >= 16:
             break
     return parts
+
+
+def _clean_attributes(raw: Any) -> dict[str, Any] | None:
+    """Sanitize the VLM's attributes blob into the wire dossier shape
+    (LIVE_BRAIN_SPEC §5.1: colors/materials/textContent as bounded string
+    lists, language/brand/state as short strings — textContent is camelCase
+    ON THE WIRE, the prompt asks snake_case, both are accepted in). Free-form
+    input: a bare string where a list belongs becomes a 1-list, junk items are
+    dropped, strings clip at 48 chars, lists at 6 entries, and an empty
+    dossier collapses to None so the wire never carries {}."""
+    if not isinstance(raw, dict):
+        return None
+
+    def strings(value: Any) -> list[str]:
+        if isinstance(value, str):
+            value = [value]
+        if not isinstance(value, (list, tuple)):
+            return []
+        out: list[str] = []
+        for item in value:
+            if isinstance(item, str) and item.strip():
+                out.append(item.strip()[:48])
+            if len(out) >= 6:
+                break
+        return out
+
+    def string(value: Any) -> str | None:
+        if isinstance(value, (list, tuple)):    # ["English"] → "English"
+            value = next((v for v in value if isinstance(v, str) and v.strip()), None)
+        if isinstance(value, str) and value.strip():
+            return value.strip()[:48]
+        return None
+
+    clean: dict[str, Any] = {}
+    for key, wire in (("colors", "colors"), ("materials", "materials"),
+                      ("text_content", "textContent")):
+        vals = strings(raw.get(key))
+        if not vals and wire != key:            # accept the camelCase alias in
+            vals = strings(raw.get(wire))
+        if vals:
+            clean[wire] = vals
+    for key in ("language", "brand", "state"):
+        val = string(raw.get(key))
+        if val is not None:
+            clean[key] = val
+    return clean or None
+
+
+def _extract_answer(text: str) -> str | None:
+    """The focus reply's one-sentence answer (LIVE_BRAIN_SPEC §5.2), pulled
+    from the same first-{...} blob _parse_identify_json reads. Anything that
+    isn't a usable short string (a bare number — a counting question — is
+    stringified) is dropped; never raises."""
+    fence = re.search(r"\{.*\}", text, re.DOTALL)
+    if not fence:
+        return None
+    try:
+        blob = json.loads(fence.group(0))
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(blob, dict):
+        return None
+    answer = blob.get("answer")
+    if isinstance(answer, (int, float)) and not isinstance(answer, bool):
+        answer = str(answer)
+    if isinstance(answer, str) and answer.strip():
+        return answer.strip()[:300]
+    return None
 
 
 def _clean_box(box: Any, frame_size: tuple[int, int] | None = None) -> list[float] | None:
@@ -502,6 +649,16 @@ class VisionEngine:
         # coalesced by _inflight_bindings.
         self._room_replan_active = False
         self._room_replan_dirty = False
+
+        # focus passes (PERCEPTION_V3 §7, LIVE_BRAIN_SPEC §5.2): question-driven
+        # hi-res crop identifies run as DETACHED tasks so a slow focus can never
+        # stall the ambient vision.identification loop; the lock keeps focus VLM
+        # calls single-flight (the GPU already serves the ambient worker), and
+        # _focus_pending coalesces latest-wins per objectId — a newer ask about
+        # the same thing replaces a queued-but-not-started one.
+        self._focus_lock = asyncio.Lock()
+        self._focus_pending: dict[str, dict] = {}   # objectId → newest queued request
+        self._focus_tasks: set = set()
 
         # replan gate (spec §1.4): the plan is bound to an identity — a mapped
         # surface kind or a tracked object id — not to the raw label string.
@@ -698,7 +855,8 @@ class VisionEngine:
         the brain. The sending socket becomes the room's owner — every plan
         derived from this room is delivered to it alone. `pose.update`
         (spec §1.1) keeps the gaze ray live between room sends and NEVER
-        triggers a replan."""
+        triggers a replan. `vision.focus` (LIVE_BRAIN_SPEC §5.2) carries a
+        hi-res crop of one object and answers the sender directly."""
         try:
             msg = json.loads(text)
         except json.JSONDecodeError:
@@ -714,6 +872,9 @@ class VisionEngine:
             payload = msg.get("payload") or {}
             if isinstance(payload, dict) and payload.get("position") and payload.get("forward"):
                 self._pose = payload
+            return
+        if mtype == "vision.focus":
+            await self._handle_focus(ws, msg.get("payload") or {})
             return
         if mtype != "room.update":
             log.debug(f"frame-ws control ignored: {mtype!r}")
@@ -756,6 +917,132 @@ class VisionEngine:
         else:
             self._room_replan_active = True
             self._spawn_replan(trigger="room.update")
+
+    # -- focus passes (PERCEPTION_V3 §7 / LIVE_BRAIN_SPEC §5.2) --------------
+
+    # A "hi-res crop" bigger than this is not a crop — reject before it ever
+    # reaches base64→VLM (the frame WS caps text messages well below this
+    # anyway; the bound also protects direct/test callers).
+    _FOCUS_MAX_JPEG = 8 * 1024 * 1024
+
+    async def _handle_focus(self, ws: WebSocketServerProtocol, payload: Any):
+        """Validate + enqueue one vision.focus request. Decode failures answer
+        IMMEDIATELY with an error-shaped result to the requester — the phone's
+        ask flow waits ≤ 3.5 s and must learn fast that nothing is coming."""
+        if not isinstance(payload, dict):
+            payload = {}
+        request_id = payload.get("requestId")
+        object_id = payload.get("objectId")
+        raw = payload.get("jpegBase64")
+        crop: bytes = b""
+        error: str | None = None
+        if not isinstance(raw, str) or not raw:
+            error = "missing jpegBase64"
+        else:
+            try:
+                # tolerate wrapped/whitespaced base64, reject genuine junk
+                crop = base64.b64decode(re.sub(r"\s+", "", raw), validate=True)
+            except Exception as exc:
+                error = f"undecodable jpegBase64 ({exc})"
+        if error is None and not crop:
+            error = "empty jpeg"
+        if error is None and len(crop) > self._FOCUS_MAX_JPEG:
+            error = f"crop too large ({len(crop)} bytes > {self._FOCUS_MAX_JPEG})"
+        if error is not None:
+            log.warning(f"vision.focus {request_id!r} rejected: {error}")
+            await self._send_focus_result(ws, {
+                "requestId": request_id, "objectId": object_id,
+                "label": None, "confidence": 0.0, "attributes": None,
+                "answer": None, "parts": [], "latencyMs": 0,
+                "model": self.vlm.model, "rawText": f"<error: {error}>",
+            })
+            return
+        key = str(object_id) if object_id is not None else ""
+        if key in self._focus_pending:
+            # latest-wins per object (§7): the phone re-asked before the queued
+            # pass started — the stale crop/question is dropped silently (the
+            # superseded requestId never answers; the phone's 3.5 s wait
+            # already covers that).
+            log.debug(f"vision.focus for object {key or '?'} superseded before start")
+        self._focus_pending[key] = {
+            "ws": ws, "requestId": request_id, "objectId": object_id,
+            "question": payload.get("question"), "wanted": payload.get("wanted"),
+            "crop": crop,
+        }
+        # Detached like replans: the frame receive loop and the ambient worker
+        # never wait on a focus VLM call.
+        task = asyncio.create_task(self._run_focus(key))
+        self._focus_tasks.add(task)
+        task.add_done_callback(self._focus_tasks.discard)
+
+    async def _run_focus(self, key: str):
+        """Run one queued focus pass: single-flight on the focus lock, re-check
+        the queue under it (latest-wins may have replaced or consumed the
+        record), call the VLM on the crop with the question-conditioned
+        prompt, and answer the REQUESTING socket only — never broadcast; a
+        crop's pixel space means nothing to anyone but the asker."""
+        reply: dict | None = None
+        ws = None
+        async with self._focus_lock:
+            req = self._focus_pending.pop(key, None)
+            if req is None:
+                return      # superseded — an earlier task already ran the newest ask
+            ws = req["ws"]
+            question = req.get("question")
+            prompt = _focus_prompt(question, req.get("wanted"))
+            try:
+                # Per-call session, created INSIDE the running loop (aiohttp
+                # binds the loop at construction); the ambient worker's session
+                # belongs to run_worker and is never shared across tasks.
+                async with ClientSession() as http:
+                    result = await self.vlm.identify(req["crop"], http, prompt=prompt)
+            except Exception as exc:
+                # vlm.identify catches its own HTTP/timeouts; this guards
+                # adapter subclasses/session setup — a focus failure must
+                # never kill the control channel or wedge the lock.
+                log.warning(f"focus pass for object {key or '?'} failed: {exc}")
+                reply = {
+                    "requestId": req.get("requestId"), "objectId": req.get("objectId"),
+                    "label": None, "confidence": 0.0, "attributes": None,
+                    "answer": None, "parts": [], "latencyMs": 0,
+                    "model": self.vlm.model, "rawText": f"<error: {exc}>",
+                }
+            else:
+                conf = result.detections[0].confidence if result.detections else 0.0
+                reply = {
+                    "requestId": req.get("requestId"),
+                    "objectId": req.get("objectId"),
+                    "label": result.primary,
+                    "confidence": round(conf, 3),
+                    "attributes": result.attributes,
+                    "answer": _extract_answer(result.raw_text),
+                    # parts boxes normalized against the CROP (identify used
+                    # _image_size(crop)); the phone converts back through the
+                    # crop rect it sent (LIVE_BRAIN_SPEC §5.2).
+                    "parts": result.parts,
+                    "latencyMs": result.latency_ms,
+                    "model": result.model,
+                    "rawText": result.raw_text,
+                }
+                log.info(f"focus#{req.get('requestId')!r} {result.latency_ms}ms "
+                         f"object={key or '?'} label={result.primary!r}")
+        # send OUTSIDE the lock — a dead/backpressured requester must not
+        # block the next focus pass.
+        await self._send_focus_result(ws, reply)
+
+    async def _send_focus_result(self, ws: WebSocketServerProtocol, payload: dict):
+        """Requester-only downlink for a focus result (never broadcast)."""
+        msg = json.dumps({
+            "type": "vision.focus.result",
+            "sentAt": datetime.now(timezone.utc).isoformat(),
+            "payload": payload,
+        })
+        try:
+            await ws.send(msg)
+        except websockets.ConnectionClosed:
+            self._clients.discard(ws)
+            log.info(f"focus result {payload.get('requestId')!r} dropped: "
+                     "requester disconnected")
 
     async def _replan(self, trigger: str):
         """Run the node fusion brain against (room, pose, identification) and
@@ -1115,7 +1402,11 @@ async def amain(args):
     # frame uplink WebSocket (binary JPEG frames from the phone)
     ws_server = await websockets.serve(
         engine.handle_frame_ws, host=args.host, port=args.frame_port,
-        max_size=4 * 1024 * 1024,   # frames are big; control plane stays separate
+        # 16 MB (was 4): binary JPEG frames are small, but vision.focus crops
+        # ride this socket as base64 TEXT (LIVE_BRAIN_SPEC §5.2) — an oversize
+        # crop must reach the engine's graceful 8 MB reject, not die as a
+        # websockets 1009 that would disconnect the phone mid-session.
+        max_size=16 * 1024 * 1024,
         ping_interval=20, ping_timeout=20,
     )
     log.info(f"frame uplink →  ws://{args.host}:{args.frame_port}/v1/vision")
@@ -1152,7 +1443,9 @@ def main():
     # 8 s (LIVE_BRAIN_SPEC §1.4): a VLM that slow is a dead identification —
     # time it out and identify the newest frame instead of blocking the loop.
     p.add_argument("--vlm-timeout", type=float, default=8.0)
-    p.add_argument("--max-tokens", type=int, default=300)
+    # 450 matches the VLMAdapter default — the ambient reply now carries the
+    # attributes dossier too (PERCEPTION_V3 §8) and 300 truncates mid-JSON.
+    p.add_argument("--max-tokens", type=int, default=450)
     p.add_argument("--min-interval", type=float, default=0.4,
                    help="minimum seconds between VLM calls (GPU throttle)")
     p.add_argument("--test-dir", default=None,
